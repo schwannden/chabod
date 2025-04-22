@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { format, startOfMonth, addMonths, isSameMonth } from "date-fns";
 import { enUS } from "date-fns/locale/en-US";
@@ -10,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { Event, Group } from "@/lib/types";
 import { useResponsiveMonths } from "./useResponsiveMonths";
 import { EventCellTooltip } from "./EventCellTooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 // Utility: group events by date key
 function getEventsByDate(events: (Event & { groups?: string[] })[]) {
@@ -45,7 +45,7 @@ export const EventCalendar: React.FC<EventCalendarProps> = ({ events, groups }) 
   const handlePrev = () => setBaseMonth((m) => addMonths(m, -monthsToShow));
   const handleNext = () => setBaseMonth((m) => addMonths(m, monthsToShow));
 
-  // Render each day cell with tooltip if events exist
+  // Render each day cell with tooltip and popover if events exist
   const renderDay = (date: Date, monthDate: Date) => {
     const key = format(date, "yyyy-MM-dd");
     const todaysEvents = eventsByDate[key];
@@ -53,6 +53,21 @@ export const EventCalendar: React.FC<EventCalendarProps> = ({ events, groups }) 
 
     // Only render events if this day belongs to the current month view
     const hasEvents = isCurrentMonth && todaysEvents && todaysEvents.length > 0;
+
+    const eventContent = hasEvents && (
+      <div>
+        <div className="text-sm font-semibold mb-2">
+          {format(date, "PPP")}
+        </div>
+        <div className="space-y-3">
+          {todaysEvents.map(ev => (
+            <div key={ev.id} className="border-b border-muted pb-1 last:border-0">
+              <EventCellTooltip event={ev} groupMap={groupMap} />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
 
     const cell = (
       <button
@@ -74,21 +89,25 @@ export const EventCalendar: React.FC<EventCalendarProps> = ({ events, groups }) 
 
     if (hasEvents) {
       return (
-        <Tooltip key={key}>
-          <TooltipTrigger asChild>{cell}</TooltipTrigger>
-          <TooltipContent className="max-w-xs">
-            <div className="text-sm font-semibold mb-2">
-              {format(date, "PPP")}
-            </div>
-            <div className="space-y-3">
-              {todaysEvents.map(ev => (
-                <div key={ev.id} className="border-b border-muted pb-1 last:border-0">
-                  <EventCellTooltip event={ev} groupMap={groupMap} />
-                </div>
-              ))}
-            </div>
-          </TooltipContent>
-        </Tooltip>
+        <div key={key}>
+          {/* Show on hover for desktop */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {/* Show on click for mobile */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  {cell}
+                </PopoverTrigger>
+                <PopoverContent>
+                  {eventContent}
+                </PopoverContent>
+              </Popover>
+            </TooltipTrigger>
+            <TooltipContent>
+              {eventContent}
+            </TooltipContent>
+          </Tooltip>
+        </div>
       );
     }
     return cell;
