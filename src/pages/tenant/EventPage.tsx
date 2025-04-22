@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSession } from "@/contexts/AuthContext";
@@ -27,12 +26,6 @@ export default function EventPage() {
   const [endDate, setEndDate] = useState<Date>();
   const [isEventsLoading, setIsEventsLoading] = useState(true);
   const { toast } = useToast();
-
-  useEffect(() => {
-    if (!isLoading && !user) {
-      navigate(`/tenant/${slug}/auth`);
-    }
-  }, [user, isLoading, navigate, slug]);
 
   useEffect(() => {
     const fetchTenant = async () => {
@@ -162,13 +155,7 @@ export default function EventPage() {
     }
   };
 
-  const handleEventUpdated = () => {
-    fetchEvents();
-  };
-
   const fetchGroups = async () => {
-    if (!user) return;
-    
     try {
       const { data, error } = await supabase.from("groups").select("*");
       if (error) throw error;
@@ -185,14 +172,10 @@ export default function EventPage() {
     }
   };
 
-  const groupMap = React.useMemo(() => Object.fromEntries(groups.map(g => [g.id, g])), [groups]);
-
   useEffect(() => {
-    if (user) {
-      fetchEvents();
-      fetchGroups();
-    }
-  }, [user, selectedGroup, startDate, endDate]);
+    fetchEvents();
+    fetchGroups();
+  }, [slug, selectedGroup, startDate, endDate]);
 
   return (
     <TenantPageLayout
@@ -202,11 +185,13 @@ export default function EventPage() {
       isLoading={isLoading}
       breadcrumbItems={[{ label: "活動" }]}
       action={
-        <CreateEventDialog 
-          tenantId={slug || ""} 
-          onEventCreated={fetchEvents}
-          groups={groups || []}
-        />
+        user ? (
+          <CreateEventDialog 
+            tenantId={slug || ""} 
+            onEventCreated={fetchEvents}
+            groups={groups || []}
+          />
+        ) : null
       }
     >
       <EventCalendar 
@@ -228,7 +213,7 @@ export default function EventPage() {
         events={events} 
         isLoading={isEventsLoading} 
         tenantId={slug || ""}
-        onEventUpdated={handleEventUpdated}
+        onEventUpdated={fetchEvents}
         groups={groups || []}
       />
     </TenantPageLayout>
