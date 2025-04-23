@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -70,13 +69,13 @@ export function SignUpForm({
           try {
             await associateUserWithTenant(signInData.user.id, tenantSlug, inviteToken);
             toast({
-              title: "Account linked with tenant",
-              description: `Your existing account has been associated with ${tenantSlug}.`,
+              title: "帳號已與教會關聯",
+              description: `您的帳號已成功加入 ${tenantSlug}。`,
             });
           } catch (associateError: any) {
             // Sign out user if tenant association fails
             await supabase.auth.signOut();
-            throw new Error(`Failed to associate account with tenant: ${associateError.message}`);
+            throw new Error(`無法將帳號加入教會：${associateError.message}`);
           }
         }
 
@@ -98,7 +97,18 @@ export function SignUpForm({
       });
 
       if (error) {
-        throw error;
+        // Translate common Supabase error codes to Chinese
+        let errorMessage = "發生未知錯誤";
+        if (error.message?.includes("invalid email")) {
+          errorMessage = "電子郵件格式不正確";
+        } else if (error.message?.includes("password")) {
+          errorMessage = "密碼需至少 6 個字元";
+        } else if (error.message?.includes("User already registered")) {
+          errorMessage = "此電子郵件已經註冊";
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        throw new Error(errorMessage);
       }
 
       // Associate new user with tenant if applicable
@@ -108,15 +118,15 @@ export function SignUpForm({
         } catch (associateError: any) {
           // Sign out user if tenant association fails
           await supabase.auth.signOut();
-          throw new Error(`Failed to associate account with tenant: ${associateError.message}`);
+          throw new Error(`無法將帳號加入教會：${associateError.message}`);
         }
       }
 
       toast({
-        title: "Account created!",
+        title: "帳號建立成功！",
         description: tenantSlug 
-          ? `Your account has been created and associated with ${tenantSlug}.` 
-          : "Check your email for the confirmation link.",
+          ? `您的帳號已建立並加入 ${tenantSlug}。` 
+          : "請前往電子郵件收信並點擊確認連結。",
       });
 
       if (onSuccess) {
@@ -124,8 +134,8 @@ export function SignUpForm({
       }
     } catch (error: any) {
       toast({
-        title: "Error creating account",
-        description: error.message || "An unknown error occurred",
+        title: "建立帳號失敗",
+        description: error.message || "發生未知錯誤",
         variant: "destructive",
       });
     } finally {
@@ -210,4 +220,3 @@ export function SignUpForm({
     </Card>
   );
 }
-

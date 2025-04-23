@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -41,7 +40,18 @@ export function SignInForm({
       });
 
       if (error) {
-        throw error;
+        let errorMessage = "電子郵件或密碼錯誤";
+        if (error.message?.includes("invalid email")) {
+          errorMessage = "電子郵件格式不正確";
+        } else if (error.message?.toLowerCase().includes("invalid login credentials") ||
+                   error.message?.toLowerCase().includes("invalid email or password")) {
+          errorMessage = "電子郵件或密碼錯誤";
+        } else if (error.message?.includes("User not confirmed")) {
+          errorMessage = "請先驗證您的電子郵件";
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        throw new Error(errorMessage);
       }
 
       if (tenantSlug && data.user) {
@@ -53,20 +63,20 @@ export function SignInForm({
             
             if (!hasAccess) {
               await supabase.auth.signOut();
-              throw new Error("You don't have access to this tenant. Please contact the administrator or sign up for access.");
+              throw new Error("您沒有權限進入此教會，請聯絡管理員或註冊新的帳號。");
             }
           }
         } catch (membershipError: any) {
           await supabase.auth.signOut();
-          throw membershipError;
+          throw new Error(membershipError.message || "無法驗證用戶於教會的權限。");
         }
       }
 
       toast({
-        title: "Signed in successfully",
+        title: "登入成功",
         description: tenantName 
-          ? `Welcome back to ${tenantName}!` 
-          : "Welcome to Chabod!",
+          ? `歡迎回來，${tenantName}！` 
+          : "歡迎使用 Chabod！",
       });
 
       if (onSuccess) {
@@ -74,8 +84,8 @@ export function SignInForm({
       }
     } catch (error: any) {
       toast({
-        title: "Sign in failed",
-        description: error.message || "Invalid email or password",
+        title: "登入失敗",
+        description: error.message || "電子郵件或密碼錯誤",
         variant: "destructive",
       });
     } finally {
@@ -93,12 +103,20 @@ export function SignInForm({
       });
 
       if (error) {
-        throw error;
+        let errorMessage = "發送重設密碼電子郵件時發生錯誤";
+        if (error.message?.includes("user not found")) {
+          errorMessage = "查無此電子郵件";
+        } else if (error.message?.includes("invalid email")) {
+          errorMessage = "電子郵件格式不正確";
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        throw new Error(errorMessage);
       }
 
       toast({
-        title: "重設密碼電子郵件已發送",
-        description: "請檢查您的電子郵件以重設密碼。",
+        title: "重設密碼郵件已發送",
+        description: "請檢查您的電子郵件收件匣，點擊連結重設密碼。",
       });
       
       setResetPasswordMode(false);
