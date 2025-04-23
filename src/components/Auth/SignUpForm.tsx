@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { associateUserWithTenant } from "@/lib/tenant-utils";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface SignUpFormProps {
   tenantSlug?: string;
@@ -15,6 +16,20 @@ interface SignUpFormProps {
   onSuccess?: () => void;
   onSignInClick: () => void;
 }
+
+// Apostle's Creed as terms of service (required to check to sign up)
+const termsOfServiceText = `
+我信上帝，全能的父，創造天地的主；
+我信我主耶穌基督，上帝的獨生子；
+因聖靈感孕，為童貞女馬利亞所生；
+在本丟彼拉多手下受難，被釘於十字架，受死，埋葬；
+降在陰間，第三天從死裡復活；
+升天，坐在全能父上帝的右邊；
+將來必從那裡降臨，審判活人死人。
+我信聖靈，我信聖而公之教會；
+我信聖徒相通；我信罪得赦免；
+我信身體復活；我信永生。阿們。
+`;
 
 export function SignUpForm({ 
   tenantSlug, 
@@ -26,11 +41,20 @@ export function SignUpForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!termsAccepted) {
+      toast({
+        title: "請同意信仰告白",
+        description: "您必須同意信仰告白才能註冊帳號。",
+        variant: "destructive",
+      });
+      return;
+    }
     setLoading(true);
 
     try {
@@ -154,6 +178,25 @@ export function SignUpForm({
               minLength={6}
             />
           </div>
+          {/* Terms of Service section */}
+          <div className="space-y-2">
+            <Label>信仰告白（註冊需同意）</Label>
+            <div className="max-h-40 overflow-y-auto bg-muted px-3 py-2 rounded border text-sm whitespace-pre-line">
+              {termsOfServiceText}
+            </div>
+            <div className="flex items-start space-x-2 mt-2">
+              <Checkbox
+                id="terms"
+                checked={termsAccepted}
+                onCheckedChange={(checked) => setTermsAccepted(!!checked)}
+                required
+                aria-required="true"
+              />
+              <Label htmlFor="terms" className="cursor-pointer select-none">
+                我已閱讀並同意以上信仰告白
+              </Label>
+            </div>
+          </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "建立帳號中..." : "建立帳號"}
           </Button>
@@ -167,3 +210,4 @@ export function SignUpForm({
     </Card>
   );
 }
+
