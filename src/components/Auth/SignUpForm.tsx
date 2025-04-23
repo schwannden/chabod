@@ -7,6 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { associateUserWithTenant } from "@/lib/tenant-utils";
 import { Checkbox } from "@/components/ui/checkbox";
+import { AuthEmailInput } from "./AuthEmailInput";
+import { AuthPasswordInput } from "./AuthPasswordInput";
+import { TermsOfService } from "./TermsOfService";
 
 interface SignUpFormProps {
   tenantSlug?: string;
@@ -165,48 +168,21 @@ export function SignUpForm({
               required
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">電子郵件</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">密碼</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="設定密碼"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-            />
-          </div>
-          {/* Terms of Service section */}
-          <div className="space-y-2">
-            <Label>信仰告白（註冊需同意）</Label>
-            <div className="max-h-40 overflow-y-auto bg-muted px-3 py-2 rounded border text-sm whitespace-pre-line">
-              {termsOfServiceText}
-            </div>
-            <div className="flex items-start space-x-2 mt-2">
-              <Checkbox
-                id="terms"
-                checked={termsAccepted}
-                onCheckedChange={(checked) => setTermsAccepted(!!checked)}
-                required
-                aria-required="true"
-              />
-              <Label htmlFor="terms" className="cursor-pointer select-none">
-                我已閱讀並同意以上信仰告白
-              </Label>
-            </div>
-          </div>
+          <AuthEmailInput
+            value={email}
+            onChange={setEmail}
+            disabled={loading}
+          />
+          <AuthPasswordInput
+            value={password}
+            onChange={setPassword}
+            required
+            disabled={loading}
+          />
+          <TermsOfService
+            accepted={termsAccepted}
+            onChange={setTermsAccepted}
+          />
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "建立帳號中..." : "建立帳號"}
           </Button>

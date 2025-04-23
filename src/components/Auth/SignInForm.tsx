@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { associateUserWithTenant } from "@/lib/membership-service";
 import { checkUserTenantAccess } from "@/lib/member-service";
+import { AuthEmailInput } from "./AuthEmailInput";
+import { AuthPasswordInput } from "./AuthPasswordInput";
 
 interface SignInFormProps {
   tenantSlug?: string; 
@@ -142,17 +144,12 @@ export function SignInForm({
         </CardHeader>
         <CardContent>
           <form onSubmit={handleResetPassword} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="reset-email">電子郵件</Label>
-              <Input
-                id="reset-email"
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+            <AuthEmailInput
+              id="reset-email"
+              value={email}
+              onChange={setEmail}
+              disabled={loading}
+            />
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "發送中..." : "發送重設密碼連結"}
             </Button>
@@ -179,38 +176,19 @@ export function SignInForm({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSignIn} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">電子郵件</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <Label htmlFor="password">密碼</Label>
-              <Button 
-                variant="link" 
-                className="px-0"
-                type="button"
-                onClick={() => setResetPasswordMode(true)}
-              >
-                忘記密碼？
-              </Button>
-            </div>
-            <Input
-              id="password"
-              type="password"
-              placeholder="輸入密碼"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+          <AuthEmailInput
+            value={email}
+            onChange={setEmail}
+            disabled={loading}
+          />
+          <AuthPasswordInput
+            value={password}
+            onChange={setPassword}
+            required
+            disabled={loading}
+            showForgotPassword
+            onForgotPassword={() => setResetPasswordMode(true)}
+          />
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "登入中..." : "登入"}
           </Button>
