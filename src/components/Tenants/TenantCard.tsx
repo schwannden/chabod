@@ -2,11 +2,14 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Users, Copy, ExternalLink } from "lucide-react";
+import { Pencil, Trash2, Users, Copy, ExternalLink, Info } from "lucide-react";
 import { TenantWithMemberCount } from "@/lib/types";
 import { useNavigate } from "react-router-dom";
 import { deleteTenant } from "@/lib/tenant-utils";
 import { TenantUpdateDialog } from "./TenantUpdateDialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { PriceTier } from "@/lib/types";
 
 interface TenantCardProps {
   tenant: TenantWithMemberCount & {
@@ -27,6 +30,8 @@ interface TenantCardProps {
 export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantCardProps) {
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isAllPlansDialogOpen, setIsAllPlansDialogOpen] = useState(false);
+  const [priceTiers, setPriceTiers] = useState<PriceTier[]>([]);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -71,6 +76,33 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
     });
   };
 
+  const fetchPriceTiers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("price_tiers")
+        .select("*")
+        .eq("is_active", true);
+      
+      if (error) {
+        console.error("Error fetching price tiers:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load pricing plans.",
+          variant: "destructive",
+        });
+      } else {
+        setPriceTiers(data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching price tiers:", error);
+    }
+  };
+
+  const handleOpenAllPlansDialog = () => {
+    fetchPriceTiers();
+    setIsAllPlansDialogOpen(true);
+  };
+
   return (
     <>
       <Card>
@@ -98,7 +130,17 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
           </p>
           
           <div className="mt-4 pt-4 border-t">
-            <h4 className="font-medium mb-2">Pricing Plan</h4>
+            <div className="flex items-center justify-between">
+              <h4 className="font-medium mb-2">Pricing Plan</h4>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="text-muted-foreground hover:text-primary"
+                onClick={handleOpenAllPlansDialog}
+              >
+                <Info className="h-4 w-4" />
+              </Button>
+            </div>
             <div className="space-y-2">
               <p className="text-sm font-semibold">{tenant.price_tier?.name || 'Free'}</p>
               <p className="text-sm text-muted-foreground">
@@ -147,6 +189,38 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
         onClose={() => setIsUpdateDialogOpen(false)}
         onTenantUpdated={onTenantUpdated}
       />
+      
+      <Dialog open={isAllPlansDialogOpen} onOpenChange={setIsAllPlansDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Pricing Plans</DialogTitle>
+            <DialogDescription>
+              Choose the plan that best fits your church's needs.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {priceTiers.map((plan) => (
+              <div 
+                key={plan.id} 
+                className={`border rounded-lg p-4 ${plan.name === tenant.price_tier?.name ? 'border-primary bg-primary/10' : ''}`}
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="text-lg font-semibold">{plan.name}</h4>
+                  <p className="text-sm text-muted-foreground">${plan.price_monthly}/month</p>
+                </div>
+                <div className="space-y-2">
+                  <p>Members Limit: {plan.user_limit}</p>
+                  <p>Groups Limit: {plan.group_limit}</p>
+                  <p>Events Limit: {plan.event_limit}</p>
+                  {plan.description && (
+                    <p className="text-sm text-muted-foreground">{plan.description}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
