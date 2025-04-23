@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -91,7 +92,11 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
           variant: "destructive",
         });
       } else {
-        setPriceTiers(data || []);
+        // Sort price tiers by monthly price in ascending order
+        const sortedPriceTiers = (data || []).sort((a, b) => 
+          a.price_monthly - b.price_monthly
+        );
+        setPriceTiers(sortedPriceTiers);
       }
     } catch (error) {
       console.error("Error fetching price tiers:", error);
