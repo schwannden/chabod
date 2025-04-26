@@ -1,5 +1,3 @@
-
-
 import { Database } from "@/integrations/supabase/types";
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
@@ -47,6 +45,12 @@ export type ResourceWithGroups = Resource & {
   groups?: string[];
 };
 
+export type Service = Database["public"]["Tables"]["services"]["Row"];
+export type ServiceAdmin = Database["public"]["Tables"]["service_admins"]["Row"];
+export type ServiceNote = Database["public"]["Tables"]["service_notes"]["Row"];
+export type ServiceGroup = Database["public"]["Tables"]["service_groups"]["Row"];
+export type ServiceRole = Database["public"]["Tables"]["service_roles"]["Row"];
+
 export type SessionContextType = {
   session: any | null;
   user: any | null;
@@ -54,4 +58,3 @@ export type SessionContextType = {
   isLoading: boolean;
   signOut: () => Promise<void>;
 };
-
