@@ -387,6 +387,89 @@ export type Database = {
           },
         ]
       }
+      service_event_owners: {
+        Row: {
+          created_at: string
+          id: string
+          service_event_id: string
+          service_role_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          service_event_id: string
+          service_role_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          service_event_id?: string
+          service_role_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_event_owners_service_event_id_fkey"
+            columns: ["service_event_id"]
+            isOneToOne: false
+            referencedRelation: "service_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_event_owners_service_role_id_fkey"
+            columns: ["service_role_id"]
+            isOneToOne: false
+            referencedRelation: "service_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_events: {
+        Row: {
+          created_at: string
+          date: string
+          end_time: string
+          id: string
+          service_id: string
+          start_time: string
+          subtitle: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          end_time: string
+          id?: string
+          service_id: string
+          start_time: string
+          subtitle?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          end_time?: string
+          id?: string
+          service_id?: string
+          start_time?: string
+          subtitle?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_events_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_groups: {
         Row: {
           created_at: string
