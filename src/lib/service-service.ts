@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Service, ServiceAdmin, ServiceNote, ServiceRole, ServiceEvent, ServiceEventOwner, ServiceEventWithOwners, ServiceEventOwnerWithDetails } from "./types";
+import { Service, ServiceAdmin, ServiceNote, ServiceRole, ServiceEvent, ServiceEventOwner, ServiceEventWithOwners, ServiceEventOwnerWithDetails, Profile } from "./types";
 
 export async function getServices(tenantId: string): Promise<Service[]> {
   const { data, error } = await supabase
@@ -253,11 +253,7 @@ export async function getServiceEventWithOwners(id: string): Promise<ServiceEven
 
   const { data: ownersData, error: ownersError } = await supabase
     .from("service_event_owners")
-    .select(`
-      *,
-      profile:profiles(*),
-      role:service_roles(*)
-    `)
+    .select("*")
     .eq("service_event_id", id);
 
   if (ownersError) {
@@ -265,9 +261,41 @@ export async function getServiceEventWithOwners(id: string): Promise<ServiceEven
     throw ownersError;
   }
 
+  const ownersWithDetails: ServiceEventOwnerWithDetails[] = [];
+  
+  for (const owner of ownersData) {
+    const { data: profileData, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", owner.user_id)
+      .single();
+      
+    if (profileError) {
+      console.error(`Error fetching profile for user ${owner.user_id}:`, profileError);
+      continue;
+    }
+    
+    const { data: roleData, error: roleError } = await supabase
+      .from("service_roles")
+      .select("*")
+      .eq("id", owner.service_role_id)
+      .single();
+      
+    if (roleError) {
+      console.error(`Error fetching role for ${owner.service_role_id}:`, roleError);
+      continue;
+    }
+    
+    ownersWithDetails.push({
+      ...owner,
+      profile: profileData,
+      role: roleData
+    });
+  }
+
   const serviceEventWithOwners: ServiceEventWithOwners = {
     ...eventData,
-    owners: ownersData as ServiceEventOwnerWithDetails[]
+    owners: ownersWithDetails
   };
 
   return serviceEventWithOwners;
