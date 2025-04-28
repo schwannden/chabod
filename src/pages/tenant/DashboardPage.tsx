@@ -5,7 +5,7 @@ import { NavBar } from "@/components/Layout/NavBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TenantWithPriceTier } from "@/lib/types";
 import { getTenantBySlug, getUserTenants } from "@/lib/tenant-utils";
-import { Loader2, Users, Calendar, Group, FileText } from "lucide-react";
+import { Loader2, Users, Calendar, Group, FileText, Handshake } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function DashboardPage() {
@@ -103,6 +103,12 @@ export default function DashboardPage() {
       icon: FileText,
       description: "管理資源超連結",
       link: `/tenant/${tenant?.slug}/resources`
+    },
+    {
+      title: "服事管理",
+      icon: Handshake,
+      description: "創建管理服事類型",
+      link: `/tenant/${tenant?.slug}/services`
     }
   ];
 

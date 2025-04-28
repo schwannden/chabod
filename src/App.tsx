@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +15,7 @@ import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 import EventPage from "./pages/tenant/EventPage";
 import ResourcePage from "./pages/tenant/ResourcePage";
+import ServicePage from "./pages/tenant/ServicePage";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +42,7 @@ export default function App() {
               <Route path="/tenant/:slug/groups/:groupId" element={<GroupMembersPage />} />
               <Route path="/tenant/:slug/profile" element={<ProfilePage />} />
               <Route path="/tenant/:slug/resources" element={<ResourcePage />} />
+              <Route path="/tenant/:slug/services" element={<ServicePage />} />
               
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />

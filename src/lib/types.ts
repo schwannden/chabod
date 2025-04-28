@@ -68,3 +68,7 @@ export type SessionContextType = {
   isLoading: boolean;
   signOut: () => Promise<void>;
 };
+
+export type ServiceWithGroups = Service & {
+  groups?: string[];
+};
