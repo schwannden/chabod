@@ -253,7 +253,11 @@ export async function getServiceEventWithOwners(id: string): Promise<ServiceEven
 
   const { data: ownersData, error: ownersError } = await supabase
     .from("service_event_owners")
-    .select("*")
+    .select(`
+      *,
+      profiles:user_id(*),
+      service_roles(*)
+    `)
     .eq("service_event_id", id);
 
   if (ownersError) {
@@ -261,42 +265,14 @@ export async function getServiceEventWithOwners(id: string): Promise<ServiceEven
     throw ownersError;
   }
 
-  const ownersWithDetails: ServiceEventOwnerWithDetails[] = [];
-  
-  for (const owner of ownersData) {
-    const { data: profileData, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", owner.user_id)
-      .single();
-      
-    if (profileError) {
-      console.error(`Error fetching profile for user ${owner.user_id}:`, profileError);
-      continue;
-    }
-    
-    const { data: roleData, error: roleError } = await supabase
-      .from("service_roles")
-      .select("*")
-      .eq("id", owner.service_role_id)
-      .single();
-      
-    if (roleError) {
-      console.error(`Error fetching role for ${owner.service_role_id}:`, roleError);
-      continue;
-    }
-    
-    ownersWithDetails.push({
-      ...owner,
-      profile: profileData,
-      role: roleData
-    });
-  }
+  const ownersWithDetails: ServiceEventOwnerWithDetails[] = ownersData.map(owner => ({
+    ...owner,
+    profile: owner.profiles,
+    role: owner.service_roles
+  }));
 
-  const serviceEventWithOwners: ServiceEventWithOwners = {
+  return {
     ...eventData,
     owners: ownersWithDetails
   };
-
-  return serviceEventWithOwners;
 }
