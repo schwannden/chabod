@@ -1,13 +1,12 @@
-
 import { useParams } from "react-router-dom";
 import { useSession } from "@/contexts/AuthContext";
 import { TenantPageLayout } from "@/components/Layout/TenantPageLayout";
 import { useQuery } from "@tanstack/react-query";
 import { getTenantBySlug } from "@/lib/tenant-utils";
 import { useTenantRole } from "@/hooks/useTenantRole";
-import { getServices } from "@/lib/service-service";
+import { getServices } from "@/lib/services";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Service } from "@/lib/types";
+import { Service } from "@/lib/services";
 
 export default function ServicePage() {
   const { slug } = useParams<{ slug: string }>();
