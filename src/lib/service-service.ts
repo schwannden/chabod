@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Service, ServiceAdmin, ServiceNote, ServiceRole, ServiceEvent, ServiceEventOwner } from "./types";
+import { Service, ServiceAdmin, ServiceNote, ServiceRole, ServiceEvent, ServiceEventOwner, ServiceEventWithOwners } from "./types";
 
 export async function getServices(tenantId: string): Promise<Service[]> {
   const { data, error } = await supabase
