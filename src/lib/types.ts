@@ -55,11 +55,13 @@ export type ServiceRole = Database["public"]["Tables"]["service_roles"]["Row"];
 export type ServiceEvent = Database["public"]["Tables"]["service_events"]["Row"];
 export type ServiceEventOwner = Database["public"]["Tables"]["service_event_owners"]["Row"];
 
+export type ServiceEventOwnerWithDetails = ServiceEventOwner & {
+  profile: Profile;
+  role: ServiceRole;
+};
+
 export type ServiceEventWithOwners = ServiceEvent & {
-  owners: (ServiceEventOwner & {
-    profile: Profile;
-    role: ServiceRole;
-  })[];
+  owners: ServiceEventOwnerWithDetails[];
 };
 
 export type SessionContextType = {

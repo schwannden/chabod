@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Service, ServiceAdmin, ServiceNote, ServiceRole, ServiceEvent, ServiceEventOwner, ServiceEventWithOwners } from "./types";
+import { Service, ServiceAdmin, ServiceNote, ServiceRole, ServiceEvent, ServiceEventOwner, ServiceEventWithOwners, ServiceEventOwnerWithDetails } from "./types";
 
 export async function getServices(tenantId: string): Promise<Service[]> {
   const { data, error } = await supabase
@@ -240,23 +240,35 @@ export async function removeServiceEventOwner(serviceEventId: string, userId: st
 }
 
 export async function getServiceEventWithOwners(id: string): Promise<ServiceEventWithOwners> {
-  const { data, error } = await supabase
+  const { data: eventData, error: eventError } = await supabase
     .from("service_events")
-    .select(`
-      *,
-      owners:service_event_owners(
-        *,
-        profile:profiles(*),
-        role:service_roles(*)
-      )
-    `)
+    .select("*")
     .eq("id", id)
     .single();
 
-  if (error) {
-    console.error("Error fetching service event with owners:", error);
-    throw error;
+  if (eventError) {
+    console.error("Error fetching service event:", eventError);
+    throw eventError;
   }
 
-  return data;
+  const { data: ownersData, error: ownersError } = await supabase
+    .from("service_event_owners")
+    .select(`
+      *,
+      profile:profiles(*),
+      role:service_roles(*)
+    `)
+    .eq("service_event_id", id);
+
+  if (ownersError) {
+    console.error("Error fetching service event owners:", ownersError);
+    throw ownersError;
+  }
+
+  const serviceEventWithOwners: ServiceEventWithOwners = {
+    ...eventData,
+    owners: ownersData as ServiceEventOwnerWithDetails[]
+  };
+
+  return serviceEventWithOwners;
 }
