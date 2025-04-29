@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 import {
   Dialog,
@@ -22,11 +23,17 @@ import { getTenantGroups } from "@/lib/group-service";
 import { 
   updateService, 
   addServiceAdmin,
+  removeServiceAdmin,
   addServiceNote,
+  deleteServiceNote,
   addServiceRole,
+  deleteServiceRole,
   addServiceGroup,
+  removeServiceGroup,
   getGroupsForService,
-  isServiceAdmin
+  isServiceAdmin,
+  getServiceNotes,
+  getServiceRoles
 } from "@/lib/services";
 
 // Import form components
@@ -56,6 +63,7 @@ export function EditServiceDialog({
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
   const [notes, setNotes] = useState<NoteFormValues[]>([]);
   const [roles, setRoles] = useState<RoleFormValues[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Setup form
   const form = useForm<ServiceFormValues>({
@@ -80,7 +88,8 @@ export function EditServiceDialog({
       fetchTenantGroups();
       fetchServiceGroups();
       fetchServiceAdmins();
-      // In a complete implementation, we would also fetch notes and roles
+      fetchServiceNotes();
+      fetchServiceRoles();
     }
   }, [open, service.id]);
 
@@ -106,7 +115,6 @@ export function EditServiceDialog({
 
   const fetchServiceGroups = async () => {
     try {
-      // Fix: Use getGroupsForService instead which returns string[] of group IDs
       const groupIds = await getGroupsForService(service.id);
       setSelectedGroups(groupIds);
     } catch (error) {
@@ -116,21 +124,55 @@ export function EditServiceDialog({
 
   const fetchServiceAdmins = async () => {
     try {
-      // This is a placeholder - in a real implementation, you would fetch service admins
-      // and set them in the selectedAdmins state
-      // For now we'll just add a console log since we don't have this functionality yet
-      console.log("Fetch service admins for service ID:", service.id);
-      // Ideally you'd have a function like:
-      // const admins = await getServiceAdmins(service.id);
-      // setSelectedAdmins(admins.map(admin => admin.user_id));
+      // Get service admin user IDs
+      const { data, error } = await supabase
+        .from("service_admins")
+        .select("user_id")
+        .eq("service_id", service.id);
+      
+      if (error) throw error;
+      
+      const adminIds = data.map(admin => admin.user_id);
+      setSelectedAdmins(adminIds);
     } catch (error) {
       console.error("Error fetching service admins:", error);
     }
   };
 
-  const onSubmit = async (values: ServiceFormValues) => {
+  const fetchServiceNotes = async () => {
     try {
-      // Update service
+      const fetchedNotes = await getServiceNotes(service.id);
+      const formattedNotes: NoteFormValues[] = fetchedNotes.map(note => ({
+        id: note.id,
+        text: note.text,
+        link: note.link || ""
+      }));
+      setNotes(formattedNotes);
+    } catch (error) {
+      console.error("Error fetching service notes:", error);
+    }
+  };
+
+  const fetchServiceRoles = async () => {
+    try {
+      const fetchedRoles = await getServiceRoles(service.id);
+      const formattedRoles: RoleFormValues[] = fetchedRoles.map(role => ({
+        id: role.id,
+        name: role.name
+      }));
+      setRoles(formattedRoles);
+    } catch (error) {
+      console.error("Error fetching service roles:", error);
+    }
+  };
+
+  const onSubmit = async (values: ServiceFormValues) => {
+    if (isSubmitting) return;
+    
+    try {
+      setIsSubmitting(true);
+      
+      // Update service basic details
       await updateService(service.id, {
         name: values.name,
         tenant_id: values.tenant_id,
@@ -138,26 +180,108 @@ export function EditServiceDialog({
         default_end_time: values.default_end_time || null,
       });
       
-      // In a complete implementation, we would:
-      // 1. Delete existing admins, groups, notes, roles
-      // 2. Add new ones based on the selected items
+      // Update service admins
+      const { data: currentAdmins, error: adminsError } = await supabase
+        .from("service_admins")
+        .select("user_id")
+        .eq("service_id", service.id);
+        
+      if (adminsError) throw adminsError;
+      
+      const currentAdminIds = currentAdmins.map(admin => admin.user_id);
+      
+      // Remove admins that were deselected
+      for (const adminId of currentAdminIds) {
+        if (!selectedAdmins.includes(adminId)) {
+          await removeServiceAdmin(service.id, adminId);
+        }
+      }
+      
+      // Add new admins
+      for (const adminId of selectedAdmins) {
+        if (!currentAdminIds.includes(adminId)) {
+          await addServiceAdmin(service.id, adminId);
+        }
+      }
+      
+      // Update service groups
+      const { data: currentGroups, error: groupsError } = await supabase
+        .from("service_groups")
+        .select("group_id")
+        .eq("service_id", service.id);
+        
+      if (groupsError) throw groupsError;
+      
+      const currentGroupIds = currentGroups.map(group => group.group_id);
+      
+      // Remove groups that were deselected
+      for (const groupId of currentGroupIds) {
+        if (!selectedGroups.includes(groupId)) {
+          await removeServiceGroup(service.id, groupId);
+        }
+      }
+      
+      // Add new groups
+      for (const groupId of selectedGroups) {
+        if (!currentGroupIds.includes(groupId)) {
+          await addServiceGroup(service.id, groupId);
+        }
+      }
+      
+      // Update notes - first delete all existing notes then add new ones
+      await supabase
+        .from("service_notes")
+        .delete()
+        .eq("service_id", service.id);
+        
+      for (const note of notes) {
+        await addServiceNote({
+          service_id: service.id,
+          tenant_id: service.tenant_id,
+          text: note.text,
+          link: note.link || null
+        });
+      }
+      
+      // Update roles - first delete all existing roles then add new ones
+      await supabase
+        .from("service_roles")
+        .delete()
+        .eq("service_id", service.id);
+        
+      for (const role of roles) {
+        await addServiceRole({
+          service_id: service.id,
+          tenant_id: service.tenant_id,
+          name: role.name
+        });
+      }
       
       toast.success("服事類型已更新");
       onSuccess?.();
-      onOpenChange(false);
+      handleDialogClose();
     } catch (error) {
       console.error("Error updating service:", error);
       toast.error("更新服事類型時發生錯誤");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDialogClose = () => {
-    onOpenChange(false);
-    setActiveTab("details");
+    // Use a timeout to allow the dialog to close properly first
+    setTimeout(() => {
+      setActiveTab("details");
+      onOpenChange(false);
+    }, 0);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      if (!isOpen) {
+        handleDialogClose();
+      }
+    }}>
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-auto">
         <DialogHeader>
           <DialogTitle>編輯服事類型</DialogTitle>
@@ -206,8 +330,13 @@ export function EditServiceDialog({
         </Tabs>
         
         <div className="flex justify-end space-x-2 mt-4">
-          <Button variant="outline" onClick={handleDialogClose}>取消</Button>
-          <Button onClick={form.handleSubmit(onSubmit)}>更新服事類型</Button>
+          <Button variant="outline" onClick={handleDialogClose} type="button">取消</Button>
+          <Button 
+            onClick={form.handleSubmit(onSubmit)}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "更新中..." : "更新服事類型"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
