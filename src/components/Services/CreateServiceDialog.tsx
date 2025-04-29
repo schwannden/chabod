@@ -182,21 +182,22 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
         await addServiceAdmin(service.id, adminId);
       }
       
-      // Add notes
+      // Add notes - use text property instead of title and remove content
       for (const note of notes) {
         await addServiceNote({
           service_id: service.id,
           text: note.title,
-          content: note.content || "",
+          tenant_id: tenantId,
+          // Note: link property is optional in the schema so we don't need to specify it
         });
       }
       
-      // Add roles
+      // Add roles - only use name property
       for (const role of roles) {
         await addServiceRole({
           service_id: service.id,
           name: role.name,
-          description: role.description || "",
+          tenant_id: tenantId,
         });
       }
       
