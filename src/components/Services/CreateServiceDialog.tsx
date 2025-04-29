@@ -1,6 +1,11 @@
 
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Service } from "@/lib/services";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Plus } from "lucide-react";
+import { toast } from "sonner";
+
 import {
   Dialog,
   DialogContent,
@@ -9,18 +14,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Plus, UserPlus, Users, FilePlus, ShieldPlus } from "lucide-react";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { TenantMemberWithProfile } from "@/lib/types";
+import { Group } from "@/lib/types";
+import { getTenantMembers } from "@/lib/member-service";
+import { getTenantGroups } from "@/lib/group-service";
 import { 
   createService, 
   addServiceAdmin, 
@@ -28,49 +27,18 @@ import {
   addServiceRole,
   addServiceGroup
 } from "@/lib/services";
-import { useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TenantMemberWithProfile } from "@/lib/types";
-import { Group } from "@/lib/types";
-import { getTenantMembers } from "@/lib/member-service";
-import { getTenantGroups } from "@/lib/group-service";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+
+// Import our new form components
+import { ServiceDetailsForm, ServiceFormValues } from "./Forms/ServiceDetailsForm";
+import { ServiceAdminsForm } from "./Forms/ServiceAdminsForm";
+import { ServiceGroupsForm } from "./Forms/ServiceGroupsForm";
+import { ServiceNotesForm, NoteFormValues } from "./Forms/ServiceNotesForm";
+import { ServiceRolesForm, RoleFormValues } from "./Forms/ServiceRolesForm";
 
 interface CreateServiceDialogProps {
   tenantId: string;
   onSuccess?: () => void;
 }
-
-const serviceFormSchema = z.object({
-  name: z.string().min(1, "名稱為必填"),
-  tenant_id: z.string(),
-  default_start_time: z.string().optional(),
-  default_end_time: z.string().optional(),
-});
-
-const noteFormSchema = z.object({
-  title: z.string().min(1, "標題為必填"),
-  content: z.string().optional(),
-});
-
-const roleFormSchema = z.object({
-  name: z.string().min(1, "角色名稱為必填"),
-  description: z.string().optional(),
-});
-
-type ServiceFormValues = z.infer<typeof serviceFormSchema>;
-type NoteFormValues = z.infer<typeof noteFormSchema>;
-type RoleFormValues = z.infer<typeof roleFormSchema>;
 
 export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialogProps) {
   const [activeTab, setActiveTab] = useState("details");
@@ -84,30 +52,17 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
 
   // Service form
   const form = useForm<ServiceFormValues>({
-    resolver: zodResolver(serviceFormSchema),
+    resolver: zodResolver(z.object({
+      name: z.string().min(1, "名稱為必填"),
+      tenant_id: z.string(),
+      default_start_time: z.string().optional(),
+      default_end_time: z.string().optional(),
+    })),
     defaultValues: {
       name: "",
       tenant_id: tenantId,
       default_start_time: "",
       default_end_time: "",
-    },
-  });
-
-  // Note form
-  const noteForm = useForm<NoteFormValues>({
-    resolver: zodResolver(noteFormSchema),
-    defaultValues: {
-      title: "",
-      content: "",
-    },
-  });
-
-  // Role form
-  const roleForm = useForm<RoleFormValues>({
-    resolver: zodResolver(roleFormSchema),
-    defaultValues: {
-      name: "",
-      description: "",
     },
   });
 
@@ -139,28 +94,6 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
     }
   };
 
-  const handleAddNote = () => {
-    const values = noteForm.getValues();
-    if (noteForm.formState.isValid) {
-      setNotes([...notes, values]);
-      noteForm.reset();
-      toast.success("已新增備註");
-    } else {
-      noteForm.trigger();
-    }
-  };
-
-  const handleAddRole = () => {
-    const values = roleForm.getValues();
-    if (roleForm.formState.isValid) {
-      setRoles([...roles, values]);
-      roleForm.reset();
-      toast.success("已新增角色");
-    } else {
-      roleForm.trigger();
-    }
-  };
-
   const onSubmit = async (values: ServiceFormValues) => {
     try {
       // Ensure name is required
@@ -182,7 +115,7 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
         await addServiceAdmin(service.id, adminId);
       }
       
-      // Add notes - use text property instead of title and remove content
+      // Add notes - use text property instead of title
       for (const note of notes) {
         await addServiceNote({
           service_id: service.id,
@@ -222,8 +155,6 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
     setOpen(false);
     setActiveTab("details");
     form.reset();
-    noteForm.reset();
-    roleForm.reset();
     setSelectedAdmins([]);
     setSelectedGroups([]);
     setNotes([]);
@@ -253,225 +184,35 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
           
           {/* Basic Details */}
           <TabsContent value="details">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>名稱</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="default_start_time"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>預設開始時間</FormLabel>
-                        <FormControl>
-                          <Input type="time" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="default_end_time"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>預設結束時間</FormLabel>
-                        <FormControl>
-                          <Input type="time" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </form>
-            </Form>
+            <ServiceDetailsForm form={form} />
           </TabsContent>
           
           {/* Service Admins */}
           <TabsContent value="admins">
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">選擇服事管理員</h3>
-              <ScrollArea className="h-72 border rounded-md p-2">
-                <div className="space-y-2">
-                  {members.length > 0 ? (
-                    members.map((member) => (
-                      <div key={member.id} className="flex items-center space-x-2">
-                        <Checkbox 
-                          id={`admin-${member.user_id}`}
-                          checked={selectedAdmins.includes(member.user_id)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setSelectedAdmins([...selectedAdmins, member.user_id]);
-                            } else {
-                              setSelectedAdmins(selectedAdmins.filter(id => id !== member.user_id));
-                            }
-                          }}
-                        />
-                        <label htmlFor={`admin-${member.user_id}`} className="text-sm font-medium">
-                          {member.profile?.full_name || member.profile?.email || "匿名成員"}
-                        </label>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-muted-foreground">尚未有成員</p>
-                  )}
-                </div>
-              </ScrollArea>
-            </div>
+            <ServiceAdminsForm 
+              members={members} 
+              selectedAdmins={selectedAdmins}
+              setSelectedAdmins={setSelectedAdmins}
+            />
           </TabsContent>
           
           {/* Service Groups */}
           <TabsContent value="groups">
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">選擇服事小組</h3>
-              <ScrollArea className="h-72 border rounded-md p-2">
-                <div className="space-y-2">
-                  {groups.length > 0 ? (
-                    groups.map((group) => (
-                      <div key={group.id} className="flex items-center space-x-2">
-                        <Checkbox 
-                          id={`group-${group.id}`}
-                          checked={selectedGroups.includes(group.id)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setSelectedGroups([...selectedGroups, group.id]);
-                            } else {
-                              setSelectedGroups(selectedGroups.filter(id => id !== group.id));
-                            }
-                          }}
-                        />
-                        <label htmlFor={`group-${group.id}`} className="text-sm font-medium">
-                          {group.name}
-                        </label>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-muted-foreground">尚未有小組</p>
-                  )}
-                </div>
-              </ScrollArea>
-            </div>
+            <ServiceGroupsForm
+              groups={groups}
+              selectedGroups={selectedGroups}
+              setSelectedGroups={setSelectedGroups}
+            />
           </TabsContent>
           
           {/* Service Notes */}
           <TabsContent value="notes">
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">新增服事備註</h3>
-              <Form {...noteForm}>
-                <form className="space-y-4">
-                  <FormField
-                    control={noteForm.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>標題</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="備註標題" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={noteForm.control}
-                    name="content"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>內容</FormLabel>
-                        <FormControl>
-                          <Textarea {...field} placeholder="備註內容" rows={3} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="button" onClick={handleAddNote}>新增備註</Button>
-                </form>
-              </Form>
-              
-              {notes.length > 0 && (
-                <div className="mt-4">
-                  <h4 className="text-sm font-medium mb-2">已新增備註</h4>
-                  <ScrollArea className="h-40 border rounded-md p-2">
-                    <div className="space-y-2">
-                      {notes.map((note, index) => (
-                        <div key={index} className="bg-secondary p-2 rounded-md">
-                          <h5 className="font-medium">{note.title}</h5>
-                          <p className="text-sm text-muted-foreground">{note.content}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-              )}
-            </div>
+            <ServiceNotesForm notes={notes} setNotes={setNotes} />
           </TabsContent>
           
           {/* Service Roles */}
           <TabsContent value="roles">
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">新增服事角色</h3>
-              <Form {...roleForm}>
-                <form className="space-y-4">
-                  <FormField
-                    control={roleForm.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>角色名稱</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="角色名稱" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={roleForm.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>角色描述</FormLabel>
-                        <FormControl>
-                          <Textarea {...field} placeholder="角色描述" rows={2} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="button" onClick={handleAddRole}>新增角色</Button>
-                </form>
-              </Form>
-              
-              {roles.length > 0 && (
-                <div className="mt-4">
-                  <h4 className="text-sm font-medium mb-2">已新增角色</h4>
-                  <ScrollArea className="h-40 border rounded-md p-2">
-                    <div className="space-y-2">
-                      {roles.map((role, index) => (
-                        <div key={index} className="bg-secondary p-2 rounded-md">
-                          <h5 className="font-medium">{role.name}</h5>
-                          <p className="text-sm text-muted-foreground">{role.description}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-              )}
-            </div>
+            <ServiceRolesForm roles={roles} setRoles={setRoles} />
           </TabsContent>
         </Tabs>
         
