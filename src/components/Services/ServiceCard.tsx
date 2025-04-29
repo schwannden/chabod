@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Pencil, Trash } from "lucide-react";
+import { MoreVertical, Pencil, Trash, UserPlus, Users, FilePlus, ShieldPlus } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +17,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { deleteService } from "@/lib/services";
 import { toast } from "sonner";
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetTrigger 
+} from "@/components/ui/sheet";
+import { useState } from "react";
 
 interface ServiceCardProps {
   service: Service;
@@ -25,6 +33,8 @@ interface ServiceCardProps {
 }
 
 export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
+  const [activeSheet, setActiveSheet] = useState<string | null>(null);
+
   const handleDelete = async () => {
     try {
       await deleteService(service.id);
@@ -56,7 +66,7 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => onEdit(service)}>
               <Pencil className="mr-2 h-4 w-4" />
-              編輯
+              編輯基本資料
             </DropdownMenuItem>
             <DropdownMenuItem className="text-destructive" onClick={handleDelete}>
               <Trash className="mr-2 h-4 w-4" />
@@ -67,14 +77,93 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">
-          <Button variant="outline" className="w-full" onClick={() => {}}>
-            服事人員
-          </Button>
-          <Button variant="outline" className="w-full" onClick={() => {}}>
-            服事小組
-          </Button>
+          <Sheet open={activeSheet === 'admins'} onOpenChange={(open) => setActiveSheet(open ? 'admins' : null)}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="w-full">
+                <UserPlus className="mr-2 h-4 w-4" />
+                服事管理員
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>{service.name} - 服事管理員</SheetTitle>
+              </SheetHeader>
+              <div className="py-4">
+                <ServiceAdminManagement serviceId={service.id} />
+              </div>
+            </SheetContent>
+          </Sheet>
+          
+          <Sheet open={activeSheet === 'groups'} onOpenChange={(open) => setActiveSheet(open ? 'groups' : null)}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="w-full">
+                <Users className="mr-2 h-4 w-4" />
+                服事小組
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>{service.name} - 服事小組</SheetTitle>
+              </SheetHeader>
+              <div className="py-4">
+                <ServiceGroupManagement serviceId={service.id} />
+              </div>
+            </SheetContent>
+          </Sheet>
+          
+          <Sheet open={activeSheet === 'notes'} onOpenChange={(open) => setActiveSheet(open ? 'notes' : null)}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="w-full">
+                <FilePlus className="mr-2 h-4 w-4" />
+                服事備註
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>{service.name} - 服事備註</SheetTitle>
+              </SheetHeader>
+              <div className="py-4">
+                <ServiceNoteManagement serviceId={service.id} />
+              </div>
+            </SheetContent>
+          </Sheet>
+          
+          <Sheet open={activeSheet === 'roles'} onOpenChange={(open) => setActiveSheet(open ? 'roles' : null)}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="w-full">
+                <ShieldPlus className="mr-2 h-4 w-4" />
+                服事角色
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>{service.name} - 服事角色</SheetTitle>
+              </SheetHeader>
+              <div className="py-4">
+                <ServiceRoleManagement serviceId={service.id} />
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </CardContent>
     </Card>
   );
+}
+
+// Placeholder components for the service management sections
+// These would be implemented as separate components in their own files
+function ServiceAdminManagement({ serviceId }: { serviceId: string }) {
+  return <div>服事管理員管理功能尚未實現</div>;
+}
+
+function ServiceGroupManagement({ serviceId }: { serviceId: string }) {
+  return <div>服事小組管理功能尚未實現</div>;
+}
+
+function ServiceNoteManagement({ serviceId }: { serviceId: string }) {
+  return <div>服事備註管理功能尚未實現</div>;
+}
+
+function ServiceRoleManagement({ serviceId }: { serviceId: string }) {
+  return <div>服事角色管理功能尚未實現</div>;
 }
