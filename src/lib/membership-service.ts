@@ -85,8 +85,9 @@ export async function associateUserWithTenant(
     }
     
     return true;
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error?.message || "未知錯誤";
     console.error("Error associating user with tenant:", error);
-    throw error;
+    throw new Error(`Failed to add user to tenant: ${errorMessage}`);
   }
 }

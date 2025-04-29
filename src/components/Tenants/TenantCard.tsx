@@ -49,10 +49,10 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
         description: `${tenant.name} has been deleted successfully.`,
       });
       onTenantDeleted();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error deleting tenant",
-        description: error.message || "An unknown error occurred",
+        description: error?.message || "An unknown error occurred",
         variant: "destructive",
       });
     } finally {

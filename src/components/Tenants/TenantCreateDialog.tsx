@@ -53,10 +53,11 @@ export function TenantCreateDialog({ isOpen, onClose, userId, onTenantCreated }:
       onClose();
       setName("");
       setSlug("");
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error?.message || "未知錯誤";
       toast({
         title: "Error creating tenant",
-        description: error.message || "An unknown error occurred",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

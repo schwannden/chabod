@@ -83,10 +83,11 @@ export default function ResourcePage() {
         }
         
         setResourceGroupMap(groupMap);
-      } catch (error: any) {
+      } catch (error) {
+        const errorMessage = error?.message || "未知錯誤";
         toast({
           title: "Error loading resources",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive",
         });
       } finally {

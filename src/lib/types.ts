@@ -1,5 +1,7 @@
 
 import { Database } from "@/integrations/supabase/types";
+import { User } from "@supabase/supabase-js";
+import { Session } from "@supabase/supabase-js";
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type Tenant = Database["public"]["Tables"]["tenants"]["Row"];
@@ -65,8 +67,8 @@ export type ServiceEventWithOwners = ServiceEvent & {
 };
 
 export type SessionContextType = {
-  session: any | null;
-  user: any | null;
+  session: Session | null;
+  user: User | null;
   profile: Profile | null;
   isLoading: boolean;
   signOut: () => Promise<void>;

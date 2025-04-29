@@ -104,10 +104,10 @@ export function EditResourceDialog({
         description: "資源已成功更新",
       });
       onClose();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "更新資源失敗",
-        description: error.message,
+        description: error?.message,
         variant: "destructive",
       });
     } finally {

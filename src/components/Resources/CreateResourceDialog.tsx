@@ -119,10 +119,10 @@ export function CreateResourceDialog({
       });
       resetForm();
       onClose();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "創建資源失敗",
-        description: error.message,
+        description: error?.message,
         variant: "destructive",
       });
     } finally {

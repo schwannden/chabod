@@ -25,13 +25,10 @@ import {
   addServiceAdmin,
   removeServiceAdmin,
   addServiceNote,
-  deleteServiceNote,
   addServiceRole,
-  deleteServiceRole,
   addServiceGroup,
   removeServiceGroup,
   getGroupsForService,
-  isServiceAdmin,
   getServiceNotes,
   getServiceRoles
 } from "@/lib/services";

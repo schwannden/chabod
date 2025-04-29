@@ -46,10 +46,10 @@ export function MemberTable({
         description: "會友的角色已成功更新。",
       });
       onMemberUpdated();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "更新會友時出錯",
-        description: error.message || "發生未知錯誤",
+        description: error?.message || "發生未知錯誤",
         variant: "destructive",
       });
     } finally {
@@ -71,10 +71,10 @@ export function MemberTable({
         description: "會友已從租戶中移除。",
       });
       onMemberUpdated();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "移除會友時出錯",
-        description: error.message || "發生未知錯誤",
+        description: error?.message || "發生未知錯誤",
         variant: "destructive",
       });
     } finally {
@@ -116,10 +116,10 @@ export function MemberTable({
       
       setEditingMemberId(null);
       onMemberUpdated();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "更新會友時出錯",
-        description: error.message || "發生未知錯誤",
+        description: error?.message || "發生未知錯誤",
         variant: "destructive",
       });
     } finally {

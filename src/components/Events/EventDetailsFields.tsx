@@ -11,14 +11,6 @@ import { cn } from "@/lib/utils";
 import { UseFormReturn } from "react-hook-form";
 import { EventFormValues } from "@/hooks/useEventForm";
 import { Group } from "@/lib/types";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { useEffect } from "react";
 
 interface EventDetailsFieldsProps {
@@ -33,19 +25,14 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
   console.log("EventDetailsFields rendering with groups:", groups);
   console.log("Selected groups:", selectedGroups);
 
-  // Ensure groups is always a valid array
-  const safeGroups = Array.isArray(groups) ? groups : [];
-  console.log("Safe groups after check:", safeGroups);
-
   useEffect(() => {
     console.log("EventDetailsFields mounted/updated");
     console.log("Groups prop:", groups);
-    console.log("safeGroups:", safeGroups);
     // Clean up function
     return () => {
       console.log("EventDetailsFields unmounting");
     };
-  }, [groups, safeGroups]);
+  }, [groups]);
 
   const toggleGroup = (groupId: string) => {
     console.log("toggleGroup called with groupId:", groupId);
@@ -121,7 +108,7 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
                   disabled={(date) =>
                     date < new Date(new Date().setHours(0, 0, 0, 0))
                   }
-                  initialFocus
+                  autoFocus
                 />
               </PopoverContent>
             </Popover>
@@ -135,16 +122,16 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
         name="groups"
         render={({ field }) => {
           console.log("Groups field rendering, field value:", field.value);
-          console.log("safeGroups in render:", safeGroups);
+          console.log("groups in render:", groups);
           
           return (
             <FormItem>
               <FormLabel>Groups</FormLabel>
               <FormControl>
-                {safeGroups.length > 0 ? (
+                {groups.length > 0 ? (
                   <div className="border rounded-md p-2">
                     <p className="text-sm mb-2">Available Groups:</p>
-                    {safeGroups.map((group) => (
+                    {groups.map((group) => (
                       <div key={group.id} className="flex items-center gap-2 p-1">
                         <input
                           type="checkbox"

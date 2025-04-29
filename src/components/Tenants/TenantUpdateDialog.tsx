@@ -48,10 +48,11 @@ export function TenantUpdateDialog({ tenant, isOpen, onClose, onTenantUpdated }:
       });
       onTenantUpdated();
       onClose();
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error?.message || "未知錯誤";
       toast({
         title: "Error updating tenant",
-        description: error.message || "An unknown error occurred",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

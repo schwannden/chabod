@@ -44,10 +44,10 @@ export function MemberInviteDialog({ tenantId, isOpen, onClose, onMemberInvited 
       onClose();
       setEmail("");
       setRole("一般會友");
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "傳送邀請時出錯",
-        description: error.message || "發生未知錯誤",
+        description: error?.message || "發生未知錯誤",
         variant: "destructive",
       });
     } finally {

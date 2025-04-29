@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, ExternalLink, Book, Link, FileText, Video, Music, BarChart, Computer, Smartphone, Globe, FileImage, FileCog, FileCode, Package, Calendar, Mail, Users, Banknote, LayoutDashboard, Settings } from "lucide-react";
+import { Pencil, Trash2, ExternalLink, Book, Link, FileText, Video, Music, BarChart, Computer, Smartphone, Globe, FileImage, FileCog, FileCode, Package, Calendar, Mail, Users, Banknote, LayoutDashboard, Settings, LucideProps } from "lucide-react";
 import { Resource, Group } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { deleteResource } from "@/lib/resource-service";
@@ -10,7 +9,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { EditResourceDialog } from "./EditResourceDialog";
 
-const ICON_MAP: Record<string, any> = {
+type LucideIcon = React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>;
+
+const ICON_MAP: Record<string, LucideIcon> = {
   book: Book,
   link: Link,
   "file-text": FileText,
@@ -54,10 +55,11 @@ export function ResourceList({ resources, isLoading, onResourceUpdated, onResour
         title: "資源已刪除",
         description: "資源已成功刪除",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "未知錯誤";
       toast({
         title: "刪除資源失敗",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     }

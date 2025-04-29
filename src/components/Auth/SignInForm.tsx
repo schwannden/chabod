@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { associateUserWithTenant } from "@/lib/membership-service";
 import { checkUserTenantAccess } from "@/lib/member-service";
@@ -57,20 +55,15 @@ export function SignInForm({
       }
 
       if (tenantSlug && data.user) {
-        try {
-          if (inviteToken) {
-            await associateUserWithTenant(data.user.id, tenantSlug, inviteToken);
-          } else {
-            const hasAccess = await checkUserTenantAccess(data.user.id, tenantSlug);
-            
-            if (!hasAccess) {
-              await supabase.auth.signOut();
-              throw new Error("您沒有權限進入此教會，請聯絡管理員或註冊新的帳號。");
-            }
+        if (inviteToken) {
+          await associateUserWithTenant(data.user.id, tenantSlug, inviteToken);
+        } else {
+          const hasAccess = await checkUserTenantAccess(data.user.id, tenantSlug);
+          
+          if (!hasAccess) {
+            await supabase.auth.signOut();
+            throw new Error("您沒有權限進入此教會，請聯絡管理員或註冊新的帳號。");
           }
-        } catch (membershipError: any) {
-          await supabase.auth.signOut();
-          throw new Error(membershipError.message || "無法驗證用戶於教會的權限。");
         }
       }
 
@@ -84,10 +77,10 @@ export function SignInForm({
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "登入失敗",
-        description: error.message || "電子郵件或密碼錯誤",
+        description: error?.message || "電子郵件或密碼錯誤",
         variant: "destructive",
       });
     } finally {
@@ -122,10 +115,11 @@ export function SignInForm({
       });
       
       setResetPasswordMode(false);
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error?.message || "未知錯誤";
       toast({
         title: "重設密碼失敗",
-        description: error.message || "發送重設密碼電子郵件時發生錯誤",
+        description: errorMessage || "發送重設密碼電子郵件時發生錯誤",
         variant: "destructive",
       });
     } finally {

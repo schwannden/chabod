@@ -154,11 +154,11 @@ export function EditEventDialog({ event, onEventUpdated, groups = [], children }
       
       onEventUpdated();
       setIsOpen(false);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error updating event:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to update the event. Please try again.",
+        description: error?.message || "Failed to update the event. Please try again.",
         variant: "destructive",
       });
     } finally {

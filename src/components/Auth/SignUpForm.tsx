@@ -75,10 +75,11 @@ export function SignUpForm({
               title: "帳號已與教會關聯",
               description: `您的帳號已成功加入 ${tenantSlug}。`,
             });
-          } catch (associateError: any) {
+          } catch (associateError) {
             // Sign out user if tenant association fails
             await supabase.auth.signOut();
-            throw new Error(`無法將帳號加入教會：${associateError.message}`);
+            const errorMessage = associateError?.message || "未知錯誤";
+            throw new Error(`無法將帳號加入教會：${errorMessage}`);
           }
         }
 
@@ -118,10 +119,10 @@ export function SignUpForm({
       if (tenantSlug && data.user) {
         try {
           await associateUserWithTenant(data.user.id, tenantSlug, inviteToken);
-        } catch (associateError: any) {
+        } catch (associateError) {
           // Sign out user if tenant association fails
           await supabase.auth.signOut();
-          throw new Error(`無法將帳號加入教會：${associateError.message}`);
+          throw new Error(`無法將帳號加入教會：${associateError}`);
         }
       }
 
@@ -135,10 +136,10 @@ export function SignUpForm({
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "建立帳號失敗",
-        description: error.message || "發生未知錯誤",
+        description: error?.message || "發生未知錯誤",
         variant: "destructive",
       });
     } finally {

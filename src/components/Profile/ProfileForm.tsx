@@ -48,10 +48,10 @@ export function ProfileForm({ profile, onProfileUpdated }: ProfileFormProps) {
       });
       
       onProfileUpdated();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "更新個人資料時出錯",
-        description: error.message || "發生未知錯誤",
+        description: error?.message || "發生未知錯誤",
         variant: "destructive",
       });
     } finally {

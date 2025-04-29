@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Event, Group } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { useSession } from "@/contexts/AuthContext";
@@ -33,55 +33,55 @@ export function EventList({ events, isLoading, tenantId, onEventUpdated, groups 
     return 0;
   });
 
-  const checkEditPermissions = async () => {
-    if (!user || events.length === 0) return;
-    
-    const permissions: Record<string, boolean> = {};
-    
-    try {
-      // Get the tenant UUID from the slug first
-      const tenant = await getTenantBySlug(tenantId);
+  useEffect(() => {
+    const checkPermissions = async () => {
+      if (!user || events.length === 0) return;
       
-      if (!tenant) {
-        console.error("Tenant not found with slug:", tenantId);
-        return;
-      }
+      const permissions: Record<string, boolean> = {};
       
-      // Check if the user is a tenant owner
-      const { data: isOwner, error: ownerError } = await supabase.rpc('is_tenant_owner', {
-        tenant_uuid: tenant.id,
-        user_uuid: user.id
-      });
-      
-      if (ownerError) {
-        console.error("Error checking tenant owner:", ownerError);
-      }
-      
-      // If user is a tenant owner, they can edit all events
-      if (isOwner) {
-        events.forEach(event => {
-          permissions[event.id] = true;
+      try {
+        // Get the tenant UUID from the slug first
+        const tenant = await getTenantBySlug(tenantId);
+        
+        if (!tenant) {
+          console.error("Tenant not found with slug:", tenantId);
+          return;
+        }
+        
+        // Check if the user is a tenant owner
+        const { data: isOwner, error: ownerError } = await supabase.rpc('is_tenant_owner', {
+          tenant_uuid: tenant.id,
+          user_uuid: user.id
         });
-      } else {
-        // Otherwise, they can only edit events they created
+        
+        if (ownerError) {
+          console.error("Error checking tenant owner:", ownerError);
+        }
+        
+        // If user is a tenant owner, they can edit all events
+        if (isOwner) {
+          events.forEach(event => {
+            permissions[event.id] = true;
+          });
+        } else {
+          // Otherwise, they can only edit events they created
+          events.forEach(event => {
+            permissions[event.id] = event.created_by === user.id;
+          });
+        }
+        
+        setEditableEvents(permissions);
+      } catch (error) {
+        console.error("Error checking edit permissions:", error);
+        // Initialize with event creators having permission
         events.forEach(event => {
           permissions[event.id] = event.created_by === user.id;
         });
+        setEditableEvents(permissions);
       }
-      
-      setEditableEvents(permissions);
-    } catch (error) {
-      console.error("Error checking edit permissions:", error);
-      // Initialize with event creators having permission
-      events.forEach(event => {
-        permissions[event.id] = event.created_by === user.id;
-      });
-      setEditableEvents(permissions);
-    }
-  };
+    };
 
-  useEffect(() => {
-    checkEditPermissions();
+    checkPermissions();
   }, [user, events, tenantId]);
 
   const handleDeleteEvent = async (eventId: string) => {

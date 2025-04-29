@@ -68,31 +68,30 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
 
   // Fetch tenant members and groups when dialog opens
   useEffect(() => {
+    const fetchTenantMembers = async () => {
+      try {
+        const fetchedMembers = await getTenantMembers(tenantId);
+        setMembers(fetchedMembers);
+      } catch (error) {
+        console.error("Error fetching tenant members:", error);
+        toast.error("載入成員時發生錯誤");
+      }
+    };
+ 
+    const fetchTenantGroups = async () => {
+      try {
+        const fetchedGroups = await getTenantGroups(tenantId);
+        setGroups(fetchedGroups);
+      } catch (error) {
+        console.error("Error fetching tenant groups:", error);
+        toast.error("載入小組時發生錯誤");
+      }
+    };
     if (open) {
       fetchTenantMembers();
       fetchTenantGroups();
     }
   }, [open, tenantId]);
-
-  const fetchTenantMembers = async () => {
-    try {
-      const fetchedMembers = await getTenantMembers(tenantId);
-      setMembers(fetchedMembers);
-    } catch (error) {
-      console.error("Error fetching tenant members:", error);
-      toast.error("載入成員時發生錯誤");
-    }
-  };
-
-  const fetchTenantGroups = async () => {
-    try {
-      const fetchedGroups = await getTenantGroups(tenantId);
-      setGroups(fetchedGroups);
-    } catch (error) {
-      console.error("Error fetching tenant groups:", error);
-      toast.error("載入小組時發生錯誤");
-    }
-  };
 
   const onSubmit = async (values: ServiceFormValues) => {
     try {

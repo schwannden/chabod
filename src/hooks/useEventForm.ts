@@ -138,11 +138,12 @@ export function useEventForm(tenantSlug: string, onSuccess: () => void, initialG
       
       form.reset();
       onSuccess();
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error?.message || "未知錯誤";
       console.error("Error creating event:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to create the event. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
