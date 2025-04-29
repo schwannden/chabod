@@ -25,7 +25,7 @@ import {
   addServiceNote,
   addServiceRole,
   addServiceGroup,
-  getServiceGroups,
+  getGroupsForService,
   isServiceAdmin
 } from "@/lib/services";
 
@@ -106,7 +106,8 @@ export function EditServiceDialog({
 
   const fetchServiceGroups = async () => {
     try {
-      const groupIds = await getServiceGroups(service.id);
+      // Fix: Use getGroupsForService instead which returns string[] of group IDs
+      const groupIds = await getGroupsForService(service.id);
       setSelectedGroups(groupIds);
     } catch (error) {
       console.error("Error fetching service groups:", error);
