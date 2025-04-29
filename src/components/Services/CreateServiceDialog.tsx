@@ -21,7 +21,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { createService, addServiceAdmin, addServiceNote } from "@/lib/services";
+import { 
+  createService, 
+  addServiceAdmin, 
+  addServiceNote,
+  addServiceRole,
+  addServiceGroup
+} from "@/lib/services";
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TenantMemberWithProfile } from "@/lib/types";
@@ -157,8 +163,19 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
 
   const onSubmit = async (values: ServiceFormValues) => {
     try {
+      // Ensure name is required
+      if (!values.name) {
+        toast.error("服事類型名稱為必填");
+        return;
+      }
+      
       // Create service
-      const service = await createService(values);
+      const service = await createService({
+        name: values.name,
+        tenant_id: values.tenant_id,
+        default_start_time: values.default_start_time || null,
+        default_end_time: values.default_end_time || null,
+      });
       
       // Add selected admins
       for (const adminId of selectedAdmins) {
@@ -169,7 +186,7 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
       for (const note of notes) {
         await addServiceNote({
           service_id: service.id,
-          title: note.title,
+          text: note.title,
           content: note.content || "",
         });
       }
