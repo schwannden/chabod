@@ -195,7 +195,7 @@ function ServiceAdminView({ serviceId }: { serviceId: string }) {
 
 // Component for displaying service groups
 function ServiceGroupView({ serviceId }: { serviceId: string }) {
-  const { data: groups = [], isLoading, error } = useQuery({
+  const { data: groupIds = [], isLoading, error } = useQuery({
     queryKey: ["serviceGroups", serviceId],
     queryFn: () => getGroupsForService(serviceId),
   });
@@ -205,13 +205,13 @@ function ServiceGroupView({ serviceId }: { serviceId: string }) {
 
   return (
     <div className="space-y-4">
-      {groups.length === 0 ? (
+      {groupIds.length === 0 ? (
         <p className="text-muted-foreground text-center">尚未指定服事小組</p>
       ) : (
         <div className="space-y-2">
-          {groups.map((group) => (
-            <div key={group.id} className="flex items-center gap-2 p-2 rounded-md border">
-              <div className="font-medium">{group.name}</div>
+          {groupIds.map((groupId, index) => (
+            <div key={`group-${index}-${groupId}`} className="flex items-center gap-2 p-2 rounded-md border">
+              <div className="font-medium">{groupId}</div>
             </div>
           ))}
         </div>

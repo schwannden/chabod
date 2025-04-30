@@ -41,3 +41,22 @@ export async function isServiceAdmin(serviceId: string, userId: string): Promise
 
   return !!data;
 }
+
+export async function getServiceAdminsWithProfiles(serviceId: string): Promise<any[]> {
+  const { data, error } = await supabase
+    .from("service_admins")
+    .select(`
+      id, 
+      user_id, 
+      user_email:profiles!inner(email, name),
+      profile:profiles(*)
+    `)
+    .eq("service_id", serviceId);
+
+  if (error) {
+    console.error("Error fetching service admins:", error);
+    throw error;
+  }
+
+  return data || [];
+}
