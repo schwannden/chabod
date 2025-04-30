@@ -24,7 +24,7 @@ export type NoteFormValues = z.infer<typeof noteFormSchema>;
 
 interface ServiceNotesFormProps {
   notes: NoteFormValues[];
-  setNotes: (notes: NoteFormValues[]) => void;
+  setNotes: React.Dispatch<React.SetStateAction<NoteFormValues[]>>;
 }
 
 export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {

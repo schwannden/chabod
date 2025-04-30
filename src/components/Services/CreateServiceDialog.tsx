@@ -120,7 +120,7 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
           service_id: service.id,
           text: note.title,
           tenant_id: tenantId,
-          // Note: link property is optional in the schema so we don't need to specify it
+          link: note.content || null
         });
       }
       
@@ -135,10 +135,7 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
       
       // Add selected groups
       for (const groupId of selectedGroups) {
-        await addServiceGroup({
-          service_id: service.id,
-          group_id: groupId,
-        });
+        await addServiceGroup(service.id, groupId);
       }
       
       toast.success("服事類型已新增");

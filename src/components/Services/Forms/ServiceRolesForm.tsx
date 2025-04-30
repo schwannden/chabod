@@ -24,7 +24,7 @@ export type RoleFormValues = z.infer<typeof roleFormSchema>;
 
 interface ServiceRolesFormProps {
   roles: RoleFormValues[];
-  setRoles: (roles: RoleFormValues[]) => void;
+  setRoles: React.Dispatch<React.SetStateAction<RoleFormValues[]>>;
 }
 
 export function ServiceRolesForm({ roles, setRoles }: ServiceRolesFormProps) {

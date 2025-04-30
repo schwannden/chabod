@@ -37,8 +37,8 @@ import {
 import { ServiceDetailsForm, ServiceFormValues } from "./Forms/ServiceDetailsForm";
 import { ServiceAdminsForm } from "./Forms/ServiceAdminsForm";
 import { ServiceGroupsForm } from "./Forms/ServiceGroupsForm";
-import { ServiceNotesForm } from "./Forms/ServiceNotesForm";
-import { ServiceRolesForm } from "./Forms/ServiceRolesForm";
+import { ServiceNotesForm, NoteFormValues } from "./Forms/ServiceNotesForm";
+import { ServiceRolesForm, RoleFormValues } from "./Forms/ServiceRolesForm";
 
 interface EditServiceDialogProps {
   service: Service;
@@ -58,8 +58,8 @@ export function EditServiceDialog({
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedAdmins, setSelectedAdmins] = useState<string[]>([]);
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
-  const [notes, setNotes] = useState<{ title: string; content?: string }[]>([]);
-  const [roles, setRoles] = useState<{ name: string; description?: string }[]>([]);
+  const [notes, setNotes] = useState<NoteFormValues[]>([]);
+  const [roles, setRoles] = useState<RoleFormValues[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Setup form
