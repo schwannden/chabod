@@ -37,8 +37,8 @@ import {
 import { ServiceDetailsForm, ServiceFormValues } from "./Forms/ServiceDetailsForm";
 import { ServiceAdminsForm } from "./Forms/ServiceAdminsForm";
 import { ServiceGroupsForm } from "./Forms/ServiceGroupsForm";
-import { ServiceNotesForm, NoteFormValues } from "./Forms/ServiceNotesForm";
-import { ServiceRolesForm, RoleFormValues } from "./Forms/ServiceRolesForm";
+import { ServiceNotesForm } from "./Forms/ServiceNotesForm";
+import { ServiceRolesForm } from "./Forms/ServiceRolesForm";
 
 interface EditServiceDialogProps {
   service: Service;
@@ -58,8 +58,8 @@ export function EditServiceDialog({
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedAdmins, setSelectedAdmins] = useState<string[]>([]);
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
-  const [notes, setNotes] = useState<NoteFormValues[]>([]);
-  const [roles, setRoles] = useState<RoleFormValues[]>([]);
+  const [notes, setNotes] = useState<{ title: string; content?: string }[]>([]);
+  const [roles, setRoles] = useState<{ name: string; description?: string }[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Setup form
@@ -139,10 +139,10 @@ export function EditServiceDialog({
   const fetchServiceNotes = async () => {
     try {
       const fetchedNotes = await getServiceNotes(service.id);
-      const formattedNotes: NoteFormValues[] = fetchedNotes.map(note => ({
-        id: note.id,
-        text: note.text,
-        link: note.link || ""
+      // Convert the notes to the format expected by the NotesForm component
+      const formattedNotes = fetchedNotes.map(note => ({
+        title: note.text,
+        content: note.link || ""
       }));
       setNotes(formattedNotes);
     } catch (error) {
@@ -153,9 +153,10 @@ export function EditServiceDialog({
   const fetchServiceRoles = async () => {
     try {
       const fetchedRoles = await getServiceRoles(service.id);
-      const formattedRoles: RoleFormValues[] = fetchedRoles.map(role => ({
-        id: role.id,
-        name: role.name
+      // Convert the roles to the format expected by the RolesForm component
+      const formattedRoles = fetchedRoles.map(role => ({
+        name: role.name,
+        description: ""
       }));
       setRoles(formattedRoles);
     } catch (error) {
@@ -235,8 +236,8 @@ export function EditServiceDialog({
         await addServiceNote({
           service_id: service.id,
           tenant_id: service.tenant_id,
-          text: note.text,
-          link: note.link || null
+          text: note.title,
+          link: note.content || null
         });
       }
       
@@ -266,11 +267,8 @@ export function EditServiceDialog({
   };
 
   const handleDialogClose = () => {
-    // Use a timeout to allow the dialog to close properly first
-    setTimeout(() => {
-      setActiveTab("details");
-      onOpenChange(false);
-    }, 0);
+    setActiveTab("details");
+    onOpenChange(false);
   };
 
   return (
