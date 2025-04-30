@@ -37,9 +37,9 @@ export function MemberFilterBar({
         />
       </FilterGroup>
 
-      <FilterGroup label="電郵">
+      <FilterGroup label="email">
         <Input
-          placeholder="搜尋電郵"
+          placeholder="搜尋email"
           value={emailFilter}
           onChange={(e) => setEmailFilter(e.target.value)}
         />

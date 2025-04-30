@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Tenant, TenantWithUsage } from "./types";
 

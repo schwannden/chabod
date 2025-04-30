@@ -6,40 +6,20 @@ import { v4 as uuidv4 } from "uuid";
  * Fetches all members of a tenant with their profile information
  */
 export async function getTenantMembers(tenantId: string): Promise<TenantMemberWithProfile[]> {
-  const { data: members, error: memberError } = await supabase
+  const { data, error } = await supabase
     .from("tenant_members")
-    .select("*")
+    .select(`
+      *,
+      profile:profiles(*)
+    `)
     .eq("tenant_id", tenantId);
 
-  if (memberError) {
-    console.error("Error fetching tenant members:", memberError);
+  if (error) {
+    console.error("Error fetching tenant members:", error);
     return [];
   }
 
-  if (!members || members.length === 0) {
-    return [];
-  }
-
-  const userIds = members.map(member => member.user_id);
-  const { data: profiles, error: profileError } = await supabase
-    .from("profiles")
-    .select("*")
-    .in("id", userIds);
-
-  if (profileError) {
-    console.error("Error fetching profiles:", profileError);
-    return [];
-  }
-
-  const membersWithProfiles = members.map(member => {
-    const profile = profiles?.find(p => p.id === member.user_id) || null;
-    return {
-      ...member,
-      profile: profile
-    } as TenantMemberWithProfile;
-  });
-
-  return membersWithProfiles;
+  return data as TenantMemberWithProfile[] || [];
 }
 
 /**

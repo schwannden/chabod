@@ -58,7 +58,7 @@ export function MemberTable({
   };
 
   const handleDeleteMember = async (memberId: string, memberName: string) => {
-    if (!confirm(`確定要從租戶中移除 ${memberName || "此會友"} 嗎？`)) {
+    if (!confirm(`確定要移除 ${memberName || "此會友"} 嗎？`)) {
       return;
     }
 
@@ -68,7 +68,7 @@ export function MemberTable({
       await deleteTenantMember(memberId);
       toast({
         title: "會友已移除",
-        description: "會友已從租戶中移除。",
+        description: "會友已從教會中移除。",
       });
       onMemberUpdated();
     } catch (error) {
@@ -128,12 +128,7 @@ export function MemberTable({
   };
 
   const sortedMembers = [...members].sort((a, b) => {
-    const aIsAdmin = a.role === "管理者" || a.role === "owner";
-    const bIsAdmin = b.role === "管理者" || b.role === "owner";
-    
-    if (aIsAdmin && !bIsAdmin) return -1;
-    if (!aIsAdmin && bIsAdmin) return 1;
-    return 0;
+    return a.role === "owner" ? -1 : 1;
   });
 
   return (
@@ -161,7 +156,7 @@ export function MemberTable({
           
           {sortedMembers.map((member) => (
             <TableRow key={member.id}>
-              <TableCell>{member.profile?.full_name || "匿名"}</TableCell>
+              <TableCell>{member.profile?.full_name}</TableCell>
               
               <TableCell>
                 {editingMemberId === member.id ? (

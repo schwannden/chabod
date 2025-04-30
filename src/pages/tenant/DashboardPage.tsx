@@ -3,17 +3,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSession } from "@/contexts/AuthContext";
 import { NavBar } from "@/components/Layout/NavBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TenantWithPriceTier } from "@/lib/types";
+import { Tenant } from "@/lib/types";
 import { getTenantBySlug, getUserTenants } from "@/lib/tenant-utils";
 import { Loader2, Users, Calendar, Group, FileText, Handshake } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 export default function DashboardPage() {
   const { slug } = useParams<{ slug: string }>();
   const { user, profile, isLoading, signOut } = useSession();
   const navigate = useNavigate();
-  const [tenant, setTenant] = useState<TenantWithPriceTier | null>(null);
-  const [memberCount, setMemberCount] = useState(0);
+  const [tenant, setTenant] = useState<Tenant | null>(null);
   const [isTenantLoading, setIsTenantLoading] = useState(true);
 
   useEffect(() => {
@@ -27,40 +25,25 @@ export default function DashboardPage() {
       if (!slug || !user) return;
       
       try {
-        const { data: tenantData, error } = await supabase
-          .from("tenants")
-          .select(`
-            *,
-            price_tier:price_tiers(*)
-          `)
-          .eq("slug", slug)
-          .single();
-
-        if (error) {
-          console.error("Error fetching tenant:", error);
-          navigate("/not-found");
+        // Check if user is a member of this tenant first
+        const userTenants = await getUserTenants(user.id);
+        const currentTenant = userTenants.find(t => t.slug === slug);
+        
+        if (!currentTenant) {
+          navigate(`/tenant/${slug}/auth`);
           return;
         }
+        
+        // User is a member, now fetch the complete tenant data
+        const tenantData = await getTenantBySlug(slug);
 
         if (!tenantData) {
+          console.error("Tenant not found");
           navigate("/not-found");
           return;
         }
 
         setTenant(tenantData);
-        
-        const userTenants = await getUserTenants(user.id);
-        const isMember = userTenants.some(t => t.id === tenantData.id);
-        
-        if (!isMember) {
-          navigate(`/tenant/${slug}/auth`);
-          return;
-        }
-        
-        const tenantWithCount = userTenants.find(t => t.id === tenantData.id);
-        if (tenantWithCount) {
-          setMemberCount(tenantWithCount.memberCount);
-        }
       } catch (error) {
         console.error("Error fetching tenant:", error);
       } finally {
@@ -73,6 +56,7 @@ export default function DashboardPage() {
 
   const handleSignOut = async () => {
     await signOut();
+    // navigate to tenant's auth page
     navigate(`/tenant/${slug}/auth`);
   };
 
