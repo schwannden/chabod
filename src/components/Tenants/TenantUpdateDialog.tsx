@@ -43,8 +43,8 @@ export function TenantUpdateDialog({ tenant, isOpen, onClose, onTenantUpdated }:
     try {
       await updateTenant(tenant.id, name, slug);
       toast({
-        title: "Tenant updated",
-        description: `${name} has been updated successfully.`,
+        title: "更新成功",
+        description: `${name} 已更新。`,
       });
       onTenantUpdated();
       onClose();
@@ -103,7 +103,7 @@ export function TenantUpdateDialog({ tenant, isOpen, onClose, onTenantUpdated }:
               Cancel
             </Button>
             <Button type="submit" disabled={isUpdating}>
-              {isUpdating ? "Updating..." : "Update Tenant"}
+              {isUpdating ? "更新中..." : "更新教會資訊"}
             </Button>
           </DialogFooter>
         </form>

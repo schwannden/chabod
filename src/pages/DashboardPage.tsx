@@ -6,14 +6,14 @@ import { NavBar } from "@/components/Layout/NavBar";
 import { TenantCard } from "@/components/Tenants/TenantCard";
 import { TenantCreateDialog } from "@/components/Tenants/TenantCreateDialog";
 import { Button } from "@/components/ui/button";
-import { TenantWithMemberCount } from "@/lib/types";
+import { TenantWithUsage } from "@/lib/types";
 import { getUserTenants } from "@/lib/tenant-utils";
 import { Plus } from "lucide-react";
 
 export default function DashboardPage() {
   const { user, isLoading } = useSession();
   const navigate = useNavigate();
-  const [tenants, setTenants] = useState<TenantWithMemberCount[]>([]);
+  const [tenants, setTenants] = useState<TenantWithUsage[]>([]);
   const [isTenantsLoading, setIsTenantsLoading] = useState(true);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
@@ -43,23 +43,7 @@ export default function DashboardPage() {
     }
   }, [user]);
 
-  const handleTenantCreated = async () => {
-    if (!user) return;
-    setIsTenantsLoading(true);
-    const tenantsData = await getUserTenants(user.id);
-    setTenants(tenantsData);
-    setIsTenantsLoading(false);
-  };
-
-  const handleTenantUpdated = async () => {
-    if (!user) return;
-    setIsTenantsLoading(true);
-    const tenantsData = await getUserTenants(user.id);
-    setTenants(tenantsData);
-    setIsTenantsLoading(false);
-  };
-
-  const handleTenantDeleted = async () => {
+  const handleTenantChange = async () => {
     if (!user) return;
     setIsTenantsLoading(true);
     const tenantsData = await getUserTenants(user.id);
@@ -83,15 +67,15 @@ export default function DashboardPage() {
         </div>
 
         {isTenantsLoading ? (
-          <div className="flex items-center justify-center py-12">Loading tenants...</div>
+          <div className="flex items-center justify-center py-12">載入教會列表...</div>
         ) : tenants.length === 0 ? (
           <div className="bg-muted rounded-lg p-6 text-center">
-            <h3 className="text-lg font-medium mb-2">No tenants yet</h3>
+            <h3 className="text-lg font-medium mb-2">還沒有您所管理的教會</h3>
             <p className="text-muted-foreground mb-4">
-              Create your first tenant to get started.
+              新增你的第一個教會來開始使用
             </p>
             <Button onClick={() => setIsCreateDialogOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" /> Create Tenant
+              <Plus className="mr-2 h-4 w-4" /> 新增教會
             </Button>
           </div>
         ) : (
@@ -100,8 +84,8 @@ export default function DashboardPage() {
               <TenantCard
                 key={tenant.id}
                 tenant={tenant}
-                onTenantUpdated={handleTenantUpdated}
-                onTenantDeleted={handleTenantDeleted}
+                onTenantUpdated={handleTenantChange}
+                onTenantDeleted={handleTenantChange}
               />
             ))}
           </div>
@@ -113,7 +97,7 @@ export default function DashboardPage() {
           isOpen={isCreateDialogOpen}
           onClose={() => setIsCreateDialogOpen(false)}
           userId={user.id}
-          onTenantCreated={handleTenantCreated}
+          onTenantCreated={handleTenantChange}
         />
       )}
     </div>

@@ -1,29 +1,16 @@
-
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Users, Copy, ExternalLink, Info } from "lucide-react";
-import { TenantWithMemberCount } from "@/lib/types";
+import { Pencil, Trash2, Users, Copy, Info } from "lucide-react";
+import { TenantWithUsage } from "@/lib/types";
 import { useNavigate } from "react-router-dom";
 import { deleteTenant } from "@/lib/tenant-utils";
 import { TenantUpdateDialog } from "./TenantUpdateDialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { supabase } from "@/integrations/supabase/client";
-import { PriceTier } from "@/lib/types";
+import { PricePlansDialog } from "./PricePlansDialog";
 
 interface TenantCardProps {
-  tenant: TenantWithMemberCount & {
-    price_tier?: {
-      name: string;
-      price_monthly: number;
-      user_limit: number;
-      group_limit: number;
-      event_limit: number;
-    };
-    groupCount?: number;
-    eventCount?: number;
-  };
+  tenant: TenantWithUsage;
   onTenantUpdated: () => void;
   onTenantDeleted: () => void;
 }
@@ -32,7 +19,6 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isAllPlansDialogOpen, setIsAllPlansDialogOpen] = useState(false);
-  const [priceTiers, setPriceTiers] = useState<PriceTier[]>([]);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -72,40 +58,9 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
     const authUrl = `${window.location.origin}/tenant/${tenant.slug}/auth`;
     navigator.clipboard.writeText(authUrl);
     toast({
-      title: "URL copied to clipboard",
-      description: "The tenant auth URL has been copied to your clipboard.",
+      title: "URL 已複製到剪貼簿",
+      description: "教會登入頁面 URL 已複製到剪貼簿。",
     });
-  };
-
-  const fetchPriceTiers = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("price_tiers")
-        .select("*")
-        .eq("is_active", true);
-      
-      if (error) {
-        console.error("Error fetching price tiers:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load pricing plans.",
-          variant: "destructive",
-        });
-      } else {
-        // Sort price tiers by monthly price in ascending order
-        const sortedPriceTiers = (data || []).sort((a, b) => 
-          a.price_monthly - b.price_monthly
-        );
-        setPriceTiers(sortedPriceTiers);
-      }
-    } catch (error) {
-      console.error("Error fetching price tiers:", error);
-    }
-  };
-
-  const handleOpenAllPlansDialog = () => {
-    fetchPriceTiers();
-    setIsAllPlansDialogOpen(true);
   };
 
   return (
@@ -136,12 +91,12 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
           
           <div className="mt-4 pt-4 border-t">
             <div className="flex items-center justify-between">
-              <h4 className="font-medium mb-2">Pricing Plan</h4>
+              <h4 className="font-medium mb-2">訂閱計畫</h4>
               <Button 
                 variant="ghost" 
                 size="icon" 
                 className="text-muted-foreground hover:text-primary"
-                onClick={handleOpenAllPlansDialog}
+                onClick={() => setIsAllPlansDialogOpen(true)}
               >
                 <Info className="h-4 w-4" />
               </Button>
@@ -166,7 +121,7 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
           </div>
 
           <div className="mt-4 pt-2 border-t">
-            <p className="text-sm font-medium mb-1">Auth Page URL:</p>
+            <p className="text-sm font-medium mb-1">教會登入頁面 URL:</p>
             <div className="flex items-center justify-between">
               <code className="text-xs bg-muted p-1 rounded break-all">
                 {window.location.origin}/tenant/{tenant.slug}/auth
@@ -195,37 +150,11 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
         onTenantUpdated={onTenantUpdated}
       />
       
-      <Dialog open={isAllPlansDialogOpen} onOpenChange={setIsAllPlansDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Pricing Plans</DialogTitle>
-            <DialogDescription>
-              Choose the plan that best fits your church's needs.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            {priceTiers.map((plan) => (
-              <div 
-                key={plan.id} 
-                className={`border rounded-lg p-4 ${plan.name === tenant.price_tier?.name ? 'border-primary bg-primary/10' : ''}`}
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <h4 className="text-lg font-semibold">{plan.name}</h4>
-                  <p className="text-sm text-muted-foreground">${plan.price_monthly}/month</p>
-                </div>
-                <div className="space-y-2">
-                  <p>Members Limit: {plan.user_limit}</p>
-                  <p>Groups Limit: {plan.group_limit}</p>
-                  <p>Events Limit: {plan.event_limit}</p>
-                  {plan.description && (
-                    <p className="text-sm text-muted-foreground">{plan.description}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <PricePlansDialog
+        tenant={tenant}
+        isOpen={isAllPlansDialogOpen}
+        onOpenChange={setIsAllPlansDialogOpen}
+      />
     </>
   );
 }

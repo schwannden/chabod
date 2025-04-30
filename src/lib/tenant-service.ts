@@ -1,21 +1,11 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Tenant, TenantWithMemberCount } from "./types";
+import { Tenant, TenantWithUsage } from "./types";
 
 /**
  * Fetches all tenants that a user is a member of
  */
-export async function getUserTenants(userId: string): Promise<(TenantWithMemberCount & { 
-  groupCount?: number; 
-  eventCount?: number;
-  price_tier?: {
-    name: string;
-    price_monthly: number;
-    user_limit: number;
-    group_limit: number;
-    event_limit: number;
-  }
-})[]> {
+export async function getUserTenants(userId: string): Promise<(TenantWithUsage)[]> {
   const { data: tenantMembers, error: memberError } = await supabase
     .from("tenant_members")
     .select("tenant_id")

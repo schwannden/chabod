@@ -77,7 +77,7 @@ export function TenantCreateDialog({ isOpen, onClose, userId, onTenantCreated }:
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Tenant Name</Label>
+            <Label htmlFor="name">教會名稱</Label>
             <Input
               id="name"
               value={name}
@@ -88,7 +88,7 @@ export function TenantCreateDialog({ isOpen, onClose, userId, onTenantCreated }:
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="slug">Tenant Slug</Label>
+            <Label htmlFor="slug">Slug</Label>
             <Input
               id="slug"
               value={slug}
@@ -99,7 +99,7 @@ export function TenantCreateDialog({ isOpen, onClose, userId, onTenantCreated }:
               title="Lowercase letters, numbers, and hyphens only"
             />
             <p className="text-xs text-muted-foreground">
-              This will be used in the URL: /tenant/{slug || "example"}
+              這將會被用於 URL: /tenant/{slug || "example"}
             </p>
           </div>
           
@@ -108,7 +108,7 @@ export function TenantCreateDialog({ isOpen, onClose, userId, onTenantCreated }:
               Cancel
             </Button>
             <Button type="submit" disabled={isCreating}>
-              {isCreating ? "Creating..." : "Create Tenant"}
+              {isCreating ? "建立中..." : "建立教會"}
             </Button>
           </DialogFooter>
         </form>

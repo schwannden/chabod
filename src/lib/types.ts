@@ -17,10 +17,17 @@ export type EventWithGroups = Event & {
   groups?: string[];
 };
 
-export type TenantWithMemberCount = Tenant & {
+export type TenantWithUsage = Tenant & {
   memberCount: number;
   groupCount?: number;
   eventCount?: number;
+  price_tier?: {
+    name: string;
+    price_monthly: number;
+    user_limit: number;
+    group_limit: number;
+    event_limit: number;
+  };
 };
 
 export type TenantMemberWithProfile = TenantMember & {
