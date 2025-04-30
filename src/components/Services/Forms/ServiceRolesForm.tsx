@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Trash2 } from "lucide-react";
 
 const roleFormSchema = z.object({
   name: z.string().min(1, "角色名稱為必填"),
@@ -44,6 +45,10 @@ export function ServiceRolesForm({ roles, setRoles }: ServiceRolesFormProps) {
     } else {
       roleForm.trigger();
     }
+  };
+
+  const handleDeleteRole = (index: number) => {
+    setRoles(roles.filter((_, i) => i !== index));
   };
 
   return (
@@ -89,11 +94,22 @@ export function ServiceRolesForm({ roles, setRoles }: ServiceRolesFormProps) {
           <ScrollArea className="h-40 border rounded-md p-2">
             <div className="space-y-2">
               {roles.map((role, index) => (
-                <div key={index} className="bg-secondary p-2 rounded-md">
-                  <h5 className="font-medium">{role.name}</h5>
-                  <p className="text-sm text-muted-foreground">
-                    {role.description}
-                  </p>
+                <div key={index} className="bg-secondary p-2 rounded-md flex justify-between items-start">
+                  <div>
+                    <h5 className="font-medium">{role.name}</h5>
+                    <p className="text-sm text-muted-foreground">
+                      {role.description}
+                    </p>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 text-destructive hover:text-destructive/80"
+                    onClick={() => handleDeleteRole(index)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">刪除角色</span>
+                  </Button>
                 </div>
               ))}
             </div>

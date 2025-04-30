@@ -1,11 +1,6 @@
 
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useState } from "react";
 import { Plus } from "lucide-react";
-import { toast } from "sonner";
-
 import {
   Dialog,
   DialogContent,
@@ -14,26 +9,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { TenantMemberWithProfile } from "@/lib/types";
-import { Group } from "@/lib/types";
-import { getTenantMembers } from "@/lib/member-service";
-import { getTenantGroups } from "@/lib/group-service";
-import { 
-  createService, 
-  addServiceAdmin, 
-  addServiceNote,
-  addServiceRole,
-  addServiceGroup
-} from "@/lib/services";
-
-// Import our new form components
-import { ServiceDetailsForm, ServiceFormValues } from "./Forms/ServiceDetailsForm";
-import { ServiceAdminsForm } from "./Forms/ServiceAdminsForm";
-import { ServiceGroupsForm } from "./Forms/ServiceGroupsForm";
-import { ServiceNotesForm, NoteFormValues } from "./Forms/ServiceNotesForm";
-import { ServiceRolesForm, RoleFormValues } from "./Forms/ServiceRolesForm";
+import { useServiceForm } from "./hooks/useServiceForm";
+import { createServiceData } from "./services/serviceDataService";
+import { ServiceForm } from "./Forms/ServiceForm";
 
 interface CreateServiceDialogProps {
   tenantId: string;
@@ -41,127 +20,66 @@ interface CreateServiceDialogProps {
 }
 
 export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialogProps) {
-  const [activeTab, setActiveTab] = useState("details");
-  const [members, setMembers] = useState<TenantMemberWithProfile[]>([]);
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [selectedAdmins, setSelectedAdmins] = useState<string[]>([]);
-  const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
-  const [notes, setNotes] = useState<NoteFormValues[]>([]);
-  const [roles, setRoles] = useState<RoleFormValues[]>([]);
   const [open, setOpen] = useState(false);
 
-  // Service form
-  const form = useForm<ServiceFormValues>({
-    resolver: zodResolver(z.object({
-      name: z.string().min(1, "名稱為必填"),
-      tenant_id: z.string(),
-      default_start_time: z.string().optional(),
-      default_end_time: z.string().optional(),
-    })),
-    defaultValues: {
-      name: "",
-      tenant_id: tenantId,
-      default_start_time: "",
-      default_end_time: "",
-    },
+  const {
+    form,
+    activeTab,
+    setActiveTab,
+    members,
+    groups,
+    selectedAdmins,
+    setSelectedAdmins,
+    selectedGroups,
+    setSelectedGroups,
+    notes,
+    setNotes,
+    roles,
+    setRoles,
+    isSubmitting,
+    setIsSubmitting,
+    resetForm
+  } = useServiceForm({
+    tenantId,
+    isOpen: open
   });
 
-  // Fetch tenant members and groups when dialog opens
-  useEffect(() => {
-    const fetchTenantMembers = async () => {
-      try {
-        const fetchedMembers = await getTenantMembers(tenantId);
-        setMembers(fetchedMembers);
-      } catch (error) {
-        console.error("Error fetching tenant members:", error);
-        toast.error("載入成員時發生錯誤");
-      }
-    };
- 
-    const fetchTenantGroups = async () => {
-      try {
-        const fetchedGroups = await getTenantGroups(tenantId);
-        setGroups(fetchedGroups);
-      } catch (error) {
-        console.error("Error fetching tenant groups:", error);
-        toast.error("載入小組時發生錯誤");
-      }
-    };
-    if (open) {
-      fetchTenantMembers();
-      fetchTenantGroups();
-    }
-  }, [open, tenantId]);
-
-  const onSubmit = async (values: ServiceFormValues) => {
+  const handleSubmit = async () => {
     try {
-      // Ensure name is required
-      if (!values.name) {
-        toast.error("服事類型名稱為必填");
-        return;
+      setIsSubmitting(true);
+      const formData = form.getValues();
+      
+      const success = await createServiceData(
+        formData,
+        {
+          admins: selectedAdmins,
+          groups: selectedGroups,
+          notes,
+          roles
+        }
+      );
+      
+      if (success) {
+        handleDialogClose();
+        onSuccess?.();
       }
-      
-      // Create service
-      const service = await createService({
-        name: values.name,
-        tenant_id: values.tenant_id,
-        default_start_time: values.default_start_time || null,
-        default_end_time: values.default_end_time || null,
-      });
-      
-      // Add selected admins
-      for (const adminId of selectedAdmins) {
-        await addServiceAdmin(service.id, adminId);
-      }
-      
-      // Add notes - use text property instead of title
-      for (const note of notes) {
-        await addServiceNote({
-          service_id: service.id,
-          text: note.title,
-          tenant_id: tenantId,
-          link: note.content || null
-        });
-      }
-      
-      // Add roles - only use name property
-      for (const role of roles) {
-        await addServiceRole({
-          service_id: service.id,
-          name: role.name,
-          tenant_id: tenantId,
-        });
-      }
-      
-      // Add selected groups
-      for (const groupId of selectedGroups) {
-        await addServiceGroup(service.id, groupId);
-      }
-      
-      toast.success("服事類型已新增");
-      handleDialogClose();
-      onSuccess?.();
     } catch (error) {
       console.error("Error creating service:", error);
-      toast.error("新增服事類型時發生錯誤");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDialogClose = () => {
     setOpen(false);
-    setActiveTab("details");
-    form.reset();
-    setSelectedAdmins([]);
-    setSelectedGroups([]);
-    setNotes([]);
-    setRoles([]);
+    resetForm();
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="size-4" />
+          <Plus className="size-4 mr-2" />
           新增服事類型
         </Button>
       </DialogTrigger>
@@ -169,53 +87,26 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
         <DialogHeader>
           <DialogTitle>新增服事類型</DialogTitle>
         </DialogHeader>
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-5 mb-4">
-            <TabsTrigger value="details">基本資料</TabsTrigger>
-            <TabsTrigger value="admins">管理員</TabsTrigger>
-            <TabsTrigger value="groups">小組</TabsTrigger>
-            <TabsTrigger value="notes">備註</TabsTrigger>
-            <TabsTrigger value="roles">角色</TabsTrigger>
-          </TabsList>
-          
-          {/* Basic Details */}
-          <TabsContent value="details">
-            <ServiceDetailsForm form={form} />
-          </TabsContent>
-          
-          {/* Service Admins */}
-          <TabsContent value="admins">
-            <ServiceAdminsForm 
-              members={members} 
-              selectedAdmins={selectedAdmins}
-              setSelectedAdmins={setSelectedAdmins}
-            />
-          </TabsContent>
-          
-          {/* Service Groups */}
-          <TabsContent value="groups">
-            <ServiceGroupsForm
-              groups={groups}
-              selectedGroups={selectedGroups}
-              setSelectedGroups={setSelectedGroups}
-            />
-          </TabsContent>
-          
-          {/* Service Notes */}
-          <TabsContent value="notes">
-            <ServiceNotesForm notes={notes} setNotes={setNotes} />
-          </TabsContent>
-          
-          {/* Service Roles */}
-          <TabsContent value="roles">
-            <ServiceRolesForm roles={roles} setRoles={setRoles} />
-          </TabsContent>
-        </Tabs>
         
-        <div className="flex justify-end space-x-2 mt-4">
-          <Button variant="outline" onClick={handleDialogClose}>取消</Button>
-          <Button onClick={form.handleSubmit(onSubmit)}>新增服事類型</Button>
-        </div>
+        <ServiceForm
+          form={form}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          members={members}
+          groups={groups}
+          selectedAdmins={selectedAdmins}
+          setSelectedAdmins={setSelectedAdmins}
+          selectedGroups={selectedGroups}
+          setSelectedGroups={setSelectedGroups}
+          notes={notes}
+          setNotes={setNotes}
+          roles={roles}
+          setRoles={setRoles}
+          onSubmit={handleSubmit}
+          onCancel={handleDialogClose}
+          isSubmitting={isSubmitting}
+          submitLabel="新增服事類型"
+        />
       </DialogContent>
     </Dialog>
   );

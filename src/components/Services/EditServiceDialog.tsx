@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -9,8 +8,9 @@ import {
 } from "@/components/ui/dialog";
 
 import { Service } from "@/lib/services";
-import { EditServiceForm } from "./EditServiceForm";
-import { updateServiceData } from "./services/serviceUpdateService";
+import { useServiceForm } from "./hooks/useServiceForm";
+import { updateServiceData } from "./services/serviceDataService";
+import { ServiceForm } from "./Forms/ServiceForm";
 
 interface EditServiceDialogProps {
   service: Service;
@@ -27,16 +27,42 @@ export function EditServiceDialog({
 }: EditServiceDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const handleSubmit = async (formData: any, selectedData: any) => {
+  const {
+    form,
+    activeTab,
+    setActiveTab,
+    members,
+    groups,
+    selectedAdmins,
+    setSelectedAdmins,
+    selectedGroups,
+    setSelectedGroups,
+    notes,
+    setNotes,
+    roles,
+    setRoles
+  } = useServiceForm({
+    tenantId: service.tenant_id,
+    service,
+    isOpen: open
+  });
+  
+  const handleSubmit = async () => {
     if (isSubmitting) return;
     
     try {
       setIsSubmitting(true);
+      const formData = form.getValues();
+      
       const success = await updateServiceData(
         service.id,
-        service.tenant_id,
         formData,
-        selectedData
+        {
+          admins: selectedAdmins,
+          groups: selectedGroups,
+          notes,
+          roles
+        }
       );
       
       if (success) {
@@ -45,7 +71,6 @@ export function EditServiceDialog({
       }
     } catch (error) {
       console.error("Error updating service:", error);
-      toast.error("更新服事類型時發生錯誤");
     } finally {
       setIsSubmitting(false);
     }
@@ -66,11 +91,24 @@ export function EditServiceDialog({
           <DialogTitle>編輯服事類型</DialogTitle>
         </DialogHeader>
         
-        <EditServiceForm
-          service={service}
-          isOpen={open}
+        <ServiceForm
+          form={form}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          members={members}
+          groups={groups}
+          selectedAdmins={selectedAdmins}
+          setSelectedAdmins={setSelectedAdmins}
+          selectedGroups={selectedGroups}
+          setSelectedGroups={setSelectedGroups}
+          notes={notes}
+          setNotes={setNotes}
+          roles={roles}
+          setRoles={setRoles}
           onSubmit={handleSubmit}
           onCancel={handleDialogClose}
+          isSubmitting={isSubmitting}
+          submitLabel="更新服事類型"
         />
       </DialogContent>
     </Dialog>

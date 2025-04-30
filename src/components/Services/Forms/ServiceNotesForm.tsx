@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Trash2 } from "lucide-react";
 
 const noteFormSchema = z.object({
   title: z.string().min(1, "標題為必填"),
@@ -44,6 +45,10 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
     } else {
       noteForm.trigger();
     }
+  };
+
+  const handleDeleteNote = (index: number) => {
+    setNotes(notes.filter((_, i) => i !== index));
   };
 
   return (
@@ -89,11 +94,22 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
           <ScrollArea className="h-40 border rounded-md p-2">
             <div className="space-y-2">
               {notes.map((note, index) => (
-                <div key={index} className="bg-secondary p-2 rounded-md">
-                  <h5 className="font-medium">{note.title}</h5>
-                  <p className="text-sm text-muted-foreground">
-                    {note.content}
-                  </p>
+                <div key={index} className="bg-secondary p-2 rounded-md flex justify-between items-start">
+                  <div>
+                    <h5 className="font-medium">{note.title}</h5>
+                    <p className="text-sm text-muted-foreground">
+                      {note.content}
+                    </p>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 text-destructive hover:text-destructive/80"
+                    onClick={() => handleDeleteNote(index)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">刪除備註</span>
+                  </Button>
                 </div>
               ))}
             </div>

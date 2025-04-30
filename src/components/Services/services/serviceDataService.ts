@@ -1,7 +1,8 @@
 
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import {
+  createService,
   updateService,
   addServiceAdmin,
   removeServiceAdmin,
@@ -12,13 +13,7 @@ import {
 } from "@/lib/services";
 import { NoteFormValues } from "../Forms/ServiceNotesForm";
 import { RoleFormValues } from "../Forms/ServiceRolesForm";
-
-interface ServiceFormData {
-  name: string;
-  tenant_id: string;
-  default_start_time?: string;
-  default_end_time?: string;
-}
+import { ServiceFormValues } from "../hooks/useServiceForm";
 
 interface SelectedData {
   admins: string[];
@@ -27,10 +22,60 @@ interface SelectedData {
   roles: RoleFormValues[];
 }
 
+export async function createServiceData(
+  formData: ServiceFormValues,
+  selectedData: SelectedData
+): Promise<boolean> {
+  try {
+    // Create service
+    const service = await createService({
+      name: formData.name,
+      tenant_id: formData.tenant_id,
+      default_start_time: formData.default_start_time || null,
+      default_end_time: formData.default_end_time || null,
+    });
+    
+    // Add selected admins
+    for (const adminId of selectedData.admins) {
+      await addServiceAdmin(service.id, adminId);
+    }
+    
+    // Add notes
+    for (const note of selectedData.notes) {
+      await addServiceNote({
+        service_id: service.id,
+        text: note.title,
+        tenant_id: formData.tenant_id,
+        link: note.content || null
+      });
+    }
+    
+    // Add roles
+    for (const role of selectedData.roles) {
+      await addServiceRole({
+        service_id: service.id,
+        name: role.name,
+        tenant_id: formData.tenant_id,
+      });
+    }
+    
+    // Add selected groups
+    for (const groupId of selectedData.groups) {
+      await addServiceGroup(service.id, groupId);
+    }
+    
+    toast.success("服事類型已新增");
+    return true;
+  } catch (error) {
+    console.error("Error creating service:", error);
+    toast.error("新增服事類型時發生錯誤");
+    return false;
+  }
+}
+
 export async function updateServiceData(
   serviceId: string,
-  tenantId: string,
-  formData: ServiceFormData,
+  formData: ServiceFormValues,
   selectedData: SelectedData
 ): Promise<boolean> {
   try {
@@ -99,7 +144,7 @@ export async function updateServiceData(
     for (const note of selectedData.notes) {
       await addServiceNote({
         service_id: serviceId,
-        tenant_id: tenantId,
+        tenant_id: formData.tenant_id,
         text: note.title,
         link: note.content || null
       });
@@ -114,7 +159,7 @@ export async function updateServiceData(
     for (const role of selectedData.roles) {
       await addServiceRole({
         service_id: serviceId,
-        tenant_id: tenantId,
+        tenant_id: formData.tenant_id,
         name: role.name
       });
     }
