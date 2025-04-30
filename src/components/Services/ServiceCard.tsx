@@ -25,6 +25,19 @@ import {
   SheetTrigger 
 } from "@/components/ui/sheet";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getServiceAdminsWithProfiles } from "@/lib/services/service-admin";
+import { getGroupsForService } from "@/lib/services/service-groups";
+import { getServiceNotes } from "@/lib/services/service-notes";
+import { getServiceRoles } from "@/lib/services/service-roles";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Separator } from "@/components/ui/separator";
 
 interface ServiceCardProps {
   service: Service;
@@ -89,7 +102,7 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
                 <SheetTitle>{service.name} - 服事管理員</SheetTitle>
               </SheetHeader>
               <div className="py-4">
-                <ServiceAdminManagement serviceId={service.id} />
+                <ServiceAdminView serviceId={service.id} />
               </div>
             </SheetContent>
           </Sheet>
@@ -106,7 +119,7 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
                 <SheetTitle>{service.name} - 服事小組</SheetTitle>
               </SheetHeader>
               <div className="py-4">
-                <ServiceGroupManagement serviceId={service.id} />
+                <ServiceGroupView serviceId={service.id} />
               </div>
             </SheetContent>
           </Sheet>
@@ -123,7 +136,7 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
                 <SheetTitle>{service.name} - 服事備註</SheetTitle>
               </SheetHeader>
               <div className="py-4">
-                <ServiceNoteManagement serviceId={service.id} />
+                <ServiceNoteView serviceId={service.id} />
               </div>
             </SheetContent>
           </Sheet>
@@ -140,7 +153,7 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
                 <SheetTitle>{service.name} - 服事角色</SheetTitle>
               </SheetHeader>
               <div className="py-4">
-                <ServiceRoleManagement serviceId={service.id} />
+                <ServiceRoleView serviceId={service.id} />
               </div>
             </SheetContent>
           </Sheet>
@@ -150,20 +163,128 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
   );
 }
 
-// Placeholder components for the service management sections
-// These would be implemented as separate components in their own files
-function ServiceAdminManagement({ serviceId }: { serviceId: string }) {
-  return <div>服事管理員管理功能尚未實現</div>;
+// Component for displaying service admins
+function ServiceAdminView({ serviceId }: { serviceId: string }) {
+  const { data: admins = [], isLoading, error } = useQuery({
+    queryKey: ["serviceAdmins", serviceId],
+    queryFn: () => getServiceAdminsWithProfiles(serviceId),
+  });
+
+  if (isLoading) return <div className="text-center py-4">載入中...</div>;
+  if (error) return <div className="text-red-500">載入失敗</div>;
+  
+  return (
+    <div className="space-y-4">
+      {admins.length === 0 ? (
+        <p className="text-muted-foreground text-center">尚未指定服事管理員</p>
+      ) : (
+        <div className="space-y-2">
+          {admins.map((admin) => (
+            <div key={admin.id} className="flex items-center gap-2 p-2 rounded-md border">
+              <div className="flex-1">
+                <div className="font-medium">{admin.profile?.name || admin.user_email}</div>
+                <div className="text-sm text-muted-foreground">{admin.user_email}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
-function ServiceGroupManagement({ serviceId }: { serviceId: string }) {
-  return <div>服事小組管理功能尚未實現</div>;
+// Component for displaying service groups
+function ServiceGroupView({ serviceId }: { serviceId: string }) {
+  const { data: groups = [], isLoading, error } = useQuery({
+    queryKey: ["serviceGroups", serviceId],
+    queryFn: () => getGroupsForService(serviceId),
+  });
+
+  if (isLoading) return <div className="text-center py-4">載入中...</div>;
+  if (error) return <div className="text-red-500">載入失敗</div>;
+
+  return (
+    <div className="space-y-4">
+      {groups.length === 0 ? (
+        <p className="text-muted-foreground text-center">尚未指定服事小組</p>
+      ) : (
+        <div className="space-y-2">
+          {groups.map((group) => (
+            <div key={group.id} className="flex items-center gap-2 p-2 rounded-md border">
+              <div className="font-medium">{group.name}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
-function ServiceNoteManagement({ serviceId }: { serviceId: string }) {
-  return <div>服事備註管理功能尚未實現</div>;
+// Component for displaying service notes
+function ServiceNoteView({ serviceId }: { serviceId: string }) {
+  const { data: notes = [], isLoading, error } = useQuery({
+    queryKey: ["serviceNotes", serviceId],
+    queryFn: () => getServiceNotes(serviceId),
+  });
+
+  if (isLoading) return <div className="text-center py-4">載入中...</div>;
+  if (error) return <div className="text-red-500">載入失敗</div>;
+
+  return (
+    <div className="space-y-4">
+      {notes.length === 0 ? (
+        <p className="text-muted-foreground text-center">尚未添加服事備註</p>
+      ) : (
+        <Accordion type="single" collapsible className="w-full">
+          {notes.map((note, index) => (
+            <AccordionItem key={note.id || index} value={note.id || `note-${index}`}>
+              <AccordionTrigger className="hover:no-underline">
+                <div className="font-medium truncate">{note.text.substring(0, 30)}{note.text.length > 30 ? '...' : ''}</div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <p className="whitespace-pre-wrap mb-2">{note.text}</p>
+                {note.link && (
+                  <a 
+                    href={note.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline text-sm block"
+                  >
+                    {note.link}
+                  </a>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      )}
+    </div>
+  );
 }
 
-function ServiceRoleManagement({ serviceId }: { serviceId: string }) {
-  return <div>服事角色管理功能尚未實現</div>;
+// Component for displaying service roles
+function ServiceRoleView({ serviceId }: { serviceId: string }) {
+  const { data: roles = [], isLoading, error } = useQuery({
+    queryKey: ["serviceRoles", serviceId],
+    queryFn: () => getServiceRoles(serviceId),
+  });
+
+  if (isLoading) return <div className="text-center py-4">載入中...</div>;
+  if (error) return <div className="text-red-500">載入失敗</div>;
+
+  return (
+    <div className="space-y-4">
+      {roles.length === 0 ? (
+        <p className="text-muted-foreground text-center">尚未添加服事角色</p>
+      ) : (
+        <div className="space-y-3">
+          {roles.map((role, index) => (
+            <div key={role.id || index} className="border rounded-md p-3">
+              <Badge variant="outline">{role.name}</Badge>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
