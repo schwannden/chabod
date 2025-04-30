@@ -1,10 +1,8 @@
-
 import { FilterLayout } from "@/components/Layout/FilterLayout";
 import { FilterGroup } from "@/components/Layout/FilterGroup";
 import { Group } from "@/lib/types";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Calendar } from "lucide-react";
-import { format } from "date-fns";
 import {
   Select,
   SelectContent,
@@ -12,12 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { formatDateForInput, parseDateFromInput } from "@/lib/dateUtils";
+import { cn } from "@/lib/utils";
 
 interface EventFilterBarProps {
   groups: Group[];
@@ -57,41 +51,37 @@ export function EventFilterBar({
       </FilterGroup>
 
       <FilterGroup label="From">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="w-full sm:w-auto">
-              <Calendar className="mr-2 h-4 w-4" />
-              {startDate ? format(startDate, "PPP") : "Start Date"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent
-              mode="single"
-              selected={startDate}
-              onSelect={setStartDate}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
+        <div className="relative">
+          <Calendar
+            className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+          />
+          <Input
+            type="date"
+            value={formatDateForInput(startDate)}
+            onChange={(e) => setStartDate(parseDateFromInput(e.target.value))}
+            className={cn(
+              "w-full sm:w-auto pl-8",
+              !startDate && "text-muted-foreground"
+            )}
+          />
+        </div>
       </FilterGroup>
 
       <FilterGroup label="To">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="w-full sm:w-auto">
-              <Calendar className="mr-2 h-4 w-4" />
-              {endDate ? format(endDate, "PPP") : "End Date"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent
-              mode="single"
-              selected={endDate}
-              onSelect={setEndDate}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
+        <div className="relative">
+          <Calendar
+            className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+          />
+          <Input
+            type="date"
+            value={formatDateForInput(endDate)}
+            onChange={(e) => setEndDate(parseDateFromInput(e.target.value))}
+            className={cn(
+              "w-full sm:w-auto pl-8",
+              !endDate && "text-muted-foreground"
+            )}
+          />
+        </div>
       </FilterGroup>
     </FilterLayout>
   );

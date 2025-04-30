@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useSession } from "@/contexts/AuthContext";
 import { CreateEventDialog } from "@/components/Events/CreateEventDialog";
 import { EventFilterBar } from "@/components/Events/EventFilterBar";
@@ -11,12 +11,10 @@ import { getTenantBySlug } from "@/lib/tenant-utils";
 import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
 import { EventCalendar } from "@/components/Events/EventCalendar";
-import React from "react";
 
 export default function EventPage() {
   const { slug } = useParams<{ slug: string }>();
   const { user, isLoading } = useSession();
-  const navigate = useNavigate();
   const [events, setEvents] = useState<Event[]>([]);
   const [eventsWithGroups, setEventsWithGroups] = useState<EventWithGroups[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);

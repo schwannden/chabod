@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Event } from "@/lib/types";
@@ -176,14 +175,14 @@ export function EditEventDialog({ event, onEventUpdated, groups = [], children }
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader className="sticky top-0 z-10 bg-background pb-4">
           <DialogTitle>Edit Event</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pb-2">
             <EventDetailsFields form={form} groups={groups} />
-            <div className="flex justify-end gap-4">
+            <div className="sticky bottom-0 pt-2 bg-background flex justify-end gap-2">
               <Button
                 type="button"
                 variant="outline"

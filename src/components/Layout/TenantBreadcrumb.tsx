@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import {
   Breadcrumb,
@@ -8,6 +7,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import React from "react";
 
 interface TenantBreadcrumbProps {
   tenantName: string;
@@ -17,6 +17,22 @@ interface TenantBreadcrumbProps {
     path?: string;
   }[];
 }
+
+// Separate component to handle the segment with separator and item
+const BreadcrumbSegment = ({ item }: { item: { label: string; path?: string } }) => (
+  <>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      {item.path ? (
+        <BreadcrumbLink asChild>
+          <Link to={item.path}>{item.label}</Link>
+        </BreadcrumbLink>
+      ) : (
+        <BreadcrumbPage>{item.label}</BreadcrumbPage>
+      )}
+    </BreadcrumbItem>
+  </>
+);
 
 export function TenantBreadcrumb({ tenantName, tenantSlug, items }: TenantBreadcrumbProps) {
   return (
@@ -29,16 +45,7 @@ export function TenantBreadcrumb({ tenantName, tenantSlug, items }: TenantBreadc
         </BreadcrumbItem>
         
         {items.map((item, index) => (
-          <BreadcrumbItem key={index}>
-            <BreadcrumbSeparator />
-            {item.path ? (
-              <BreadcrumbLink asChild>
-                <Link to={item.path}>{item.label}</Link>
-              </BreadcrumbLink>
-            ) : (
-              <BreadcrumbPage>{item.label}</BreadcrumbPage>
-            )}
-          </BreadcrumbItem>
+          <BreadcrumbSegment key={index} item={item} />
         ))}
       </BreadcrumbList>
     </Breadcrumb>

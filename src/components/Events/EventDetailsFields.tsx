@@ -1,17 +1,13 @@
-
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Calendar } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
 import { UseFormReturn } from "react-hook-form";
 import { EventFormValues } from "@/hooks/useEventForm";
 import { Group } from "@/lib/types";
 import { useEffect } from "react";
+import { formatDateForInput, parseDateFromInput } from "@/lib/dateUtils";
 
 interface EventDetailsFieldsProps {
   form: UseFormReturn<EventFormValues>;
@@ -81,37 +77,17 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
         render={({ field }) => (
           <FormItem className="flex flex-col">
             <FormLabel>Date</FormLabel>
-            <Popover>
-              <PopoverTrigger asChild>
-                <FormControl>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full pl-3 text-left font-normal",
-                      !field.value && "text-muted-foreground"
-                    )}
-                  >
-                    {field.value ? (
-                      format(field.value, "PPP")
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
-                    <Calendar className="ml-auto h-4 w-4 opacity-50" />
-                  </Button>
-                </FormControl>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 z-50" align="start">
-                <CalendarComponent
-                  mode="single"
-                  selected={field.value}
-                  onSelect={field.onChange}
-                  disabled={(date) =>
-                    date < new Date(new Date().setHours(0, 0, 0, 0))
-                  }
-                  autoFocus
-                />
-              </PopoverContent>
-            </Popover>
+            <FormControl>
+              <Input
+                type="date"
+                value={formatDateForInput(field.value)}
+                onChange={(e) => field.onChange(parseDateFromInput(e.target.value))}
+                onBlur={field.onBlur} // Keep react-hook-form's blur handling
+                name={field.name} // Keep react-hook-form's name handling
+                ref={field.ref} // Keep react-hook-form's ref handling
+                className={cn(!field.value && "text-muted-foreground")}
+              />
+            </FormControl>
             <FormMessage />
           </FormItem>
         )}

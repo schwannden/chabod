@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { useState } from "react";
 import {
@@ -35,16 +34,21 @@ export function CreateEventDialog({ tenantId, onEventCreated, groups = [] }: Cre
       <DialogTrigger asChild>
         <Button>Create Event</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader className="sticky top-0 z-10 bg-background pb-4">
           <DialogTitle>Create New Event</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={onSubmit} className="space-y-4 pb-2">
             <EventDetailsFields form={form} groups={safeGroups} />
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Creating..." : "Create Event"}
-            </Button>
+            <div className="sticky bottom-0 pt-2 bg-background flex justify-end gap-2">
+              <Button variant="outline" type="button" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Creating..." : "Create Event"}
+              </Button>
+            </div>
           </form>
         </Form>
       </DialogContent>
