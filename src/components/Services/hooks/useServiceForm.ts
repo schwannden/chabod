@@ -12,6 +12,7 @@ import { getTenantMembers } from "@/lib/member-service";
 import { getTenantGroups } from "@/lib/group-service";
 import { getGroupsForService, getServiceNotes, getServiceRoles } from "@/lib/services";
 
+// Make sure name and tenant_id are required fields
 export const serviceFormSchema = z.object({
   name: z.string().min(1, "名稱為必填"),
   tenant_id: z.string(),

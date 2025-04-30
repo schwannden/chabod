@@ -11,15 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
-const serviceFormSchema = z.object({
-  name: z.string().min(1, "名稱為必填"),
-  tenant_id: z.string(),
-  default_start_time: z.string().optional(),
-  default_end_time: z.string().optional(),
-});
-
-export type ServiceFormValues = z.infer<typeof serviceFormSchema>;
+import { ServiceFormValues } from "../hooks/useServiceForm";
 
 interface ServiceDetailsFormProps {
   form: ReturnType<typeof useForm<ServiceFormValues>>;
@@ -50,7 +42,7 @@ export function ServiceDetailsForm({ form }: ServiceDetailsFormProps) {
               <FormItem>
                 <FormLabel>預設開始時間</FormLabel>
                 <FormControl>
-                  <Input type="time" {...field} />
+                  <Input type="time" {...field} value={field.value || ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -63,7 +55,7 @@ export function ServiceDetailsForm({ form }: ServiceDetailsFormProps) {
               <FormItem>
                 <FormLabel>預設結束時間</FormLabel>
                 <FormControl>
-                  <Input type="time" {...field} />
+                  <Input type="time" {...field} value={field.value || ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

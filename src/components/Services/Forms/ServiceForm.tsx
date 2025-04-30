@@ -11,14 +11,10 @@ import { Service } from "@/lib/services";
 import { Group, TenantMemberWithProfile } from "@/lib/types";
 import { NoteFormValues } from "./ServiceNotesForm";
 import { RoleFormValues } from "./ServiceRolesForm";
+import { ServiceFormValues } from "../hooks/useServiceForm";
 
 export interface ServiceFormProps {
-  form: UseFormReturn<{
-    name: string;
-    tenant_id: string;
-    default_start_time?: string;
-    default_end_time?: string;
-  }, any, undefined>;
+  form: UseFormReturn<ServiceFormValues, any, undefined>;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   members: TenantMemberWithProfile[];
