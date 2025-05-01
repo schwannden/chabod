@@ -12,7 +12,7 @@ export function ServiceAdminView({ serviceId }: { serviceId: string }) {
   });
 
   if (isLoading) return <div className="text-center py-4">載入中...</div>;
-  if (error) return <div className="text-red-500">載入失敗</div>;
+  if (error) return <div className="text-red-500">載入失敗: {(error as Error).message}</div>;
   
   return (
     <div className="space-y-4">

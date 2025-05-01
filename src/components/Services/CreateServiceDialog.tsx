@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { useServiceForm } from "./hooks/useServiceForm";
-import { createServiceData } from "./services/serviceDataService";
+import { saveServiceData } from "./services/serviceDataService";
 import { ServiceForm } from "./Forms/ServiceForm";
 
 interface CreateServiceDialogProps {
@@ -49,7 +49,7 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
       setIsSubmitting(true);
       const formData = form.getValues();
       
-      const success = await createServiceData(
+      const success = await saveServiceData(
         formData,
         {
           admins: selectedAdmins,

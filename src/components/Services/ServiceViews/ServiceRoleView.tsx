@@ -48,9 +48,7 @@ export function ServiceRoleView({ serviceId }: { serviceId: string }) {
                 <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
                   <span>創建於: {new Date(role.created_at).toLocaleString()}</span>
                 </div>
-                <div className="mt-2">
-                  {role.description}
-                </div>
+                {/* Remove the reference to description since it doesn't exist in the ServiceRole type */}
               </AccordionContent>
             </AccordionItem>
           ))}
