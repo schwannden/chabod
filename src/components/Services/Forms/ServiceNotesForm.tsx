@@ -14,12 +14,20 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Edit2, Trash2, X, Check, Plus } from "lucide-react";
+import { Edit2, Trash2, X, Check, Plus, Link } from "lucide-react";
 import { useState } from "react";
 
+// Updated schema to validate URLs
 const noteFormSchema = z.object({
   title: z.string().min(1, "標題為必填"),
   content: z.string().optional(),
+  link: z.string()
+    .refine(
+      (val) => !val || /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(val),
+      { message: "請輸入有效的URL" }
+    )
+    .optional()
+    .or(z.literal(''))
 });
 
 export type NoteFormValues = z.infer<typeof noteFormSchema>;
@@ -37,6 +45,7 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
     defaultValues: {
       title: "",
       content: "",
+      link: "",
     },
   });
 
@@ -45,6 +54,7 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
     defaultValues: {
       title: "",
       content: "",
+      link: "",
     },
   });
 
@@ -64,6 +74,7 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
     editForm.reset({
       title: note.title,
       content: note.content,
+      link: note.link || "",
     });
   };
 
@@ -121,6 +132,29 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
               </FormItem>
             )}
           />
+          <FormField
+            control={noteForm.control}
+            name="link"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-1">
+                  <Link className="h-4 w-4" />
+                  連結 URL
+                </FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Input 
+                      {...field} 
+                      placeholder="https://example.com" 
+                      className="pl-10"
+                    />
+                    <Link className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <Button type="button" onClick={handleAddNote}>
             <Plus className="mr-2 h-4 w-4" />
             新增備註
@@ -162,6 +196,26 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
                             </FormItem>
                           )}
                         />
+                        <FormField
+                          control={editForm.control}
+                          name="link"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs">連結 URL</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Input 
+                                    {...field} 
+                                    placeholder="https://example.com" 
+                                    className="pl-10"
+                                  />
+                                  <Link className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                         <div className="flex justify-end space-x-2">
                           <Button 
                             type="button" 
@@ -190,6 +244,17 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
                         <p className="text-sm text-muted-foreground">
                           {note.content}
                         </p>
+                        {note.link && (
+                          <a 
+                            href={note.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-blue-500 hover:underline flex items-center mt-1"
+                          >
+                            <Link className="h-3 w-3 mr-1" />
+                            {note.link}
+                          </a>
+                        )}
                       </div>
                       <div className="flex space-x-1">
                         <Button 

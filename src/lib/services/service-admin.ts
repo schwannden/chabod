@@ -43,13 +43,13 @@ export async function isServiceAdmin(serviceId: string, userId: string): Promise
 }
 
 export async function getServiceAdmins(serviceId: string): Promise<any[]> {
+  // Fix the query to join with profiles table properly
   const { data, error } = await supabase
     .from("service_admins")
     .select(`
       id, 
-      user_id, 
-      user_email:profiles!inner(email, name),
-      profile:profiles(*)
+      user_id,
+      profiles:user_id(email, full_name)
     `)
     .eq("service_id", serviceId);
 

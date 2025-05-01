@@ -7,7 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Calendar, ExternalLink, FileText, PlusCircle } from "lucide-react";
+import { Calendar, ExternalLink, FileText, PlusCircle, Link } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function ServiceNoteView({ serviceId }: { serviceId: string }) {
@@ -57,7 +57,7 @@ export function ServiceNoteView({ serviceId }: { serviceId: string }) {
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 text-blue-600 hover:underline text-sm"
                     >
-                      <ExternalLink className="h-4 w-4" />
+                      <Link className="h-4 w-4" />
                       {note.link}
                     </a>
                   </div>

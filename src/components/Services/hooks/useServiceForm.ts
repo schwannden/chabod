@@ -119,7 +119,8 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
       // Convert the notes to the format expected by the NotesForm component
       const formattedNotes = fetchedNotes.map(note => ({
         title: note.text,
-        content: note.link || ""
+        content: note.text,
+        link: note.link || ""
       }));
       setNotes(formattedNotes);
     } catch (error) {

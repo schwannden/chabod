@@ -33,17 +33,17 @@ export function ServiceAdminView({ serviceId }: { serviceId: string }) {
             >
               <Avatar className="h-10 w-10">
                 <AvatarFallback className="bg-primary/10 text-primary">
-                  {admin.profile?.name?.substring(0, 2) || 
-                   admin.user_email?.substring(0, 2) || 
+                  {admin.profiles?.full_name?.substring(0, 2) || 
+                   admin.profiles?.email?.substring(0, 2) || 
                    <User className="h-5 w-5" />}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="font-medium">
-                  {admin.profile?.name || admin.user_email}
+                  {admin.profiles?.full_name || "匿名成員"}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  {admin.user_email}
+                  {admin.profiles?.email || "無電子郵件"}
                 </div>
               </div>
             </div>
