@@ -1,4 +1,3 @@
-
 export * from '../types';
 
 // Define the ServiceNote type that matches the database schema
@@ -29,4 +28,42 @@ export interface ServiceGroup {
   group_id: string;
   created_at: string;
   updated_at: string;
+}
+
+// Define the ServiceEvent type that matches the database schema
+export interface ServiceEvent {
+  id: string;
+  service_id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  subtitle?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Define the ServiceEventOwner type that matches the database schema
+export interface ServiceEventOwner {
+  id: string;
+  service_event_id: string;
+  user_id: string;
+  service_role_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ServiceEventOwnerWithDetails extends ServiceEventOwner {
+  profile: any; // Profile information
+  role: ServiceRole; // Role information
+}
+
+export interface ServiceEventWithOwners extends ServiceEvent {
+  owners: ServiceEventOwnerWithDetails[];
+}
+
+export interface ServiceEventWithService extends ServiceEvent {
+  service: {
+    id: string;
+    name: string;
+  };
 }

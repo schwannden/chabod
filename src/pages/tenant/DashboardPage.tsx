@@ -93,6 +93,12 @@ export default function DashboardPage() {
       icon: Handshake,
       description: "創建管理服事類型",
       link: `/tenant/${tenant?.slug}/services`
+    },
+    {
+      title: "服事表",
+      icon: Calendar,
+      description: "各組服事表",
+      link: `/tenant/${tenant?.slug}/service_events`
     }
   ];
 

@@ -385,6 +385,13 @@ export type Database = {
             referencedRelation: "services"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "service_admins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       service_event_owners: {
@@ -425,6 +432,13 @@ export type Database = {
             columns: ["service_role_id"]
             isOneToOne: false
             referencedRelation: "service_roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_event_owners_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
