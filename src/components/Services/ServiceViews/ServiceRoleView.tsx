@@ -49,12 +49,7 @@ export function ServiceRoleView({ serviceId }: { serviceId: string }) {
                   <span>創建於: {new Date(role.created_at).toLocaleString()}</span>
                 </div>
                 <div className="mt-2">
-                  <Badge variant="outline" className="px-3 py-1">
-                    {role.name}
-                  </Badge>
-                </div>
-                <div className="mt-4 text-xs text-muted-foreground">
-                  ID: {role.id.substring(0, 8)}...
+                  {role.description}
                 </div>
               </AccordionContent>
             </AccordionItem>
