@@ -118,8 +118,7 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
       const fetchedNotes = await getServiceNotes(service.id);
       // Convert the notes to the format expected by the NotesForm component
       const formattedNotes = fetchedNotes.map(note => ({
-        title: note.text,
-        content: note.text,
+        text: note.text,
         link: note.link || ""
       }));
       setNotes(formattedNotes);
@@ -135,7 +134,7 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
       // Convert the roles to the format expected by the RolesForm component
       const formattedRoles = fetchedRoles.map(role => ({
         name: role.name,
-        description: ""
+        description: role.description
       }));
       setRoles(formattedRoles);
     } catch (error) {

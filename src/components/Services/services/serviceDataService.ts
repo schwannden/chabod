@@ -65,7 +65,7 @@ export async function saveServiceData(
       const noteInserts = additionalData.notes.map((note) => ({
         service_id: serviceId,
         tenant_id: formData.tenant_id,
-        text: note.title,
+        text: note.text,
         link: note.link || null
       }));
 
@@ -81,7 +81,8 @@ export async function saveServiceData(
       const roleInserts = additionalData.roles.map((role) => ({
         service_id: serviceId,
         tenant_id: formData.tenant_id,
-        name: role.name
+        name: role.name,
+        description: role.description,
       }));
 
       const { error: rolesError } = await supabase
@@ -172,7 +173,7 @@ export async function updateServiceData(
       const noteInserts = additionalData.notes.map((note) => ({
         service_id: serviceId,
         tenant_id: formData.tenant_id,
-        text: note.title,
+        text: note.text,
         link: note.link || null
       }));
 
@@ -195,7 +196,8 @@ export async function updateServiceData(
       const roleInserts = additionalData.roles.map((role) => ({
         service_id: serviceId,
         tenant_id: formData.tenant_id,
-        name: role.name
+        name: role.name,
+        description: role.description,
       }));
 
       const { error: rolesError } = await supabase

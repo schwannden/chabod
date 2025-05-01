@@ -108,19 +108,6 @@ export function ServiceRolesForm({ roles, setRoles }: ServiceRolesFormProps) {
               </FormItem>
             )}
           />
-          <FormField
-            control={roleForm.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>角色描述</FormLabel>
-                <FormControl>
-                  <Textarea {...field} placeholder="角色描述" rows={2} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <Button type="button" onClick={handleAddRole}>
             <Plus className="mr-2 h-4 w-4" />
             新增角色

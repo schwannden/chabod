@@ -19,8 +19,7 @@ import { useState } from "react";
 
 // Updated schema to validate URLs
 const noteFormSchema = z.object({
-  title: z.string().min(1, "標題為必填"),
-  content: z.string().optional(),
+  text: z.string().min(1, "標題為必填"),
   link: z.string()
     .refine(
       (val) => !val || /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(val),
@@ -43,8 +42,7 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
   const noteForm = useForm<NoteFormValues>({
     resolver: zodResolver(noteFormSchema),
     defaultValues: {
-      title: "",
-      content: "",
+      text: "",
       link: "",
     },
   });
@@ -52,8 +50,7 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
   const editForm = useForm<NoteFormValues>({
     resolver: zodResolver(noteFormSchema),
     defaultValues: {
-      title: "",
-      content: "",
+      text: "",
       link: "",
     },
   });
@@ -72,8 +69,7 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
     setEditingIndex(index);
     const note = notes[index];
     editForm.reset({
-      title: note.title,
-      content: note.content,
+      text: note.text,
       link: note.link || "",
     });
   };
@@ -108,25 +104,12 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
         <form className="space-y-4">
           <FormField
             control={noteForm.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>標題</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="備註標題" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={noteForm.control}
-            name="content"
+            name="text"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>內容</FormLabel>
                 <FormControl>
-                  <Textarea {...field} placeholder="備註內容" rows={3} />
+                  <Input {...field} placeholder="備註內容" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -174,23 +157,11 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
                       <form className="space-y-2">
                         <FormField
                           control={editForm.control}
-                          name="title"
+                          name="text"
                           render={({ field }) => (
                             <FormItem>
                               <FormControl>
-                                <Input {...field} placeholder="備註標題" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={editForm.control}
-                          name="content"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <Textarea {...field} placeholder="備註內容" rows={2} />
+                                <Input {...field} placeholder="備註內容" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -240,7 +211,7 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
                   ) : (
                     <div className="flex justify-between items-start">
                       <div>
-                        <h5 className="font-medium">{note.title}</h5>
+                        <h5 className="font-medium">{note.text}</h5>
                         <p className="text-sm text-muted-foreground">
                           {note.content}
                         </p>
