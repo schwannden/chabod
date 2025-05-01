@@ -42,7 +42,7 @@ export async function isServiceAdmin(serviceId: string, userId: string): Promise
   return !!data;
 }
 
-export async function getServiceAdminsWithProfiles(serviceId: string): Promise<any[]> {
+export async function getServiceAdmins(serviceId: string): Promise<any[]> {
   const { data, error } = await supabase
     .from("service_admins")
     .select(`

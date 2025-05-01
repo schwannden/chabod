@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { getServiceAdminsWithProfiles } from "@/lib/services/service-admin";
+import { getServiceAdmins } from "@/lib/services/service-admin";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { UserPlus, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 export function ServiceAdminView({ serviceId }: { serviceId: string }) {
   const { data: admins = [], isLoading, error } = useQuery({
     queryKey: ["serviceAdmins", serviceId],
-    queryFn: () => getServiceAdminsWithProfiles(serviceId),
+    queryFn: () => getServiceAdmins(serviceId),
   });
 
   if (isLoading) return <div className="text-center py-4">載入中...</div>;

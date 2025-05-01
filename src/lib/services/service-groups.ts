@@ -39,3 +39,25 @@ export async function getGroupsForService(serviceId: string): Promise<string[]> 
 
   return data.map(item => item.group_id);
 }
+
+export async function getGroupsForServiceWithNames(serviceId: string): Promise<any[]> {
+  const { data, error } = await supabase
+    .from("service_groups")
+    .select(`
+      id,
+      group_id,
+      groups:group_id(id, name, description)
+    `)
+    .eq("service_id", serviceId);
+
+  if (error) {
+    console.error("Error fetching service groups with names:", error);
+    throw error;
+  }
+
+  return data.map(item => ({
+    id: item.group_id,
+    name: item.groups?.name || 'Unknown Group',
+    description: item.groups?.description || ''
+  }));
+}
