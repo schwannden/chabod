@@ -82,7 +82,7 @@ export async function saveServiceData(
         service_id: serviceId,
         tenant_id: formData.tenant_id,
         name: role.name,
-        description: role.description,
+        description: role.description || null, // Handle empty description
       }));
 
       const { error: rolesError } = await supabase
@@ -197,7 +197,7 @@ export async function updateServiceData(
         service_id: serviceId,
         tenant_id: formData.tenant_id,
         name: role.name,
-        description: role.description,
+        description: role.description || null, // Handle empty description
       }));
 
       const { error: rolesError } = await supabase

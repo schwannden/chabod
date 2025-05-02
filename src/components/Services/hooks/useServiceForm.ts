@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -134,7 +133,7 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
       // Convert the roles to the format expected by the RolesForm component
       const formattedRoles = fetchedRoles.map(role => ({
         name: role.name,
-        description: role.description
+        description: role.description || ''
       }));
       setRoles(formattedRoles);
     } catch (error) {

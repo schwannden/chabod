@@ -17,6 +17,7 @@ export interface ServiceRole {
   service_id: string;
   tenant_id: string;
   name: string;
+  description?: string;  // Added description field
   created_at: string;
   updated_at: string;
 }

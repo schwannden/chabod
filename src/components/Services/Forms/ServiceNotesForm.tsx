@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -212,9 +211,6 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
                     <div className="flex justify-between items-start">
                       <div>
                         <h5 className="font-medium">{note.text}</h5>
-                        <p className="text-sm text-muted-foreground">
-                          {note.content}
-                        </p>
                         {note.link && (
                           <a 
                             href={note.link}
