@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import { useSession } from "@/contexts/AuthContext";
 import { TenantPageLayout } from "@/components/Layout/TenantPageLayout";
 import { Button } from "@/components/ui/button";
-import { ServiceEvent, ServiceEventWithService } from "@/lib/services/types";
 import { supabase } from "@/integrations/supabase/client";
 import { getTenantBySlug } from "@/lib/tenant-utils";
 import { Tenant, Group } from "@/lib/types";
@@ -19,9 +18,14 @@ export default function ServiceEventPage() {
   const { slug } = useParams<{ slug: string }>();
   const { user, isLoading } = useSession();
   const { role, isLoading: isRoleLoading } = useTenantRole(slug, user?.id);
-  const [serviceEvents, setServiceEvents] = useState<ServiceEventWithService[]>([]);
+  const [serviceEvents, setServiceEvents] = useState<any[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
-  const [services, setServices] = useState<{id: string, name: string}[]>([]);
+  const [services, setServices] = useState<{
+    id: string;
+    name: string;
+    default_start_time?: string | null;
+    default_end_time?: string | null;
+  }[]>([]);
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<string>("all");
   const [selectedService, setSelectedService] = useState<string>("all");
@@ -145,7 +149,9 @@ export default function ServiceEventPage() {
 
   const fetchServices = async () => {
     try {
-      const { data, error } = await supabase.from("services").select("id, name");
+      const { data, error } = await supabase
+        .from("services")
+        .select("id, name, default_start_time, default_end_time");
       if (error) throw error;
       setServices(data || []);
     } catch (error) {
@@ -201,7 +207,6 @@ export default function ServiceEventPage() {
         setEndDate={setEndDate}
       />
       
-      {/* Add CreateServiceEventDialog when it's implemented */}
       {isDialogOpen && (
         <CreateServiceEventDialog
           isOpen={isDialogOpen}

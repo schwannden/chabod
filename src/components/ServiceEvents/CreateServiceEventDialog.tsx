@@ -1,8 +1,5 @@
 
-import React, { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,44 +8,23 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ServiceEventOwnerSelect, ServiceEventOwner } from "./ServiceEventOwnerSelect";
 import { Separator } from "@/components/ui/separator";
-
-// Schema for form validation
-const formSchema = z.object({
-  serviceId: z.string().min(1, "服事類型為必填"),
-  date: z.string().min(1, "日期為必填"),
-  startTime: z.string().min(1, "開始時間為必填"),
-  endTime: z.string().min(1, "結束時間為必填"),
-  subtitle: z.string().optional(),
-});
-
-type ServiceEventFormValues = z.infer<typeof formSchema>;
+import { ServiceEventForm, ServiceEventFormValues } from "./ServiceEventForm";
 
 interface CreateServiceEventDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onEventCreated: () => void;
   tenantId: string;
-  services: { id: string; name: string }[];
+  services: { 
+    id: string; 
+    name: string;
+    default_start_time?: string | null;
+    default_end_time?: string | null;
+  }[];
 }
 
 export function CreateServiceEventDialog({
@@ -63,32 +39,7 @@ export function CreateServiceEventDialog({
   const [selectedServiceId, setSelectedServiceId] = useState<string>("");
   const { toast } = useToast();
 
-  // Initialize form
-  const form = useForm<ServiceEventFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      serviceId: "",
-      date: "",
-      startTime: "",
-      endTime: "",
-      subtitle: "",
-    },
-  });
-
-  // Update selectedServiceId when the service changes in the form
-  useEffect(() => {
-    const subscription = form.watch((value) => {
-      if (value.serviceId && value.serviceId !== selectedServiceId) {
-        setSelectedServiceId(value.serviceId);
-        // Reset selected owners when service changes
-        setSelectedOwners([]);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [form, selectedServiceId]);
-
-  const onSubmit = async (values: ServiceEventFormValues) => {
+  const handleSubmit = async (values: ServiceEventFormValues) => {
     setIsSubmitting(true);
     try {
       // First insert the service event
@@ -148,117 +99,39 @@ export function CreateServiceEventDialog({
           <DialogTitle>新增服事排班</DialogTitle>
         </DialogHeader>
         
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="serviceId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>服事類型</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="選擇服事類型" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {services.map((service) => (
-                        <SelectItem key={service.id} value={service.id}>
-                          {service.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>日期</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="startTime"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>開始時間</FormLabel>
-                    <FormControl>
-                      <Input type="time" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+        <ServiceEventForm
+          onSubmit={handleSubmit}
+          services={services}
+          selectedServiceId={selectedServiceId}
+          setSelectedServiceId={setSelectedServiceId}
+          selectedOwners={selectedOwners}
+          setSelectedOwners={setSelectedOwners}
+          tenantId={tenantId}
+          isSubmitting={isSubmitting}
+          onCancel={onClose}
+        >
+          {selectedServiceId && (
+            <>
+              <Separator className="my-4" />
+              <h3 className="text-sm font-medium mb-2">服事排班成員</h3>
+              <ServiceEventOwnerSelect 
+                serviceId={selectedServiceId}
+                tenantId={tenantId}
+                selectedOwners={selectedOwners}
+                setSelectedOwners={setSelectedOwners}
               />
-              
-              <FormField
-                control={form.control}
-                name="endTime"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>結束時間</FormLabel>
-                    <FormControl>
-                      <Input type="time" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            
-            <FormField
-              control={form.control}
-              name="subtitle"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>備註 (選填)</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {selectedServiceId && (
-              <>
-                <Separator className="my-4" />
-                <h3 className="text-sm font-medium mb-2">服事排班成員</h3>
-                <ServiceEventOwnerSelect 
-                  serviceId={selectedServiceId}
-                  tenantId={tenantId}
-                  selectedOwners={selectedOwners}
-                  setSelectedOwners={setSelectedOwners}
-                />
-              </>
-            )}
-            
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={onClose}>
-                取消
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "提交中..." : "創建"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+            </>
+          )}
+          
+          <DialogFooter className="mt-6">
+            <Button type="button" variant="outline" onClick={onClose}>
+              取消
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "提交中..." : "創建"}
+            </Button>
+          </DialogFooter>
+        </ServiceEventForm>
       </DialogContent>
     </Dialog>
   );
