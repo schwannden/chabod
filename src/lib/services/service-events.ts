@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { ServiceEvent, ServiceEventOwner, ServiceEventWithOwners, ServiceEventOwnerWithDetails } from "./types";
+import { ServiceEvent, ServiceEventOwner, ServiceEventWithOwners, ServiceEventOwnerWithDetails, ServiceEventWithService } from "./types";
 
 export async function createServiceEvent(
   event: Omit<ServiceEvent, "id" | "created_at" | "updated_at">
@@ -17,6 +17,43 @@ export async function createServiceEvent(
   }
 
   return data;
+}
+
+export async function createServiceEventWithOwners(
+  event: Omit<ServiceEvent, "id" | "created_at" | "updated_at">,
+  owners: Array<{ user_id: string; service_role_id: string }>
+): Promise<ServiceEvent> {
+  // First create the event
+  const { data: eventData, error: eventError } = await supabase
+    .from("service_events")
+    .insert(event)
+    .select()
+    .single();
+
+  if (eventError) {
+    console.error("Error creating service event:", eventError);
+    throw eventError;
+  }
+
+  // If we have owners, create them too
+  if (owners && owners.length > 0) {
+    const ownersToInsert = owners.map(owner => ({
+      service_event_id: eventData.id,
+      user_id: owner.user_id,
+      service_role_id: owner.service_role_id
+    }));
+
+    const { error: ownersError } = await supabase
+      .from("service_event_owners")
+      .insert(ownersToInsert);
+
+    if (ownersError) {
+      console.error("Error adding service event owners:", ownersError);
+      throw ownersError;
+    }
+  }
+
+  return eventData;
 }
 
 export async function updateServiceEvent(
@@ -173,4 +210,54 @@ export async function getServiceEventWithOwners(id: string): Promise<ServiceEven
     ...eventData,
     owners: ownerDetails
   };
+}
+
+export async function getServiceEventsWithOwners(
+  serviceId?: string,
+  startDate?: string,
+  endDate?: string
+): Promise<ServiceEventWithOwners[]> {
+  // Start with the basic query to get events
+  let query = supabase
+    .from("service_events")
+    .select("*");
+    
+  // Apply filters if provided
+  if (serviceId) {
+    query = query.eq("service_id", serviceId);
+  }
+  
+  if (startDate) {
+    query = query.gte("date", startDate);
+  }
+  
+  if (endDate) {
+    query = query.lte("date", endDate);
+  }
+  
+  // Order by date
+  query = query.order("date", { ascending: true });
+  
+  const { data: events, error } = await query;
+  
+  if (error) {
+    console.error("Error fetching service events:", error);
+    throw error;
+  }
+  
+  // For each event, fetch its owners with details
+  const eventsWithOwners: ServiceEventWithOwners[] = [];
+  
+  for (const event of events) {
+    try {
+      const eventWithOwners = await getServiceEventWithOwners(event.id);
+      eventsWithOwners.push(eventWithOwners);
+    } catch (error) {
+      console.error(`Error getting owners for event ${event.id}:`, error);
+      // Add the event without owners if there's an error
+      eventsWithOwners.push({ ...event, owners: [] });
+    }
+  }
+  
+  return eventsWithOwners;
 }

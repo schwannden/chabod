@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -29,6 +29,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { ServiceEventOwnerSelect, ServiceEventOwner } from "./ServiceEventOwnerSelect";
+import { Separator } from "@/components/ui/separator";
 
 // Schema for form validation
 const formSchema = z.object({
@@ -57,6 +59,8 @@ export function CreateServiceEventDialog({
   services,
 }: CreateServiceEventDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedOwners, setSelectedOwners] = useState<ServiceEventOwner[]>([]);
+  const [selectedServiceId, setSelectedServiceId] = useState<string>("");
   const { toast } = useToast();
 
   // Initialize form
@@ -71,18 +75,52 @@ export function CreateServiceEventDialog({
     },
   });
 
+  // Update selectedServiceId when the service changes in the form
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      if (value.serviceId && value.serviceId !== selectedServiceId) {
+        setSelectedServiceId(value.serviceId);
+        // Reset selected owners when service changes
+        setSelectedOwners([]);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form, selectedServiceId]);
+
   const onSubmit = async (values: ServiceEventFormValues) => {
     setIsSubmitting(true);
     try {
-      const { data, error } = await supabase.from("service_events").insert({
-        service_id: values.serviceId,
-        date: values.date,
-        start_time: values.startTime,
-        end_time: values.endTime,
-        subtitle: values.subtitle || null,
-      }).select();
+      // First insert the service event
+      const { data: eventData, error: eventError } = await supabase
+        .from("service_events")
+        .insert({
+          service_id: values.serviceId,
+          date: values.date,
+          start_time: values.startTime,
+          end_time: values.endTime,
+          subtitle: values.subtitle || null,
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (eventError) throw eventError;
+      if (!eventData) throw new Error("Failed to create service event");
+
+      // If we have selected owners, insert them
+      if (selectedOwners.length > 0) {
+        const ownersToInsert = selectedOwners.map(owner => ({
+          service_event_id: eventData.id,
+          user_id: owner.userId,
+          service_role_id: owner.roleId,
+        }));
+
+        const { error: ownersError } = await supabase
+          .from("service_event_owners")
+          .insert(ownersToInsert);
+
+        if (ownersError) throw ownersError;
+      }
 
       toast({
         title: "成功",
@@ -197,6 +235,19 @@ export function CreateServiceEventDialog({
                 </FormItem>
               )}
             />
+
+            {selectedServiceId && (
+              <>
+                <Separator className="my-4" />
+                <h3 className="text-sm font-medium mb-2">服事排班成員</h3>
+                <ServiceEventOwnerSelect 
+                  serviceId={selectedServiceId}
+                  tenantId={tenantId}
+                  selectedOwners={selectedOwners}
+                  setSelectedOwners={setSelectedOwners}
+                />
+              </>
+            )}
             
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose}>

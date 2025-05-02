@@ -1,3 +1,4 @@
+
 export * from '../types';
 
 // Define the ServiceNote type that matches the database schema
@@ -67,4 +68,12 @@ export interface ServiceEventWithService extends ServiceEvent {
     id: string;
     name: string;
   };
+}
+
+// Interface to define the structure of an owner when adding to an event
+export interface ServiceEventOwnerFormValue {
+  userId: string;
+  roleId: string;
+  profile: any;
+  role: ServiceRole;
 }
