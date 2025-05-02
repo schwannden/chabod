@@ -153,6 +153,7 @@ export async function removeServiceEventOwner(
 }
 
 export async function getServiceEventWithOwners(id: string): Promise<ServiceEventWithOwners> {
+  // First get the event details
   const { data: eventData, error: eventError } = await supabase
     .from("service_events")
     .select("*")
@@ -164,8 +165,7 @@ export async function getServiceEventWithOwners(id: string): Promise<ServiceEven
     throw eventError;
   }
 
-  const ownerDetails: ServiceEventOwnerWithDetails[] = [];
-  
+  // Then get the owners in a separate query
   const { data: eventOwners, error: ownersError } = await supabase
     .from("service_event_owners")
     .select("*")
@@ -176,34 +176,35 @@ export async function getServiceEventWithOwners(id: string): Promise<ServiceEven
     throw ownersError;
   }
 
-  for (const owner of eventOwners) {
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", owner.user_id)
-      .single();
+  // Prepare to collect owner details
+  const ownerDetails: ServiceEventOwnerWithDetails[] = [];
+  
+  // For each owner, get profile and role details
+  for (const owner of eventOwners || []) {
+    try {
+      const [profileResult, roleResult] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", owner.user_id).single(),
+        supabase.from("service_roles").select("*").eq("id", owner.service_role_id).single()
+      ]);
+      
+      if (profileResult.error) {
+        console.error("Error fetching profile:", profileResult.error);
+        continue;
+      }
 
-    if (profileError) {
-      console.error("Error fetching profile:", profileError);
-      continue;
+      if (roleResult.error) {
+        console.error("Error fetching role:", roleResult.error);
+        continue;
+      }
+      
+      ownerDetails.push({
+        ...owner,
+        profile: profileResult.data,
+        role: roleResult.data
+      });
+    } catch (error) {
+      console.error(`Error processing owner ${owner.id}:`, error);
     }
-
-    const { data: role, error: roleError } = await supabase
-      .from("service_roles")
-      .select("*")
-      .eq("id", owner.service_role_id)
-      .single();
-
-    if (roleError) {
-      console.error("Error fetching role:", roleError);
-      continue;
-    }
-
-    ownerDetails.push({
-      ...owner,
-      profile,
-      role
-    });
   }
 
   return {
@@ -217,10 +218,8 @@ export async function getServiceEventsWithOwners(
   startDate?: string,
   endDate?: string
 ): Promise<ServiceEventWithOwners[]> {
-  // Start with the basic query to get events
-  let query = supabase
-    .from("service_events")
-    .select("*");
+  // Start with the basic query - avoid complex join
+  let query = supabase.from("service_events").select("*");
     
   // Apply filters if provided
   if (serviceId) {
@@ -235,10 +234,8 @@ export async function getServiceEventsWithOwners(
     query = query.lte("date", endDate);
   }
   
-  // Order by date
-  query = query.order("date", { ascending: true });
-  
-  const { data: events, error } = await query;
+  // Execute the query
+  const { data: events, error } = await query.order("date", { ascending: true });
   
   if (error) {
     console.error("Error fetching service events:", error);
@@ -248,13 +245,54 @@ export async function getServiceEventsWithOwners(
   // For each event, fetch its owners with details
   const eventsWithOwners: ServiceEventWithOwners[] = [];
   
-  for (const event of events) {
+  for (const event of events || []) {
     try {
-      const eventWithOwners = await getServiceEventWithOwners(event.id);
-      eventsWithOwners.push(eventWithOwners);
-    } catch (error) {
-      console.error(`Error getting owners for event ${event.id}:`, error);
-      // Add the event without owners if there's an error
+      // Get owners data for this event
+      const { data: owners, error: ownersError } = await supabase
+        .from("service_event_owners")
+        .select("*")
+        .eq("service_event_id", event.id);
+        
+      if (ownersError) {
+        console.error(`Error getting owners for event ${event.id}:`, ownersError);
+        eventsWithOwners.push({ ...event, owners: [] });
+        continue;
+      }
+      
+      // Get detailed info for each owner
+      const ownersWithDetails: ServiceEventOwnerWithDetails[] = [];
+      
+      for (const owner of owners || []) {
+        try {
+          const [profileResult, roleResult] = await Promise.all([
+            supabase.from("profiles").select("*").eq("id", owner.user_id).maybeSingle(),
+            supabase.from("service_roles").select("*").eq("id", owner.service_role_id).maybeSingle()
+          ]);
+          
+          if (profileResult.error || roleResult.error) {
+            console.warn(`Skipping owner ${owner.id} due to error fetching details`);
+            continue;
+          }
+          
+          if (profileResult.data && roleResult.data) {
+            ownersWithDetails.push({
+              ...owner,
+              profile: profileResult.data,
+              role: roleResult.data
+            });
+          }
+        } catch (e) {
+          console.error(`Error processing owner ${owner.id}:`, e);
+        }
+      }
+      
+      eventsWithOwners.push({
+        ...event,
+        owners: ownersWithDetails
+      });
+      
+    } catch (eventError) {
+      console.error(`Error processing event ${event.id}:`, eventError);
       eventsWithOwners.push({ ...event, owners: [] });
     }
   }

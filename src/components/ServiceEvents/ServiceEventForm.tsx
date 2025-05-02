@@ -1,8 +1,7 @@
 
-import React from "react";
-import { z } from "zod";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
 import {
   Form,
   FormControl,
@@ -11,6 +10,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -18,32 +18,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { ServiceEventOwner } from "./ServiceEventOwnerSelect";
-import { Separator } from "@/components/ui/separator";
 
-// Schema for form validation
-export const serviceEventFormSchema = z.object({
-  serviceId: z.string().min(1, "服事類型為必填"),
-  date: z.string().min(1, "日期為必填"),
-  startTime: z.string().min(1, "開始時間為必填"),
-  endTime: z.string().min(1, "結束時間為必填"),
-  subtitle: z.string().optional(),
-});
-
-export type ServiceEventFormValues = z.infer<typeof serviceEventFormSchema>;
+export interface ServiceEventFormValues {
+  serviceId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  subtitle?: string;
+}
 
 interface ServiceEventFormProps {
   onSubmit: (values: ServiceEventFormValues) => void;
-  services: { id: string; name: string; default_start_time?: string | null; default_end_time?: string | null; }[];
+  services: { 
+    id: string; 
+    name: string;
+    default_start_time?: string | null;
+    default_end_time?: string | null;
+  }[];
   selectedServiceId: string;
   setSelectedServiceId: (id: string) => void;
   selectedOwners: ServiceEventOwner[];
-  setSelectedOwners: React.Dispatch<React.SetStateAction<ServiceEventOwner[]>>;
+  setSelectedOwners: (owners: ServiceEventOwner[]) => void;
   tenantId: string;
   isSubmitting: boolean;
   onCancel: () => void;
   children?: React.ReactNode;
+  defaultStartTime?: string;
+  defaultEndTime?: string;
 }
 
 export function ServiceEventForm({
@@ -51,62 +53,56 @@ export function ServiceEventForm({
   services,
   selectedServiceId,
   setSelectedServiceId,
-  selectedOwners,
-  setSelectedOwners,
   tenantId,
   isSubmitting,
-  onCancel,
-  children
+  children,
+  defaultStartTime,
+  defaultEndTime
 }: ServiceEventFormProps) {
-  // Initialize form
+  const today = format(new Date(), "yyyy-MM-dd");
+  
   const form = useForm<ServiceEventFormValues>({
-    resolver: zodResolver(serviceEventFormSchema),
     defaultValues: {
       serviceId: "",
-      date: "",
+      date: today,
       startTime: "",
       endTime: "",
-      subtitle: "",
+      subtitle: ""
     },
   });
-  
-  // When service changes, update start and end times if defaults exist
-  const handleServiceChange = (serviceId: string) => {
-    setSelectedServiceId(serviceId);
-    
-    // Find the selected service
-    const selectedService = services.find(service => service.id === serviceId);
-    
-    // If the service has default times, update the form
-    if (selectedService) {
-      if (selectedService.default_start_time) {
-        form.setValue("startTime", selectedService.default_start_time);
-      }
-      
-      if (selectedService.default_end_time) {
-        form.setValue("endTime", selectedService.default_end_time);
-      }
+
+  // Update form values when default times change
+  useEffect(() => {
+    if (defaultStartTime) {
+      form.setValue("startTime", defaultStartTime);
     }
     
-    // Reset selected owners when service changes
-    setSelectedOwners([]);
+    if (defaultEndTime) {
+      form.setValue("endTime", defaultEndTime);
+    }
+  }, [defaultStartTime, defaultEndTime, form]);
+
+  const handleServiceChange = (serviceId: string) => {
+    setSelectedServiceId(serviceId);
+    form.setValue("serviceId", serviceId);
+  };
+
+  const handleFormSubmit = (values: ServiceEventFormValues) => {
+    onSubmit(values);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="serviceId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>服事類型</FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  handleServiceChange(value);
-                }}
-                value={field.value}
+              <Select 
+                onValueChange={(value) => handleServiceChange(value)}
+                value={selectedServiceId}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -125,7 +121,7 @@ export function ServiceEventForm({
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="date"
@@ -139,7 +135,7 @@ export function ServiceEventForm({
             </FormItem>
           )}
         />
-        
+
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -154,7 +150,7 @@ export function ServiceEventForm({
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="endTime"
@@ -169,7 +165,7 @@ export function ServiceEventForm({
             )}
           />
         </div>
-        
+
         <FormField
           control={form.control}
           name="subtitle"

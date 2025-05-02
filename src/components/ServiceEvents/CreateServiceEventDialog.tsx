@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -37,7 +37,20 @@ export function CreateServiceEventDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedOwners, setSelectedOwners] = useState<ServiceEventOwner[]>([]);
   const [selectedServiceId, setSelectedServiceId] = useState<string>("");
+  const [defaultStartTime, setDefaultStartTime] = useState<string | undefined>(undefined);
+  const [defaultEndTime, setDefaultEndTime] = useState<string | undefined>(undefined);
   const { toast } = useToast();
+  
+  // Update default times when service selection changes
+  useEffect(() => {
+    if (selectedServiceId) {
+      const selectedService = services.find(service => service.id === selectedServiceId);
+      if (selectedService) {
+        setDefaultStartTime(selectedService.default_start_time || undefined);
+        setDefaultEndTime(selectedService.default_end_time || undefined);
+      }
+    }
+  }, [selectedServiceId, services]);
 
   const handleSubmit = async (values: ServiceEventFormValues) => {
     setIsSubmitting(true);
@@ -109,6 +122,8 @@ export function CreateServiceEventDialog({
           tenantId={tenantId}
           isSubmitting={isSubmitting}
           onCancel={onClose}
+          defaultStartTime={defaultStartTime}
+          defaultEndTime={defaultEndTime}
         >
           {selectedServiceId && (
             <>
