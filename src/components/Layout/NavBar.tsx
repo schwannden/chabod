@@ -21,7 +21,8 @@ export function NavBar({ tenant, onSignOut }: NavBarProps) {
   const { user, profile, signOut } = useSession();
   const navigate = useNavigate();
   const location = useLocation();
-  const { role } = useTenantRole(tenant?.id, user?.id);
+  // Use the slug, not the ID for the tenant role lookup
+  const { role } = useTenantRole(tenant?.slug, user?.id);
   
   const handleSignOut = async () => {
     if (onSignOut) {
@@ -70,13 +71,7 @@ export function NavBar({ tenant, onSignOut }: NavBarProps) {
     }
   };
 
-  const showManageTenants = tenant?.id && role === "owner";
-
-  console.log('Current user ID:', user?.id);
-  console.log('Current path:', location.pathname);
-  console.log('Current tenant ID:', tenant?.id);
-  console.log('Current tenant role:', role);
-  console.log('Should show Manage Tenants:', showManageTenants);
+  const showManageTenants = tenant?.slug && role === "owner";
 
   return (
     <header className="bg-background border-b sticky top-0 z-10">

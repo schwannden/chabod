@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSession } from "@/contexts/AuthContext";
@@ -136,8 +137,7 @@ export default function DashboardPage() {
       <NavBar 
         tenant={{ 
           name: tenant?.name || "", 
-          slug: slug || "",
-          id: tenant?.id
+          slug: tenant?.slug || ""
         }} 
         onSignOut={handleSignOut}
       />

@@ -16,9 +16,7 @@ export function useTenantRole(tenantSlug: string | undefined, userId: string | u
       }
 
       try {
-        console.log('Fetching tenant role for:', { tenantSlug, userId });
-        
-        // First get the tenant ID from the slug
+        // First get the tenant ID from the slug - this needs to be a proper slug, not a UUID
         const { data: tenantData, error: tenantError } = await supabase
           .from("tenants")
           .select("id")
