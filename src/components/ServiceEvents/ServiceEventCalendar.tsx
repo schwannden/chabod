@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { format, startOfMonth, addMonths, isSameMonth } from "date-fns";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -47,6 +46,7 @@ export const ServiceEventCalendar: React.FC<ServiceEventCalendarProps> = ({
   const today = new Date();
   const [baseMonth, setBaseMonth] = React.useState<Date>(startOfMonth(today));
   const eventsByDate = React.useMemo(() => getEventsByDate(serviceEvents), [serviceEvents]);
+  console.log("Events By Date:", eventsByDate);
   const serviceMap = React.useMemo(
     () => Object.fromEntries(services.map(s => [s.id, s.name])) as Record<string, string>, 
     [services]
@@ -98,9 +98,11 @@ export const ServiceEventCalendar: React.FC<ServiceEventCalendarProps> = ({
     });
     
     // Return an object with a hasEvents array for each month
-    return Object.fromEntries(
+    const modifiers = Object.fromEntries(
       Object.entries(months).map(([index, dates]) => [`hasEvents-${index}`, dates])
     );
+    console.log("Calculated Modifiers:", modifiers);
+    return modifiers;
   }, [eventsByDate, baseMonth, monthsToShow]);
   
   // Custom styling for days with events

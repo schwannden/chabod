@@ -1,6 +1,10 @@
-
 import { supabase } from "@/integrations/supabase/client";
-import { ServiceGroup } from "./types";
+
+export interface GroupInfo {
+  id: string;
+  name: string;
+  description: string;
+}
 
 export async function addServiceGroup(serviceId: string, groupId: string): Promise<void> {
   const { error } = await supabase
@@ -40,7 +44,7 @@ export async function getGroupsForService(serviceId: string): Promise<string[]> 
   return data.map(item => item.group_id);
 }
 
-export async function getGroupsForServiceWithNames(serviceId: string): Promise<any[]> {
+export async function getGroupsForServiceWithNames(serviceId: string): Promise<GroupInfo[]> {
   const { data, error } = await supabase
     .from("service_groups")
     .select(`

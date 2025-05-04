@@ -1,6 +1,14 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { ServiceAdmin } from "./types";
+
+export interface ServiceAdminWithProfile {
+  id: string;
+  user_id: string;
+  profiles: {
+    email: string | null;
+    full_name: string | null;
+  } | null;
+}
 
 export async function addServiceAdmin(serviceId: string, userId: string): Promise<void> {
   const { error } = await supabase
@@ -42,7 +50,7 @@ export async function isServiceAdmin(serviceId: string, userId: string): Promise
   return !!data;
 }
 
-export async function getServiceAdmins(serviceId: string): Promise<any[]> {
+export async function getServiceAdmins(serviceId: string): Promise<ServiceAdminWithProfile[]> {
   // Use a properly formatted join to get profiles data
   const { data, error } = await supabase
     .from("service_admins")

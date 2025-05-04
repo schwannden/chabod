@@ -21,7 +21,7 @@ const noteFormSchema = z.object({
   text: z.string().min(1, "標題為必填"),
   link: z.string()
     .refine(
-      (val) => !val || /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(val),
+      (val) => !val || /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/.test(val),
       { message: "請輸入有效的URL" }
     )
     .optional()

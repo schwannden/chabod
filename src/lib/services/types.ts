@@ -1,4 +1,3 @@
-
 export * from '../types';
 
 // Define the ServiceNote type that matches the database schema
@@ -36,6 +35,7 @@ export interface ServiceGroup {
 export interface ServiceEvent {
   id: string;
   service_id: string;
+  tenant_id: string;
   date: string;
   start_time: string;
   end_time: string;
@@ -50,12 +50,20 @@ export interface ServiceEventOwner {
   service_event_id: string;
   user_id: string;
   service_role_id: string;
+  tenant_id: string;
   created_at: string;
   updated_at: string;
 }
 
+// Define a common UserProfile type
+export interface UserProfile {
+  id?: string; // Optional, might not always be present depending on join
+  email: string | null;
+  full_name: string | null;
+}
+
 export interface ServiceEventOwnerWithDetails extends ServiceEventOwner {
-  profile: any; // Profile information
+  profile: UserProfile | null; // Profile information, allow null if join might fail
   role: ServiceRole; // Role information
 }
 
@@ -74,6 +82,6 @@ export interface ServiceEventWithService extends ServiceEvent {
 export interface ServiceEventOwnerFormValue {
   userId: string;
   roleId: string;
-  profile: any;
+  profile: UserProfile | null; // Use UserProfile, allow null
   role: ServiceRole;
 }

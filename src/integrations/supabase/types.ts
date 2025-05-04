@@ -7,6 +7,31 @@ export type Json =
   | Json[]
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          operationName?: string
+          query?: string
+          variables?: Json
+          extensions?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       events: {
@@ -400,6 +425,7 @@ export type Database = {
           id: string
           service_event_id: string
           service_role_id: string
+          tenant_id: string
           updated_at: string
           user_id: string
         }
@@ -408,6 +434,7 @@ export type Database = {
           id?: string
           service_event_id: string
           service_role_id: string
+          tenant_id: string
           updated_at?: string
           user_id: string
         }
@@ -416,6 +443,7 @@ export type Database = {
           id?: string
           service_event_id?: string
           service_role_id?: string
+          tenant_id?: string
           updated_at?: string
           user_id?: string
         }
@@ -432,6 +460,13 @@ export type Database = {
             columns: ["service_role_id"]
             isOneToOne: false
             referencedRelation: "service_roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_event_owners_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
           {
@@ -452,6 +487,7 @@ export type Database = {
           service_id: string
           start_time: string
           subtitle: string | null
+          tenant_id: string
           updated_at: string
         }
         Insert: {
@@ -462,6 +498,7 @@ export type Database = {
           service_id: string
           start_time: string
           subtitle?: string | null
+          tenant_id: string
           updated_at?: string
         }
         Update: {
@@ -472,6 +509,7 @@ export type Database = {
           service_id?: string
           start_time?: string
           subtitle?: string | null
+          tenant_id?: string
           updated_at?: string
         }
         Relationships: [
@@ -480,6 +518,13 @@ export type Database = {
             columns: ["service_id"]
             isOneToOne: false
             referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -886,6 +931,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       event_visibility: ["public", "private"],

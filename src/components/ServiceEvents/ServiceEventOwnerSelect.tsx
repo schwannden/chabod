@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Check, Plus, Trash2, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,12 +12,12 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { TenantMemberWithProfile } from "@/lib/types";
-import { ServiceRole } from "@/lib/services/types";
+import { ServiceRole, UserProfile } from "@/lib/services/types";
 
 export interface ServiceEventOwner {
   userId: string;
   roleId: string;
-  profile: any;
+  profile: UserProfile | null;
   role: ServiceRole;
 }
 

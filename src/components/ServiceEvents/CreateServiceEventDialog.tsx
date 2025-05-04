@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -64,6 +63,7 @@ export function CreateServiceEventDialog({
           start_time: values.startTime,
           end_time: values.endTime,
           subtitle: values.subtitle || null,
+          tenant_id: tenantId,
         })
         .select()
         .single();
@@ -77,6 +77,7 @@ export function CreateServiceEventDialog({
           service_event_id: eventData.id,
           user_id: owner.userId,
           service_role_id: owner.roleId,
+          tenant_id: tenantId,
         }));
 
         const { error: ownersError } = await supabase

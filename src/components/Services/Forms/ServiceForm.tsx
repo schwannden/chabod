@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ServiceDetailsForm } from "./ServiceDetailsForm";
@@ -7,14 +6,13 @@ import { ServiceGroupsForm } from "./ServiceGroupsForm";
 import { ServiceNotesForm } from "./ServiceNotesForm";
 import { ServiceRolesForm } from "./ServiceRolesForm";
 import { UseFormReturn } from "react-hook-form";
-import { Service } from "@/lib/services";
 import { Group, TenantMemberWithProfile } from "@/lib/types";
 import { NoteFormValues } from "./ServiceNotesForm";
 import { RoleFormValues } from "./ServiceRolesForm";
 import { ServiceFormValues } from "../hooks/useServiceForm";
 
 export interface ServiceFormProps {
-  form: UseFormReturn<ServiceFormValues, any, undefined>;
+  form: UseFormReturn<ServiceFormValues, unknown, undefined>;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   members: TenantMemberWithProfile[];
