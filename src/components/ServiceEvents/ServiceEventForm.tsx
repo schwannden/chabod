@@ -57,6 +57,7 @@ export function ServiceEventForm({
   setSelectedServiceId,
   tenantId,
   isSubmitting,
+  onCancel,
   children,
   defaultStartTime,
   defaultEndTime,
@@ -91,6 +92,9 @@ export function ServiceEventForm({
   const handleServiceChange = (serviceId: string) => {
     setSelectedServiceId(serviceId);
     form.setValue("serviceId", serviceId);
+    
+    // Clear owners when changing service as they're tied to specific roles
+    setSelectedOwners([]);
   };
 
   const handleFormSubmit = (values: ServiceEventFormValues) => {

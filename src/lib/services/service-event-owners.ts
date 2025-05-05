@@ -117,3 +117,28 @@ export async function getServiceEventOwners(
 
   return ownersWithDetails;
 }
+
+/**
+ * Update service event owners
+ * This will remove all existing owners and add the new ones
+ */
+export async function updateServiceEventOwners(
+  serviceEventId: string,
+  owners: Array<{ user_id: string; service_role_id: string; tenant_id: string }>
+): Promise<void> {
+  // Delete all existing owners
+  const { error: deleteError } = await supabase
+    .from("service_event_owners")
+    .delete()
+    .eq("service_event_id", serviceEventId);
+    
+  if (deleteError) {
+    console.error("Error removing existing service event owners:", deleteError);
+    throw deleteError;
+  }
+  
+  // Add new owners if any
+  if (owners && owners.length > 0) {
+    await createServiceEventOwners(serviceEventId, owners);
+  }
+}
