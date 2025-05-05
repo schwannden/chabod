@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 
@@ -24,21 +23,11 @@ export function MemberTableActions({
   return (
     <div className="space-x-1">
       {!isEditing && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onEditClick}
-          disabled={isLoading}
-        >
+        <Button variant="ghost" size="icon" onClick={onEditClick} disabled={isLoading}>
           <Edit className="h-4 w-4" />
         </Button>
       )}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onDeleteClick}
-        disabled={isLoading}
-      >
+      <Button variant="ghost" size="icon" onClick={onDeleteClick} disabled={isLoading}>
         <Trash2 className="h-4 w-4" />
       </Button>
     </div>

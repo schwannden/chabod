@@ -53,11 +53,13 @@ export async function getServiceAdmins(serviceId: string): Promise<ServiceAdminW
   // Use a properly formatted join to get profiles data
   const { data, error } = await supabase
     .from("service_admins")
-    .select(`
+    .select(
+      `
       id, 
       user_id,
       profiles:user_id(email, full_name)
-    `)
+    `,
+    )
     .eq("service_id", serviceId);
 
   if (error) {

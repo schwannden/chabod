@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { ServiceEvent } from "./types";
 import { createServiceEventOwners } from "./service-event-owners";
@@ -7,13 +6,9 @@ import { createServiceEventOwners } from "./service-event-owners";
  * Create a new service event
  */
 export async function createServiceEvent(
-  event: Omit<ServiceEvent, "id" | "created_at" | "updated_at">
+  event: Omit<ServiceEvent, "id" | "created_at" | "updated_at">,
 ): Promise<ServiceEvent> {
-  const { data, error } = await supabase
-    .from("service_events")
-    .insert(event)
-    .select()
-    .single();
+  const { data, error } = await supabase.from("service_events").insert(event).select().single();
 
   if (error) {
     console.error("Error creating service event:", error);
@@ -28,7 +23,7 @@ export async function createServiceEvent(
  */
 export async function createServiceEventWithOwners(
   event: Omit<ServiceEvent, "id" | "created_at" | "updated_at">,
-  owners: Array<{ user_id: string; service_role_id: string }>
+  owners: Array<{ user_id: string; service_role_id: string }>,
 ): Promise<ServiceEvent> {
   // First create the event
   const { data: eventData, error: eventError } = await supabase
@@ -44,12 +39,12 @@ export async function createServiceEventWithOwners(
 
   // If we have owners, create them too
   if (owners && owners.length > 0) {
-    const ownersWithTenant = owners.map(owner => ({
+    const ownersWithTenant = owners.map((owner) => ({
       user_id: owner.user_id,
       service_role_id: owner.service_role_id,
-      tenant_id: event.tenant_id
+      tenant_id: event.tenant_id,
     }));
-    
+
     await createServiceEventOwners(eventData.id, ownersWithTenant);
   }
 
@@ -61,7 +56,7 @@ export async function createServiceEventWithOwners(
  */
 export async function updateServiceEvent(
   id: string,
-  updates: Partial<Omit<ServiceEvent, "id" | "created_at" | "updated_at">>
+  updates: Partial<Omit<ServiceEvent, "id" | "created_at" | "updated_at">>,
 ): Promise<ServiceEvent> {
   const { data, error } = await supabase
     .from("service_events")
@@ -87,17 +82,14 @@ export async function deleteServiceEvent(id: string): Promise<void> {
     .from("service_event_owners")
     .delete()
     .eq("service_event_id", id);
-    
+
   if (ownersError) {
     console.error("Error deleting service event owners:", ownersError);
     throw ownersError;
   }
 
   // Then delete the event itself
-  const { error } = await supabase
-    .from("service_events")
-    .delete()
-    .eq("id", id);
+  const { error } = await supabase.from("service_events").delete().eq("id", id);
 
   if (error) {
     console.error("Error deleting service event:", error);

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import {
   Dialog,
@@ -34,19 +33,19 @@ export function CreateServiceEventDialog({
   services,
 }: CreateServiceEventDialogProps) {
   const [selectedServiceId, setSelectedServiceId] = useState<string>(
-    services.length > 0 ? services[0].id : ""
+    services.length > 0 ? services[0].id : "",
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [defaultStartTime, setDefaultStartTime] = useState<string>("");
   const [defaultEndTime, setDefaultEndTime] = useState<string>("");
   const [selectedOwners, setSelectedOwners] = useState<ServiceEventOwner[]>([]);
-  
+
   const { toast } = useToast();
 
   // Update default times when selected service changes
   useEffect(() => {
     if (selectedServiceId) {
-      const selectedService = services.find(s => s.id === selectedServiceId);
+      const selectedService = services.find((s) => s.id === selectedServiceId);
       setDefaultStartTime(selectedService?.default_start_time || "");
       setDefaultEndTime(selectedService?.default_end_time || "");
     }
@@ -63,21 +62,21 @@ export function CreateServiceEventDialog({
         end_time: values.endTime,
         subtitle: values.subtitle || null,
       };
-      
+
       // Convert owners to the required format
-      const owners = selectedOwners.map(owner => ({
+      const owners = selectedOwners.map((owner) => ({
         user_id: owner.userId,
         service_role_id: owner.roleId,
-        tenant_id: tenantId
+        tenant_id: tenantId,
       }));
-      
+
       await createServiceEventWithOwners(eventData, owners);
 
       toast({
         title: "成功",
         description: "服事排班已建立",
       });
-      
+
       onEventCreated();
       onClose();
     } catch (error) {
@@ -98,7 +97,7 @@ export function CreateServiceEventDialog({
         <DialogHeader>
           <DialogTitle>新增服事排班</DialogTitle>
         </DialogHeader>
-        
+
         <ServiceEventForm
           onSubmit={handleSubmit}
           services={services}
@@ -123,7 +122,7 @@ export function CreateServiceEventDialog({
               />
             )}
           </div>
-          
+
           <DialogFooter className="mt-6">
             <Button type="button" variant="outline" onClick={onClose}>
               取消

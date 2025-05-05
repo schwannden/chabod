@@ -1,15 +1,58 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, ExternalLink, Book, Link, FileText, Video, Music, BarChart, Computer, Smartphone, Globe, FileImage, FileCog, FileCode, Package, Calendar, Mail, Users, Banknote, LayoutDashboard, Settings, LucideProps } from "lucide-react";
+import {
+  Pencil,
+  Trash2,
+  ExternalLink,
+  Book,
+  Link,
+  FileText,
+  Video,
+  Music,
+  BarChart,
+  Computer,
+  Smartphone,
+  Globe,
+  FileImage,
+  FileCog,
+  FileCode,
+  Package,
+  Calendar,
+  Mail,
+  Users,
+  Banknote,
+  LayoutDashboard,
+  Settings,
+  LucideProps,
+} from "lucide-react";
 import { Resource, Group } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { deleteResource } from "@/lib/resource-service";
 import { useToast } from "@/components/ui/use-toast";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { EditResourceDialog } from "./EditResourceDialog";
 
-type LucideIcon = React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>;
+type LucideIcon = React.ForwardRefExoticComponent<
+  Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
+>;
 
 const ICON_MAP: Record<string, LucideIcon> = {
   book: Book,
@@ -42,7 +85,14 @@ interface ResourceListProps {
   groups: Group[];
 }
 
-export function ResourceList({ resources, isLoading, onResourceUpdated, onResourceDeleted, canManage, groups = [] }: ResourceListProps) {
+export function ResourceList({
+  resources,
+  isLoading,
+  onResourceUpdated,
+  onResourceDeleted,
+  canManage,
+  groups = [],
+}: ResourceListProps) {
   const { toast } = useToast();
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -96,7 +146,11 @@ export function ResourceList({ resources, isLoading, onResourceUpdated, onResour
       <Card className="border-dashed border-2">
         <CardContent className="flex flex-col items-center justify-center p-6">
           <p className="text-center text-muted-foreground">暫無資源</p>
-          {canManage && <p className="text-center text-muted-foreground mt-2">點擊右上角的「新增資源」按鈕來添加教會資源。</p>}
+          {canManage && (
+            <p className="text-center text-muted-foreground mt-2">
+              點擊右上角的「新增資源」按鈕來添加教會資源。
+            </p>
+          )}
         </CardContent>
       </Card>
     );
@@ -114,13 +168,16 @@ export function ResourceList({ resources, isLoading, onResourceUpdated, onResour
                   <IconComponent className="h-5 w-5" />
                   <CardTitle>{resource.name}</CardTitle>
                 </div>
-                {resource.description && (
-                  <CardDescription>{resource.description}</CardDescription>
-                )}
+                {resource.description && <CardDescription>{resource.description}</CardDescription>}
               </CardHeader>
               <CardFooter className="flex justify-between pt-2">
                 <Button variant="outline" size="sm" asChild>
-                  <a href={resource.url} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                  <a
+                    href={resource.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center"
+                  >
                     <ExternalLink className="h-4 w-4 mr-1" />
                     打開連結
                   </a>
@@ -145,7 +202,9 @@ export function ResourceList({ resources, isLoading, onResourceUpdated, onResour
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>取消</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDelete(resource.id)}>刪除</AlertDialogAction>
+                          <AlertDialogAction onClick={() => handleDelete(resource.id)}>
+                            刪除
+                          </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>

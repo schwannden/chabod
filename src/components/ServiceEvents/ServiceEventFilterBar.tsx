@@ -30,37 +30,37 @@ export function ServiceEventFilterBar({
   const filters: FilterConfig<Group | Service>[] = [
     // Group filter
     {
-      type: 'select',
-      id: 'group-filter',
-      label: '組別',
-      placeholder: '選擇組別',
+      type: "select",
+      id: "group-filter",
+      label: "組別",
+      placeholder: "選擇組別",
       options: allGroups,
       value: selectedGroup,
       onChange: setSelectedGroup,
     },
     // Service filter
     {
-      type: 'select',
-      id: 'service-filter',
-      label: '服事類型',
-      placeholder: '選擇服事',
+      type: "select",
+      id: "service-filter",
+      label: "服事類型",
+      placeholder: "選擇服事",
       options: services,
       value: selectedService,
       onChange: setSelectedService,
     },
     // Start date filter
     {
-      type: 'date',
-      id: 'start-date-filter',
-      label: '開始日期',
+      type: "date",
+      id: "start-date-filter",
+      label: "開始日期",
       value: startDate,
       onChange: setStartDate,
     },
     // End date filter
     {
-      type: 'date',
-      id: 'end-date-filter',
-      label: '結束日期',
+      type: "date",
+      id: "end-date-filter",
+      label: "結束日期",
       value: endDate,
       onChange: setEndDate,
     },

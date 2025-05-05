@@ -9,26 +9,29 @@ type ServiceEventCalendarProps = {
   isLoading: boolean;
 };
 
-export const ServiceEventCalendar: React.FC<ServiceEventCalendarProps> = ({ 
-  serviceEvents, 
+export const ServiceEventCalendar: React.FC<ServiceEventCalendarProps> = ({
+  serviceEvents,
   services,
-  isLoading 
+  isLoading,
 }) => {
   const serviceMap = React.useMemo(
-    () => Object.fromEntries(services.map(s => [s.id, s.name])) as Record<string, string>, 
-    [services]
+    () => Object.fromEntries(services.map((s) => [s.id, s.name])) as Record<string, string>,
+    [services],
   );
 
-  const renderEventTooltip = React.useCallback((event: BaseEvent) => {
-    // Cast the BaseEvent back to ServiceEventWithService since we know that's what we're providing
-    const serviceEvent = event as ServiceEventWithService;
-    return (
-      <ServiceEventCellTooltip 
-        event={serviceEvent} 
-        serviceName={serviceMap[serviceEvent.service_id] || "Unknown Service"} 
-      />
-    );
-  }, [serviceMap]);
+  const renderEventTooltip = React.useCallback(
+    (event: BaseEvent) => {
+      // Cast the BaseEvent back to ServiceEventWithService since we know that's what we're providing
+      const serviceEvent = event as ServiceEventWithService;
+      return (
+        <ServiceEventCellTooltip
+          event={serviceEvent}
+          serviceName={serviceMap[serviceEvent.service_id] || "Unknown Service"}
+        />
+      );
+    },
+    [serviceMap],
+  );
 
   return (
     <GenericCalendar

@@ -1,13 +1,10 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { ServiceRole } from "./types";
 
-export async function addServiceRole(role: Omit<ServiceRole, "id" | "created_at" | "updated_at">): Promise<ServiceRole> {
-  const { data, error } = await supabase
-    .from("service_roles")
-    .insert(role)
-    .select()
-    .single();
+export async function addServiceRole(
+  role: Omit<ServiceRole, "id" | "created_at" | "updated_at">,
+): Promise<ServiceRole> {
+  const { data, error } = await supabase.from("service_roles").insert(role).select().single();
 
   if (error) {
     console.error("Error adding service role:", error);
@@ -32,7 +29,10 @@ export async function getServiceRoles(serviceId: string): Promise<ServiceRole[]>
   return data;
 }
 
-export async function updateServiceRole(id: string, updates: Partial<Omit<ServiceRole, "id" | "created_at" | "updated_at">>): Promise<ServiceRole> {
+export async function updateServiceRole(
+  id: string,
+  updates: Partial<Omit<ServiceRole, "id" | "created_at" | "updated_at">>,
+): Promise<ServiceRole> {
   const { data, error } = await supabase
     .from("service_roles")
     .update(updates)
@@ -49,10 +49,7 @@ export async function updateServiceRole(id: string, updates: Partial<Omit<Servic
 }
 
 export async function deleteServiceRole(id: string): Promise<void> {
-  const { error } = await supabase
-    .from("service_roles")
-    .delete()
-    .eq("id", id);
+  const { error } = await supabase.from("service_roles").delete().eq("id", id);
 
   if (error) {
     console.error("Error deleting service role:", error);
@@ -61,10 +58,7 @@ export async function deleteServiceRole(id: string): Promise<void> {
 }
 
 export async function deleteServiceRoles(serviceId: string): Promise<void> {
-  const { error } = await supabase
-    .from("service_roles")
-    .delete()
-    .eq("service_id", serviceId);
+  const { error } = await supabase.from("service_roles").delete().eq("service_id", serviceId);
 
   if (error) {
     console.error("Error deleting service roles:", error);

@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { createResource, addResourceToGroup } from "@/lib/resource-service";
@@ -107,9 +113,7 @@ export function CreateResourceDialog({
       });
 
       await Promise.all(
-        selectedGroups.map((groupId) =>
-          addResourceToGroup(newResource.id, groupId)
-        )
+        selectedGroups.map((groupId) => addResourceToGroup(newResource.id, groupId)),
       );
 
       onResourceCreated(newResource);
@@ -132,9 +136,7 @@ export function CreateResourceDialog({
 
   const handleGroupToggle = (groupId: string) => {
     setSelectedGroups((prev) =>
-      prev.includes(groupId)
-        ? prev.filter((id) => id !== groupId)
-        : [...prev, groupId]
+      prev.includes(groupId) ? prev.filter((id) => id !== groupId) : [...prev, groupId],
     );
   };
 

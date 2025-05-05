@@ -36,7 +36,7 @@ export default function ServiceEventPage() {
     startDate,
     setStartDate,
     endDate,
-    setEndDate
+    setEndDate,
   } = useEventFilters();
 
   // Use our service events hook
@@ -46,65 +46,62 @@ export default function ServiceEventPage() {
     selectedService,
     startDate,
     endDate,
-    refreshTrigger
+    refreshTrigger,
   });
 
   useEffect(() => {
     // Check if user can create events (is a service admin or tenant owner)
-    if (role === 'owner' || user) {
+    if (role === "owner" || user) {
       setCanCreateEvent(true);
     } else {
       setCanCreateEvent(false);
     }
   }, [role, user]);
 
-  const fetchBaseData = useCallback(async (id: string) => {
-    setTenantId(id);
-    
-    const fetchAllGroups = async (id: string) => {
-      if (!id) return;
-      try {
-        const groups = await getTenantGroups(id);
-        setAllGroups(groups || []);
-      } catch (error) {
-        console.error("Error fetching groups:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load groups. Some features may be limited.",
-          variant: "destructive",
-        });
-      }
-    };
+  const fetchBaseData = useCallback(
+    async (id: string) => {
+      setTenantId(id);
 
-    const fetchServices = async (id: string) => {
-      if (!id) return;
-      try {
-        const { data, error } = await supabase
-          .from("services")
-          .select()
-          .eq("tenant_id", id);
-          
-        if (error) throw error;
-        setServices(data || []);
-      } catch (error) {
-        console.error("Error fetching services:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load services. Some features may be limited.",
-          variant: "destructive",
-        });
-      }
-    };
-    
-    await Promise.all([
-      fetchAllGroups(id),
-      fetchServices(id)
-    ]);
-  }, [toast]);
+      const fetchAllGroups = async (id: string) => {
+        if (!id) return;
+        try {
+          const groups = await getTenantGroups(id);
+          setAllGroups(groups || []);
+        } catch (error) {
+          console.error("Error fetching groups:", error);
+          toast({
+            title: "Error",
+            description: "Failed to load groups. Some features may be limited.",
+            variant: "destructive",
+          });
+        }
+      };
+
+      const fetchServices = async (id: string) => {
+        if (!id) return;
+        try {
+          const { data, error } = await supabase.from("services").select().eq("tenant_id", id);
+
+          if (error) throw error;
+          setServices(data || []);
+        } catch (error) {
+          console.error("Error fetching services:", error);
+          toast({
+            title: "Error",
+            description: "Failed to load services. Some features may be limited.",
+            variant: "destructive",
+          });
+        }
+      };
+
+      await Promise.all([fetchAllGroups(id), fetchServices(id)]);
+    },
+    [toast],
+  );
 
   const handleEventUpdated = () => {
     // Increment the refresh trigger to force a refetch of events
-    setRefreshTrigger(prev => prev + 1);
+    setRefreshTrigger((prev) => prev + 1);
   };
 
   return slug ? (
@@ -112,7 +109,7 @@ export default function ServiceEventPage() {
       slug={slug}
       title="服事表"
       calendar={
-        <ServiceEventCalendar 
+        <ServiceEventCalendar
           serviceEvents={serviceEvents}
           services={services}
           isLoading={isEventsLoading}
@@ -142,9 +139,7 @@ export default function ServiceEventPage() {
         />
       }
       actionButton={
-        canCreateEvent ? (
-          <ServiceEventAddButton onClick={() => setIsDialogOpen(true)} />
-        ) : null
+        canCreateEvent ? <ServiceEventAddButton onClick={() => setIsDialogOpen(true)} /> : null
       }
       dialog={
         isDialogOpen && (

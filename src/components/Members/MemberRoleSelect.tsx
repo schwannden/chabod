@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,10 +20,10 @@ export function MemberRoleSelect({
 }: MemberRoleSelectProps) {
   const translateRole = (role: string): string => {
     switch (role) {
-      case 'owner':
-        return '管理者';
-      case 'member':
-        return '一般會友';
+      case "owner":
+        return "管理者";
+      case "member":
+        return "一般會友";
       default:
         return role;
     }
@@ -42,12 +41,8 @@ export function MemberRoleSelect({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
-        <DropdownMenuItem onClick={() => onRoleChange("管理者")}>
-          管理者
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onRoleChange("一般會友")}>
-          一般會友
-        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onRoleChange("管理者")}>管理者</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onRoleChange("一般會友")}>一般會友</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

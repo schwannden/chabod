@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ServiceEventWithService } from "@/lib/services/types";
 import {
@@ -11,7 +10,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { updateServiceEvent } from "@/lib/services/service-event-crud";
-import { getServiceEventOwners, updateServiceEventOwners } from "@/lib/services/service-event-owners";
+import {
+  getServiceEventOwners,
+  updateServiceEventOwners,
+} from "@/lib/services/service-event-owners";
 import { ServiceEventForm, ServiceEventFormValues } from "./ServiceEventForm";
 import { ServiceEventOwner, ServiceEventOwnerSelect } from "./ServiceEventOwnerSelect";
 
@@ -34,7 +36,7 @@ export function ServiceEventEditDialog({
   const [selectedOwners, setSelectedOwners] = useState<ServiceEventOwner[]>([]);
   const [isLoadingOwners, setIsLoadingOwners] = useState(true);
   const { toast } = useToast();
-  
+
   const initialValues: ServiceEventFormValues = {
     serviceId: event.service_id,
     date: event.date,
@@ -50,15 +52,15 @@ export function ServiceEventEditDialog({
         setIsLoadingOwners(true);
         try {
           const ownersData = await getServiceEventOwners(event.id);
-          
+
           // Convert to the format expected by the component
-          const formattedOwners = ownersData.map(owner => ({
+          const formattedOwners = ownersData.map((owner) => ({
             userId: owner.user_id,
             roleId: owner.service_role_id,
             profile: owner.profile,
-            role: owner.role
+            role: owner.role,
           }));
-          
+
           setSelectedOwners(formattedOwners);
         } catch (error) {
           console.error("Error loading event owners:", error);
@@ -72,7 +74,7 @@ export function ServiceEventEditDialog({
         }
       }
     };
-    
+
     fetchOwners();
   }, [isOpen, event.id, toast]);
 
@@ -91,19 +93,19 @@ export function ServiceEventEditDialog({
 
       // Update the service event owners
       // Convert owners to the format required by the updateServiceEventOwners function
-      const owners = selectedOwners.map(owner => ({
+      const owners = selectedOwners.map((owner) => ({
         user_id: owner.userId,
         service_role_id: owner.roleId,
-        tenant_id: event.tenant_id
+        tenant_id: event.tenant_id,
       }));
-      
+
       await updateServiceEventOwners(event.id, owners);
 
       toast({
         title: "成功",
         description: "服事排班已更新",
       });
-      
+
       onEventUpdated();
       onClose();
     } catch (error) {
@@ -124,7 +126,7 @@ export function ServiceEventEditDialog({
         <DialogHeader>
           <DialogTitle>編輯服事排班</DialogTitle>
         </DialogHeader>
-        
+
         <ServiceEventForm
           onSubmit={handleSubmit}
           services={services}
@@ -151,7 +153,7 @@ export function ServiceEventEditDialog({
               />
             )}
           </div>
-          
+
           <DialogFooter className="mt-6">
             <Button type="button" variant="outline" onClick={onClose}>
               取消

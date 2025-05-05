@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSession } from "@/hooks/useSession";
@@ -31,7 +30,7 @@ export default function ResourcePage() {
 
   useEffect(() => {
     if (!slug) return;
-    
+
     const fetchTenantName = async () => {
       try {
         const { data, error } = await supabase
@@ -39,12 +38,12 @@ export default function ResourcePage() {
           .select("id, name")
           .eq("slug", slug)
           .single();
-        
+
         if (error) {
           console.error("Error fetching tenant name:", error);
         } else {
           setTenantName(data?.name || "");
-          
+
           if (data?.id) {
             try {
               const groupsData = await getTenantGroups(data.id);
@@ -58,18 +57,18 @@ export default function ResourcePage() {
         console.error("Error fetching tenant name:", error);
       }
     };
-    
+
     fetchTenantName();
   }, [slug]);
 
   useEffect(() => {
     if (!slug) return;
-    
+
     const fetchResources = async () => {
       try {
         const data = await getResources(slug);
         setResources(data);
-        
+
         // Fetch group associations for each resource
         const groupMap: Record<string, string[]> = {};
         for (const resource of data) {
@@ -81,7 +80,7 @@ export default function ResourcePage() {
             groupMap[resource.id] = [];
           }
         }
-        
+
         setResourceGroupMap(groupMap);
       } catch (error) {
         const errorMessage = error?.message || "未知錯誤";
@@ -99,17 +98,17 @@ export default function ResourcePage() {
   }, [slug, toast]);
 
   const handleResourceCreated = (newResource: Resource) => {
-    setResources(prev => [newResource, ...prev]);
+    setResources((prev) => [newResource, ...prev]);
   };
 
   const handleResourceUpdated = (updatedResource: Resource) => {
-    setResources(prev => prev.map(resource => 
-      resource.id === updatedResource.id ? updatedResource : resource
-    ));
+    setResources((prev) =>
+      prev.map((resource) => (resource.id === updatedResource.id ? updatedResource : resource)),
+    );
   };
 
   const handleResourceDeleted = (id: string) => {
-    setResources(prev => prev.filter(resource => resource.id !== id));
+    setResources((prev) => prev.filter((resource) => resource.id !== id));
   };
 
   const filteredResources = resources.filter((resource) => {
@@ -122,7 +121,7 @@ export default function ResourcePage() {
 
     // Group filter logic
     const matchesGroup =
-      selectedGroup === "all" || 
+      selectedGroup === "all" ||
       (resourceGroupMap[resource.id] && resourceGroupMap[resource.id].includes(selectedGroup));
 
     return matchesText && matchesGroup;

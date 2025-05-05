@@ -1,10 +1,5 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 import { Service, updateService } from "@/lib/services";
@@ -18,14 +13,14 @@ interface EditServiceDialogProps {
   onSuccess?: () => void;
 }
 
-export function EditServiceDialog({ 
-  service, 
-  open, 
-  onOpenChange, 
-  onSuccess 
+export function EditServiceDialog({
+  service,
+  open,
+  onOpenChange,
+  onSuccess,
 }: EditServiceDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const {
     form,
     activeTab,
@@ -39,27 +34,27 @@ export function EditServiceDialog({
     notes,
     setNotes,
     roles,
-    setRoles
+    setRoles,
   } = useServiceForm({
     tenantId: service.tenant_id,
     service,
-    isOpen: open
+    isOpen: open,
   });
-  
+
   const handleSubmit = async () => {
     if (isSubmitting) return;
-    
+
     try {
       setIsSubmitting(true);
       const formData = form.getValues();
-      
+
       // Direct call to updateService
       await updateService(service.id, {
         name: formData.name,
         default_start_time: formData.default_start_time || null,
         default_end_time: formData.default_end_time || null,
       });
-      
+
       toast.success("服事類型已更新");
       onSuccess?.();
       handleDialogClose();
@@ -76,16 +71,19 @@ export function EditServiceDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => {
-      if (!isOpen) {
-        handleDialogClose();
-      }
-    }}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          handleDialogClose();
+        }
+      }}
+    >
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-auto">
         <DialogHeader>
           <DialogTitle>編輯服事類型</DialogTitle>
         </DialogHeader>
-        
+
         <ServiceForm
           form={form}
           activeTab={activeTab}

@@ -36,9 +36,9 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
   const [notes, setNotes] = useState<NoteFormValues[]>([]);
   const [roles, setRoles] = useState<RoleFormValues[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const isEditMode = !!service;
-  
+
   // Setup form with validation schema
   const form = useForm<ServiceFormValues>({
     resolver: zodResolver(serviceFormSchema),
@@ -85,10 +85,10 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
         .from("service_admins")
         .select("user_id")
         .eq("service_id", service.id);
-      
+
       if (error) throw error;
-      
-      const adminIds = data.map(admin => admin.user_id);
+
+      const adminIds = data.map((admin) => admin.user_id);
       setSelectedAdmins(adminIds);
     } catch (error) {
       console.error("Error fetching service admins:", error);
@@ -100,9 +100,9 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
     try {
       const fetchedNotes = await getServiceNotes(service.id);
       // Convert the notes to the format expected by the NotesForm component
-      const formattedNotes = fetchedNotes.map(note => ({
+      const formattedNotes = fetchedNotes.map((note) => ({
         text: note.text,
-        link: note.link || ""
+        link: note.link || "",
       }));
       setNotes(formattedNotes);
     } catch (error) {
@@ -115,9 +115,9 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
     try {
       const fetchedRoles = await getServiceRoles(service.id);
       // Convert the roles to the format expected by the RolesForm component
-      const formattedRoles = fetchedRoles.map(role => ({
+      const formattedRoles = fetchedRoles.map((role) => ({
         name: role.name,
-        description: role.description || ''
+        description: role.description || "",
       }));
       setRoles(formattedRoles);
     } catch (error) {
@@ -130,7 +130,7 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
     if (isOpen) {
       fetchTenantMembers();
       fetchTenantGroups();
-      
+
       // If editing, fetch service-specific data
       if (isEditMode && service) {
         fetchServiceGroups();
@@ -139,8 +139,17 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
         fetchServiceRoles();
       }
     }
-  }, [isOpen, isEditMode, service, fetchTenantMembers, fetchTenantGroups, 
-    fetchServiceGroups, fetchServiceAdmins, fetchServiceNotes, fetchServiceRoles]);
+  }, [
+    isOpen,
+    isEditMode,
+    service,
+    fetchTenantMembers,
+    fetchTenantGroups,
+    fetchServiceGroups,
+    fetchServiceAdmins,
+    fetchServiceNotes,
+    fetchServiceRoles,
+  ]);
 
   const resetForm = () => {
     setActiveTab("details");
@@ -173,6 +182,6 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
     isSubmitting,
     setIsSubmitting,
     resetForm,
-    isEditMode
+    isEditMode,
   };
 };

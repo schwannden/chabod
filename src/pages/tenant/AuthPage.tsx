@@ -19,7 +19,7 @@ export default function AuthPage() {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
+    const token = urlParams.get("token");
     if (token) {
       setInviteToken(token);
     }
@@ -28,12 +28,12 @@ export default function AuthPage() {
   useEffect(() => {
     const fetchTenant = async () => {
       if (!slug) return;
-      
+
       try {
         console.log("Fetching tenant with slug:", slug);
         const tenantData = await getTenantBySlug(slug);
         console.log("Tenant data received:", tenantData);
-        
+
         if (tenantData) {
           setTenant(tenantData);
           setError(null);
@@ -56,7 +56,7 @@ export default function AuthPage() {
       if (!isLoading && user && tenant && slug) {
         try {
           const hasAccess = await checkUserTenantAccess(user.id, slug);
-          
+
           if (hasAccess) {
             navigate(`/tenant/${slug}`);
           } else if (!inviteToken) {
@@ -92,10 +92,7 @@ export default function AuthPage() {
           <div className="text-center">
             <h1 className="text-3xl font-bold mb-4">Tenant Not Found</h1>
             <p className="mb-6">{error}</p>
-            <button
-              onClick={() => navigate("/")}
-              className="text-primary hover:underline"
-            >
+            <button onClick={() => navigate("/")} className="text-primary hover:underline">
               Return to home
             </button>
           </div>
@@ -112,11 +109,11 @@ export default function AuthPage() {
           {tenant && (
             <>
               <h1 className="text-3xl font-bold text-center mb-8">歡迎來到 {tenant.name}</h1>
-              <AuthTabs 
-                tenantSlug={tenant.slug} 
+              <AuthTabs
+                tenantSlug={tenant.slug}
                 tenantName={tenant.name}
-                inviteToken={inviteToken || undefined} 
-                onSuccess={handleAuthSuccess} 
+                inviteToken={inviteToken || undefined}
+                onSuccess={handleAuthSuccess}
               />
             </>
           )}

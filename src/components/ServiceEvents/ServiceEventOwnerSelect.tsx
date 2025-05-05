@@ -3,7 +3,7 @@ import { Plus, Trash2, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -32,7 +32,7 @@ export function ServiceEventOwnerSelect({
   serviceId,
   tenantId,
   selectedOwners,
-  setSelectedOwners
+  setSelectedOwners,
 }: ServiceEventOwnerSelectProps) {
   const [members, setMembers] = useState<TenantMemberWithProfile[]>([]);
   const [roles, setRoles] = useState<ServiceRole[]>([]);
@@ -47,14 +47,16 @@ export function ServiceEventOwnerSelect({
         // Fetch tenant members
         const { data: membersData, error: membersError } = await supabase
           .from("tenant_members")
-          .select(`
+          .select(
+            `
             *,
             profile:profiles(*)
-          `)
+          `,
+          )
           .eq("tenant_id", tenantId);
 
         if (membersError) throw membersError;
-        
+
         // Fetch service roles
         const { data: rolesData, error: rolesError } = await supabase
           .from("service_roles")
@@ -64,8 +66,8 @@ export function ServiceEventOwnerSelect({
 
         if (rolesError) throw rolesError;
 
-        setMembers(membersData as TenantMemberWithProfile[] || []);
-        setRoles(rolesData as ServiceRole[] || []);
+        setMembers((membersData as TenantMemberWithProfile[]) || []);
+        setRoles((rolesData as ServiceRole[]) || []);
 
         // Set default selections if available
         if (rolesData?.length > 0 && membersData?.length > 0) {
@@ -89,20 +91,20 @@ export function ServiceEventOwnerSelect({
 
     // Check if this user+role combination already exists
     const exists = selectedOwners.some(
-      owner => owner.userId === selectedUserId && owner.roleId === selectedRoleId
+      (owner) => owner.userId === selectedUserId && owner.roleId === selectedRoleId,
     );
 
     if (exists) return;
 
-    const selectedMember = members.find(m => m.user_id === selectedUserId);
-    const selectedRole = roles.find(r => r.id === selectedRoleId);
+    const selectedMember = members.find((m) => m.user_id === selectedUserId);
+    const selectedRole = roles.find((r) => r.id === selectedRoleId);
 
     if (selectedMember && selectedRole) {
       const newOwner: ServiceEventOwner = {
         userId: selectedUserId,
         roleId: selectedRoleId,
         profile: selectedMember.profile,
-        role: selectedRole
+        role: selectedRole,
       };
 
       setSelectedOwners([...selectedOwners, newOwner]);
@@ -111,9 +113,7 @@ export function ServiceEventOwnerSelect({
 
   const handleRemoveOwner = (userId: string, roleId: string) => {
     setSelectedOwners(
-      selectedOwners.filter(
-        owner => !(owner.userId === userId && owner.roleId === roleId)
-      )
+      selectedOwners.filter((owner) => !(owner.userId === userId && owner.roleId === roleId)),
     );
   };
 
@@ -151,7 +151,7 @@ export function ServiceEventOwnerSelect({
             </SelectContent>
           </Select>
         </div>
-        
+
         <div className="flex-1">
           <label className="text-sm font-medium mb-1 block">角色</label>
           <Select
@@ -171,11 +171,11 @@ export function ServiceEventOwnerSelect({
             </SelectContent>
           </Select>
         </div>
-        
-        <Button 
-          onClick={handleAddOwner} 
-          type="button" 
-          variant="outline" 
+
+        <Button
+          onClick={handleAddOwner}
+          type="button"
+          variant="outline"
           size="icon"
           disabled={!selectedUserId || !selectedRoleId}
         >
@@ -190,8 +190,8 @@ export function ServiceEventOwnerSelect({
           <ScrollArea className="h-[150px] rounded-md border">
             <div className="p-2">
               {selectedOwners.map((owner) => (
-                <div 
-                  key={`${owner.userId}-${owner.roleId}`} 
+                <div
+                  key={`${owner.userId}-${owner.roleId}`}
                   className="flex items-center justify-between py-2 px-1"
                 >
                   <div className="flex items-center gap-2">
@@ -202,9 +202,7 @@ export function ServiceEventOwnerSelect({
                       <div className="font-medium">
                         {owner.profile?.full_name || owner.profile?.email || "未命名成員"}
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        {owner.role.name}
-                      </div>
+                      <div className="text-xs text-muted-foreground">{owner.role.name}</div>
                     </div>
                   </div>
                   <Button

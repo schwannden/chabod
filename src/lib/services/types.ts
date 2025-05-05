@@ -1,4 +1,4 @@
-export * from '../types';
+export * from "../types";
 
 // Define the ServiceNote type that matches the database schema
 export interface ServiceNote {
@@ -17,7 +17,7 @@ export interface ServiceRole {
   service_id: string;
   tenant_id: string;
   name: string;
-  description?: string;  // Added description field
+  description?: string; // Added description field
   created_at: string;
   updated_at: string;
 }

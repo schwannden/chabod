@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Clock } from "lucide-react";
 import { ServiceEventWithService } from "@/lib/services/types";
@@ -8,7 +7,10 @@ interface ServiceEventCellTooltipProps {
   serviceName: string;
 }
 
-export const ServiceEventCellTooltip: React.FC<ServiceEventCellTooltipProps> = ({ event, serviceName }) => {
+export const ServiceEventCellTooltip: React.FC<ServiceEventCellTooltipProps> = ({
+  event,
+  serviceName,
+}) => {
   // Format time for display (e.g., "12:30" from "12:30:00")
   const formatTime = (timeString: string | null): string => {
     if (!timeString) return "";
@@ -25,10 +27,8 @@ export const ServiceEventCellTooltip: React.FC<ServiceEventCellTooltipProps> = (
             {formatTime(event.start_time)} - {formatTime(event.end_time)}
           </div>
         </div>
-        
-        {event.subtitle && (
-          <p className="text-sm text-muted-foreground">{event.subtitle}</p>
-        )}
+
+        {event.subtitle && <p className="text-sm text-muted-foreground">{event.subtitle}</p>}
       </div>
     </div>
   );

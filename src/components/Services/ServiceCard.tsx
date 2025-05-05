@@ -1,12 +1,5 @@
-
 import { Service } from "@/lib/services";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MoreVertical, Pencil, Trash, UserPlus, Users, FilePlus, ShieldPlus } from "lucide-react";
 import {
@@ -17,20 +10,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { deleteService } from "@/lib/services";
 import { toast } from "sonner";
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetHeader, 
-  SheetTitle, 
-  SheetTrigger 
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
-import { 
-  ServiceAdminView, 
-  ServiceGroupView, 
-  ServiceNoteView, 
-  ServiceRoleView 
-} from './ServiceViews';
+import {
+  ServiceAdminView,
+  ServiceGroupView,
+  ServiceNoteView,
+  ServiceRoleView,
+} from "./ServiceViews";
 
 interface ServiceCardProps {
   service: Service;
@@ -58,9 +45,9 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
         <div>
           <CardTitle className="text-xl">{service.name}</CardTitle>
           <CardDescription>
-            {service.default_start_time && service.default_end_time ? 
-              `${service.default_start_time} - ${service.default_end_time}` : 
-              "未設定預設時間"}
+            {service.default_start_time && service.default_end_time
+              ? `${service.default_start_time} - ${service.default_end_time}`
+              : "未設定預設時間"}
           </CardDescription>
         </div>
         <DropdownMenu>
@@ -83,7 +70,10 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">
-          <Sheet open={activeSheet === 'admins'} onOpenChange={(open) => setActiveSheet(open ? 'admins' : null)}>
+          <Sheet
+            open={activeSheet === "admins"}
+            onOpenChange={(open) => setActiveSheet(open ? "admins" : null)}
+          >
             <SheetTrigger asChild>
               <Button variant="outline" className="w-full">
                 <UserPlus className="mr-2 h-4 w-4" />
@@ -99,8 +89,11 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
               </div>
             </SheetContent>
           </Sheet>
-          
-          <Sheet open={activeSheet === 'groups'} onOpenChange={(open) => setActiveSheet(open ? 'groups' : null)}>
+
+          <Sheet
+            open={activeSheet === "groups"}
+            onOpenChange={(open) => setActiveSheet(open ? "groups" : null)}
+          >
             <SheetTrigger asChild>
               <Button variant="outline" className="w-full">
                 <Users className="mr-2 h-4 w-4" />
@@ -116,8 +109,11 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
               </div>
             </SheetContent>
           </Sheet>
-          
-          <Sheet open={activeSheet === 'notes'} onOpenChange={(open) => setActiveSheet(open ? 'notes' : null)}>
+
+          <Sheet
+            open={activeSheet === "notes"}
+            onOpenChange={(open) => setActiveSheet(open ? "notes" : null)}
+          >
             <SheetTrigger asChild>
               <Button variant="outline" className="w-full">
                 <FilePlus className="mr-2 h-4 w-4" />
@@ -133,8 +129,11 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
               </div>
             </SheetContent>
           </Sheet>
-          
-          <Sheet open={activeSheet === 'roles'} onOpenChange={(open) => setActiveSheet(open ? 'roles' : null)}>
+
+          <Sheet
+            open={activeSheet === "roles"}
+            onOpenChange={(open) => setActiveSheet(open ? "roles" : null)}
+          >
             <SheetTrigger asChild>
               <Button variant="outline" className="w-full">
                 <ShieldPlus className="mr-2 h-4 w-4" />

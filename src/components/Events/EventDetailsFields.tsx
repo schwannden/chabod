@@ -1,4 +1,11 @@
-import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
@@ -98,7 +105,7 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
         render={({ field }) => {
           console.log("Groups field rendering, field value:", field.value);
           console.log("groups in render:", groups);
-          
+
           return (
             <FormItem>
               <FormLabel>Groups</FormLabel>
@@ -127,7 +134,9 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
                   </div>
                 )}
               </FormControl>
-              <FormDescription>Select groups that will be associated with this event</FormDescription>
+              <FormDescription>
+                Select groups that will be associated with this event
+              </FormDescription>
               <FormMessage />
             </FormItem>
           );
@@ -140,10 +149,7 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
         render={({ field }) => (
           <FormItem className="flex flex-row items-start space-x-3 space-y-0">
             <FormControl>
-              <Switch
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
+              <Switch checked={field.value} onCheckedChange={field.onChange} />
             </FormControl>
             <FormLabel>Full day event</FormLabel>
             <FormMessage />
@@ -190,11 +196,7 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
           <FormItem>
             <FormLabel>Event Link (Optional)</FormLabel>
             <FormControl>
-              <Input
-                type="url"
-                placeholder="https://example.com"
-                {...field}
-              />
+              <Input type="url" placeholder="https://example.com" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -208,16 +210,12 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
           <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
             <div className="space-y-0.5">
               <FormLabel>Private Event</FormLabel>
-              <FormDescription>
-                Make this event private (only visible to members)
-              </FormDescription>
+              <FormDescription>Make this event private (only visible to members)</FormDescription>
             </div>
             <FormControl>
               <Switch
                 checked={field.value === "private"}
-                onCheckedChange={(checked) =>
-                  field.onChange(checked ? "private" : "public")
-                }
+                onCheckedChange={(checked) => field.onChange(checked ? "private" : "public")}
               />
             </FormControl>
           </FormItem>

@@ -23,23 +23,15 @@ export default function EventPage() {
   const { toast } = useToast();
 
   // Use our custom filters hook
-  const {
-    selectedGroup,
-    setSelectedGroup,
-    startDate,
-    setStartDate,
-    endDate,
-    setEndDate
-  } = useEventFilters();
+  const { selectedGroup, setSelectedGroup, startDate, setStartDate, endDate, setEndDate } =
+    useEventFilters();
 
   const fetchEvents = useCallback(async () => {
     try {
       setIsEventsLoading(true);
-      
+
       // Build a query that joins events with events_groups and groups
-      let query = supabase
-        .from("events")
-        .select(`
+      let query = supabase.from("events").select(`
           *,
           events_groups!inner(
             group:groups(*)
@@ -54,26 +46,24 @@ export default function EventPage() {
       if (endDate) {
         query = query.lte("date", format(endDate, "yyyy-MM-dd"));
       }
-      
+
       // Get the data first
       const { data, error } = await query;
-      
+
       if (error) throw error;
 
       // Now filter by group if needed
-      let filteredData = data.map(
-        event => ({
-          ...event,
-          groups: event.events_groups.map(eventGroup => eventGroup.group)
- }));
+      let filteredData = data.map((event) => ({
+        ...event,
+        groups: event.events_groups.map((eventGroup) => eventGroup.group),
+      }));
       if (selectedGroup !== "all") {
-        filteredData = filteredData?.filter(event => 
-          event.events_groups?.some(eg => eg.group.id === selectedGroup)
+        filteredData = filteredData?.filter((event) =>
+          event.events_groups?.some((eg) => eg.group.id === selectedGroup),
         );
       }
-      
+
       setEvents(filteredData);
-      
     } catch (error) {
       console.error("Error fetching events:", error);
       setEvents([]);
@@ -87,26 +77,29 @@ export default function EventPage() {
     }
   }, [selectedGroup, startDate, endDate, toast]);
 
-  const fetchAllGroups = useCallback(async (tenantId: string) => {
-    try {
-      const groups = await getTenantGroups(tenantId);
-      setAllGroups(groups || []);
-    } catch (error) {
-      console.error("Error fetching groups:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load groups. Some features may be limited.",
-        variant: "destructive",
-      });
-    }
-  }, [toast]);
+  const fetchAllGroups = useCallback(
+    async (tenantId: string) => {
+      try {
+        const groups = await getTenantGroups(tenantId);
+        setAllGroups(groups || []);
+      } catch (error) {
+        console.error("Error fetching groups:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load groups. Some features may be limited.",
+          variant: "destructive",
+        });
+      }
+    },
+    [toast],
+  );
 
   useEffect(() => {
     fetchEvents();
   }, [fetchEvents, refreshTrigger]);
 
   const handleEventUpdated = () => {
-    setRefreshTrigger(prev => prev + 1);
+    setRefreshTrigger((prev) => prev + 1);
   };
 
   // Return the refactored page using the generic component
@@ -114,12 +107,7 @@ export default function EventPage() {
     <GenericEventPage
       slug={slug}
       title="活動"
-      calendar={
-        <EventCalendar 
-          events={events}
-          isLoading={isEventsLoading}
-        />
-      }
+      calendar={<EventCalendar events={events} isLoading={isEventsLoading} />}
       filterBar={
         <EventFilterBar
           allGroups={allGroups || []}
@@ -132,9 +120,9 @@ export default function EventPage() {
         />
       }
       listView={
-        <EventList 
-          events={events} 
-          isLoading={isEventsLoading} 
+        <EventList
+          events={events}
+          isLoading={isEventsLoading}
           tenantId={slug}
           onEventUpdated={handleEventUpdated}
           allGroups={allGroups || []}
@@ -142,8 +130,8 @@ export default function EventPage() {
       }
       actionButton={
         user ? (
-          <CreateEventDialog 
-            tenantId={slug} 
+          <CreateEventDialog
+            tenantId={slug}
             onEventCreated={handleEventUpdated}
             allGroups={allGroups || []}
           />

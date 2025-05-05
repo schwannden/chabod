@@ -29,8 +29,8 @@ export interface ServiceEventFormValues {
 
 interface ServiceEventFormProps {
   onSubmit: (values: ServiceEventFormValues) => void;
-  services: { 
-    id: string; 
+  services: {
+    id: string;
     name: string;
     default_start_time?: string | null;
     default_end_time?: string | null;
@@ -59,17 +59,17 @@ export function ServiceEventForm({
   defaultStartTime,
   defaultEndTime,
   initialValues,
-  isEditMode
+  isEditMode,
 }: ServiceEventFormProps) {
   const today = format(new Date(), "yyyy-MM-dd");
-  
+
   const form = useForm<ServiceEventFormValues>({
     defaultValues: initialValues || {
       serviceId: selectedServiceId || "",
       date: today,
       startTime: defaultStartTime || "",
       endTime: defaultEndTime || "",
-      subtitle: ""
+      subtitle: "",
     },
   });
 
@@ -78,7 +78,7 @@ export function ServiceEventForm({
     if (!initialValues && defaultStartTime) {
       form.setValue("startTime", defaultStartTime);
     }
-    
+
     if (!initialValues && defaultEndTime) {
       form.setValue("endTime", defaultEndTime);
     }
@@ -87,7 +87,7 @@ export function ServiceEventForm({
   const handleServiceChange = (serviceId: string) => {
     setSelectedServiceId(serviceId);
     form.setValue("serviceId", serviceId);
-    
+
     // Clear owners when changing service as they're tied to specific roles
     setSelectedOwners([]);
   };
@@ -105,7 +105,7 @@ export function ServiceEventForm({
           render={() => (
             <FormItem>
               <FormLabel>服事類型</FormLabel>
-              <Select 
+              <Select
                 onValueChange={(value) => handleServiceChange(value)}
                 value={selectedServiceId}
                 disabled={isEditMode}
@@ -185,7 +185,7 @@ export function ServiceEventForm({
             </FormItem>
           )}
         />
-        
+
         {children}
       </form>
     </Form>

@@ -1,7 +1,13 @@
-
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +20,12 @@ interface TenantCreateDialogProps {
   onTenantCreated: () => void;
 }
 
-export function TenantCreateDialog({ isOpen, onClose, userId, onTenantCreated }: TenantCreateDialogProps) {
+export function TenantCreateDialog({
+  isOpen,
+  onClose,
+  userId,
+  onTenantCreated,
+}: TenantCreateDialogProps) {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [isCreating, setIsCreating] = useState(false);
@@ -23,15 +34,18 @@ export function TenantCreateDialog({ isOpen, onClose, userId, onTenantCreated }:
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setName(value);
-    
+
     // Auto-generate slug from name (lowercase, replace spaces with hyphens)
-    const slugValue = value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+    const slugValue = value
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
     setSlug(slugValue);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!name.trim() || !slug.trim()) {
       toast({
         title: "Validation error",
@@ -40,9 +54,9 @@ export function TenantCreateDialog({ isOpen, onClose, userId, onTenantCreated }:
       });
       return;
     }
-    
+
     setIsCreating(true);
-    
+
     try {
       await createTenant(name, slug, userId);
       toast({
@@ -74,7 +88,7 @@ export function TenantCreateDialog({ isOpen, onClose, userId, onTenantCreated }:
             Create a new tenant organization that you will own and manage.
           </DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">教會名稱</Label>
@@ -86,7 +100,7 @@ export function TenantCreateDialog({ isOpen, onClose, userId, onTenantCreated }:
               required
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="slug">Slug</Label>
             <Input
@@ -102,7 +116,7 @@ export function TenantCreateDialog({ isOpen, onClose, userId, onTenantCreated }:
               這將會被用於 URL: /tenant/{slug || "example"}
             </p>
           </div>
-          
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel

@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Users, Copy, Info } from "lucide-react";
 import { TenantWithUsage } from "@/lib/types";
@@ -73,7 +80,12 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
               <Button size="icon" variant="outline" onClick={() => setIsUpdateDialogOpen(true)}>
                 <Pencil className="h-4 w-4" />
               </Button>
-              <Button size="icon" variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+              <Button
+                size="icon"
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
@@ -88,13 +100,13 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
           <p className="text-sm text-muted-foreground mt-2">
             Created: {new Date(tenant.created_at).toLocaleDateString()}
           </p>
-          
+
           <div className="mt-4 pt-4 border-t">
             <div className="flex items-center justify-between">
               <h4 className="font-medium mb-2">訂閱計畫</h4>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 className="text-muted-foreground hover:text-primary"
                 onClick={() => setIsAllPlansDialogOpen(true)}
               >
@@ -102,7 +114,7 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
               </Button>
             </div>
             <div className="space-y-2">
-              <p className="text-sm font-semibold">{tenant.price_tier?.name || 'Free'}</p>
+              <p className="text-sm font-semibold">{tenant.price_tier?.name || "Free"}</p>
               <p className="text-sm text-muted-foreground">
                 ${tenant.price_tier?.price_monthly || 0}/month
               </p>
@@ -137,19 +149,17 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
           <Button variant="outline" onClick={handleManageTenant}>
             前往教會首頁
           </Button>
-          <Button onClick={handleOpenTenantAuth}>
-            前往教會登入頁面
-          </Button>
+          <Button onClick={handleOpenTenantAuth}>前往教會登入頁面</Button>
         </CardFooter>
       </Card>
-      
+
       <TenantUpdateDialog
         tenant={tenant}
         isOpen={isUpdateDialogOpen}
         onClose={() => setIsUpdateDialogOpen(false)}
         onTenantUpdated={onTenantUpdated}
       />
-      
+
       <PricePlansDialog
         tenant={tenant}
         isOpen={isAllPlansDialogOpen}

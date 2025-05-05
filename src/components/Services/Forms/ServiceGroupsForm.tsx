@@ -17,7 +17,7 @@ export function ServiceGroupsForm({
   selectedGroups,
   setSelectedGroups,
   serviceId,
-  isEditing
+  isEditing,
 }: ServiceGroupsFormProps) {
   const handleGroupChange = async (groupId: string, checked: boolean) => {
     try {
@@ -29,19 +29,19 @@ export function ServiceGroupsForm({
           await removeServiceGroup(serviceId, groupId);
         }
       }
-      
+
       // Always update local state
       if (checked) {
         setSelectedGroups([...selectedGroups, groupId]);
       } else {
-        setSelectedGroups(selectedGroups.filter(id => id !== groupId));
+        setSelectedGroups(selectedGroups.filter((id) => id !== groupId));
       }
     } catch (error) {
       console.error("Error updating service groups:", error);
       toast.error("更新小組時發生錯誤");
     }
   };
-  
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">選擇服事小組</h3>
@@ -57,10 +57,7 @@ export function ServiceGroupsForm({
                     handleGroupChange(group.id, !!checked);
                   }}
                 />
-                <label
-                  htmlFor={`group-${group.id}`}
-                  className="text-sm font-medium"
-                >
+                <label htmlFor={`group-${group.id}`} className="text-sm font-medium">
                   {group.name}
                 </label>
               </div>

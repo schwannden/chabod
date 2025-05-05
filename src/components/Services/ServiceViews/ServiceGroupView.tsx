@@ -1,11 +1,14 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { getGroupsForServiceWithNames } from "@/lib/services/service-groups";
 import { PlusCircle, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function ServiceGroupView({ serviceId }: { serviceId: string }) {
-  const { data: groups = [], isLoading, error } = useQuery({
+  const {
+    data: groups = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["serviceGroups", serviceId],
     queryFn: () => getGroupsForServiceWithNames(serviceId),
   });
@@ -26,18 +29,16 @@ export function ServiceGroupView({ serviceId }: { serviceId: string }) {
       ) : (
         <div className="space-y-2">
           {groups.map((group, index) => (
-            <div 
-              key={`group-${index}-${group.id}`} 
+            <div
+              key={`group-${index}-${group.id}`}
               className="flex items-center gap-3 p-3 rounded-md border hover:bg-muted/50 transition-colors"
             >
               <div className="bg-primary/10 p-2 rounded-md">
                 <Users className="h-5 w-5 text-primary" />
               </div>
               <div className="flex-1">
-                <div className="font-medium">{group.name || '未命名小組'}</div>
-                <div className="text-sm text-muted-foreground">
-                  {group.description || '無描述'}
-                </div>
+                <div className="font-medium">{group.name || "未命名小組"}</div>
+                <div className="text-sm text-muted-foreground">{group.description || "無描述"}</div>
               </div>
             </div>
           ))}

@@ -28,7 +28,12 @@ interface EventActionsProps {
   allGroups: Group[];
 }
 
-export function EventActions({ event, onEventUpdated, onDeleteEvent, allGroups }: EventActionsProps) {
+export function EventActions({
+  event,
+  onEventUpdated,
+  onDeleteEvent,
+  allGroups,
+}: EventActionsProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
 
   return (
@@ -41,23 +46,16 @@ export function EventActions({ event, onEventUpdated, onDeleteEvent, allGroups }
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <EditEventDialog 
-            event={event} 
-            onEventUpdated={onEventUpdated} 
-            allGroups={allGroups}
-          >
+          <EditEventDialog event={event} onEventUpdated={onEventUpdated} allGroups={allGroups}>
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
               <Pencil className="mr-2 h-4 w-4" />
               Edit event
             </DropdownMenuItem>
           </EditEventDialog>
-          
+
           <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
             <AlertDialogTrigger asChild>
-              <DropdownMenuItem
-                onSelect={(e) => e.preventDefault()}
-                className="text-destructive"
-              >
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive">
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete event
               </DropdownMenuItem>

@@ -33,15 +33,15 @@ interface ServiceRolesFormProps {
   isEditing: boolean;
 }
 
-export function ServiceRolesForm({ 
-  roles, 
+export function ServiceRolesForm({
+  roles,
   setRoles,
   serviceId,
   tenantId,
-  isEditing
+  isEditing,
 }: ServiceRolesFormProps) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  
+
   const roleForm = useForm<RoleFormValues>({
     resolver: zodResolver(roleFormSchema),
     defaultValues: {
@@ -49,7 +49,7 @@ export function ServiceRolesForm({
       description: "",
     },
   });
-  
+
   const editForm = useForm<RoleFormValues>({
     resolver: zodResolver(roleFormSchema),
     defaultValues: {
@@ -68,10 +68,10 @@ export function ServiceRolesForm({
             service_id: serviceId,
             tenant_id: tenantId,
             name: values.name,
-            description: values.description || null
+            description: values.description || null,
           });
         }
-        
+
         // Always update local state
         setRoles([...roles, values]);
         roleForm.reset();
@@ -83,7 +83,7 @@ export function ServiceRolesForm({
       roleForm.trigger();
     }
   };
-  
+
   const handleEditRole = (index: number) => {
     setEditingIndex(index);
     const role = roles[index];
@@ -101,21 +101,21 @@ export function ServiceRolesForm({
         // since there's no direct update function
         if (isEditing && serviceId && tenantId) {
           await deleteServiceRoles(serviceId);
-          
+
           // Prepare updated roles list
           const updatedRoles = [...roles];
           updatedRoles[index] = values;
-          
+
           // Re-add all roles to the database
           for (const role of updatedRoles) {
             await addServiceRole({
               service_id: serviceId,
               tenant_id: tenantId,
               name: role.name,
-              description: role.description || null
+              description: role.description || null,
             });
           }
-          
+
           // Update local state
           setRoles(updatedRoles);
         } else {
@@ -124,7 +124,7 @@ export function ServiceRolesForm({
           updatedRoles[index] = values;
           setRoles(updatedRoles);
         }
-        
+
         setEditingIndex(null);
       } catch (error) {
         console.error("Error updating service role:", error);
@@ -144,27 +144,27 @@ export function ServiceRolesForm({
       // For deleting roles, we delete all and re-add the remaining ones
       if (isEditing && serviceId && tenantId) {
         await deleteServiceRoles(serviceId);
-        
+
         // Filter out the deleted role
         const updatedRoles = roles.filter((_, i) => i !== index);
-        
+
         // Re-add all remaining roles
         for (const role of updatedRoles) {
           await addServiceRole({
             service_id: serviceId,
             tenant_id: tenantId,
             name: role.name,
-            description: role.description || null
+            description: role.description || null,
           });
         }
-        
+
         // Update local state
         setRoles(updatedRoles);
       } else {
         // Just update local state for new services
         setRoles(roles.filter((_, i) => i !== index));
       }
-      
+
       if (editingIndex === index) {
         setEditingIndex(null);
       }
@@ -234,20 +234,16 @@ export function ServiceRolesForm({
                           )}
                         />
                         <div className="flex justify-end space-x-2">
-                          <Button 
-                            type="button" 
-                            size="sm" 
-                            variant="outline" 
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
                             onClick={handleCancelEdit}
                           >
                             <X className="h-4 w-4" />
                             <span className="sr-only">取消</span>
                           </Button>
-                          <Button 
-                            type="button" 
-                            size="sm" 
-                            onClick={() => handleSaveEdit(index)}
-                          >
+                          <Button type="button" size="sm" onClick={() => handleSaveEdit(index)}>
                             <Check className="h-4 w-4" />
                             <span className="sr-only">儲存</span>
                           </Button>
@@ -258,23 +254,21 @@ export function ServiceRolesForm({
                     <div className="flex justify-between items-start">
                       <div>
                         <h5 className="font-medium">{role.name}</h5>
-                        <p className="text-sm text-muted-foreground">
-                          {role.description}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{role.description}</p>
                       </div>
                       <div className="flex space-x-1">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           className="h-8 w-8 text-blue-500"
                           onClick={() => handleEditRole(index)}
                         >
                           <Edit2 className="h-4 w-4" />
                           <span className="sr-only">編輯角色</span>
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           className="h-8 w-8 text-destructive hover:text-destructive/80"
                           onClick={() => handleDeleteRole(index)}
                         >

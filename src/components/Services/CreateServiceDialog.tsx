@@ -38,17 +38,17 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
     setRoles,
     isSubmitting,
     setIsSubmitting,
-    resetForm
+    resetForm,
   } = useServiceForm({
     tenantId,
-    isOpen: open
+    isOpen: open,
   });
 
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
       const formData = form.getValues();
-      
+
       // Direct call to service-core
       await createService({
         name: formData.name,
@@ -56,7 +56,7 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
         default_start_time: formData.default_start_time || null,
         default_end_time: formData.default_end_time || null,
       });
-      
+
       toast.success("服事類型已創建");
       handleDialogClose();
       onSuccess?.();
@@ -85,7 +85,7 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
         <DialogHeader>
           <DialogTitle>新增服事類型</DialogTitle>
         </DialogHeader>
-        
+
         <ServiceForm
           form={form}
           activeTab={activeTab}

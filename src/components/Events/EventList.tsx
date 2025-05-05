@@ -16,7 +16,13 @@ interface EventListProps {
   allGroups: Group[];
 }
 
-export function EventList({ events, isLoading, tenantId, onEventUpdated, allGroups }: EventListProps) {
+export function EventList({
+  events,
+  isLoading,
+  tenantId,
+  onEventUpdated,
+  allGroups,
+}: EventListProps) {
   const { user } = useSession();
   const { toast } = useToast();
   const [editableEvents, setEditableEvents] = useState<Record<string, boolean>>({});
@@ -24,7 +30,7 @@ export function EventList({ events, isLoading, tenantId, onEventUpdated, allGrou
   const sortedEvents = [...events].sort((a, b) => {
     const dateComparison = new Date(a.date).getTime() - new Date(b.date).getTime();
     if (dateComparison !== 0) return dateComparison;
-    
+
     if (a.start_time && b.start_time) {
       return a.start_time.localeCompare(b.start_time);
     }
@@ -36,45 +42,45 @@ export function EventList({ events, isLoading, tenantId, onEventUpdated, allGrou
   useEffect(() => {
     const checkPermissions = async () => {
       if (!user || events.length === 0) return;
-      
+
       const permissions: Record<string, boolean> = {};
-      
+
       try {
         // Get the tenant UUID from the slug first
         const tenant = await getTenantBySlug(tenantId);
-        
+
         if (!tenant) {
           console.error("Tenant not found with slug:", tenantId);
           return;
         }
-        
+
         // Check if the user is a tenant owner
-        const { data: isOwner, error: ownerError } = await supabase.rpc('is_tenant_owner', {
+        const { data: isOwner, error: ownerError } = await supabase.rpc("is_tenant_owner", {
           tenant_uuid: tenant.id,
-          user_uuid: user.id
+          user_uuid: user.id,
         });
-        
+
         if (ownerError) {
           console.error("Error checking tenant owner:", ownerError);
         }
-        
+
         // If user is a tenant owner, they can edit all events
         if (isOwner) {
-          events.forEach(event => {
+          events.forEach((event) => {
             permissions[event.id] = true;
           });
         } else {
           // Otherwise, they can only edit events they created
-          events.forEach(event => {
+          events.forEach((event) => {
             permissions[event.id] = event.created_by === user.id;
           });
         }
-        
+
         setEditableEvents(permissions);
       } catch (error) {
         console.error("Error checking edit permissions:", error);
         // Initialize with event creators having permission
-        events.forEach(event => {
+        events.forEach((event) => {
           permissions[event.id] = event.created_by === user.id;
         });
         setEditableEvents(permissions);
@@ -86,10 +92,7 @@ export function EventList({ events, isLoading, tenantId, onEventUpdated, allGrou
 
   const handleDeleteEvent = async (eventId: string) => {
     try {
-      const { error } = await supabase
-        .from("events")
-        .delete()
-        .eq("id", eventId);
+      const { error } = await supabase.from("events").delete().eq("id", eventId);
 
       if (error) throw error;
 
@@ -121,9 +124,7 @@ export function EventList({ events, isLoading, tenantId, onEventUpdated, allGrou
       <Card>
         <CardHeader>
           <CardTitle>No events found</CardTitle>
-          <CardDescription>
-            There are no events matching your filters.
-          </CardDescription>
+          <CardDescription>There are no events matching your filters.</CardDescription>
         </CardHeader>
       </Card>
     );

@@ -19,7 +19,11 @@ interface CreateEventDialogProps {
   allGroups: Group[];
 }
 
-export function CreateEventDialog({ tenantId, onEventCreated, allGroups = [] }: CreateEventDialogProps) {
+export function CreateEventDialog({
+  tenantId,
+  onEventCreated,
+  allGroups = [],
+}: CreateEventDialogProps) {
   const [open, setOpen] = useState(false);
   const { form, isLoading, onSubmit } = useEventForm(tenantId, () => {
     setOpen(false);

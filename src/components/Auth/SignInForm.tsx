@@ -2,26 +2,33 @@ import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { associateUserWithTenant } from "@/lib/membership-service";
 import { checkUserTenantAccess } from "@/lib/member-service";
 import { AuthEmailInput } from "./AuthEmailInput";
 import { AuthPasswordInput } from "./AuthPasswordInput";
 
 interface SignInFormProps {
-  tenantSlug?: string; 
-  tenantName?: string; 
+  tenantSlug?: string;
+  tenantName?: string;
   inviteToken?: string;
   onSuccess?: () => void;
   onSignUpClick: () => void;
 }
 
-export function SignInForm({ 
-  tenantSlug, 
-  tenantName, 
-  inviteToken, 
-  onSuccess, 
-  onSignUpClick 
+export function SignInForm({
+  tenantSlug,
+  tenantName,
+  inviteToken,
+  onSuccess,
+  onSignUpClick,
 }: SignInFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,8 +50,10 @@ export function SignInForm({
         let errorMessage = "電子郵件或密碼錯誤";
         if (error.message?.includes("invalid email")) {
           errorMessage = "電子郵件格式不正確";
-        } else if (error.message?.toLowerCase().includes("invalid login credentials") ||
-                   error.message?.toLowerCase().includes("invalid email or password")) {
+        } else if (
+          error.message?.toLowerCase().includes("invalid login credentials") ||
+          error.message?.toLowerCase().includes("invalid email or password")
+        ) {
           errorMessage = "電子郵件或密碼錯誤";
         } else if (error.message?.includes("User not confirmed")) {
           errorMessage = "請先驗證您的電子郵件";
@@ -59,7 +68,7 @@ export function SignInForm({
           await associateUserWithTenant(data.user.id, tenantSlug, inviteToken);
         } else {
           const hasAccess = await checkUserTenantAccess(data.user.id, tenantSlug);
-          
+
           if (!hasAccess) {
             await supabase.auth.signOut();
             throw new Error("您沒有權限進入此教會，請聯絡管理員或註冊新的帳號。");
@@ -69,9 +78,7 @@ export function SignInForm({
 
       toast({
         title: "登入成功",
-        description: tenantName 
-          ? `歡迎回來，${tenantName}！` 
-          : "歡迎使用 Chabod！",
+        description: tenantName ? `歡迎回來，${tenantName}！` : "歡迎使用 Chabod！",
       });
 
       if (onSuccess) {
@@ -94,7 +101,7 @@ export function SignInForm({
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + '/auth',
+        redirectTo: window.location.origin + "/auth",
       });
 
       if (error) {
@@ -113,7 +120,7 @@ export function SignInForm({
         title: "重設密碼郵件已發送",
         description: "請檢查您的電子郵件收件匣，點擊連結重設密碼。",
       });
-      
+
       setResetPasswordMode(false);
     } catch (error) {
       const errorMessage = error?.message || "未知錯誤";
@@ -132,18 +139,11 @@ export function SignInForm({
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
           <CardTitle>重設密碼</CardTitle>
-          <CardDescription>
-            輸入您的電子郵件地址，我們將發送重設密碼的連結。
-          </CardDescription>
+          <CardDescription>輸入您的電子郵件地址，我們將發送重設密碼的連結。</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleResetPassword} className="space-y-4">
-            <AuthEmailInput
-              id="reset-email"
-              value={email}
-              onChange={setEmail}
-              disabled={loading}
-            />
+            <AuthEmailInput id="reset-email" value={email} onChange={setEmail} disabled={loading} />
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "發送中..." : "發送重設密碼連結"}
             </Button>
@@ -163,18 +163,12 @@ export function SignInForm({
       <CardHeader>
         <CardTitle>登入</CardTitle>
         <CardDescription>
-          {tenantName 
-            ? `登入到 ${tenantName}` 
-            : "登入到 Chabod 教會管理系統"}
+          {tenantName ? `登入到 ${tenantName}` : "登入到 Chabod 教會管理系統"}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSignIn} className="space-y-4">
-          <AuthEmailInput
-            value={email}
-            onChange={setEmail}
-            disabled={loading}
-          />
+          <AuthEmailInput value={email} onChange={setEmail} disabled={loading} />
           <AuthPasswordInput
             value={password}
             onChange={setPassword}

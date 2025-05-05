@@ -41,7 +41,12 @@ interface EditEventDialogProps {
   children?: React.ReactNode;
 }
 
-export function EditEventDialog({ event, onEventUpdated, allGroups = [], children }: EditEventDialogProps) {
+export function EditEventDialog({
+  event,
+  onEventUpdated,
+  allGroups = [],
+  children,
+}: EditEventDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -53,7 +58,7 @@ export function EditEventDialog({ event, onEventUpdated, allGroups = [], childre
   console.log("Safe groups after check:", safeGroups);
 
   // Initialize form with existing groups if available
-  const initialGroupIds = event.groups?.map(group => group.id) || [];
+  const initialGroupIds = event.groups?.map((group) => group.id) || [];
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
@@ -72,7 +77,7 @@ export function EditEventDialog({ event, onEventUpdated, allGroups = [], childre
 
   useEffect(() => {
     if (isOpen && event.groups) {
-      const groupIds = event.groups.map(group => group.id);
+      const groupIds = event.groups.map((group) => group.id);
       form.setValue("groups", groupIds);
     }
   }, [isOpen, event.groups, form]);
@@ -114,7 +119,7 @@ export function EditEventDialog({ event, onEventUpdated, allGroups = [], childre
           data.groups.map((groupId) => ({
             event_id: event.id,
             group_id: groupId,
-          }))
+          })),
         );
 
         if (groupError) throw groupError;
@@ -125,7 +130,7 @@ export function EditEventDialog({ event, onEventUpdated, allGroups = [], childre
         title: "Event updated",
         description: "The event has been updated successfully.",
       });
-      
+
       onEventUpdated();
       setIsOpen(false);
     } catch (error) {
@@ -158,11 +163,7 @@ export function EditEventDialog({ event, onEventUpdated, allGroups = [], childre
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pb-2">
             <EventDetailsFields form={form} groups={safeGroups} />
             <div className="sticky bottom-0 pt-2 bg-background flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsOpen(false)}
-              >
+              <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>

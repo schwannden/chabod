@@ -25,22 +25,22 @@ type GenericCalendarProps = {
   getDateKey?: (event: BaseEvent) => string;
 };
 
-export function GenericCalendar({ 
-  events, 
+export function GenericCalendar({
+  events,
   isLoading = false,
   renderTooltip,
-  getDateKey = (event) => event.date
+  getDateKey = (event) => event.date,
 }: GenericCalendarProps) {
   const monthsToShow = useResponsiveMonths();
   const today = new Date();
   const [baseMonth, setBaseMonth] = React.useState<Date>(startOfMonth(today));
-  
+
   // Group events by date
   const eventsByDate = React.useMemo(() => {
     const byDate: Record<string, BaseEvent[]> = {};
     events.forEach((event) => {
       if (!event.date) return;
-      
+
       try {
         const key = getDateKey(event);
         if (!byDate[key]) byDate[key] = [];
@@ -51,7 +51,7 @@ export function GenericCalendar({
     });
     return byDate;
   }, [events, getDateKey]);
-  
+
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [selectedDate, setSelectedDate] = React.useState<string | null>(null);
   const [selectedEvents, setSelectedEvents] = React.useState<BaseEvent[]>([]);
@@ -63,25 +63,25 @@ export function GenericCalendar({
   // Event handlers for day click
   const handleDayClick = (date: Date) => {
     if (!date || isNaN(date.getTime())) return;
-    
+
     const dateKey = format(date, "yyyy-MM-dd");
     const selectedDateEvents = eventsByDate[dateKey];
     const hasEvents = selectedDateEvents && selectedDateEvents.length > 0;
-    
+
     if (hasEvents) {
       setSelectedEvents(selectedDateEvents);
       setSelectedDate(dateKey);
       setIsDialogOpen(true);
     }
   };
-  
+
   // This modifies the day component rendering behavior
   const modifiers = React.useMemo(() => {
     // Create an array of dates with events for each month
     const months: Record<number, Date[]> = {};
-    
+
     // Add all dates with events to the appropriate month
-    Object.keys(eventsByDate).forEach(dateKey => {
+    Object.keys(eventsByDate).forEach((dateKey) => {
       if (eventsByDate[dateKey] && eventsByDate[dateKey].length > 0) {
         const date = new Date(dateKey);
         if (!isNaN(date.getTime())) {
@@ -96,13 +96,13 @@ export function GenericCalendar({
         }
       }
     });
-    
+
     // Return an object with a hasEvents array for each month
     return Object.fromEntries(
-      Object.entries(months).map(([index, dates]) => [`hasEvents-${index}`, dates])
+      Object.entries(months).map(([index, dates]) => [`hasEvents-${index}`, dates]),
     );
   }, [eventsByDate, baseMonth, monthsToShow]);
-  
+
   // Custom styling for days with events
   const modifiersStyles = {
     hasEvents: {
@@ -111,7 +111,7 @@ export function GenericCalendar({
       fontWeight: "bold",
       border: "1px solid hsl(var(--primary) / 0.5)",
       cursor: "pointer",
-    }
+    },
   };
 
   const calendarClassNames = {
@@ -161,10 +161,7 @@ export function GenericCalendar({
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>
-      <div className={cn(
-        "flex gap-4",
-        monthsToShow === 1 ? "flex-col" : "flex-row"
-      )}>
+      <div className={cn("flex gap-4", monthsToShow === 1 ? "flex-col" : "flex-row")}>
         {Array.from({ length: monthsToShow }).map((_, idx) => {
           const monthStart = addMonths(baseMonth, idx);
           return (
@@ -178,7 +175,7 @@ export function GenericCalendar({
                 onDayClick={handleDayClick}
                 classNames={calendarClassNames}
                 modifiers={{
-                  hasEvents: modifiers[`hasEvents-${idx}`] || []
+                  hasEvents: modifiers[`hasEvents-${idx}`] || [],
                 }}
                 modifiersStyles={modifiersStyles}
               />
@@ -186,17 +183,15 @@ export function GenericCalendar({
           );
         })}
       </div>
-      
+
       {/* Dialog for showing events */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>
-              {selectedDate && format(new Date(selectedDate), "PPP")}
-            </DialogTitle>
+            <DialogTitle>{selectedDate && format(new Date(selectedDate), "PPP")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 mt-4">
-            {selectedEvents.map(event => (
+            {selectedEvents.map((event) => (
               <div key={event.id} className="border-b border-muted pb-2 last:border-0">
                 {renderTooltip(event)}
               </div>
@@ -206,4 +201,4 @@ export function GenericCalendar({
       </Dialog>
     </div>
   );
-} 
+}

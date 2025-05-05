@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { TenantMemberWithProfile } from "@/lib/types";
 import { deleteTenantMember, updateTenantMember } from "@/lib/member-service";
@@ -16,11 +23,7 @@ interface MemberTableProps {
   onMemberUpdated: () => void;
 }
 
-export function MemberTable({ 
-  members, 
-  isCurrentUserOwner, 
-  onMemberUpdated 
-}: MemberTableProps) {
+export function MemberTable({ members, isCurrentUserOwner, onMemberUpdated }: MemberTableProps) {
   const [loadingMemberId, setLoadingMemberId] = useState<string | null>(null);
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
   const [firstName, setFirstName] = useState<string>("");
@@ -35,11 +38,11 @@ export function MemberTable({
 
   const handleRoleChange = async (memberId: string, displayRole: string) => {
     setLoadingMemberId(memberId);
-    
+
     try {
       const dbRole = getRoleValue(displayRole);
       await updateTenantMember(memberId, dbRole);
-      
+
       toast({
         title: "會友角色已更新",
         description: "會友的角色已成功更新。",
@@ -62,7 +65,7 @@ export function MemberTable({
     }
 
     setLoadingMemberId(memberId);
-    
+
     try {
       await deleteTenantMember(memberId);
       toast({
@@ -95,24 +98,28 @@ export function MemberTable({
 
   const saveNameChanges = async (member: TenantMemberWithProfile) => {
     if (!member.profile) return;
-    
+
     setLoadingMemberId(member.id);
-    
+
     try {
       await updateUserProfile(member.profile.id, {
         first_name: firstName,
         last_name: lastName,
-        full_name: firstName && lastName ? `${firstName} ${lastName}` : 
-                   firstName ? firstName : 
-                   lastName ? lastName : 
-                   member.profile.full_name,
+        full_name:
+          firstName && lastName
+            ? `${firstName} ${lastName}`
+            : firstName
+              ? firstName
+              : lastName
+                ? lastName
+                : member.profile.full_name,
       });
-      
+
       toast({
         title: "會友已更新",
         description: "會友的資訊已成功更新。",
       });
-      
+
       setEditingMemberId(null);
       onMemberUpdated();
     } catch (error) {
@@ -152,15 +159,15 @@ export function MemberTable({
               </TableCell>
             </TableRow>
           )}
-          
+
           {sortedMembers.map((member) => (
             <TableRow key={member.id}>
               <TableCell>{member.profile?.full_name}</TableCell>
-              
+
               <TableCell>
                 {editingMemberId === member.id ? (
-                  <Input 
-                    value={firstName} 
+                  <Input
+                    value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="名字"
                     className="w-full max-w-[150px]"
@@ -169,10 +176,10 @@ export function MemberTable({
                   member.profile?.first_name || "-"
                 )}
               </TableCell>
-              
+
               <TableCell>
                 {editingMemberId === member.id ? (
-                  <MemberNameEditor 
+                  <MemberNameEditor
                     firstName={firstName}
                     lastName={lastName}
                     setFirstName={setFirstName}
@@ -185,9 +192,9 @@ export function MemberTable({
                   member.profile?.last_name || "-"
                 )}
               </TableCell>
-              
+
               <TableCell>{member.profile?.email}</TableCell>
-              
+
               <TableCell>
                 <MemberRoleSelect
                   role={member.role}
@@ -195,16 +202,18 @@ export function MemberTable({
                   isCurrentUserOwner={isCurrentUserOwner}
                 />
               </TableCell>
-              
+
               <TableCell>{new Date(member.created_at).toLocaleDateString()}</TableCell>
-              
+
               <TableCell className="text-right">
                 <MemberTableActions
                   isCurrentUserOwner={isCurrentUserOwner}
                   isEditing={editingMemberId === member.id}
                   isLoading={loadingMemberId === member.id}
                   onEditClick={() => startEditing(member)}
-                  onDeleteClick={() => handleDeleteMember(member.id, member.profile?.full_name || "")}
+                  onDeleteClick={() =>
+                    handleDeleteMember(member.id, member.profile?.full_name || "")
+                  }
                 />
               </TableCell>
             </TableRow>

@@ -1,4 +1,3 @@
-
 import { EventWithGroups } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 
@@ -13,7 +12,7 @@ export function EventCellTooltip({ event }: EventCellTooltipProps) {
         <span className="font-medium">{event.name}</span>
         {event.groups && event.groups.length > 0 && (
           <span className="flex gap-1 flex-wrap">
-            {event.groups.map(group => (
+            {event.groups.map((group) => (
               <Badge key={group.id} className="px-2 py-0.5 text-xs">
                 {group.name}
               </Badge>

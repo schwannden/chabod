@@ -19,11 +19,11 @@ export interface BaseFilterOption {
 }
 
 // Filter configuration types
-export type FilterType = 'select' | 'date';
+export type FilterType = "select" | "date";
 
 // Configuration for a select filter
 export interface SelectFilterConfig<T extends BaseFilterOption> {
-  type: 'select';
+  type: "select";
   id: string;
   label: string;
   placeholder?: string;
@@ -34,7 +34,7 @@ export interface SelectFilterConfig<T extends BaseFilterOption> {
 
 // Configuration for a date filter
 export interface DateFilterConfig {
-  type: 'date';
+  type: "date";
   id: string;
   label: string;
   value: Date | undefined;
@@ -56,7 +56,7 @@ export function GenericFilterBar<T extends BaseFilterOption>({
     <FilterLayout>
       {filters.map((filter) => (
         <FilterGroup key={filter.id} label={filter.label}>
-          {filter.type === 'select' && (
+          {filter.type === "select" && (
             <Select value={filter.value} onValueChange={filter.onChange}>
               <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder={filter.placeholder || "Select"} />
@@ -72,19 +72,14 @@ export function GenericFilterBar<T extends BaseFilterOption>({
             </Select>
           )}
 
-          {filter.type === 'date' && (
+          {filter.type === "date" && (
             <div className="relative">
-              <Calendar
-                className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
-              />
+              <Calendar className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="date"
                 value={formatDateForInput(filter.value)}
                 onChange={(e) => filter.onChange(parseDateFromInput(e.target.value))}
-                className={cn(
-                  "w-full pl-8",
-                  !filter.value && "text-muted-foreground"
-                )}
+                className={cn("w-full pl-8", !filter.value && "text-muted-foreground")}
               />
             </div>
           )}
@@ -92,4 +87,4 @@ export function GenericFilterBar<T extends BaseFilterOption>({
       ))}
     </FilterLayout>
   );
-} 
+}

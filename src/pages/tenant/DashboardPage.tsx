@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSession } from "@/hooks/useSession";
@@ -24,17 +23,17 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchTenant = async () => {
       if (!slug || !user) return;
-      
+
       try {
         // Check if user is a member of this tenant first
         const userTenants = await getUserTenants(user.id);
-        const currentTenant = userTenants.find(t => t.slug === slug);
-        
+        const currentTenant = userTenants.find((t) => t.slug === slug);
+
         if (!currentTenant) {
           navigate(`/tenant/${slug}/auth`);
           return;
         }
-        
+
         // User is a member, now fetch the complete tenant data
         const tenantData = await getTenantBySlug(slug);
 
@@ -66,14 +65,14 @@ export default function DashboardPage() {
       title: "會友",
       icon: Users,
       description: "管理您的教會會友",
-      link: `/tenant/${tenant?.slug}/members`
+      link: `/tenant/${tenant?.slug}/members`,
     },
     {
       title: "群組",
       icon: Group,
       description: "將您的教會組織成群組",
-      link: `/tenant/${tenant?.slug}/groups`
-    }
+      link: `/tenant/${tenant?.slug}/groups`,
+    },
   ];
 
   const utilityCards = [
@@ -81,26 +80,26 @@ export default function DashboardPage() {
       title: "活動",
       icon: Calendar,
       description: "安排和管理活動",
-      link: `/tenant/${tenant?.slug}/events`
+      link: `/tenant/${tenant?.slug}/events`,
     },
     {
       title: "資源",
       icon: FileText,
       description: "管理資源超連結",
-      link: `/tenant/${tenant?.slug}/resources`
+      link: `/tenant/${tenant?.slug}/resources`,
     },
     {
       title: "服事管理",
       icon: Handshake,
       description: "創建管理服事類型",
-      link: `/tenant/${tenant?.slug}/services`
+      link: `/tenant/${tenant?.slug}/services`,
     },
     {
       title: "服事表",
       icon: Calendar,
       description: "各組服事表",
-      link: `/tenant/${tenant?.slug}/service_events`
-    }
+      link: `/tenant/${tenant?.slug}/service_events`,
+    },
   ];
 
   if (isLoading || isTenantLoading) {
@@ -120,10 +119,7 @@ export default function DashboardPage() {
           <div className="text-center">
             <h1 className="text-3xl font-bold mb-4">教會不存在</h1>
             <p className="mb-6">教會 "{slug}" 不存在或已被刪除。</p>
-            <button
-              onClick={() => navigate("/")}
-              className="text-primary hover:underline"
-            >
+            <button onClick={() => navigate("/")} className="text-primary hover:underline">
               返回首頁
             </button>
           </div>
@@ -134,11 +130,11 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <NavBar 
-        tenant={{ 
-          name: tenant?.name || "", 
-          slug: tenant?.slug || ""
-        }} 
+      <NavBar
+        tenant={{
+          name: tenant?.name || "",
+          slug: tenant?.slug || "",
+        }}
         onSignOut={handleSignOut}
       />
       <main className="flex-1 container mx-auto px-4 py-8">
@@ -152,7 +148,7 @@ export default function DashboardPage() {
             <h2 className="text-2xl font-semibold mb-4">組織管理</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {organizationCards.map((card) => (
-                <Card 
+                <Card
                   key={card.title}
                   className="hover:shadow-lg transition-shadow cursor-pointer"
                   onClick={() => navigate(card.link)}
@@ -173,7 +169,7 @@ export default function DashboardPage() {
             <h2 className="text-2xl font-semibold mb-4">工具</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {utilityCards.map((card) => (
-                <Card 
+                <Card
                   key={card.title}
                   className="hover:shadow-lg transition-shadow cursor-pointer"
                   onClick={() => navigate(card.link)}

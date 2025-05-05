@@ -20,13 +20,18 @@ import { addServiceNote, deleteServiceNotes } from "@/lib/services";
 // Updated schema to validate URLs
 const noteFormSchema = z.object({
   text: z.string().min(1, "標題為必填"),
-  link: z.string()
+  link: z
+    .string()
     .refine(
-      (val) => !val || /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/.test(val),
-      { message: "請輸入有效的URL" }
+      (val) =>
+        !val ||
+        /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/.test(
+          val,
+        ),
+      { message: "請輸入有效的URL" },
     )
     .optional()
-    .or(z.literal(''))
+    .or(z.literal("")),
 });
 
 export type NoteFormValues = z.infer<typeof noteFormSchema>;
@@ -39,15 +44,15 @@ interface ServiceNotesFormProps {
   isEditing: boolean;
 }
 
-export function ServiceNotesForm({ 
-  notes, 
-  setNotes, 
+export function ServiceNotesForm({
+  notes,
+  setNotes,
   serviceId,
   tenantId,
-  isEditing 
+  isEditing,
 }: ServiceNotesFormProps) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  
+
   const noteForm = useForm<NoteFormValues>({
     resolver: zodResolver(noteFormSchema),
     defaultValues: {
@@ -74,10 +79,10 @@ export function ServiceNotesForm({
             service_id: serviceId,
             tenant_id: tenantId,
             text: values.text,
-            link: values.link || null
+            link: values.link || null,
           });
         }
-        
+
         // Always update local state
         setNotes([...notes, values]);
         noteForm.reset();
@@ -107,21 +112,21 @@ export function ServiceNotesForm({
         // since there's no direct update function
         if (isEditing && serviceId && tenantId) {
           await deleteServiceNotes(serviceId);
-          
+
           // Prepare updated notes list
           const updatedNotes = [...notes];
           updatedNotes[index] = values;
-          
+
           // Re-add all notes to the database
           for (const note of updatedNotes) {
             await addServiceNote({
               service_id: serviceId,
               tenant_id: tenantId,
               text: note.text,
-              link: note.link || null
+              link: note.link || null,
             });
           }
-          
+
           // Update local state
           setNotes(updatedNotes);
         } else {
@@ -130,7 +135,7 @@ export function ServiceNotesForm({
           updatedNotes[index] = values;
           setNotes(updatedNotes);
         }
-        
+
         setEditingIndex(null);
       } catch (error) {
         console.error("Error updating service note:", error);
@@ -150,27 +155,27 @@ export function ServiceNotesForm({
       // For deleting notes, we delete all and re-add the remaining ones
       if (isEditing && serviceId && tenantId) {
         await deleteServiceNotes(serviceId);
-        
+
         // Filter out the deleted note
         const updatedNotes = notes.filter((_, i) => i !== index);
-        
+
         // Re-add all remaining notes
         for (const note of updatedNotes) {
           await addServiceNote({
             service_id: serviceId,
             tenant_id: tenantId,
             text: note.text,
-            link: note.link || null
+            link: note.link || null,
           });
         }
-        
+
         // Update local state
         setNotes(updatedNotes);
       } else {
         // Just update local state for new services
         setNotes(notes.filter((_, i) => i !== index));
       }
-      
+
       if (editingIndex === index) {
         setEditingIndex(null);
       }
@@ -209,11 +214,7 @@ export function ServiceNotesForm({
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Input 
-                      {...field} 
-                      placeholder="https://example.com" 
-                      className="pl-10"
-                    />
+                    <Input {...field} placeholder="https://example.com" className="pl-10" />
                     <Link className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   </div>
                 </FormControl>
@@ -258,9 +259,9 @@ export function ServiceNotesForm({
                               <FormLabel className="text-xs">連結 URL</FormLabel>
                               <FormControl>
                                 <div className="relative">
-                                  <Input 
-                                    {...field} 
-                                    placeholder="https://example.com" 
+                                  <Input
+                                    {...field}
+                                    placeholder="https://example.com"
                                     className="pl-10"
                                   />
                                   <Link className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -271,20 +272,16 @@ export function ServiceNotesForm({
                           )}
                         />
                         <div className="flex justify-end space-x-2">
-                          <Button 
-                            type="button" 
-                            size="sm" 
-                            variant="outline" 
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
                             onClick={handleCancelEdit}
                           >
                             <X className="h-4 w-4" />
                             <span className="sr-only">取消</span>
                           </Button>
-                          <Button 
-                            type="button" 
-                            size="sm" 
-                            onClick={() => handleSaveEdit(index)}
-                          >
+                          <Button type="button" size="sm" onClick={() => handleSaveEdit(index)}>
                             <Check className="h-4 w-4" />
                             <span className="sr-only">儲存</span>
                           </Button>
@@ -296,7 +293,7 @@ export function ServiceNotesForm({
                       <div>
                         <h5 className="font-medium">{note.text}</h5>
                         {note.link && (
-                          <a 
+                          <a
                             href={note.link}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -308,18 +305,18 @@ export function ServiceNotesForm({
                         )}
                       </div>
                       <div className="flex space-x-1">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           className="h-8 w-8 text-blue-500"
                           onClick={() => handleEditNote(index)}
                         >
                           <Edit2 className="h-4 w-4" />
                           <span className="sr-only">編輯備註</span>
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           className="h-8 w-8 text-destructive hover:text-destructive/80"
                           onClick={() => handleDeleteNote(index)}
                         >

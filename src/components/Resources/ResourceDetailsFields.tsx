@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -61,8 +60,8 @@ export function ResourceDetailsFields({
           </SelectTrigger>
           <SelectContent className="max-h-[300px] overflow-y-auto">
             {AVAILABLE_ICONS.map((iconOption) => (
-              <SelectItem 
-                key={iconOption.value} 
+              <SelectItem
+                key={iconOption.value}
                 value={iconOption.value}
                 className="flex items-center gap-2 cursor-pointer"
               >

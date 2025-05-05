@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,10 +55,32 @@ export function AuthPasswordInput({
         >
           {show ? (
             // eye-off icon
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17.94 17.94A10.04 10.04 0 0 1 12 20c-5 0-9.27-3-11-8 1.11-2.66 2.85-4.89 5.06-6.47"/><path d="M1 1l22 22"/><path d="M9.53 9.53A3.98 3.98 0 0 1 12 8c2.21 0 4 1.79 4 4 0 .67-.17 1.3-.47 1.84"/><path d="M21 21L3 3"/></svg>
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M17.94 17.94A10.04 10.04 0 0 1 12 20c-5 0-9.27-3-11-8 1.11-2.66 2.85-4.89 5.06-6.47" />
+              <path d="M1 1l22 22" />
+              <path d="M9.53 9.53A3.98 3.98 0 0 1 12 8c2.21 0 4 1.79 4 4 0 .67-.17 1.3-.47 1.84" />
+              <path d="M21 21L3 3" />
+            </svg>
           ) : (
             // eye icon
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M2.05 12C3.81 7.61 7.95 4.5 12 4.5c4.05 0 8.19 3.11 9.95 7.5-1.76 4.39-5.9 7.5-9.95 7.5-4.05 0-8.19-3.11-9.95-7.5z"/></svg>
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path d="M2.05 12C3.81 7.61 7.95 4.5 12 4.5c4.05 0 8.19 3.11 9.95 7.5-1.76 4.39-5.9 7.5-9.95 7.5-4.05 0-8.19-3.11-9.95-7.5z" />
+            </svg>
           )}
         </Button>
       </div>

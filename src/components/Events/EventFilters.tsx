@@ -1,4 +1,3 @@
-
 import { Group } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
@@ -10,11 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 
@@ -38,15 +33,12 @@ export function EventFilters({
   setEndDate,
 }: EventFiltersProps) {
   const safeGroups = Array.isArray(groups) ? groups : [];
-  
+
   return (
     <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
       <div className="flex flex-col space-y-2">
         <label className="text-sm font-medium">Group</label>
-        <Select 
-          value={selectedGroup} 
-          onValueChange={setSelectedGroup}
-        >
+        <Select value={selectedGroup} onValueChange={setSelectedGroup}>
           <SelectTrigger className="w-full sm:w-[200px]">
             <SelectValue placeholder="Select Group" />
           </SelectTrigger>

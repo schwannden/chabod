@@ -9,8 +9,9 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "format": "prettier --write src/**/*.{js,jsx,ts,tsx,css} --config ./.prettierrc",
-    "preview": "vite preview"
+    "format": "prettier --write src --config ./.prettierrc",
+    "preview": "vite preview",
+    "prepare": "husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -82,6 +83,7 @@
     "eslint-plugin-react-refresh": "^0.4.9",
     "eslint-plugin-unused-imports": "^4.1.4",
     "globals": "^15.9.0",
+    "husky": "^9.1.7",
     "lovable-tagger": "^1.1.7",
     "postcss": "^8.4.47",
     "prettier": "^3.5.3",

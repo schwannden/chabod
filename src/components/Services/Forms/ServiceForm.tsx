@@ -52,10 +52,10 @@ export function ServiceForm({
   isSubmitting,
   submitLabel,
   serviceId,
-  isEditing
+  isEditing,
 }: ServiceFormProps) {
   const tenantId = form.getValues().tenant_id;
-  
+
   return (
     <>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -66,23 +66,23 @@ export function ServiceForm({
           <TabsTrigger value="notes">備註</TabsTrigger>
           <TabsTrigger value="roles">角色</TabsTrigger>
         </TabsList>
-        
+
         {/* Basic Details */}
         <TabsContent value="details">
           <ServiceDetailsForm form={form} />
         </TabsContent>
-        
+
         {/* Service Admins */}
         <TabsContent value="admins">
-          <ServiceAdminsForm 
-            members={members} 
+          <ServiceAdminsForm
+            members={members}
             selectedAdmins={selectedAdmins}
             setSelectedAdmins={setSelectedAdmins}
             serviceId={serviceId}
             isEditing={isEditing}
           />
         </TabsContent>
-        
+
         {/* Service Groups */}
         <TabsContent value="groups">
           <ServiceGroupsForm
@@ -93,22 +93,22 @@ export function ServiceForm({
             isEditing={isEditing}
           />
         </TabsContent>
-        
+
         {/* Service Notes */}
         <TabsContent value="notes">
-          <ServiceNotesForm 
-            notes={notes} 
+          <ServiceNotesForm
+            notes={notes}
             setNotes={setNotes}
             serviceId={serviceId}
             tenantId={tenantId}
             isEditing={isEditing}
           />
         </TabsContent>
-        
+
         {/* Service Roles */}
         <TabsContent value="roles">
-          <ServiceRolesForm 
-            roles={roles} 
+          <ServiceRolesForm
+            roles={roles}
             setRoles={setRoles}
             serviceId={serviceId}
             tenantId={tenantId}
@@ -116,13 +116,12 @@ export function ServiceForm({
           />
         </TabsContent>
       </Tabs>
-      
+
       <div className="flex justify-end space-x-2 mt-4">
-        <Button variant="outline" onClick={onCancel} type="button">取消</Button>
-        <Button 
-          onClick={form.handleSubmit(onSubmit)}
-          disabled={isSubmitting}
-        >
+        <Button variant="outline" onClick={onCancel} type="button">
+          取消
+        </Button>
+        <Button onClick={form.handleSubmit(onSubmit)} disabled={isSubmitting}>
           {isSubmitting ? "處理中..." : submitLabel}
         </Button>
       </div>

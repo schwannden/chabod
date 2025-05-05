@@ -1,5 +1,11 @@
 import { PriceTier, TenantWithUsage } from "@/lib/types";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useState, useEffect } from "react";
@@ -21,7 +27,7 @@ export function PricePlansDialog({ isOpen, onOpenChange, tenant }: PricePlansDia
           .from("price_tiers")
           .select("*")
           .eq("is_active", true);
-        
+
         if (error) {
           console.error("Error fetching price tiers:", error);
           toast({
@@ -31,9 +37,7 @@ export function PricePlansDialog({ isOpen, onOpenChange, tenant }: PricePlansDia
           });
         } else {
           // Sort price tiers by monthly price in ascending order
-          const sortedPriceTiers = (data || []).sort((a, b) => 
-            a.price_monthly - b.price_monthly
-          );
+          const sortedPriceTiers = (data || []).sort((a, b) => a.price_monthly - b.price_monthly);
           setPriceTiers(sortedPriceTiers);
         }
       } catch (error) {
@@ -50,15 +54,13 @@ export function PricePlansDialog({ isOpen, onOpenChange, tenant }: PricePlansDia
       <DialogContent>
         <DialogHeader>
           <DialogTitle>訂閱計畫</DialogTitle>
-          <DialogDescription>
-            選擇最適合您教會需求的計畫。
-          </DialogDescription>
+          <DialogDescription>選擇最適合您教會需求的計畫。</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           {priceTiers.map((plan) => (
-            <div 
-              key={plan.id} 
-              className={`border rounded-lg p-4 ${plan.name === tenant.price_tier?.name ? 'border-primary bg-primary/10' : ''}`}
+            <div
+              key={plan.id}
+              className={`border rounded-lg p-4 ${plan.name === tenant.price_tier?.name ? "border-primary bg-primary/10" : ""}`}
             >
               <div className="flex justify-between items-center mb-2">
                 <h4 className="text-lg font-semibold">{plan.name}</h4>
@@ -78,4 +80,4 @@ export function PricePlansDialog({ isOpen, onOpenChange, tenant }: PricePlansDia
       </DialogContent>
     </Dialog>
   );
-} 
+}

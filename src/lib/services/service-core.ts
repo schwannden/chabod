@@ -1,12 +1,8 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Service } from "./types";
 
 export async function getServices(tenantId: string): Promise<Service[]> {
-  const { data, error } = await supabase
-    .from("services")
-    .select("*")
-    .eq("tenant_id", tenantId)
+  const { data, error } = await supabase.from("services").select("*").eq("tenant_id", tenantId);
 
   if (error) {
     console.error("Error fetching services:", error);
@@ -16,12 +12,10 @@ export async function getServices(tenantId: string): Promise<Service[]> {
   return data;
 }
 
-export async function createService(service: Omit<Service, "id" | "created_at" | "updated_at">): Promise<Service> {
-  const { data, error } = await supabase
-    .from("services")
-    .insert(service)
-    .select()
-    .single();
+export async function createService(
+  service: Omit<Service, "id" | "created_at" | "updated_at">,
+): Promise<Service> {
+  const { data, error } = await supabase.from("services").insert(service).select().single();
 
   if (error) {
     console.error("Error creating service:", error);
@@ -32,8 +26,8 @@ export async function createService(service: Omit<Service, "id" | "created_at" |
 }
 
 export async function updateService(
-  id: string, 
-  updates: Partial<Omit<Service, "id" | "created_at" | "updated_at">>
+  id: string,
+  updates: Partial<Omit<Service, "id" | "created_at" | "updated_at">>,
 ): Promise<Service> {
   const { data, error } = await supabase
     .from("services")
@@ -51,10 +45,7 @@ export async function updateService(
 }
 
 export async function deleteService(id: string): Promise<void> {
-  const { error } = await supabase
-    .from("services")
-    .delete()
-    .eq("id", id);
+  const { error } = await supabase.from("services").delete().eq("id", id);
 
   if (error) {
     console.error("Error deleting service:", error);

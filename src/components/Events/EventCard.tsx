@@ -21,12 +21,12 @@ interface EventCardProps {
   allGroups: Group[];
 }
 
-export function EventCard({ 
-  event, 
+export function EventCard({
+  event,
   isEditable,
-  onEventUpdated, 
+  onEventUpdated,
   onDeleteEvent,
-  allGroups
+  allGroups,
 }: EventCardProps) {
   return (
     <Card className="relative">
@@ -34,17 +34,8 @@ export function EventCard({
         <div className="flex items-center gap-2">
           <CardTitle>{event.name}</CardTitle>
           {event.event_link && (
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8"
-              asChild
-            >
-              <a 
-                href={event.event_link} 
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
+            <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+              <a href={event.event_link} target="_blank" rel="noopener noreferrer">
                 <LinkIcon className="h-4 w-4" />
                 <span className="sr-only">Event Link</span>
               </a>
@@ -65,7 +56,7 @@ export function EventCard({
       )}
       {event.groups && event.groups.length > 0 && (
         <CardFooter className="flex flex-wrap gap-1 pt-0">
-          {event.groups.map(group => (
+          {event.groups.map((group) => (
             <Badge key={group.id} variant="secondary">
               {group.name}
             </Badge>

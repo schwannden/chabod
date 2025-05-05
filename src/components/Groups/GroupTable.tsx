@@ -4,7 +4,13 @@ import { Group, GroupWithMemberCount } from "@/lib/types";
 import { createGroup, deleteGroup, updateGroup } from "@/lib/group-service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
@@ -147,18 +153,20 @@ export function GroupTable({
   };
 
   const navigateToGroupMembers = (groupId: string) => {
-    navigate(`/tenant/${window.location.pathname.split('/')[2]}/groups/${groupId}`);
+    navigate(`/tenant/${window.location.pathname.split("/")[2]}/groups/${groupId}`);
   };
 
   return (
     <div className="space-y-4">
       {isTenantOwner && (
         <div className="flex justify-end">
-          <Button onClick={() => {
-            setNewGroupName("");
-            setNewGroupDescription("");
-            setIsCreateOpen(true);
-          }}>
+          <Button
+            onClick={() => {
+              setNewGroupName("");
+              setNewGroupDescription("");
+              setIsCreateOpen(true);
+            }}
+          >
             建立群組
           </Button>
         </div>
@@ -188,30 +196,22 @@ export function GroupTable({
                 <TableCell>{new Date(group.created_at).toLocaleDateString()}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => navigateToGroupMembers(group.id)}
                     >
                       <Users className="h-4 w-4 mr-1" />
                       Members
                     </Button>
-                    
+
                     {isTenantOwner && (
                       <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openEditDialog(group)}
-                        >
+                        <Button variant="outline" size="sm" onClick={() => openEditDialog(group)}>
                           <Edit className="h-4 w-4" />
                           <span className="sr-only">Edit</span>
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openDeleteDialog(group)}
-                        >
+                        <Button variant="outline" size="sm" onClick={() => openDeleteDialog(group)}>
                           <Trash2 className="h-4 w-4" />
                           <span className="sr-only">Delete</span>
                         </Button>
@@ -312,11 +312,7 @@ export function GroupTable({
             <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
               取消
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDeleteGroup}
-              disabled={isSubmitting}
-            >
+            <Button variant="destructive" onClick={handleDeleteGroup} disabled={isSubmitting}>
               {isSubmitting ? "刪除中..." : "刪除群組"}
             </Button>
           </DialogFooter>

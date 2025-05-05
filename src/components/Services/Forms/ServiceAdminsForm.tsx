@@ -17,11 +17,11 @@ export function ServiceAdminsForm({
   selectedAdmins,
   setSelectedAdmins,
   serviceId,
-  isEditing
+  isEditing,
 }: ServiceAdminsFormProps) {
   // For new services (not editing), we just manage local state
   // For existing services, we update in real-time
-  
+
   const handleAdminChange = async (adminId: string, checked: boolean) => {
     try {
       if (isEditing && serviceId) {
@@ -32,19 +32,19 @@ export function ServiceAdminsForm({
           await removeServiceAdmin(serviceId, adminId);
         }
       }
-      
+
       // Always update local state
       if (checked) {
         setSelectedAdmins([...selectedAdmins, adminId]);
       } else {
-        setSelectedAdmins(selectedAdmins.filter(id => id !== adminId));
+        setSelectedAdmins(selectedAdmins.filter((id) => id !== adminId));
       }
     } catch (error) {
       console.error("Error updating service admins:", error);
       toast.error("更新管理員時發生錯誤");
     }
   };
-  
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">選擇服事管理員</h3>
@@ -60,13 +60,8 @@ export function ServiceAdminsForm({
                     handleAdminChange(member.user_id, !!checked);
                   }}
                 />
-                <label
-                  htmlFor={`admin-${member.user_id}`}
-                  className="text-sm font-medium"
-                >
-                  {member.profile?.full_name ||
-                    member.profile?.email ||
-                    "匿名成員"}
+                <label htmlFor={`admin-${member.user_id}`} className="text-sm font-medium">
+                  {member.profile?.full_name || member.profile?.email || "匿名成員"}
                 </label>
               </div>
             ))

@@ -4,7 +4,14 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { associateUserWithTenant } from "@/lib/tenant-utils";
 import { AuthEmailInput } from "./AuthEmailInput";
 import { AuthPasswordInput } from "./AuthPasswordInput";
@@ -18,12 +25,12 @@ interface SignUpFormProps {
   onSignInClick: () => void;
 }
 
-export function SignUpForm({ 
-  tenantSlug, 
-  tenantName, 
-  inviteToken, 
-  onSuccess, 
-  onSignInClick 
+export function SignUpForm({
+  tenantSlug,
+  tenantName,
+  inviteToken,
+  onSuccess,
+  onSignInClick,
 }: SignUpFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -113,8 +120,8 @@ export function SignUpForm({
 
       toast({
         title: "帳號建立成功！",
-        description: tenantSlug 
-          ? `您的帳號已建立並加入 ${tenantSlug}。` 
+        description: tenantSlug
+          ? `您的帳號已建立並加入 ${tenantSlug}。`
           : "請前往電子郵件收信並點擊確認連結。",
       });
 
@@ -137,9 +144,7 @@ export function SignUpForm({
       <CardHeader>
         <CardTitle>建立帳號</CardTitle>
         <CardDescription>
-          {tenantName 
-            ? `註冊加入 ${tenantName}` 
-            : "註冊 Chabod 教會管理系統帳號"}
+          {tenantName ? `註冊加入 ${tenantName}` : "註冊 Chabod 教會管理系統帳號"}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -154,21 +159,9 @@ export function SignUpForm({
               required
             />
           </div>
-          <AuthEmailInput
-            value={email}
-            onChange={setEmail}
-            disabled={loading}
-          />
-          <AuthPasswordInput
-            value={password}
-            onChange={setPassword}
-            required
-            disabled={loading}
-          />
-          <TermsOfService
-            accepted={termsAccepted}
-            onChange={setTermsAccepted}
-          />
+          <AuthEmailInput value={email} onChange={setEmail} disabled={loading} />
+          <AuthPasswordInput value={password} onChange={setPassword} required disabled={loading} />
+          <TermsOfService accepted={termsAccepted} onChange={setTermsAccepted} />
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "建立帳號中..." : "建立帳號"}
           </Button>

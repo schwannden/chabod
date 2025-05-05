@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ServiceEventWithService } from "@/lib/services/types";
 import { Loader2 } from "lucide-react";
@@ -23,7 +22,7 @@ export function ServiceEventList({
   isLoading,
   tenantId,
   onEventUpdated,
-  services
+  services,
 }: ServiceEventListProps) {
   const { user } = useSession();
   const { toast } = useToast();
@@ -32,7 +31,7 @@ export function ServiceEventList({
   const sortedEvents = [...serviceEvents].sort((a, b) => {
     const dateComparison = new Date(a.date).getTime() - new Date(b.date).getTime();
     if (dateComparison !== 0) return dateComparison;
-    
+
     if (a.start_time && b.start_time) {
       return a.start_time.localeCompare(b.start_time);
     }
@@ -44,23 +43,23 @@ export function ServiceEventList({
   useEffect(() => {
     const checkPermissions = async () => {
       if (!user || serviceEvents.length === 0) return;
-      
+
       const permissions: Record<string, boolean> = {};
-      
+
       try {
         // For simplicity, check if the user is a tenant owner
-        const { data: isOwner, error: ownerError } = await supabase.rpc('is_tenant_owner', {
+        const { data: isOwner, error: ownerError } = await supabase.rpc("is_tenant_owner", {
           tenant_uuid: tenantId,
-          user_uuid: user.id
+          user_uuid: user.id,
         });
-        
+
         if (ownerError) {
           console.error("Error checking tenant owner:", ownerError);
         }
-        
+
         // If user is a tenant owner, they can edit all events
         if (isOwner) {
-          serviceEvents.forEach(event => {
+          serviceEvents.forEach((event) => {
             permissions[event.id] = true;
           });
         } else {
@@ -71,20 +70,20 @@ export function ServiceEventList({
               .select("id")
               .eq("service_id", event.service_id)
               .eq("user_id", user.id);
-              
+
             if (adminError) {
               console.error("Error checking service admin:", adminError);
             }
-            
+
             permissions[event.id] = isAdmin && isAdmin.length > 0;
           }
         }
-        
+
         setEditableEvents(permissions);
       } catch (error) {
         console.error("Error checking edit permissions:", error);
         // Initialize with no permissions by default
-        serviceEvents.forEach(event => {
+        serviceEvents.forEach((event) => {
           permissions[event.id] = false;
         });
         setEditableEvents(permissions);
@@ -102,7 +101,7 @@ export function ServiceEventList({
         title: "事件刪除成功",
         description: "服事排班已刪除",
       });
-      
+
       // Call the onEventUpdated callback to refresh the parent components
       onEventUpdated();
     } catch (error) {
@@ -128,9 +127,7 @@ export function ServiceEventList({
       <Card>
         <CardHeader>
           <CardTitle>未找到服事排班</CardTitle>
-          <CardDescription>
-            沒有符合您篩選條件的服事排班
-          </CardDescription>
+          <CardDescription>沒有符合您篩選條件的服事排班</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -154,7 +151,7 @@ export function ServiceEventList({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedEvents.map(event => (
+              {sortedEvents.map((event) => (
                 <ServiceEventRow
                   key={event.id}
                   event={event}

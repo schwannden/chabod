@@ -1,9 +1,8 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { getServiceRoles } from "@/lib/services/service-roles";
 import { PlusCircle, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -11,7 +10,11 @@ import {
 } from "@/components/ui/accordion";
 
 export function ServiceRoleView({ serviceId }: { serviceId: string }) {
-  const { data: roles = [], isLoading, error } = useQuery({
+  const {
+    data: roles = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["serviceRoles", serviceId],
     queryFn: () => getServiceRoles(serviceId),
   });
@@ -38,9 +41,7 @@ export function ServiceRoleView({ serviceId }: { serviceId: string }) {
                   <div className="bg-primary/10 p-2 rounded-md">
                     <Shield className="h-4 w-4 text-primary" />
                   </div>
-                  <div className="font-medium text-left">
-                    {role.name}
-                  </div>
+                  <div className="font-medium text-left">{role.name}</div>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-4 pt-2 pb-4">

@@ -1,7 +1,6 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { getServiceNotes } from "@/lib/services/service-notes";
-import { 
+import {
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -11,7 +10,11 @@ import { Calendar, FileText, PlusCircle, Link } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function ServiceNoteView({ serviceId }: { serviceId: string }) {
-  const { data: notes = [], isLoading, error } = useQuery({
+  const {
+    data: notes = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["serviceNotes", serviceId],
     queryFn: () => getServiceNotes(serviceId),
   });
@@ -39,7 +42,8 @@ export function ServiceNoteView({ serviceId }: { serviceId: string }) {
                     <FileText className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div className="font-medium text-left">
-                    {note.text.substring(0, 30)}{note.text.length > 30 ? '...' : ''}
+                    {note.text.substring(0, 30)}
+                    {note.text.length > 30 ? "..." : ""}
                   </div>
                 </div>
               </AccordionTrigger>
@@ -51,9 +55,9 @@ export function ServiceNoteView({ serviceId }: { serviceId: string }) {
                 <p className="whitespace-pre-wrap mb-2 mt-4 text-sm">{note.text}</p>
                 {note.link && (
                   <div className="mt-4">
-                    <a 
-                      href={note.link} 
-                      target="_blank" 
+                    <a
+                      href={note.link}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 text-blue-600 hover:underline text-sm"
                     >

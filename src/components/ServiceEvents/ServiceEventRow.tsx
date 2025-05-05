@@ -1,4 +1,3 @@
-
 import { format } from "date-fns";
 import { ServiceEventWithService } from "@/lib/services/types";
 import { TableRow, TableCell } from "@/components/ui/table";
@@ -26,12 +25,12 @@ interface ServiceEventRowProps {
   services: { id: string; name: string }[];
 }
 
-export function ServiceEventRow({ 
-  event, 
-  isEditable, 
-  onEventUpdated, 
+export function ServiceEventRow({
+  event,
+  isEditable,
+  onEventUpdated,
   onDeleteEvent,
-  services
+  services,
 }: ServiceEventRowProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -46,17 +45,15 @@ export function ServiceEventRow({
     <>
       <TableRow>
         <TableCell>{format(new Date(event.date), "yyyy-MM-dd")}</TableCell>
-        <TableCell>{event.start_time} - {event.end_time}</TableCell>
+        <TableCell>
+          {event.start_time} - {event.end_time}
+        </TableCell>
         <TableCell>{event.service.name}</TableCell>
         <TableCell>{event.subtitle || "—"}</TableCell>
         <TableCell>
           {isEditable && (
             <div className="flex space-x-2">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setIsEditDialogOpen(true)}
-              >
+              <Button variant="ghost" size="icon" onClick={() => setIsEditDialogOpen(true)}>
                 <Edit className="h-4 w-4" />
               </Button>
               <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

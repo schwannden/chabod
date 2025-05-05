@@ -39,7 +39,7 @@ export default function GroupMembersPage() {
   const { user, isLoading: isSessionLoading } = useSession();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [groupName, setGroupName] = useState<string>("");
   const [members, setMembers] = useState<GroupMemberWithProfile[]>([]);
@@ -59,7 +59,7 @@ export default function GroupMembersPage() {
   useEffect(() => {
     const fetchDataAndCheckAccess = async () => {
       if (!slug || !user || !groupId) return;
-      
+
       try {
         const tenantData = await getTenantBySlug(slug);
         if (!tenantData) {
@@ -67,33 +67,33 @@ export default function GroupMembersPage() {
           return;
         }
         setTenant(tenantData);
-        
+
         setIsTenantOwner(tenantData.owner_id === user.id);
-        
+
         const { data: groupData, error: groupError } = await supabase
           .from("groups")
           .select("*")
           .eq("id", groupId)
           .single();
-          
+
         if (groupError || !groupData) {
           console.error("Error fetching group:", groupError);
           navigate(`/tenant/${slug}`);
           return;
         }
-        
+
         setGroupName(groupData.name);
-        
+
         const groupMembers = await getGroupMembers(groupId);
         setMembers(groupMembers);
-        
+
         const tenantMembers = await getTenantMembers(tenantData.id);
-        const existingMemberIds = new Set(groupMembers.map(m => m.user_id));
-        
+        const existingMemberIds = new Set(groupMembers.map((m) => m.user_id));
+
         const availableProfiles = tenantMembers
-          .filter(tm => !existingMemberIds.has(tm.profile.id))
-          .map(tm => tm.profile);
-          
+          .filter((tm) => !existingMemberIds.has(tm.profile.id))
+          .map((tm) => tm.profile);
+
         setAvailableMembers(availableProfiles);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -114,7 +114,7 @@ export default function GroupMembersPage() {
 
   const handleAddMember = async () => {
     if (!selectedUserId || !groupId) return;
-    
+
     setIsSubmitting(true);
     try {
       await addUserToGroup(groupId, selectedUserId);
@@ -122,15 +122,13 @@ export default function GroupMembersPage() {
         title: "Success",
         description: "Member added to group",
       });
-      
+
       const updatedMembers = await getGroupMembers(groupId);
       setMembers(updatedMembers);
-      
-      const existingMemberIds = new Set(updatedMembers.map(m => m.user_id));
-      setAvailableMembers(prev => 
-        prev.filter(profile => !existingMemberIds.has(profile.id))
-      );
-      
+
+      const existingMemberIds = new Set(updatedMembers.map((m) => m.user_id));
+      setAvailableMembers((prev) => prev.filter((profile) => !existingMemberIds.has(profile.id)));
+
       setIsAddMemberOpen(false);
       setSelectedUserId("");
     } catch (error) {
@@ -153,16 +151,16 @@ export default function GroupMembersPage() {
         title: "Success",
         description: "Member removed from group",
       });
-      
+
       const updatedMembers = await getGroupMembers(groupId!);
       setMembers(updatedMembers);
-      
+
       if (tenant) {
         const tenantMembers = await getTenantMembers(tenant.id);
-        const existingMemberIds = new Set(updatedMembers.map(m => m.user_id));
+        const existingMemberIds = new Set(updatedMembers.map((m) => m.user_id));
         const availableProfiles = tenantMembers
-          .filter(tm => !existingMemberIds.has(tm.profile.id))
-          .map(tm => tm.profile);
+          .filter((tm) => !existingMemberIds.has(tm.profile.id))
+          .map((tm) => tm.profile);
         setAvailableMembers(availableProfiles);
       }
     } catch (error) {
@@ -188,11 +186,17 @@ export default function GroupMembersPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <NavBar tenant={tenant ? { 
-        name: tenant.name, 
-        slug: tenant.slug,
-        id: tenant.id
-      } : undefined} />
+      <NavBar
+        tenant={
+          tenant
+            ? {
+                name: tenant.name,
+                slug: tenant.slug,
+                id: tenant.id,
+              }
+            : undefined
+        }
+      />
       <main className="flex-1 container mx-auto px-4 py-8">
         {tenant && (
           <div className="mb-6 space-y-6">
@@ -200,33 +204,28 @@ export default function GroupMembersPage() {
               tenantName={tenant.name}
               tenantSlug={tenant.slug}
               items={[
-                { 
-                  label: "Groups", 
-                  path: `/tenant/${tenant.slug}/groups` 
+                {
+                  label: "Groups",
+                  path: `/tenant/${tenant.slug}/groups`,
                 },
-                { 
-                  label: "Members" 
-                }
+                {
+                  label: "Members",
+                },
               ]}
             />
 
             <div className="flex justify-between items-center">
               <div>
                 <h1 className="text-3xl font-bold">{groupName} Members</h1>
-                <p className="text-muted-foreground">
-                  Manage members for this group
-                </p>
+                <p className="text-muted-foreground">Manage members for this group</p>
               </div>
               <div className="flex space-x-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => navigate(`/tenant/${slug}/groups`)}
-                >
+                <Button variant="outline" onClick={() => navigate(`/tenant/${slug}/groups`)}>
                   Back to Groups
                 </Button>
-                
+
                 {isTenantOwner && (
-                  <Button 
+                  <Button
                     onClick={() => setIsAddMemberOpen(true)}
                     disabled={availableMembers.length === 0}
                   >
@@ -240,8 +239,11 @@ export default function GroupMembersPage() {
 
         {members.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            No members in this group yet. {isTenantOwner && availableMembers.length > 0 && "Add members to get started."}
-            {isTenantOwner && availableMembers.length === 0 && "All tenant members are already in this group."}
+            No members in this group yet.{" "}
+            {isTenantOwner && availableMembers.length > 0 && "Add members to get started."}
+            {isTenantOwner &&
+              availableMembers.length === 0 &&
+              "All tenant members are already in this group."}
           </div>
         ) : (
           <Table>
@@ -310,8 +312,8 @@ export default function GroupMembersPage() {
               <Button variant="outline" onClick={() => setIsAddMemberOpen(false)}>
                 Cancel
               </Button>
-              <Button 
-                onClick={handleAddMember} 
+              <Button
+                onClick={handleAddMember}
                 disabled={isSubmitting || !selectedUserId || availableMembers.length === 0}
               >
                 {isSubmitting ? "Adding..." : "Add to Group"}

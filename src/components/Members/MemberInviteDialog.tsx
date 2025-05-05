@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +21,12 @@ interface MemberInviteDialogProps {
   onMemberInvited: () => void;
 }
 
-export function MemberInviteDialog({ tenantId, isOpen, onClose, onMemberInvited }: MemberInviteDialogProps) {
+export function MemberInviteDialog({
+  tenantId,
+  isOpen,
+  onClose,
+  onMemberInvited,
+}: MemberInviteDialogProps) {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("一般會友");
   const [isInviting, setIsInviting] = useState(false);
@@ -22,7 +34,7 @@ export function MemberInviteDialog({ tenantId, isOpen, onClose, onMemberInvited 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email.trim()) {
       toast({
         title: "驗證錯誤",
@@ -31,9 +43,9 @@ export function MemberInviteDialog({ tenantId, isOpen, onClose, onMemberInvited 
       });
       return;
     }
-    
+
     setIsInviting(true);
-    
+
     try {
       await inviteUserToTenant(tenantId, email, role);
       toast({
@@ -60,11 +72,9 @@ export function MemberInviteDialog({ tenantId, isOpen, onClose, onMemberInvited 
       <DialogContent>
         <DialogHeader>
           <DialogTitle>邀請會友</DialogTitle>
-          <DialogDescription>
-            邀請新會友加入此教會。
-          </DialogDescription>
+          <DialogDescription>邀請新會友加入此教會。</DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">電子郵件地址</Label>
@@ -77,21 +87,25 @@ export function MemberInviteDialog({ tenantId, isOpen, onClose, onMemberInvited 
               required
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label>角色</Label>
             <RadioGroup value={role} onValueChange={setRole} className="flex flex-col space-y-1">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="一般會友" id="一般會友" />
-                <Label htmlFor="一般會友" className="cursor-pointer">一般會友</Label>
+                <Label htmlFor="一般會友" className="cursor-pointer">
+                  一般會友
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="管理者" id="管理者" />
-                <Label htmlFor="管理者" className="cursor-pointer">管理者</Label>
+                <Label htmlFor="管理者" className="cursor-pointer">
+                  管理者
+                </Label>
               </div>
             </RadioGroup>
           </div>
-          
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               取消

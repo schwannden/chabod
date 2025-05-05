@@ -33,7 +33,7 @@ export default function MembersPage() {
   useEffect(() => {
     const fetchData = async () => {
       if (!slug || !user) return;
-      
+
       try {
         const tenantData = await getTenantBySlug(slug);
         if (!tenantData) {
@@ -41,16 +41,16 @@ export default function MembersPage() {
           return;
         }
         setTenant(tenantData);
-        
+
         const membersData = await getTenantMembers(tenantData.id);
         setMembers(membersData);
-        
-        const currentUserMember = membersData.find(m => m.user_id === user.id);
+
+        const currentUserMember = membersData.find((m) => m.user_id === user.id);
         if (!currentUserMember) {
           navigate(`/tenant/${slug}`);
           return;
         }
-        
+
         const isUserOwner = currentUserMember.role === "owner";
         setIsOwner(isUserOwner);
         console.log("Current user role:", currentUserMember.role, "Is owner:", isUserOwner);
@@ -75,15 +75,11 @@ export default function MembersPage() {
   const filteredMembers = members.filter((member) => {
     const nameMatch =
       !nameFilter ||
-      (member.profile?.full_name || "")
-        .toLowerCase()
-        .includes(nameFilter.toLowerCase());
+      (member.profile?.full_name || "").toLowerCase().includes(nameFilter.toLowerCase());
 
     const emailMatch =
       !emailFilter ||
-      (member.profile?.email || "")
-        .toLowerCase()
-        .includes(emailFilter.toLowerCase());
+      (member.profile?.email || "").toLowerCase().includes(emailFilter.toLowerCase());
 
     const roleMatch = roleFilter === "all" || member.role === roleFilter;
 
@@ -101,10 +97,7 @@ export default function MembersPage() {
           <div className="text-center">
             <h1 className="text-3xl font-bold mb-4">Tenant Not Found</h1>
             <p className="mb-6">The tenant "{slug}" does not exist or has been deleted.</p>
-            <button
-              onClick={() => navigate("/")}
-              className="text-primary hover:underline"
-            >
+            <button onClick={() => navigate("/")} className="text-primary hover:underline">
               Return to home
             </button>
           </div>

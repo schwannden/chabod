@@ -1,8 +1,19 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { updateResource, addResourceToGroup, removeResourceFromGroup, getResourceGroups } from "@/lib/resource-service";
+import {
+  updateResource,
+  addResourceToGroup,
+  removeResourceFromGroup,
+  getResourceGroups,
+} from "@/lib/resource-service";
 import { Resource, Group } from "@/lib/types";
 import { ResourceDetailsFields } from "./ResourceDetailsFields";
 
@@ -82,20 +93,12 @@ export function EditResourceDialog({
       });
 
       const currentGroups = await getResourceGroups(resource.id);
-      const groupsToAdd = selectedGroups.filter(
-        (g) => !currentGroups.includes(g)
-      );
-      const groupsToRemove = currentGroups.filter(
-        (g) => !selectedGroups.includes(g)
-      );
+      const groupsToAdd = selectedGroups.filter((g) => !currentGroups.includes(g));
+      const groupsToRemove = currentGroups.filter((g) => !selectedGroups.includes(g));
 
       await Promise.all([
-        ...groupsToAdd.map((groupId) =>
-          addResourceToGroup(resource.id, groupId)
-        ),
-        ...groupsToRemove.map((groupId) =>
-          removeResourceFromGroup(resource.id, groupId)
-        ),
+        ...groupsToAdd.map((groupId) => addResourceToGroup(resource.id, groupId)),
+        ...groupsToRemove.map((groupId) => removeResourceFromGroup(resource.id, groupId)),
       ]);
 
       onResourceUpdated(updatedResource);
@@ -117,9 +120,7 @@ export function EditResourceDialog({
 
   const handleGroupToggle = (groupId: string) => {
     setSelectedGroups((prev) =>
-      prev.includes(groupId)
-        ? prev.filter((id) => id !== groupId)
-        : [...prev, groupId]
+      prev.includes(groupId) ? prev.filter((id) => id !== groupId) : [...prev, groupId],
     );
   };
 

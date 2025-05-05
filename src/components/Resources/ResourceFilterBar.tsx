@@ -1,4 +1,3 @@
-
 import { Search } from "lucide-react";
 import { FilterLayout } from "@/components/Layout/FilterLayout";
 import { FilterGroup } from "@/components/Layout/FilterGroup";

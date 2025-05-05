@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -34,7 +33,7 @@ export default function App() {
               <Route path="/" element={<DashboardPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/profile" element={<ProfilePage />} />
-              
+
               {/* Tenant routes */}
               <Route path="/tenant/:slug" element={<TenantDashboard />} />
               <Route path="/tenant/:slug/auth" element={<TenantAuth />} />
@@ -46,7 +45,7 @@ export default function App() {
               <Route path="/tenant/:slug/resources" element={<ResourcePage />} />
               <Route path="/tenant/:slug/services" element={<ServicePage />} />
               <Route path="/tenant/:slug/service_events" element={<ServiceEventPage />} />
-              
+
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -2,7 +2,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/useSession";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { LogOut, User, Building } from "lucide-react";
 import { useTenantRole } from "@/hooks/useTenantRole";
 
@@ -20,7 +26,7 @@ export function NavBar({ tenant, onSignOut }: NavBarProps) {
   const navigate = useNavigate();
   // Use the slug, not the ID for the tenant role lookup
   const { role } = useTenantRole(tenant?.slug, user?.id);
-  
+
   const handleSignOut = async () => {
     if (onSignOut) {
       await onSignOut();
@@ -37,7 +43,7 @@ export function NavBar({ tenant, onSignOut }: NavBarProps) {
   const getDisplayName = () => {
     if (profile?.first_name) return profile.first_name;
     if (user?.email) {
-      const username = user.email.split('@')[0];
+      const username = user.email.split("@")[0];
       return username.slice(0, 2).toUpperCase();
     }
     return "U";
@@ -73,7 +79,7 @@ export function NavBar({ tenant, onSignOut }: NavBarProps) {
             </Link>
           )}
         </div>
-        
+
         <div>
           {user ? (
             <DropdownMenu>
@@ -91,14 +97,14 @@ export function NavBar({ tenant, onSignOut }: NavBarProps) {
                   <p className="text-xs text-muted-foreground">{profile?.email || user?.email}</p>
                 </div>
                 <DropdownMenuSeparator />
-                
+
                 <DropdownMenuItem asChild>
                   <Link to={getProfileLink()} className="flex items-center cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
                     <span>個人資料</span>
                   </Link>
                 </DropdownMenuItem>
-                
+
                 {showManageTenants && (
                   <DropdownMenuItem asChild>
                     <Link to="/" className="flex items-center cursor-pointer">
@@ -107,10 +113,13 @@ export function NavBar({ tenant, onSignOut }: NavBarProps) {
                     </Link>
                   </DropdownMenuItem>
                 )}
-                
+
                 <DropdownMenuSeparator />
-                
-                <DropdownMenuItem onClick={handleSignOut} className="text-red-600 hover:text-red-700 cursor-pointer">
+
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  className="text-red-600 hover:text-red-700 cursor-pointer"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>登出</span>
                 </DropdownMenuItem>

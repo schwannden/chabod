@@ -9,16 +9,16 @@ interface GenericEventPageProps {
   // Page metadata
   slug: string;
   title: string;
-  
+
   // Main components
   calendar: ReactNode;
   filterBar: ReactNode;
   listView: ReactNode;
-  
+
   // Optional components
   actionButton?: ReactNode;
   dialog?: ReactNode;
-  
+
   // Fetch functions
   fetchBaseData?: (tenantId: string) => Promise<void>;
 }
@@ -31,7 +31,7 @@ export function GenericEventPage({
   listView,
   actionButton,
   dialog,
-  fetchBaseData
+  fetchBaseData,
 }: GenericEventPageProps) {
   const { isLoading } = useSession();
   const [tenant, setTenant] = useState<Tenant | null>(null);
@@ -52,7 +52,7 @@ export function GenericEventPage({
         });
       }
     };
-    
+
     fetchTenant();
   }, [slug, toast]);
 
@@ -73,15 +73,15 @@ export function GenericEventPage({
     >
       {/* Calendar View */}
       {calendar}
-      
+
       {/* Filter Bar */}
       {filterBar}
-      
+
       {/* List View */}
       {listView}
-      
+
       {/* Dialog (if provided) */}
       {dialog}
     </TenantPageLayout>
   );
-} 
+}

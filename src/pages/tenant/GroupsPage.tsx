@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSession } from "@/hooks/useSession";
@@ -27,7 +26,7 @@ export default function GroupsPage() {
   useEffect(() => {
     const fetchTenantAndGroups = async () => {
       if (!slug || !user) return;
-      
+
       try {
         const tenantData = await getTenantBySlug(slug);
         if (!tenantData) {
@@ -35,9 +34,9 @@ export default function GroupsPage() {
           return;
         }
         setTenant(tenantData);
-        
+
         setIsTenantOwner(tenantData.owner_id === user.id);
-        
+
         const groupsData = await getTenantGroups(tenantData.id);
         setGroups(groupsData);
       } catch (error) {

@@ -43,7 +43,7 @@ export function TenantBreadcrumb({ tenantName, tenantSlug, items }: TenantBreadc
             <Link to={`/tenant/${tenantSlug}`}>{tenantName}</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
-        
+
         {items.map((item, index) => (
           <BreadcrumbSegment key={index} item={item} />
         ))}

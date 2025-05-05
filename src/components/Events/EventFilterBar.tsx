@@ -24,27 +24,27 @@ export function EventFilterBar({
   const filters: FilterConfig<Group>[] = [
     // Group filter
     {
-      type: 'select',
-      id: 'group-filter',
-      label: 'Group',
-      placeholder: 'Select Group',
+      type: "select",
+      id: "group-filter",
+      label: "Group",
+      placeholder: "Select Group",
       options: allGroups,
       value: selectedGroup,
       onChange: setSelectedGroup,
     },
     // Start date filter
     {
-      type: 'date',
-      id: 'start-date-filter',
-      label: 'From',
+      type: "date",
+      id: "start-date-filter",
+      label: "From",
       value: startDate,
       onChange: setStartDate,
     },
     // End date filter
     {
-      type: 'date',
-      id: 'end-date-filter',
-      label: 'To',
+      type: "date",
+      id: "end-date-filter",
+      label: "To",
       value: endDate,
       onChange: setEndDate,
     },

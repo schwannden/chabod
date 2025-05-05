@@ -1,7 +1,13 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +21,12 @@ interface TenantUpdateDialogProps {
   onTenantUpdated: () => void;
 }
 
-export function TenantUpdateDialog({ tenant, isOpen, onClose, onTenantUpdated }: TenantUpdateDialogProps) {
+export function TenantUpdateDialog({
+  tenant,
+  isOpen,
+  onClose,
+  onTenantUpdated,
+}: TenantUpdateDialogProps) {
   const [name, setName] = useState(tenant.name);
   const [slug, setSlug] = useState(tenant.slug);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -28,7 +39,7 @@ export function TenantUpdateDialog({ tenant, isOpen, onClose, onTenantUpdated }:
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!name.trim() || !slug.trim()) {
       toast({
         title: "Validation error",
@@ -37,9 +48,9 @@ export function TenantUpdateDialog({ tenant, isOpen, onClose, onTenantUpdated }:
       });
       return;
     }
-    
+
     setIsUpdating(true);
-    
+
     try {
       await updateTenant(tenant.id, name, slug);
       toast({
@@ -65,11 +76,9 @@ export function TenantUpdateDialog({ tenant, isOpen, onClose, onTenantUpdated }:
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Update Tenant</DialogTitle>
-          <DialogDescription>
-            Update the details of your tenant organization.
-          </DialogDescription>
+          <DialogDescription>Update the details of your tenant organization.</DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Tenant Name</Label>
@@ -81,7 +90,7 @@ export function TenantUpdateDialog({ tenant, isOpen, onClose, onTenantUpdated }:
               required
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="slug">Tenant Slug</Label>
             <Input
@@ -97,7 +106,7 @@ export function TenantUpdateDialog({ tenant, isOpen, onClose, onTenantUpdated }:
               This will be used in the URL: /tenant/{slug || tenant.slug}
             </p>
           </div>
-          
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel

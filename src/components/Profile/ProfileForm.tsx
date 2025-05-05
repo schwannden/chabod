@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -46,7 +45,7 @@ export function ProfileForm({ profile, onProfileUpdated }: ProfileFormProps) {
         title: "個人資料已更新",
         description: "你的個人資料已成功更新。",
       });
-      
+
       onProfileUpdated();
     } catch (error) {
       toast({
@@ -63,9 +62,7 @@ export function ProfileForm({ profile, onProfileUpdated }: ProfileFormProps) {
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
         <CardTitle>你的個人資料</CardTitle>
-        <CardDescription>
-          更新你的個人資訊
-        </CardDescription>
+        <CardDescription>更新你的個人資訊</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -78,7 +75,7 @@ export function ProfileForm({ profile, onProfileUpdated }: ProfileFormProps) {
               placeholder="你的名字"
             />
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="first-name">名字</Label>
@@ -89,7 +86,7 @@ export function ProfileForm({ profile, onProfileUpdated }: ProfileFormProps) {
                 placeholder="名字"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="last-name">姓氏</Label>
               <Input
@@ -100,20 +97,13 @@ export function ProfileForm({ profile, onProfileUpdated }: ProfileFormProps) {
               />
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="email">電子郵件地址</Label>
-            <Input
-              id="email"
-              value={email}
-              disabled
-              className="bg-muted"
-            />
-            <p className="text-xs text-muted-foreground">
-              電子郵件無法更改。
-            </p>
+            <Input id="email" value={email} disabled className="bg-muted" />
+            <p className="text-xs text-muted-foreground">電子郵件無法更改。</p>
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="avatar-url">頭像 URL</Label>
             <Input
@@ -123,7 +113,7 @@ export function ProfileForm({ profile, onProfileUpdated }: ProfileFormProps) {
               placeholder="https://example.com/avatar.jpg"
             />
           </div>
-          
+
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "儲存中..." : "儲存變更"}
           </Button>
