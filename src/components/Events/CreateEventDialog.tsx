@@ -16,10 +16,10 @@ import { Group } from "@/lib/types";
 interface CreateEventDialogProps {
   tenantId: string;
   onEventCreated: () => void;
-  groups: Group[];
+  allGroups: Group[];
 }
 
-export function CreateEventDialog({ tenantId, onEventCreated, groups = [] }: CreateEventDialogProps) {
+export function CreateEventDialog({ tenantId, onEventCreated, allGroups = [] }: CreateEventDialogProps) {
   const [open, setOpen] = useState(false);
   const { form, isLoading, onSubmit } = useEventForm(tenantId, () => {
     setOpen(false);
@@ -27,7 +27,7 @@ export function CreateEventDialog({ tenantId, onEventCreated, groups = [] }: Cre
   });
 
   // Ensure we have a valid groups array
-  const safeGroups = Array.isArray(groups) ? groups : [];
+  const safeGroups = Array.isArray(allGroups) ? allGroups : [];
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

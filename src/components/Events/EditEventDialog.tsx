@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { Event } from "@/lib/types";
+import { EventWithGroups, Group } from "@/lib/types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { Group } from "@/lib/types";
 
 const eventSchema = z.object({
   name: z.string().min(1, "Event name is required"),
@@ -36,23 +35,25 @@ const eventSchema = z.object({
 type EventFormValues = z.infer<typeof eventSchema>;
 
 interface EditEventDialogProps {
-  event: Event;
+  event: EventWithGroups;
   onEventUpdated: () => void;
-  groups: Group[];
+  allGroups: Group[];
   children?: React.ReactNode;
 }
 
-export function EditEventDialog({ event, onEventUpdated, groups = [], children }: EditEventDialogProps) {
+export function EditEventDialog({ event, onEventUpdated, allGroups = [], children }: EditEventDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [_, setEventGroups] = useState<string[]>([]);
   const { toast } = useToast();
 
   console.log("EditEventDialog rendering with event:", event.id);
-  console.log("Groups prop:", groups);
+  console.log("AllGroups prop:", allGroups);
 
-  const safeGroups = Array.isArray(groups) ? groups : [];
+  const safeGroups = Array.isArray(allGroups) ? allGroups : [];
   console.log("Safe groups after check:", safeGroups);
+
+  // Initialize form with existing groups if available
+  const initialGroupIds = event.groups?.map(group => group.id) || [];
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
@@ -65,42 +66,16 @@ export function EditEventDialog({ event, onEventUpdated, groups = [], children }
       end_time: event.end_time || "",
       event_link: event.event_link || "",
       visibility: event.visibility,
-      groups: [],
+      groups: initialGroupIds,
     },
   });
 
   useEffect(() => {
-    console.log("EditEventDialog useEffect for fetching event groups, isOpen:", isOpen);
-    
-    const fetchEventGroups = async () => {
-      if (!isOpen) return;
-      console.log("Fetching event groups for event ID:", event.id);
-      
-      try {
-        const { data, error } = await supabase
-          .from("events_groups")
-          .select("group_id")
-          .eq("event_id", event.id);
-
-        if (error) {
-          console.error("Error fetching event groups:", error);
-          return;
-        }
-
-        console.log("Raw events_groups data:", data);
-        const groupIds = data?.map(eg => eg.group_id) || [];
-        console.log("Extracted group IDs:", groupIds);
-        
-        setEventGroups(groupIds);
-        form.setValue("groups", groupIds);
-        console.log("Form values after setting groups:", form.getValues());
-      } catch (err) {
-        console.error("Failed to fetch event groups:", err);
-      }
-    };
-
-    fetchEventGroups();
-  }, [event.id, isOpen, form]);
+    if (isOpen && event.groups) {
+      const groupIds = event.groups.map(group => group.id);
+      form.setValue("groups", groupIds);
+    }
+  }, [isOpen, event.groups, form]);
 
   const onSubmit = async (data: EventFormValues) => {
     console.log("Submitting form with data:", data);
@@ -181,7 +156,7 @@ export function EditEventDialog({ event, onEventUpdated, groups = [], children }
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pb-2">
-            <EventDetailsFields form={form} groups={groups} />
+            <EventDetailsFields form={form} groups={safeGroups} />
             <div className="sticky bottom-0 pt-2 bg-background flex justify-end gap-2">
               <Button
                 type="button"

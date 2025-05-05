@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Event, Group } from "@/lib/types";
+import { Group, EventWithGroups } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { useSession } from "@/hooks/useSession";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -9,7 +9,7 @@ import { EventCard } from "./EventCard";
 import { getTenantBySlug } from "@/lib/tenant-utils";
 
 interface EventListProps {
-  events: Event[];
+  events: EventWithGroups[];
   isLoading: boolean;
   tenantId: string;
   onEventUpdated: () => void;

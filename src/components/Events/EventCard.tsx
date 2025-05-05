@@ -1,6 +1,4 @@
-
-import React from "react";
-import { Event, Group } from "@/lib/types";
+import { Group, EventWithGroups } from "@/lib/types";
 import { format } from "date-fns";
 import { Link as LinkIcon } from "lucide-react";
 import {
@@ -9,12 +7,14 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EventActions } from "./EventActions";
+import { Badge } from "@/components/ui/badge";
 
 interface EventCardProps {
-  event: Event;
+  event: EventWithGroups;
   isEditable: boolean;
   onEventUpdated: () => void;
   onDeleteEvent: (eventId: string) => Promise<void>;
@@ -62,6 +62,15 @@ export function EventCard({
         <CardContent>
           <p className="text-muted-foreground">{event.description}</p>
         </CardContent>
+      )}
+      {event.groups && event.groups.length > 0 && (
+        <CardFooter className="flex flex-wrap gap-1 pt-0">
+          {event.groups.map(group => (
+            <Badge key={group.id} variant="secondary">
+              {group.name}
+            </Badge>
+          ))}
+        </CardFooter>
       )}
       {isEditable && (
         <EventActions

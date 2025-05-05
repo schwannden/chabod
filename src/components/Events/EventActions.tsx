@@ -1,6 +1,5 @@
-
 import React from "react";
-import { Event, Group } from "@/lib/types";
+import { EventWithGroups, Group } from "@/lib/types";
 import { Trash2, MoreVertical, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EditEventDialog } from "./EditEventDialog";
@@ -23,7 +22,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface EventActionsProps {
-  event: Event;
+  event: EventWithGroups;
   onEventUpdated: () => void;
   onDeleteEvent: (eventId: string) => Promise<void>;
   groups: Group[];
@@ -45,7 +44,7 @@ export function EventActions({ event, onEventUpdated, onDeleteEvent, groups }: E
           <EditEventDialog 
             event={event} 
             onEventUpdated={onEventUpdated} 
-            groups={groups}
+            allGroups={groups}
           >
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
               <Pencil className="mr-2 h-4 w-4" />

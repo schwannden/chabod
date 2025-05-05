@@ -14,7 +14,7 @@ export type Event = Database["public"]["Tables"]["events"]["Row"];
 export type EventGroup = Database["public"]["Tables"]["events_groups"]["Row"];
 
 export type EventWithGroups = Event & {
-  groups?: string[];
+  groups?: Group[];
 };
 
 export type TenantWithUsage = Tenant & {
