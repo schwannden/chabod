@@ -14,6 +14,8 @@ import { useTenantRole } from "@/hooks/useTenantRole";
 import { useServiceEventFilters } from "@/hooks/useServiceEventFilters";
 import { useServiceEvents } from "@/hooks/useServiceEvents";
 import { ServiceEventAddButton } from "@/components/ServiceEvents/ServiceEventAddButton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ServiceEventList } from "@/components/ServiceEvents/ServiceEventList";
 
 export default function ServiceEventPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -29,6 +31,7 @@ export default function ServiceEventPage() {
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [canCreateEvent, setCanCreateEvent] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("calendar");
   const { toast } = useToast();
 
   // Use our custom hooks
@@ -124,7 +127,6 @@ export default function ServiceEventPage() {
   const handleEventCreated = () => {
     // Force refetch of events when a new event is created
     // The useServiceEvents hook will automatically refetch when dependencies change
-    const randomUpdate = Math.random(); // Force the useEffect to re-run
     setSelectedGroup(prev => prev); // This triggers a re-render
   };
 
@@ -141,11 +143,30 @@ export default function ServiceEventPage() {
         ) : null
       }
     >
-      <ServiceEventCalendar 
-        serviceEvents={serviceEvents}
-        services={services}
-        isLoading={isEventsLoading}
-      />
+      <Tabs defaultValue="calendar" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="calendar">日曆視圖</TabsTrigger>
+          <TabsTrigger value="list">列表視圖</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="calendar" className="mt-0">
+          <ServiceEventCalendar 
+            serviceEvents={serviceEvents}
+            services={services}
+            isLoading={isEventsLoading}
+          />
+        </TabsContent>
+        
+        <TabsContent value="list" className="mt-0">
+          <ServiceEventList
+            serviceEvents={serviceEvents}
+            isLoading={isEventsLoading}
+            tenantId={tenant?.id || ""}
+            onEventUpdated={handleEventCreated}
+            services={services}
+          />
+        </TabsContent>
+      </Tabs>
 
       <ServiceEventFilterBar
         groups={groups || []}
