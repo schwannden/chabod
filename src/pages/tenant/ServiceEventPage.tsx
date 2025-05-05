@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
-import { Group } from "@/lib/types";
+import { Group, Service } from "@/lib/types";
 import { useToast } from "@/components/ui/use-toast";
 import { ServiceEventCalendar } from "@/components/ServiceEvents/ServiceEventCalendar";
 import { ServiceEventFilterBar } from "@/components/ServiceEvents/ServiceEventFilterBar";
@@ -13,18 +13,14 @@ import { useServiceEvents } from "@/hooks/useServiceEvents";
 import { ServiceEventAddButton } from "@/components/ServiceEvents/ServiceEventAddButton";
 import { ServiceEventList } from "@/components/ServiceEvents/ServiceEventList";
 import { GenericEventPage } from "@/components/shared/GenericEventPage";
+import { getTenantGroups } from "@/lib/group-service";
 
 export default function ServiceEventPage() {
   const { slug } = useParams<{ slug: string }>();
   const { user } = useSession();
   const { role } = useTenantRole(slug, user?.id);
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [services, setServices] = useState<{
-    id: string;
-    name: string;
-    default_start_time?: string | null;
-    default_end_time?: string | null;
-  }[]>([]);
+  const [allGroups, setAllGroups] = useState<Group[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [canCreateEvent, setCanCreateEvent] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -65,16 +61,11 @@ export default function ServiceEventPage() {
   const fetchBaseData = useCallback(async (id: string) => {
     setTenantId(id);
     
-    const fetchGroups = async (id: string) => {
+    const fetchAllGroups = async (id: string) => {
       if (!id) return;
       try {
-        const { data, error } = await supabase
-          .from("groups")
-          .select("*")
-          .eq("tenant_id", id);
-          
-        if (error) throw error;
-        setGroups(data || []);
+        const groups = await getTenantGroups(id);
+        setAllGroups(groups || []);
       } catch (error) {
         console.error("Error fetching groups:", error);
         toast({
@@ -90,7 +81,7 @@ export default function ServiceEventPage() {
       try {
         const { data, error } = await supabase
           .from("services")
-          .select("id, name, default_start_time, default_end_time")
+          .select()
           .eq("tenant_id", id);
           
         if (error) throw error;
@@ -106,7 +97,7 @@ export default function ServiceEventPage() {
     };
     
     await Promise.all([
-      fetchGroups(id),
+      fetchAllGroups(id),
       fetchServices(id)
     ]);
   }, [toast]);
@@ -129,7 +120,7 @@ export default function ServiceEventPage() {
       }
       filterBar={
         <ServiceEventFilterBar
-          groups={groups || []}
+          allGroups={allGroups || []}
           services={services || []}
           selectedGroup={selectedGroup}
           setSelectedGroup={setSelectedGroup}

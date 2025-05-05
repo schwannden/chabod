@@ -18,7 +18,7 @@ interface EventCardProps {
   isEditable: boolean;
   onEventUpdated: () => void;
   onDeleteEvent: (eventId: string) => Promise<void>;
-  groups: Group[];
+  allGroups: Group[];
 }
 
 export function EventCard({ 
@@ -26,7 +26,7 @@ export function EventCard({
   isEditable,
   onEventUpdated, 
   onDeleteEvent,
-  groups 
+  allGroups
 }: EventCardProps) {
   return (
     <Card className="relative">
@@ -77,7 +77,7 @@ export function EventCard({
           event={event}
           onEventUpdated={onEventUpdated}
           onDeleteEvent={onDeleteEvent}
-          groups={groups}
+          allGroups={allGroups}
         />
       )}
     </Card>

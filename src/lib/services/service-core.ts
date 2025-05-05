@@ -7,7 +7,6 @@ export async function getServices(tenantId: string): Promise<Service[]> {
     .from("services")
     .select("*")
     .eq("tenant_id", tenantId)
-    .order("name");
 
   if (error) {
     console.error("Error fetching services:", error);

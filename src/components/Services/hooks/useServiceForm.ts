@@ -9,7 +9,7 @@ import { NoteFormValues } from "../Forms/ServiceNotesForm";
 import { RoleFormValues } from "../Forms/ServiceRolesForm";
 import { getTenantMembers } from "@/lib/member-service";
 import { getTenantGroups } from "@/lib/group-service";
-import { getGroupsForService, getServiceNotes, getServiceRoles } from "@/lib/services";
+import { getServiceGroups, getServiceNotes, getServiceRoles } from "@/lib/services";
 
 // Make sure name and tenant_id are required fields
 export const serviceFormSchema = z.object({
@@ -71,7 +71,7 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
   const fetchServiceGroups = useCallback(async () => {
     if (!service) return;
     try {
-      const groupIds = await getGroupsForService(service.id);
+      const groupIds = await getServiceGroups(service.id);
       setSelectedGroups(groupIds);
     } catch (error) {
       console.error("Error fetching service groups:", error);

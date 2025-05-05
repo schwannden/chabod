@@ -25,10 +25,10 @@ interface EventActionsProps {
   event: EventWithGroups;
   onEventUpdated: () => void;
   onDeleteEvent: (eventId: string) => Promise<void>;
-  groups: Group[];
+  allGroups: Group[];
 }
 
-export function EventActions({ event, onEventUpdated, onDeleteEvent, groups }: EventActionsProps) {
+export function EventActions({ event, onEventUpdated, onDeleteEvent, allGroups }: EventActionsProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
 
   return (
@@ -44,7 +44,7 @@ export function EventActions({ event, onEventUpdated, onDeleteEvent, groups }: E
           <EditEventDialog 
             event={event} 
             onEventUpdated={onEventUpdated} 
-            allGroups={groups}
+            allGroups={allGroups}
           >
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
               <Pencil className="mr-2 h-4 w-4" />

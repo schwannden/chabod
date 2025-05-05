@@ -13,10 +13,10 @@ interface EventListProps {
   isLoading: boolean;
   tenantId: string;
   onEventUpdated: () => void;
-  groups: Group[];
+  allGroups: Group[];
 }
 
-export function EventList({ events, isLoading, tenantId, onEventUpdated, groups }: EventListProps) {
+export function EventList({ events, isLoading, tenantId, onEventUpdated, allGroups }: EventListProps) {
   const { user } = useSession();
   const { toast } = useToast();
   const [editableEvents, setEditableEvents] = useState<Record<string, boolean>>({});
@@ -86,13 +86,6 @@ export function EventList({ events, isLoading, tenantId, onEventUpdated, groups 
 
   const handleDeleteEvent = async (eventId: string) => {
     try {
-      const { error: groupsError } = await supabase
-        .from("events_groups")
-        .delete()
-        .eq("event_id", eventId);
-
-      if (groupsError) throw groupsError;
-
       const { error } = await supabase
         .from("events")
         .delete()
@@ -145,7 +138,7 @@ export function EventList({ events, isLoading, tenantId, onEventUpdated, groups 
           isEditable={editableEvents[event.id] || false}
           onEventUpdated={onEventUpdated}
           onDeleteEvent={handleDeleteEvent}
-          groups={groups}
+          allGroups={allGroups}
         />
       ))}
     </div>

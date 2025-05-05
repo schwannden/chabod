@@ -59,3 +59,15 @@ export async function deleteServiceRole(id: string): Promise<void> {
     throw error;
   }
 }
+
+export async function deleteServiceRoles(serviceId: string): Promise<void> {
+  const { error } = await supabase
+    .from("service_roles")
+    .delete()
+    .eq("service_id", serviceId);
+
+  if (error) {
+    console.error("Error deleting service roles:", error);
+    throw error;
+  }
+}

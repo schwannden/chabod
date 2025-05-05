@@ -10,7 +10,6 @@ export async function getTenantGroups(tenantId: string): Promise<GroupWithMember
     .from("groups")
     .select("*")
     .eq("tenant_id", tenantId)
-    .order("name");
 
   if (error) {
     console.error("Error fetching groups:", error);

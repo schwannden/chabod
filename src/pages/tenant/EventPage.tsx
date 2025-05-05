@@ -11,12 +11,13 @@ import { useToast } from "@/components/ui/use-toast";
 import { EventCalendar } from "@/components/Events/EventCalendar";
 import { GenericEventPage } from "@/components/shared/GenericEventPage";
 import { useEventFilters } from "@/hooks/useEventFilters";
+import { getTenantGroups } from "@/lib/group-service";
 
 export default function EventPage() {
   const { slug } = useParams<{ slug: string }>();
   const { user } = useSession();
   const [events, setEvents] = useState<EventWithGroups[]>([]);
-  const [groups, setGroups] = useState<Group[]>([]);
+  const [allGroups, setAllGroups] = useState<Group[]>([]);
   const [isEventsLoading, setIsEventsLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { toast } = useToast();
@@ -86,15 +87,10 @@ export default function EventPage() {
     }
   }, [selectedGroup, startDate, endDate, toast]);
 
-  const fetchGroups = useCallback(async (tenantId: string) => {
+  const fetchAllGroups = useCallback(async (tenantId: string) => {
     try {
-      const { data, error } = await supabase
-        .from("groups")
-        .select("*")
-        .eq("tenant_id", tenantId);
-        
-      if (error) throw error;
-      setGroups(data || []);
+      const groups = await getTenantGroups(tenantId);
+      setAllGroups(groups || []);
     } catch (error) {
       console.error("Error fetching groups:", error);
       toast({
@@ -113,12 +109,6 @@ export default function EventPage() {
     setRefreshTrigger(prev => prev + 1);
   };
 
-  // Convert EventWithGroups (with groups as Group[]) to format expected by EventCalendar (with groups as string[])
-  const eventsForCalendar = events.map(event => ({
-    ...event,
-    groups: event.groups?.map(group => group.id) || []
-  }));
-
   // Return the refactored page using the generic component
   return slug ? (
     <GenericEventPage
@@ -126,14 +116,13 @@ export default function EventPage() {
       title="活動"
       calendar={
         <EventCalendar 
-          events={eventsForCalendar}
-          groups={groups || []}
+          events={events}
           isLoading={isEventsLoading}
         />
       }
       filterBar={
         <EventFilterBar
-          groups={groups || []}
+          allGroups={allGroups || []}
           selectedGroup={selectedGroup}
           setSelectedGroup={setSelectedGroup}
           startDate={startDate}
@@ -148,7 +137,7 @@ export default function EventPage() {
           isLoading={isEventsLoading} 
           tenantId={slug}
           onEventUpdated={handleEventUpdated}
-          groups={groups || []}
+          allGroups={allGroups || []}
         />
       }
       actionButton={
@@ -156,11 +145,11 @@ export default function EventPage() {
           <CreateEventDialog 
             tenantId={slug} 
             onEventCreated={handleEventUpdated}
-            allGroups={groups || []}
+            allGroups={allGroups || []}
           />
         ) : null
       }
-      fetchBaseData={fetchGroups}
+      fetchBaseData={fetchAllGroups}
     />
   ) : null;
 }

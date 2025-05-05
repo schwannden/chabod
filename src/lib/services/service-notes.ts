@@ -58,3 +58,16 @@ export async function deleteServiceNote(id: string): Promise<void> {
     throw error;
   }
 }
+
+
+export async function deleteServiceNotes(serviceId: string): Promise<void> {
+  const { error } = await supabase
+    .from("service_notes")
+    .delete()
+    .eq("service_id", serviceId);
+
+  if (error) {
+    console.error("Error deleting service notes:", error);
+    throw error;
+  }
+}

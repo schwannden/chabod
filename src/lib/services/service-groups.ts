@@ -30,7 +30,7 @@ export async function removeServiceGroup(serviceId: string, groupId: string): Pr
   }
 }
 
-export async function getGroupsForService(serviceId: string): Promise<string[]> {
+export async function getServiceGroups(serviceId: string): Promise<string[]> {
   const { data, error } = await supabase
     .from("service_groups")
     .select("group_id")

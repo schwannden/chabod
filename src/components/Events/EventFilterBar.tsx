@@ -2,7 +2,7 @@ import { Group } from "@/lib/types";
 import { GenericFilterBar, FilterConfig } from "@/components/shared/GenericFilterBar";
 
 interface EventFilterBarProps {
-  groups: Group[];
+  allGroups: Group[];
   selectedGroup: string;
   setSelectedGroup: (value: string) => void;
   startDate: Date | undefined;
@@ -12,7 +12,7 @@ interface EventFilterBarProps {
 }
 
 export function EventFilterBar({
-  groups,
+  allGroups,
   selectedGroup,
   setSelectedGroup,
   startDate,
@@ -28,7 +28,7 @@ export function EventFilterBar({
       id: 'group-filter',
       label: 'Group',
       placeholder: 'Select Group',
-      options: groups,
+      options: allGroups,
       value: selectedGroup,
       onChange: setSelectedGroup,
     },

@@ -1,20 +1,8 @@
-import { Group } from "@/lib/types";
-import { GenericFilterBar, BaseFilterOption, FilterConfig } from "@/components/shared/GenericFilterBar";
-
-// Define a service type for the filter
-interface Service extends BaseFilterOption {
-  id: string;
-  name: string;
-  default_start_time?: string | null;
-  default_end_time?: string | null;
-  tenant_id: string;
-  description: string | null;
-  created_at: string;
-  updated_at: string;
-}
+import { Group, Service } from "@/lib/types";
+import { GenericFilterBar, FilterConfig } from "@/components/shared/GenericFilterBar";
 
 interface ServiceEventFilterBarProps {
-  groups: Group[];
+  allGroups: Group[];
   services: Service[];
   selectedGroup: string;
   setSelectedGroup: (value: string) => void;
@@ -27,7 +15,7 @@ interface ServiceEventFilterBarProps {
 }
 
 export function ServiceEventFilterBar({
-  groups,
+  allGroups,
   services,
   selectedGroup,
   setSelectedGroup,
@@ -46,7 +34,7 @@ export function ServiceEventFilterBar({
       id: 'group-filter',
       label: '組別',
       placeholder: '選擇組別',
-      options: groups,
+      options: allGroups,
       value: selectedGroup,
       onChange: setSelectedGroup,
     },

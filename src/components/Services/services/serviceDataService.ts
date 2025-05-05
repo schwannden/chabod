@@ -1,8 +1,21 @@
-import { supabase } from "@/integrations/supabase/client";
 import { ServiceFormValues } from "../hooks/useServiceForm";
 import { NoteFormValues } from "../Forms/ServiceNotesForm";
 import { RoleFormValues } from "../Forms/ServiceRolesForm";
 import { toast } from "sonner";
+import {
+  createService,
+  updateService,
+  addServiceAdmin,
+  removeServiceAdmin,
+  addServiceGroup,
+  removeServiceGroup,
+  addServiceNote,
+  addServiceRole,
+  getServiceAdmins,
+  getServiceGroups,
+  deleteServiceNotes,
+  deleteServiceRoles
+} from "@/lib/services";
 
 interface AdditionalData {
   admins: string[];
@@ -16,80 +29,44 @@ export async function saveServiceData(
   additionalData: AdditionalData
 ): Promise<string | null> {
   try {
-    // Insert the service
-    const { data: service, error: serviceError } = await supabase
-      .from("services")
-      .insert({
-        name: formData.name,
-        tenant_id: formData.tenant_id,
-        default_start_time: formData.default_start_time || null,
-        default_end_time: formData.default_end_time || null,
-      })
-      .select()
-      .single();
-
-    if (serviceError) throw serviceError;
+    // Insert the service using service-core function
+    const service = await createService({
+      name: formData.name,
+      tenant_id: formData.tenant_id,
+      default_start_time: formData.default_start_time || null,
+      default_end_time: formData.default_end_time || null,
+    });
 
     const serviceId = service.id;
 
-    // Add admins
-    if (additionalData.admins.length > 0) {
-      const adminInserts = additionalData.admins.map((adminId) => ({
-        service_id: serviceId,
-        user_id: adminId,
-      }));
-
-      const { error: adminsError } = await supabase
-        .from("service_admins")
-        .insert(adminInserts);
-
-      if (adminsError) throw adminsError;
+    // Add admins using service-admin functions
+    for (const adminId of additionalData.admins) {
+      await addServiceAdmin(serviceId, adminId);
     }
 
-    // Add groups
-    if (additionalData.groups.length > 0) {
-      const groupInserts = additionalData.groups.map((groupId) => ({
-        service_id: serviceId,
-        group_id: groupId,
-      }));
-
-      const { error: groupsError } = await supabase
-        .from("service_groups")
-        .insert(groupInserts);
-
-      if (groupsError) throw groupsError;
+    // Add groups using service-groups functions
+    for (const groupId of additionalData.groups) {
+      await addServiceGroup(serviceId, groupId);
     }
 
-    // Add notes
-    if (additionalData.notes.length > 0) {
-      const noteInserts = additionalData.notes.map((note) => ({
+    // Add notes using service-notes function
+    for (const note of additionalData.notes) {
+      await addServiceNote({
         service_id: serviceId,
         tenant_id: formData.tenant_id,
         text: note.text,
         link: note.link || null
-      }));
-
-      const { error: notesError } = await supabase
-        .from("service_notes")
-        .insert(noteInserts);
-
-      if (notesError) throw notesError;
+      });
     }
 
-    // Add roles
-    if (additionalData.roles.length > 0) {
-      const roleInserts = additionalData.roles.map((role) => ({
+    // Add roles using service-roles function
+    for (const role of additionalData.roles) {
+      await addServiceRole({
         service_id: serviceId,
         tenant_id: formData.tenant_id,
         name: role.name,
-        description: role.description || null, // Handle empty description
-      }));
-
-      const { error: rolesError } = await supabase
-        .from("service_roles")
-        .insert(roleInserts);
-
-      if (rolesError) throw rolesError;
+        description: role.description || null
+      });
     }
 
     toast.success("服事類型已創建");
@@ -107,104 +84,67 @@ export async function updateServiceData(
   additionalData: AdditionalData
 ): Promise<boolean> {
   try {
-    // Update the service
-    const { error: serviceError } = await supabase
-      .from("services")
-      .update({
-        name: formData.name,
-        default_start_time: formData.default_start_time || null,
-        default_end_time: formData.default_end_time || null,
-      })
-      .eq("id", serviceId);
+    // Update the service using service-core function
+    await updateService(serviceId, {
+      name: formData.name,
+      default_start_time: formData.default_start_time || null,
+      default_end_time: formData.default_end_time || null,
+    });
 
-    if (serviceError) throw serviceError;
-
-    // Remove existing admins and add new ones
-    const { error: deleteAdminsError } = await supabase
-      .from("service_admins")
-      .delete()
-      .eq("service_id", serviceId);
-
-    if (deleteAdminsError) throw deleteAdminsError;
-
-    if (additionalData.admins.length > 0) {
-      const adminInserts = additionalData.admins.map((adminId) => ({
-        service_id: serviceId,
-        user_id: adminId,
-      }));
-
-      const { error: adminsError } = await supabase
-        .from("service_admins")
-        .insert(adminInserts);
-
-      if (adminsError) throw adminsError;
+    // For update, we need to handle removing existing relationships first
+    // Remove existing admins
+    const existingAdmins = await getServiceAdmins(serviceId);
+    
+    if (existingAdmins) {
+      for (const admin of existingAdmins) {
+        await removeServiceAdmin(serviceId, admin.user_id);
+      }
     }
 
-    // Remove existing groups and add new ones
-    const { error: deleteGroupsError } = await supabase
-      .from("service_groups")
-      .delete()
-      .eq("service_id", serviceId);
-
-    if (deleteGroupsError) throw deleteGroupsError;
-
-    if (additionalData.groups.length > 0) {
-      const groupInserts = additionalData.groups.map((groupId) => ({
-        service_id: serviceId,
-        group_id: groupId,
-      }));
-
-      const { error: groupsError } = await supabase
-        .from("service_groups")
-        .insert(groupInserts);
-
-      if (groupsError) throw groupsError;
+    // Add new admins
+    for (const adminId of additionalData.admins) {
+      await addServiceAdmin(serviceId, adminId);
     }
 
+    // Remove existing groups
+    const existingGroups = await getServiceGroups(serviceId);
+    
+    if (existingGroups) {
+      for (const group_id of existingGroups) {
+        await removeServiceGroup(serviceId, group_id);
+      }
+    }
+
+    // Add new groups
+    for (const groupId of additionalData.groups) {
+      await addServiceGroup(serviceId, groupId);
+    }
+
+    // For notes and roles, we'll still use the batch delete approach since there's no direct function for it
     // Remove existing notes and add new ones
-    const { error: deleteNotesError } = await supabase
-      .from("service_notes")
-      .delete()
-      .eq("service_id", serviceId);
+    await deleteServiceNotes(serviceId);
 
-    if (deleteNotesError) throw deleteNotesError;
-
-    if (additionalData.notes.length > 0) {
-      const noteInserts = additionalData.notes.map((note) => ({
+    // Add new notes
+    for (const note of additionalData.notes) {
+      await addServiceNote({
         service_id: serviceId,
         tenant_id: formData.tenant_id,
         text: note.text,
         link: note.link || null
-      }));
-
-      const { error: notesError } = await supabase
-        .from("service_notes")
-        .insert(noteInserts);
-
-      if (notesError) throw notesError;
+      });
     }
 
     // Remove existing roles and add new ones
-    const { error: deleteRolesError } = await supabase
-      .from("service_roles")
-      .delete()
-      .eq("service_id", serviceId);
+    await deleteServiceRoles(serviceId);
 
-    if (deleteRolesError) throw deleteRolesError;
-
-    if (additionalData.roles.length > 0) {
-      const roleInserts = additionalData.roles.map((role) => ({
+    // Add new roles
+    for (const role of additionalData.roles) {
+      await addServiceRole({
         service_id: serviceId,
         tenant_id: formData.tenant_id,
         name: role.name,
-        description: role.description || null, // Handle empty description
-      }));
-
-      const { error: rolesError } = await supabase
-        .from("service_roles")
-        .insert(roleInserts);
-
-      if (rolesError) throw rolesError;
+        description: role.description || null
+      });
     }
 
     toast.success("服事類型已更新");
