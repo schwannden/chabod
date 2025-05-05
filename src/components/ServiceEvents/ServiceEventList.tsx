@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ServiceEventWithService } from "@/lib/services/types";
 import { Loader2 } from "lucide-react";
@@ -101,6 +102,8 @@ export function ServiceEventList({
         title: "事件刪除成功",
         description: "服事排班已刪除",
       });
+      
+      // Call the onEventUpdated callback to refresh the parent components
       onEventUpdated();
     } catch (error) {
       console.error("Error deleting service event:", error);

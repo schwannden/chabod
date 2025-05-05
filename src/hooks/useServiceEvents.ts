@@ -11,6 +11,7 @@ interface UseServiceEventsProps {
   selectedService: string;
   startDate?: Date;
   endDate?: Date;
+  refreshTrigger?: number; // Add a refreshTrigger that will cause the hook to refresh when incremented
 }
 
 export function useServiceEvents({
@@ -19,6 +20,7 @@ export function useServiceEvents({
   selectedService,
   startDate,
   endDate,
+  refreshTrigger = 0, // Default to 0 if not provided
 }: UseServiceEventsProps) {
   const [serviceEvents, setServiceEvents] = useState<ServiceEventWithService[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -80,7 +82,7 @@ export function useServiceEvents({
     };
 
     fetchServiceEvents();
-  }, [tenantId, selectedGroup, selectedService, startDate, endDate, toast]);
+  }, [tenantId, selectedGroup, selectedService, startDate, endDate, toast, refreshTrigger]); // Add refreshTrigger as a dependency
 
   return { serviceEvents, isLoading };
 }

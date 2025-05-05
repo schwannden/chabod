@@ -36,6 +36,12 @@ export function ServiceEventRow({
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+  const handleDelete = async () => {
+    await onDeleteEvent(event.id);
+    // Explicitly call onEventUpdated to refresh the list
+    onEventUpdated();
+  };
+
   return (
     <>
       <TableRow>
@@ -69,9 +75,7 @@ export function ServiceEventRow({
                   <AlertDialogFooter>
                     <AlertDialogCancel>取消</AlertDialogCancel>
                     <AlertDialogAction
-                      onClick={async () => {
-                        await onDeleteEvent(event.id);
-                      }}
+                      onClick={handleDelete}
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     >
                       刪除

@@ -30,6 +30,7 @@ export default function ServiceEventPage() {
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [canCreateEvent, setCanCreateEvent] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // Add a refresh trigger state
   const { toast } = useToast();
 
   // Use our custom hooks
@@ -49,7 +50,8 @@ export default function ServiceEventPage() {
     selectedGroup,
     selectedService,
     startDate,
-    endDate
+    endDate,
+    refreshTrigger // Pass the refreshTrigger to the hook
   });
 
   useEffect(() => {
@@ -122,9 +124,9 @@ export default function ServiceEventPage() {
     }
   }, [tenant]);
 
-  const handleEventCreated = () => {
-    // Force refetch of events when a new event is created
-    setSelectedGroup(prev => prev); // This triggers a re-render
+  const handleEventUpdated = () => {
+    // Increment the refresh trigger to force a refetch of events
+    setRefreshTrigger(prev => prev + 1);
   };
 
   return (
@@ -166,7 +168,7 @@ export default function ServiceEventPage() {
         serviceEvents={serviceEvents}
         isLoading={isEventsLoading}
         tenantId={tenant?.id || ""}
-        onEventUpdated={handleEventCreated}
+        onEventUpdated={handleEventUpdated}
         services={services}
       />
       
@@ -174,7 +176,7 @@ export default function ServiceEventPage() {
         <CreateServiceEventDialog
           isOpen={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
-          onEventCreated={handleEventCreated}
+          onEventCreated={handleEventUpdated}
           tenantId={tenant?.id || ""}
           services={services}
         />
