@@ -1,6 +1,6 @@
 
 import { useParams } from "react-router-dom";
-import { useSession } from "@/contexts/AuthContext";
+import { useSession } from "@/hooks/useSession";
 import { TenantPageLayout } from "@/components/Layout/TenantPageLayout";
 import { useQuery } from "@tanstack/react-query";
 import { getTenantBySlug } from "@/lib/tenant-utils";

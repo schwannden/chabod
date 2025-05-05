@@ -18,7 +18,6 @@ interface MemberTableProps {
 
 export function MemberTable({ 
   members, 
-  currentUserId, 
   isCurrentUserOwner, 
   onMemberUpdated 
 }: MemberTableProps) {
@@ -127,7 +126,7 @@ export function MemberTable({
     }
   };
 
-  const sortedMembers = [...members].sort((a, b) => {
+  const sortedMembers = [...members].sort((a) => {
     return a.role === "owner" ? -1 : 1;
   });
 

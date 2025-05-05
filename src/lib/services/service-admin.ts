@@ -1,5 +1,4 @@
 import { supabase } from "@/integrations/supabase/client";
-import { ServiceAdmin } from "./types";
 
 export interface ServiceAdminWithProfile {
   id: string;

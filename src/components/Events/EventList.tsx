@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Event, Group } from "@/lib/types";
 import { Loader2 } from "lucide-react";
-import { useSession } from "@/contexts/AuthContext";
+import { useSession } from "@/hooks/useSession";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";

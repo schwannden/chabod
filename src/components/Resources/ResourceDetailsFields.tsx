@@ -3,8 +3,6 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Check, ChevronsUpDown } from "lucide-react";
 import { AVAILABLE_ICONS } from "./resource-icons";
 import { Group } from "@/lib/types";
 import {

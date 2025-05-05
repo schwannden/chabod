@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -50,41 +50,25 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
     },
   });
 
-  // Fetch data when dialog opens
-  useEffect(() => {
-    if (isOpen) {
-      fetchTenantMembers();
-      fetchTenantGroups();
-      
-      // If editing, fetch service-specific data
-      if (isEditMode && service) {
-        fetchServiceGroups();
-        fetchServiceAdmins();
-        fetchServiceNotes();
-        fetchServiceRoles();
-      }
-    }
-  }, [isOpen, isEditMode, service?.id]);
-
-  const fetchTenantMembers = async () => {
+  const fetchTenantMembers = useCallback(async () => {
     try {
       const fetchedMembers = await getTenantMembers(tenantId);
       setMembers(fetchedMembers);
     } catch (error) {
       console.error("Error fetching tenant members:", error);
     }
-  };
+  }, [tenantId]);
 
-  const fetchTenantGroups = async () => {
+  const fetchTenantGroups = useCallback(async () => {
     try {
       const fetchedGroups = await getTenantGroups(tenantId);
       setGroups(fetchedGroups);
     } catch (error) {
       console.error("Error fetching tenant groups:", error);
     }
-  };
+  }, [tenantId]);
 
-  const fetchServiceGroups = async () => {
+  const fetchServiceGroups = useCallback(async () => {
     if (!service) return;
     try {
       const groupIds = await getGroupsForService(service.id);
@@ -92,9 +76,9 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
     } catch (error) {
       console.error("Error fetching service groups:", error);
     }
-  };
+  }, [service]);
 
-  const fetchServiceAdmins = async () => {
+  const fetchServiceAdmins = useCallback(async () => {
     if (!service) return;
     try {
       const { data, error } = await supabase
@@ -109,9 +93,9 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
     } catch (error) {
       console.error("Error fetching service admins:", error);
     }
-  };
+  }, [service]);
 
-  const fetchServiceNotes = async () => {
+  const fetchServiceNotes = useCallback(async () => {
     if (!service) return;
     try {
       const fetchedNotes = await getServiceNotes(service.id);
@@ -124,9 +108,9 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
     } catch (error) {
       console.error("Error fetching service notes:", error);
     }
-  };
+  }, [service]);
 
-  const fetchServiceRoles = async () => {
+  const fetchServiceRoles = useCallback(async () => {
     if (!service) return;
     try {
       const fetchedRoles = await getServiceRoles(service.id);
@@ -139,7 +123,24 @@ export const useServiceForm = ({ tenantId, service, isOpen }: UseServiceFormProp
     } catch (error) {
       console.error("Error fetching service roles:", error);
     }
-  };
+  }, [service]);
+
+  // Fetch data when dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchTenantMembers();
+      fetchTenantGroups();
+      
+      // If editing, fetch service-specific data
+      if (isEditMode && service) {
+        fetchServiceGroups();
+        fetchServiceAdmins();
+        fetchServiceNotes();
+        fetchServiceRoles();
+      }
+    }
+  }, [isOpen, isEditMode, service, fetchTenantMembers, fetchTenantGroups, 
+    fetchServiceGroups, fetchServiceAdmins, fetchServiceNotes, fetchServiceRoles]);
 
   const resetForm = () => {
     setActiveTab("details");

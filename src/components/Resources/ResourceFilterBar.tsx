@@ -1,5 +1,5 @@
 
-import { Search, ListFilter } from "lucide-react";
+import { Search } from "lucide-react";
 import { FilterLayout } from "@/components/Layout/FilterLayout";
 import { FilterGroup } from "@/components/Layout/FilterGroup";
 import { Input } from "@/components/ui/input";

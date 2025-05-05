@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthTabs } from "@/components/Auth/AuthTabs";
 import { NavBar } from "@/components/Layout/NavBar";
-import { useSession } from "@/contexts/AuthContext";
+import { useSession } from "@/hooks/useSession";
 
 export default function AuthPage() {
   const { user, isLoading } = useSession();

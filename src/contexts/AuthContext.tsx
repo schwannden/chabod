@@ -1,17 +1,9 @@
-
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Profile, SessionContextType } from "@/lib/types";
+import { Profile } from "@/lib/types";
 import { Session, User } from "@supabase/supabase-js";
-
-const SessionContext = createContext<SessionContextType>({
-  session: null,
-  user: null,
-  profile: null,
-  isLoading: true,
-  signOut: async () => {},
-});
+import { SessionContext } from "./SessionContext";
 
 export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
@@ -96,12 +88,4 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       {children}
     </SessionContext.Provider>
   );
-};
-
-export const useSession = () => {
-  const context = useContext(SessionContext);
-  if (context === undefined) {
-    throw new Error("useSession must be used within a SessionProvider");
-  }
-  return context;
 };

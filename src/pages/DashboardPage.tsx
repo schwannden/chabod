@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSession } from "@/contexts/AuthContext";
+import { useSession } from "@/hooks/useSession";
 import { NavBar } from "@/components/Layout/NavBar";
 import { TenantCard } from "@/components/Tenants/TenantCard";
 import { TenantCreateDialog } from "@/components/Tenants/TenantCreateDialog";

@@ -1,25 +1,23 @@
-
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { useSession } from "@/contexts/AuthContext";
-import { TenantPageLayout } from "@/components/Layout/TenantPageLayout";
+import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
-import { getTenantBySlug } from "@/lib/tenant-utils";
-import { Tenant, Group } from "@/lib/types";
+import { Group } from "@/lib/types";
 import { useToast } from "@/components/ui/use-toast";
 import { ServiceEventCalendar } from "@/components/ServiceEvents/ServiceEventCalendar";
 import { ServiceEventFilterBar } from "@/components/ServiceEvents/ServiceEventFilterBar";
 import { CreateServiceEventDialog } from "@/components/ServiceEvents/CreateServiceEventDialog";
 import { useTenantRole } from "@/hooks/useTenantRole";
-import { useServiceEventFilters } from "@/hooks/useServiceEventFilters";
+import { useEventFilters } from "@/hooks/useEventFilters";
 import { useServiceEvents } from "@/hooks/useServiceEvents";
 import { ServiceEventAddButton } from "@/components/ServiceEvents/ServiceEventAddButton";
 import { ServiceEventList } from "@/components/ServiceEvents/ServiceEventList";
+import { GenericEventPage } from "@/components/shared/GenericEventPage";
 
 export default function ServiceEventPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { user, isLoading } = useSession();
-  const { role, isLoading: isRoleLoading } = useTenantRole(slug, user?.id);
+  const { user } = useSession();
+  const { role } = useTenantRole(slug, user?.id);
   const [groups, setGroups] = useState<Group[]>([]);
   const [services, setServices] = useState<{
     id: string;
@@ -27,46 +25,33 @@ export default function ServiceEventPage() {
     default_start_time?: string | null;
     default_end_time?: string | null;
   }[]>([]);
-  const [tenant, setTenant] = useState<Tenant | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [canCreateEvent, setCanCreateEvent] = useState(false);
-  const [refreshTrigger, setRefreshTrigger] = useState(0); // Add a refresh trigger state
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [tenantId, setTenantId] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Use our custom hooks
+  // Use the shared event filters hook
   const {
     selectedGroup,
     setSelectedGroup,
-    selectedService,
-    setSelectedService,
+    selectedSecondary: selectedService,
+    setSelectedSecondary: setSelectedService,
     startDate,
     setStartDate,
     endDate,
     setEndDate
-  } = useServiceEventFilters();
+  } = useEventFilters();
 
+  // Use our service events hook
   const { serviceEvents, isLoading: isEventsLoading } = useServiceEvents({
-    tenantId: tenant?.id || null,
+    tenantId,
     selectedGroup,
     selectedService,
     startDate,
     endDate,
-    refreshTrigger // Pass the refreshTrigger to the hook
+    refreshTrigger
   });
-
-  useEffect(() => {
-    const fetchTenant = async () => {
-      if (!slug) return;
-      try {
-        const tenantData = await getTenantBySlug(slug);
-        setTenant(tenantData);
-      } catch (error) {
-        console.error("Error fetching tenant:", error);
-      }
-    };
-    
-    fetchTenant();
-  }, [slug]);
 
   useEffect(() => {
     // Check if user can create events (is a service admin or tenant owner)
@@ -77,110 +62,111 @@ export default function ServiceEventPage() {
     }
   }, [role, user]);
 
-  const fetchGroups = async () => {
-    if (!tenant?.id) return;
-    try {
-      const { data, error } = await supabase
-        .from("groups")
-        .select("*")
-        .eq("tenant_id", tenant.id);
-        
-      if (error) throw error;
-      setGroups(data || []);
-    } catch (error) {
-      console.error("Error fetching groups:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load groups. Some features may be limited.",
-        variant: "destructive",
-      });
-    }
-  };
+  const fetchBaseData = useCallback(async (id: string) => {
+    setTenantId(id);
+    
+    const fetchGroups = async (id: string) => {
+      if (!id) return;
+      try {
+        const { data, error } = await supabase
+          .from("groups")
+          .select("*")
+          .eq("tenant_id", id);
+          
+        if (error) throw error;
+        setGroups(data || []);
+      } catch (error) {
+        console.error("Error fetching groups:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load groups. Some features may be limited.",
+          variant: "destructive",
+        });
+      }
+    };
 
-  const fetchServices = async () => {
-    if (!tenant?.id) return;
-    try {
-      const { data, error } = await supabase
-        .from("services")
-        .select("id, name, default_start_time, default_end_time")
-        .eq("tenant_id", tenant.id);
-        
-      if (error) throw error;
-      setServices(data || []);
-    } catch (error) {
-      console.error("Error fetching services:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load services. Some features may be limited.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (tenant?.id) {
-      fetchGroups();
-      fetchServices();
-    }
-  }, [tenant]);
+    const fetchServices = async (id: string) => {
+      if (!id) return;
+      try {
+        const { data, error } = await supabase
+          .from("services")
+          .select("id, name, default_start_time, default_end_time")
+          .eq("tenant_id", id);
+          
+        if (error) throw error;
+        setServices(data || []);
+      } catch (error) {
+        console.error("Error fetching services:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load services. Some features may be limited.",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    await Promise.all([
+      fetchGroups(id),
+      fetchServices(id)
+    ]);
+  }, [toast]);
 
   const handleEventUpdated = () => {
     // Increment the refresh trigger to force a refetch of events
     setRefreshTrigger(prev => prev + 1);
   };
 
-  return (
-    <TenantPageLayout
+  return slug ? (
+    <GenericEventPage
+      slug={slug}
       title="服事表"
-      tenantName={tenant?.name || ""}
-      tenantSlug={slug || ""}
-      isLoading={isLoading || isRoleLoading}
-      breadcrumbItems={[{ label: "服事表" }]}
-      action={
+      calendar={
+        <ServiceEventCalendar 
+          serviceEvents={serviceEvents}
+          services={services}
+          isLoading={isEventsLoading}
+        />
+      }
+      filterBar={
+        <ServiceEventFilterBar
+          groups={groups || []}
+          services={services || []}
+          selectedGroup={selectedGroup}
+          setSelectedGroup={setSelectedGroup}
+          selectedService={selectedService}
+          setSelectedService={setSelectedService}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+        />
+      }
+      listView={
+        <ServiceEventList
+          serviceEvents={serviceEvents}
+          isLoading={isEventsLoading}
+          tenantId={tenantId || ""}
+          onEventUpdated={handleEventUpdated}
+          services={services}
+        />
+      }
+      actionButton={
         canCreateEvent ? (
           <ServiceEventAddButton onClick={() => setIsDialogOpen(true)} />
         ) : null
       }
-    >
-      {/* Calendar View */}
-      <ServiceEventCalendar 
-        serviceEvents={serviceEvents}
-        services={services}
-        isLoading={isEventsLoading}
-      />
-      
-      {/* Filter Bar */}
-      <ServiceEventFilterBar
-        groups={groups || []}
-        services={services || []}
-        selectedGroup={selectedGroup}
-        setSelectedGroup={setSelectedGroup}
-        selectedService={selectedService}
-        setSelectedService={setSelectedService}
-        startDate={startDate}
-        setStartDate={setStartDate}
-        endDate={endDate}
-        setEndDate={setEndDate}
-      />
-      
-      {/* List View */}
-      <ServiceEventList
-        serviceEvents={serviceEvents}
-        isLoading={isEventsLoading}
-        tenantId={tenant?.id || ""}
-        onEventUpdated={handleEventUpdated}
-        services={services}
-      />
-      
-      {isDialogOpen && (
-        <CreateServiceEventDialog
-          isOpen={isDialogOpen}
-          onClose={() => setIsDialogOpen(false)}
-          onEventCreated={handleEventUpdated}
-          tenantId={tenant?.id || ""}
-          services={services}
-        />
-      )}
-    </TenantPageLayout>
-  );
+      dialog={
+        isDialogOpen && (
+          <CreateServiceEventDialog
+            isOpen={isDialogOpen}
+            onClose={() => setIsDialogOpen(false)}
+            onEventCreated={handleEventUpdated}
+            tenantId={tenantId || ""}
+            services={services}
+          />
+        )
+      }
+      fetchBaseData={fetchBaseData}
+    />
+  ) : null;
 }

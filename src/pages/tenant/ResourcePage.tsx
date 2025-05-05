@@ -1,14 +1,14 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useSession } from "@/contexts/AuthContext";
+import { useSession } from "@/hooks/useSession";
 import { ResourceList } from "@/components/Resources/ResourceList";
 import { CreateResourceDialog } from "@/components/Resources/CreateResourceDialog";
 import { ResourceFilterBar } from "@/components/Resources/ResourceFilterBar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Plus } from "lucide-react";
-import { Resource, Group, ResourceGroup } from "@/lib/types";
+import { Resource, Group } from "@/lib/types";
 import { getResources, getResourceGroups } from "@/lib/resource-service";
 import { useTenantRole } from "@/hooks/useTenantRole";
 import { supabase } from "@/integrations/supabase/client";

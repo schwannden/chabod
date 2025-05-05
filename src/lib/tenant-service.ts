@@ -170,7 +170,6 @@ export async function getTenantBySlug(slug: string): Promise<Tenant | null> {
 
     return data;
   } catch (error) {
-    const errorMessage = error?.message || "未知錯誤";
     console.error("Error in getTenantBySlug:", error);
     return null;
   }

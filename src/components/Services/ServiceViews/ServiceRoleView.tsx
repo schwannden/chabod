@@ -1,7 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getServiceRoles } from "@/lib/services/service-roles";
-import { Badge } from "@/components/ui/badge";
 import { PlusCircle, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 

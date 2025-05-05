@@ -7,7 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Calendar, ExternalLink, FileText, PlusCircle, Link } from "lucide-react";
+import { Calendar, FileText, PlusCircle, Link } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function ServiceNoteView({ serviceId }: { serviceId: string }) {

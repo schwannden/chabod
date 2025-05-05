@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useSession } from "@/contexts/AuthContext";
+import { useSession } from "@/hooks/useSession";
 import { Button } from "@/components/ui/button";
 import { getTenantBySlug } from "@/lib/tenant-service";
 import { getTenantMembers } from "@/lib/member-service";

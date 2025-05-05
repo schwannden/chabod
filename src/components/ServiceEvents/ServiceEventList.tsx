@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { ServiceEventWithService } from "@/lib/services/types";
 import { Loader2 } from "lucide-react";
-import { useSession } from "@/contexts/AuthContext";
+import { useSession } from "@/hooks/useSession";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";

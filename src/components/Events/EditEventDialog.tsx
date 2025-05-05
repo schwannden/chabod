@@ -45,7 +45,7 @@ interface EditEventDialogProps {
 export function EditEventDialog({ event, onEventUpdated, groups = [], children }: EditEventDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [eventGroups, setEventGroups] = useState<string[]>([]);
+  const [_, setEventGroups] = useState<string[]>([]);
   const { toast } = useToast();
 
   console.log("EditEventDialog rendering with event:", event.id);

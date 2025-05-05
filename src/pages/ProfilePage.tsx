@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useSession } from "@/contexts/AuthContext";
+import { useSession } from "@/hooks/useSession";
 import { NavBar } from "@/components/Layout/NavBar";
 import { getTenantBySlug } from "@/lib/tenant-utils";
 import { ProfileForm } from "@/components/Profile/ProfileForm";

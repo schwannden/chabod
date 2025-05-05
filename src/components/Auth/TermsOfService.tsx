@@ -8,17 +8,18 @@ interface TermsOfServiceProps {
   onChange: (value: boolean) => void;
 }
 
+// Apostle's Creed as terms of service (required to check to sign up)
 const termsOfServiceText = `
 我信上帝，全能的父，創造天地的主；
-我信我主耶穌基督，上帝的獨生子；
-因聖靈感孕，為童貞女馬利亞所生；
-在本丟彼拉多手下受難，被釘於十字架，受死，埋葬；
-降在陰間，第三天從死裡復活；
-升天，坐在全能父上帝的右邊；
+我信耶穌基督，上帝的獨生子；
+因聖靈成孕，為童女馬利亞所生；
+在本丟彼拉多手下受難，被釘於十字架上，死了，葬了；
+下到陰間，第三天從死裡復活；
+後升天，坐在無所不能的父上帝右邊；
 將來必從那裡降臨，審判活人死人。
 我信聖靈，我信聖而公之教會；
-我信聖徒相通；我信罪得赦免；
-我信身體復活；我信永生。阿們。
+聖徒相通；罪得赦免；
+肉身復活；並且永生。阿們。
 `;
 
 export function TermsOfService({ accepted, onChange }: TermsOfServiceProps) {

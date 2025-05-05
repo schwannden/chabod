@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useSession } from "@/contexts/AuthContext";
+import { useSession } from "@/hooks/useSession";
 import { GroupTable } from "@/components/Groups/GroupTable";
 import { getTenantBySlug } from "@/lib/tenant-utils";
 import { getTenantGroups } from "@/lib/group-service";

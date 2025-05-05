@@ -7,7 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { getTenantBySlug } from "@/lib/tenant-utils";
 import { format } from "date-fns";
-import { useSession } from "@/contexts/AuthContext";
+import { useSession } from "@/hooks/useSession";
 
 const eventSchema = z.object({
   name: z.string().min(1, "Event name is required"),

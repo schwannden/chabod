@@ -1,8 +1,6 @@
-
-import { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useSession } from "@/contexts/AuthContext";
+import { useSession } from "@/hooks/useSession";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LogOut, User, Building } from "lucide-react";
@@ -20,7 +18,6 @@ interface NavBarProps {
 export function NavBar({ tenant, onSignOut }: NavBarProps) {
   const { user, profile, signOut } = useSession();
   const navigate = useNavigate();
-  const location = useLocation();
   // Use the slug, not the ID for the tenant role lookup
   const { role } = useTenantRole(tenant?.slug, user?.id);
   
@@ -50,17 +47,6 @@ export function NavBar({ tenant, onSignOut }: NavBarProps) {
     if (profile?.first_name) return profile.first_name[0].toUpperCase();
     if (user?.email) return user.email.slice(0, 2).toUpperCase();
     return "U";
-  };
-
-  const translateRole = (role: string): string => {
-    switch (role) {
-      case 'owner':
-        return '管理者';
-      case 'member':
-        return '一般會友';
-      default:
-        return role;
-    }
   };
 
   const getProfileLink = () => {

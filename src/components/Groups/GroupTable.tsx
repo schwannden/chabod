@@ -1,7 +1,5 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useSession } from "@/contexts/AuthContext";
 import { Group, GroupWithMemberCount } from "@/lib/types";
 import { createGroup, deleteGroup, updateGroup } from "@/lib/group-service";
 import { Button } from "@/components/ui/button";
@@ -17,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash2, UserPlus, Users } from "lucide-react";
+import { Edit, Trash2, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface GroupTableProps {
@@ -149,7 +147,6 @@ export function GroupTable({
   };
 
   const navigateToGroupMembers = (groupId: string) => {
-    const groupSlug = groups.find(g => g.id === groupId)?.name.toLowerCase().replace(/\s+/g, '-');
     navigate(`/tenant/${window.location.pathname.split('/')[2]}/groups/${groupId}`);
   };
 

@@ -2,7 +2,6 @@
 import React from "react";
 import { Group } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 
 type EventCellTooltipProps = {
   event: { id: string; name: string; start_time: string | null; end_time: string | null; groups?: string[]; };

@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { format } from "date-fns";
@@ -55,16 +54,12 @@ export function ServiceEventForm({
   services,
   selectedServiceId,
   setSelectedServiceId,
-  tenantId,
-  isSubmitting,
-  onCancel,
+  setSelectedOwners,
   children,
   defaultStartTime,
   defaultEndTime,
   initialValues,
-  isEditMode,
-  selectedOwners,
-  setSelectedOwners
+  isEditMode
 }: ServiceEventFormProps) {
   const today = format(new Date(), "yyyy-MM-dd");
   
@@ -107,7 +102,7 @@ export function ServiceEventForm({
         <FormField
           control={form.control}
           name="serviceId"
-          render={({ field }) => (
+          render={() => (
             <FormItem>
               <FormLabel>服事類型</FormLabel>
               <Select 
