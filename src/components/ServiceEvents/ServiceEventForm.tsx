@@ -46,6 +46,8 @@ interface ServiceEventFormProps {
   children?: React.ReactNode;
   defaultStartTime?: string;
   defaultEndTime?: string;
+  initialValues?: ServiceEventFormValues;
+  isEditMode?: boolean;
 }
 
 export function ServiceEventForm({
@@ -57,30 +59,34 @@ export function ServiceEventForm({
   isSubmitting,
   children,
   defaultStartTime,
-  defaultEndTime
+  defaultEndTime,
+  initialValues,
+  isEditMode,
+  selectedOwners,
+  setSelectedOwners
 }: ServiceEventFormProps) {
   const today = format(new Date(), "yyyy-MM-dd");
   
   const form = useForm<ServiceEventFormValues>({
-    defaultValues: {
-      serviceId: "",
+    defaultValues: initialValues || {
+      serviceId: selectedServiceId || "",
       date: today,
-      startTime: "",
-      endTime: "",
+      startTime: defaultStartTime || "",
+      endTime: defaultEndTime || "",
       subtitle: ""
     },
   });
 
   // Update form values when default times change
   useEffect(() => {
-    if (defaultStartTime) {
+    if (!initialValues && defaultStartTime) {
       form.setValue("startTime", defaultStartTime);
     }
     
-    if (defaultEndTime) {
+    if (!initialValues && defaultEndTime) {
       form.setValue("endTime", defaultEndTime);
     }
-  }, [defaultStartTime, defaultEndTime, form]);
+  }, [defaultStartTime, defaultEndTime, form, initialValues]);
 
   const handleServiceChange = (serviceId: string) => {
     setSelectedServiceId(serviceId);
@@ -103,6 +109,7 @@ export function ServiceEventForm({
               <Select 
                 onValueChange={(value) => handleServiceChange(value)}
                 value={selectedServiceId}
+                disabled={isEditMode}
               >
                 <FormControl>
                   <SelectTrigger>

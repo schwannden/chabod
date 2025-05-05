@@ -87,6 +87,8 @@ export function ServiceEventEditDialog({
           onCancel={onClose}
           initialValues={initialValues}
           isEditMode={true}
+          selectedOwners={[]}
+          setSelectedOwners={() => {}}
         >
           <DialogFooter className="mt-6">
             <Button type="button" variant="outline" onClick={onClose}>

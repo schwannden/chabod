@@ -40,7 +40,8 @@ export async function createServiceEventWithOwners(
     const ownersToInsert = owners.map(owner => ({
       service_event_id: eventData.id,
       user_id: owner.user_id,
-      service_role_id: owner.service_role_id
+      service_role_id: owner.service_role_id,
+      tenant_id: event.tenant_id  // Add tenant_id from the event
     }));
 
     const { error: ownersError } = await supabase
