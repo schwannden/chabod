@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { updateServiceEvent } from "@/lib/services/service-event-crud";
-import { getServiceEventOwners } from "@/lib/services/service-event-owners";
+import { getServiceEventOwners, updateServiceEventOwners } from "@/lib/services/service-event-owners";
 import { ServiceEventForm, ServiceEventFormValues } from "./ServiceEventForm";
 import { ServiceEventOwner, ServiceEventOwnerSelect } from "./ServiceEventOwnerSelect";
 
@@ -79,6 +79,7 @@ export function ServiceEventEditDialog({
   const handleSubmit = async (values: ServiceEventFormValues) => {
     setIsSubmitting(true);
     try {
+      // Update the service event details
       await updateServiceEvent(event.id, {
         service_id: values.serviceId,
         date: values.date,
@@ -88,8 +89,15 @@ export function ServiceEventEditDialog({
         tenant_id: event.tenant_id,
       });
 
-      // Update owners - for now we'll just use the existing owners
-      // In a future enhancement, we could add owner management in the edit dialog
+      // Update the service event owners
+      // Convert owners to the format required by the updateServiceEventOwners function
+      const owners = selectedOwners.map(owner => ({
+        user_id: owner.userId,
+        service_role_id: owner.roleId,
+        tenant_id: event.tenant_id
+      }));
+      
+      await updateServiceEventOwners(event.id, owners);
 
       toast({
         title: "成功",
