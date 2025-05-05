@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import {
@@ -9,9 +8,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 import { useServiceForm } from "./hooks/useServiceForm";
-import { saveServiceData } from "./services/serviceDataService"; // Fixed import
+import { createService } from "@/lib/services";
 import { ServiceForm } from "./Forms/ServiceForm";
 
 interface CreateServiceDialogProps {
@@ -49,22 +49,20 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
       setIsSubmitting(true);
       const formData = form.getValues();
       
-      const success = await saveServiceData(
-        formData,
-        {
-          admins: selectedAdmins,
-          groups: selectedGroups,
-          notes,
-          roles
-        }
-      );
+      // Direct call to service-core
+      await createService({
+        name: formData.name,
+        tenant_id: formData.tenant_id,
+        default_start_time: formData.default_start_time || null,
+        default_end_time: formData.default_end_time || null,
+      });
       
-      if (success) {
-        handleDialogClose();
-        onSuccess?.();
-      }
+      toast.success("服事類型已創建");
+      handleDialogClose();
+      onSuccess?.();
     } catch (error) {
       console.error("Error creating service:", error);
+      toast.error("創建服事類型時發生錯誤");
     } finally {
       setIsSubmitting(false);
     }
@@ -106,6 +104,7 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
           onCancel={handleDialogClose}
           isSubmitting={isSubmitting}
           submitLabel="新增服事類型"
+          isEditing={false}
         />
       </DialogContent>
     </Dialog>

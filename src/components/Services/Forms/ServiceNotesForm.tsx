@@ -14,6 +14,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Edit2, Trash2, X, Check, Plus, Link } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
+import { addServiceNote, deleteServiceNotes } from "@/lib/services";
 
 // Updated schema to validate URLs
 const noteFormSchema = z.object({
@@ -32,9 +34,18 @@ export type NoteFormValues = z.infer<typeof noteFormSchema>;
 interface ServiceNotesFormProps {
   notes: NoteFormValues[];
   setNotes: React.Dispatch<React.SetStateAction<NoteFormValues[]>>;
+  serviceId?: string;
+  tenantId?: string;
+  isEditing: boolean;
 }
 
-export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
+export function ServiceNotesForm({ 
+  notes, 
+  setNotes, 
+  serviceId,
+  tenantId,
+  isEditing 
+}: ServiceNotesFormProps) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   
   const noteForm = useForm<NoteFormValues>({
@@ -53,11 +64,27 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
     },
   });
 
-  const handleAddNote = () => {
+  const handleAddNote = async () => {
     const values = noteForm.getValues();
     if (noteForm.formState.isValid) {
-      setNotes([...notes, values]);
-      noteForm.reset();
+      try {
+        // Add note to database if editing an existing service
+        if (isEditing && serviceId && tenantId) {
+          await addServiceNote({
+            service_id: serviceId,
+            tenant_id: tenantId,
+            text: values.text,
+            link: values.link || null
+          });
+        }
+        
+        // Always update local state
+        setNotes([...notes, values]);
+        noteForm.reset();
+      } catch (error) {
+        console.error("Error adding service note:", error);
+        toast.error("新增備註時發生錯誤");
+      }
     } else {
       noteForm.trigger();
     }
@@ -72,13 +99,43 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
     });
   };
 
-  const handleSaveEdit = (index: number) => {
+  const handleSaveEdit = async (index: number) => {
     const values = editForm.getValues();
     if (editForm.formState.isValid) {
-      const updatedNotes = [...notes];
-      updatedNotes[index] = values;
-      setNotes(updatedNotes);
-      setEditingIndex(null);
+      try {
+        // For editing existing notes, we delete all and re-add them
+        // since there's no direct update function
+        if (isEditing && serviceId && tenantId) {
+          await deleteServiceNotes(serviceId);
+          
+          // Prepare updated notes list
+          const updatedNotes = [...notes];
+          updatedNotes[index] = values;
+          
+          // Re-add all notes to the database
+          for (const note of updatedNotes) {
+            await addServiceNote({
+              service_id: serviceId,
+              tenant_id: tenantId,
+              text: note.text,
+              link: note.link || null
+            });
+          }
+          
+          // Update local state
+          setNotes(updatedNotes);
+        } else {
+          // Just update local state for new services
+          const updatedNotes = [...notes];
+          updatedNotes[index] = values;
+          setNotes(updatedNotes);
+        }
+        
+        setEditingIndex(null);
+      } catch (error) {
+        console.error("Error updating service note:", error);
+        toast.error("更新備註時發生錯誤");
+      }
     } else {
       editForm.trigger();
     }
@@ -88,10 +145,38 @@ export function ServiceNotesForm({ notes, setNotes }: ServiceNotesFormProps) {
     setEditingIndex(null);
   };
 
-  const handleDeleteNote = (index: number) => {
-    setNotes(notes.filter((_, i) => i !== index));
-    if (editingIndex === index) {
-      setEditingIndex(null);
+  const handleDeleteNote = async (index: number) => {
+    try {
+      // For deleting notes, we delete all and re-add the remaining ones
+      if (isEditing && serviceId && tenantId) {
+        await deleteServiceNotes(serviceId);
+        
+        // Filter out the deleted note
+        const updatedNotes = notes.filter((_, i) => i !== index);
+        
+        // Re-add all remaining notes
+        for (const note of updatedNotes) {
+          await addServiceNote({
+            service_id: serviceId,
+            tenant_id: tenantId,
+            text: note.text,
+            link: note.link || null
+          });
+        }
+        
+        // Update local state
+        setNotes(updatedNotes);
+      } else {
+        // Just update local state for new services
+        setNotes(notes.filter((_, i) => i !== index));
+      }
+      
+      if (editingIndex === index) {
+        setEditingIndex(null);
+      }
+    } catch (error) {
+      console.error("Error deleting service note:", error);
+      toast.error("刪除備註時發生錯誤");
     }
   };
 

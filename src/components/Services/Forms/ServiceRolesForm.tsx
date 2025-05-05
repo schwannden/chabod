@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -16,6 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Edit2, Trash2, X, Check, Plus } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
+import { addServiceRole, deleteServiceRoles } from "@/lib/services";
 
 const roleFormSchema = z.object({
   name: z.string().min(1, "角色名稱為必填"),
@@ -27,9 +28,18 @@ export type RoleFormValues = z.infer<typeof roleFormSchema>;
 interface ServiceRolesFormProps {
   roles: RoleFormValues[];
   setRoles: React.Dispatch<React.SetStateAction<RoleFormValues[]>>;
+  serviceId?: string;
+  tenantId?: string;
+  isEditing: boolean;
 }
 
-export function ServiceRolesForm({ roles, setRoles }: ServiceRolesFormProps) {
+export function ServiceRolesForm({ 
+  roles, 
+  setRoles,
+  serviceId,
+  tenantId,
+  isEditing
+}: ServiceRolesFormProps) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   
   const roleForm = useForm<RoleFormValues>({
@@ -48,11 +58,27 @@ export function ServiceRolesForm({ roles, setRoles }: ServiceRolesFormProps) {
     },
   });
 
-  const handleAddRole = () => {
+  const handleAddRole = async () => {
     const values = roleForm.getValues();
     if (roleForm.formState.isValid) {
-      setRoles([...roles, values]);
-      roleForm.reset();
+      try {
+        // Add role to database if editing an existing service
+        if (isEditing && serviceId && tenantId) {
+          await addServiceRole({
+            service_id: serviceId,
+            tenant_id: tenantId,
+            name: values.name,
+            description: values.description || null
+          });
+        }
+        
+        // Always update local state
+        setRoles([...roles, values]);
+        roleForm.reset();
+      } catch (error) {
+        console.error("Error adding service role:", error);
+        toast.error("新增角色時發生錯誤");
+      }
     } else {
       roleForm.trigger();
     }
@@ -67,13 +93,43 @@ export function ServiceRolesForm({ roles, setRoles }: ServiceRolesFormProps) {
     });
   };
 
-  const handleSaveEdit = (index: number) => {
+  const handleSaveEdit = async (index: number) => {
     const values = editForm.getValues();
     if (editForm.formState.isValid) {
-      const updatedRoles = [...roles];
-      updatedRoles[index] = values;
-      setRoles(updatedRoles);
-      setEditingIndex(null);
+      try {
+        // For editing existing roles, we delete all and re-add them
+        // since there's no direct update function
+        if (isEditing && serviceId && tenantId) {
+          await deleteServiceRoles(serviceId);
+          
+          // Prepare updated roles list
+          const updatedRoles = [...roles];
+          updatedRoles[index] = values;
+          
+          // Re-add all roles to the database
+          for (const role of updatedRoles) {
+            await addServiceRole({
+              service_id: serviceId,
+              tenant_id: tenantId,
+              name: role.name,
+              description: role.description || null
+            });
+          }
+          
+          // Update local state
+          setRoles(updatedRoles);
+        } else {
+          // Just update local state for new services
+          const updatedRoles = [...roles];
+          updatedRoles[index] = values;
+          setRoles(updatedRoles);
+        }
+        
+        setEditingIndex(null);
+      } catch (error) {
+        console.error("Error updating service role:", error);
+        toast.error("更新角色時發生錯誤");
+      }
     } else {
       editForm.trigger();
     }
@@ -83,10 +139,38 @@ export function ServiceRolesForm({ roles, setRoles }: ServiceRolesFormProps) {
     setEditingIndex(null);
   };
 
-  const handleDeleteRole = (index: number) => {
-    setRoles(roles.filter((_, i) => i !== index));
-    if (editingIndex === index) {
-      setEditingIndex(null);
+  const handleDeleteRole = async (index: number) => {
+    try {
+      // For deleting roles, we delete all and re-add the remaining ones
+      if (isEditing && serviceId && tenantId) {
+        await deleteServiceRoles(serviceId);
+        
+        // Filter out the deleted role
+        const updatedRoles = roles.filter((_, i) => i !== index);
+        
+        // Re-add all remaining roles
+        for (const role of updatedRoles) {
+          await addServiceRole({
+            service_id: serviceId,
+            tenant_id: tenantId,
+            name: role.name,
+            description: role.description || null
+          });
+        }
+        
+        // Update local state
+        setRoles(updatedRoles);
+      } else {
+        // Just update local state for new services
+        setRoles(roles.filter((_, i) => i !== index));
+      }
+      
+      if (editingIndex === index) {
+        setEditingIndex(null);
+      }
+    } catch (error) {
+      console.error("Error deleting service role:", error);
+      toast.error("刪除角色時發生錯誤");
     }
   };
 

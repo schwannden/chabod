@@ -1,19 +1,47 @@
-
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Group } from "@/lib/types";
+import { toast } from "sonner";
+import { addServiceGroup, removeServiceGroup } from "@/lib/services";
 
 interface ServiceGroupsFormProps {
   groups: Group[];
   selectedGroups: string[];
   setSelectedGroups: (groups: string[]) => void;
+  serviceId?: string;
+  isEditing: boolean;
 }
 
 export function ServiceGroupsForm({
   groups,
   selectedGroups,
   setSelectedGroups,
+  serviceId,
+  isEditing
 }: ServiceGroupsFormProps) {
+  const handleGroupChange = async (groupId: string, checked: boolean) => {
+    try {
+      if (isEditing && serviceId) {
+        // Update database in real-time
+        if (checked) {
+          await addServiceGroup(serviceId, groupId);
+        } else {
+          await removeServiceGroup(serviceId, groupId);
+        }
+      }
+      
+      // Always update local state
+      if (checked) {
+        setSelectedGroups([...selectedGroups, groupId]);
+      } else {
+        setSelectedGroups(selectedGroups.filter(id => id !== groupId));
+      }
+    } catch (error) {
+      console.error("Error updating service groups:", error);
+      toast.error("更新小組時發生錯誤");
+    }
+  };
+  
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">選擇服事小組</h3>
@@ -26,13 +54,7 @@ export function ServiceGroupsForm({
                   id={`group-${group.id}`}
                   checked={selectedGroups.includes(group.id)}
                   onCheckedChange={(checked) => {
-                    if (checked) {
-                      setSelectedGroups([...selectedGroups, group.id]);
-                    } else {
-                      setSelectedGroups(
-                        selectedGroups.filter((id) => id !== group.id)
-                      );
-                    }
+                    handleGroupChange(group.id, !!checked);
                   }}
                 />
                 <label

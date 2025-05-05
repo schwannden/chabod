@@ -29,6 +29,8 @@ export interface ServiceFormProps {
   onCancel: () => void;
   isSubmitting: boolean;
   submitLabel: string;
+  serviceId?: string;
+  isEditing: boolean;
 }
 
 export function ServiceForm({
@@ -48,8 +50,12 @@ export function ServiceForm({
   onSubmit,
   onCancel,
   isSubmitting,
-  submitLabel
+  submitLabel,
+  serviceId,
+  isEditing
 }: ServiceFormProps) {
+  const tenantId = form.getValues().tenant_id;
+  
   return (
     <>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -72,6 +78,8 @@ export function ServiceForm({
             members={members} 
             selectedAdmins={selectedAdmins}
             setSelectedAdmins={setSelectedAdmins}
+            serviceId={serviceId}
+            isEditing={isEditing}
           />
         </TabsContent>
         
@@ -81,6 +89,8 @@ export function ServiceForm({
             groups={groups}
             selectedGroups={selectedGroups}
             setSelectedGroups={setSelectedGroups}
+            serviceId={serviceId}
+            isEditing={isEditing}
           />
         </TabsContent>
         
@@ -88,7 +98,10 @@ export function ServiceForm({
         <TabsContent value="notes">
           <ServiceNotesForm 
             notes={notes} 
-            setNotes={setNotes} 
+            setNotes={setNotes}
+            serviceId={serviceId}
+            tenantId={tenantId}
+            isEditing={isEditing}
           />
         </TabsContent>
         
@@ -96,7 +109,10 @@ export function ServiceForm({
         <TabsContent value="roles">
           <ServiceRolesForm 
             roles={roles} 
-            setRoles={setRoles} 
+            setRoles={setRoles}
+            serviceId={serviceId}
+            tenantId={tenantId}
+            isEditing={isEditing}
           />
         </TabsContent>
       </Tabs>

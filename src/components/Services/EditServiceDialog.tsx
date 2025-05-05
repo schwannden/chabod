@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Dialog,
@@ -6,10 +5,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
-import { Service } from "@/lib/services";
+import { Service, updateService } from "@/lib/services";
 import { useServiceForm } from "./hooks/useServiceForm";
-import { updateServiceData } from "./services/serviceDataService";
 import { ServiceForm } from "./Forms/ServiceForm";
 
 interface EditServiceDialogProps {
@@ -54,23 +53,19 @@ export function EditServiceDialog({
       setIsSubmitting(true);
       const formData = form.getValues();
       
-      const success = await updateServiceData(
-        service.id,
-        formData,
-        {
-          admins: selectedAdmins,
-          groups: selectedGroups,
-          notes,
-          roles
-        }
-      );
+      // Direct call to updateService
+      await updateService(service.id, {
+        name: formData.name,
+        default_start_time: formData.default_start_time || null,
+        default_end_time: formData.default_end_time || null,
+      });
       
-      if (success) {
-        onSuccess?.();
-        handleDialogClose();
-      }
+      toast.success("服事類型已更新");
+      onSuccess?.();
+      handleDialogClose();
     } catch (error) {
       console.error("Error updating service:", error);
+      toast.error("更新服事類型時發生錯誤");
     } finally {
       setIsSubmitting(false);
     }
@@ -109,6 +104,8 @@ export function EditServiceDialog({
           onCancel={handleDialogClose}
           isSubmitting={isSubmitting}
           submitLabel="更新服事類型"
+          serviceId={service.id}
+          isEditing={true}
         />
       </DialogContent>
     </Dialog>
