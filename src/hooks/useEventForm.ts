@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -18,18 +17,18 @@ const eventSchema = z.object({
   isFullDay: z.boolean().default(false),
   start_time: z.string().optional(),
   end_time: z.string().optional(),
-  event_link: z
-    .string()
-    .url("Please enter a valid URL")
-    .optional()
-    .or(z.literal("")),
+  event_link: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
   visibility: z.enum(["public", "private"]).default("public"),
   groups: z.array(z.string()).default([]),
 });
 
 export type EventFormValues = z.infer<typeof eventSchema>;
 
-export function useEventForm(tenantSlug: string, onSuccess: () => void, initialGroups: string[] = []) {
+export function useEventForm(
+  tenantSlug: string,
+  onSuccess: () => void,
+  initialGroups: string[] = [],
+) {
   const [isLoading, setIsLoading] = useState(false);
   const [tenantUuid, setTenantUuid] = useState<string | null>(null);
   const { toast } = useToast();
@@ -81,35 +80,40 @@ export function useEventForm(tenantSlug: string, onSuccess: () => void, initialG
     try {
       // First check if the tenant has reached its event limit
       const { data: checkData, error: checkError } = await supabase.rpc(
-        'check_tenant_event_limit',
-        { tenant_uuid: tenantUuid }
+        "check_tenant_event_limit",
+        { tenant_uuid: tenantUuid },
       );
-      
+
       if (checkError) {
         throw checkError;
       }
-      
+
       if (!checkData) {
         toast({
           title: "Limit Reached",
-          description: "You have reached the maximum number of events allowed by your plan. Please upgrade to create more events.",
+          description:
+            "You have reached the maximum number of events allowed by your plan. Please upgrade to create more events.",
           variant: "destructive",
         });
         setIsLoading(false);
         return;
       }
 
-      const { data: eventData, error: eventError } = await supabase.from("events").insert({
-        name: data.name,
-        description: data.description || null,
-        date: format(data.date, "yyyy-MM-dd"),
-        start_time: !data.isFullDay ? data.start_time : null,
-        end_time: !data.isFullDay ? data.end_time : null,
-        event_link: data.event_link || null,
-        tenant_id: tenantUuid,
-        visibility: data.visibility,
-        created_by: user?.id || null,
-      }).select().single();
+      const { data: eventData, error: eventError } = await supabase
+        .from("events")
+        .insert({
+          name: data.name,
+          description: data.description || null,
+          date: format(data.date, "yyyy-MM-dd"),
+          start_time: !data.isFullDay ? data.start_time : null,
+          end_time: !data.isFullDay ? data.end_time : null,
+          event_link: data.event_link || null,
+          tenant_id: tenantUuid,
+          visibility: data.visibility,
+          created_by: user?.id || null,
+        })
+        .select()
+        .single();
 
       if (eventError) {
         console.error("Event creation error details:", eventError);
@@ -125,7 +129,7 @@ export function useEventForm(tenantSlug: string, onSuccess: () => void, initialG
           data.groups.map((groupId) => ({
             event_id: eventData.id,
             group_id: groupId,
-          }))
+          })),
         );
 
         if (groupError) throw groupError;
@@ -135,7 +139,7 @@ export function useEventForm(tenantSlug: string, onSuccess: () => void, initialG
         title: "Event created",
         description: "The event has been created successfully.",
       });
-      
+
       form.reset();
       onSuccess();
     } catch (error) {

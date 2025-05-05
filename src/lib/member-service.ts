@@ -8,10 +8,12 @@ import { v4 as uuidv4 } from "uuid";
 export async function getTenantMembers(tenantId: string): Promise<TenantMemberWithProfile[]> {
   const { data, error } = await supabase
     .from("tenant_members")
-    .select(`
+    .select(
+      `
       *,
       profile:profiles(*)
-    `)
+    `,
+    )
     .eq("tenant_id", tenantId);
 
   if (error) {
@@ -19,13 +21,16 @@ export async function getTenantMembers(tenantId: string): Promise<TenantMemberWi
     return [];
   }
 
-  return data as TenantMemberWithProfile[] || [];
+  return (data as TenantMemberWithProfile[]) || [];
 }
 
 /**
  * Updates a tenant member's role
  */
-export async function updateTenantMember(memberId: string, role: string): Promise<TenantMember | null> {
+export async function updateTenantMember(
+  memberId: string,
+  role: string,
+): Promise<TenantMember | null> {
   const { data, error } = await supabase
     .from("tenant_members")
     .update({
@@ -48,10 +53,7 @@ export async function updateTenantMember(memberId: string, role: string): Promis
  * Deletes a tenant member
  */
 export async function deleteTenantMember(memberId: string): Promise<void> {
-  const { error } = await supabase
-    .from("tenant_members")
-    .delete()
-    .eq("id", memberId);
+  const { error } = await supabase.from("tenant_members").delete().eq("id", memberId);
 
   if (error) {
     console.error("Error deleting tenant member:", error);
@@ -62,17 +64,19 @@ export async function deleteTenantMember(memberId: string): Promise<void> {
 /**
  * Invites a user to join a tenant
  */
-export async function inviteUserToTenant(tenantId: string, email: string, role: string = "member"): Promise<void> {
+export async function inviteUserToTenant(
+  tenantId: string,
+  email: string,
+  role: string = "member",
+): Promise<void> {
   const token = uuidv4();
-  
-  const { error } = await supabase
-    .from("invitations")
-    .insert({
-      tenant_id: tenantId,
-      email,
-      role,
-      token,
-    });
+
+  const { error } = await supabase.from("invitations").insert({
+    tenant_id: tenantId,
+    email,
+    role,
+    token,
+  });
 
   if (error) {
     console.error("Error creating invitation:", error);
@@ -92,12 +96,12 @@ export async function checkUserTenantAccess(userId: string, tenantSlug: string):
       .select("id")
       .eq("slug", tenantSlug)
       .single();
-      
+
     if (tenantError || !tenant) {
       console.error("Error finding tenant:", tenantError);
       return false;
     }
-    
+
     // Now check if the user is a member of that tenant
     const { data: member, error: memberError } = await supabase
       .from("tenant_members")
@@ -105,12 +109,12 @@ export async function checkUserTenantAccess(userId: string, tenantSlug: string):
       .eq("tenant_id", tenant.id)
       .eq("user_id", userId)
       .maybeSingle();
-      
+
     if (memberError) {
       console.error("Error checking membership:", memberError);
       return false;
     }
-    
+
     return !!member;
   } catch (error) {
     console.error("Error checking tenant access:", error);

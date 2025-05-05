@@ -11,7 +11,7 @@ export function useEventFilters({
   initialGroupValue = "all",
   initialSecondaryValue = "all",
   initialStartDate = new Date(new Date().setHours(0, 0, 0, 0)),
-  initialEndDate
+  initialEndDate,
 }: EventFiltersOptions = {}) {
   const [selectedGroup, setSelectedGroup] = useState<string>(initialGroupValue);
   const [selectedSecondary, setSelectedSecondary] = useState<string>(initialSecondaryValue);
@@ -34,6 +34,6 @@ export function useEventFilters({
     setStartDate,
     endDate,
     setEndDate,
-    resetFilters
+    resetFilters,
   };
-} 
+}

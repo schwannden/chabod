@@ -4,7 +4,7 @@ import { format, parseISO } from "date-fns";
 export const formatDateForInput = (date: Date | undefined): string => {
   if (!date) return "";
   try {
-    return format(date, 'yyyy-MM-dd');
+    return format(date, "yyyy-MM-dd");
   } catch (error) {
     console.error("Error formatting date for input:", error);
     return "";
@@ -16,9 +16,9 @@ export const parseDateFromInput = (value: string): Date | undefined => {
   if (!value) return undefined;
   try {
     // Add time component to avoid timezone issues when creating Date object
-    return parseISO(value + 'T00:00:00'); 
+    return parseISO(value + "T00:00:00");
   } catch (error) {
     console.error("Error parsing date from input:", error);
     return undefined;
   }
-}; 
+};

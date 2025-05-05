@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Group, GroupMember, GroupWithMemberCount, GroupMemberWithProfile } from "./types";
 
@@ -9,7 +8,7 @@ export async function getTenantGroups(tenantId: string): Promise<GroupWithMember
   const { data: groups, error } = await supabase
     .from("groups")
     .select("*")
-    .eq("tenant_id", tenantId)
+    .eq("tenant_id", tenantId);
 
   if (error) {
     console.error("Error fetching groups:", error);
@@ -29,7 +28,7 @@ export async function getTenantGroups(tenantId: string): Promise<GroupWithMember
       }
 
       return { ...group, memberCount: count || 0 };
-    })
+    }),
   );
 
   return groupsWithCounts;
@@ -38,13 +37,17 @@ export async function getTenantGroups(tenantId: string): Promise<GroupWithMember
 /**
  * Creates a new group
  */
-export async function createGroup(tenantId: string, name: string, description?: string): Promise<Group | null> {
+export async function createGroup(
+  tenantId: string,
+  name: string,
+  description?: string,
+): Promise<Group | null> {
   const { data, error } = await supabase
     .from("groups")
     .insert({
       tenant_id: tenantId,
       name,
-      description
+      description,
     })
     .select()
     .single();
@@ -60,13 +63,17 @@ export async function createGroup(tenantId: string, name: string, description?: 
 /**
  * Updates an existing group
  */
-export async function updateGroup(groupId: string, name: string, description?: string): Promise<Group | null> {
+export async function updateGroup(
+  groupId: string,
+  name: string,
+  description?: string,
+): Promise<Group | null> {
   const { data, error } = await supabase
     .from("groups")
     .update({
       name,
       description,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     })
     .eq("id", groupId)
     .select()
@@ -84,10 +91,7 @@ export async function updateGroup(groupId: string, name: string, description?: s
  * Deletes a group
  */
 export async function deleteGroup(groupId: string): Promise<void> {
-  const { error } = await supabase
-    .from("groups")
-    .delete()
-    .eq("id", groupId);
+  const { error } = await supabase.from("groups").delete().eq("id", groupId);
 
   if (error) {
     console.error("Error deleting group:", error);
@@ -113,7 +117,7 @@ export async function getGroupMembers(groupId: string): Promise<GroupMemberWithP
     return [];
   }
 
-  const userIds = members.map(member => member.user_id);
+  const userIds = members.map((member) => member.user_id);
   const { data: profiles, error: profileError } = await supabase
     .from("profiles")
     .select("*")
@@ -124,11 +128,11 @@ export async function getGroupMembers(groupId: string): Promise<GroupMemberWithP
     return [];
   }
 
-  const membersWithProfiles = members.map(member => {
-    const profile = profiles?.find(p => p.id === member.user_id) || null;
+  const membersWithProfiles = members.map((member) => {
+    const profile = profiles?.find((p) => p.id === member.user_id) || null;
     return {
       ...member,
-      profile: profile
+      profile: profile,
     } as GroupMemberWithProfile;
   });
 
@@ -143,7 +147,7 @@ export async function addUserToGroup(groupId: string, userId: string): Promise<G
     .from("group_members")
     .insert({
       group_id: groupId,
-      user_id: userId
+      user_id: userId,
     })
     .select()
     .single();
@@ -160,10 +164,7 @@ export async function addUserToGroup(groupId: string, userId: string): Promise<G
  * Removes a user from a group
  */
 export async function removeUserFromGroup(groupMemberId: string): Promise<void> {
-  const { error } = await supabase
-    .from("group_members")
-    .delete()
-    .eq("id", groupMemberId);
+  const { error } = await supabase.from("group_members").delete().eq("id", groupMemberId);
 
   if (error) {
     console.error("Error removing user from group:", error);

@@ -1,4 +1,3 @@
-
 import { Database } from "@/integrations/supabase/types";
 import { User } from "@supabase/supabase-js";
 import { Session } from "@supabase/supabase-js";
@@ -49,7 +48,7 @@ export type TenantWithPriceTier = Tenant & {
 };
 
 export type Resource = Database["public"]["Tables"]["resources"]["Row"];
-export type ResourceGroup = Database['public']['Tables']['resources_groups']['Row'];
+export type ResourceGroup = Database["public"]["Tables"]["resources_groups"]["Row"];
 
 export type ResourceWithGroups = Resource & {
   groups?: string[];

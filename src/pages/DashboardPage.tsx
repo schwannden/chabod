@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSession } from "@/hooks/useSession";
@@ -27,7 +26,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchTenants = async () => {
       if (!user) return;
-      
+
       try {
         const tenantsData = await getUserTenants(user.id);
         setTenants(tenantsData);
@@ -71,9 +70,7 @@ export default function DashboardPage() {
         ) : tenants.length === 0 ? (
           <div className="bg-muted rounded-lg p-6 text-center">
             <h3 className="text-lg font-medium mb-2">還沒有您所管理的教會</h3>
-            <p className="text-muted-foreground mb-4">
-              新增你的第一個教會來開始使用
-            </p>
+            <p className="text-muted-foreground mb-4">新增你的第一個教會來開始使用</p>
             <Button onClick={() => setIsCreateDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" /> 新增教會
             </Button>

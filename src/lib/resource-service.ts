@@ -33,12 +33,10 @@ export async function getResources(tenantSlug: string): Promise<Resource[]> {
   return data || [];
 }
 
-export async function createResource(resource: Omit<Resource, "id" | "created_at" | "updated_at">): Promise<Resource> {
-  const { data, error } = await supabase
-    .from("resources")
-    .insert(resource)
-    .select()
-    .single();
+export async function createResource(
+  resource: Omit<Resource, "id" | "created_at" | "updated_at">,
+): Promise<Resource> {
+  const { data, error } = await supabase.from("resources").insert(resource).select().single();
 
   if (error) {
     console.error("Error creating resource:", error);
@@ -48,7 +46,10 @@ export async function createResource(resource: Omit<Resource, "id" | "created_at
   return data;
 }
 
-export async function updateResource(id: string, updates: Partial<Omit<Resource, "id" | "created_at" | "updated_at">>): Promise<Resource> {
+export async function updateResource(
+  id: string,
+  updates: Partial<Omit<Resource, "id" | "created_at" | "updated_at">>,
+): Promise<Resource> {
   const { data, error } = await supabase
     .from("resources")
     .update(updates)
@@ -65,10 +66,7 @@ export async function updateResource(id: string, updates: Partial<Omit<Resource,
 }
 
 export async function deleteResource(id: string): Promise<void> {
-  const { error } = await supabase
-    .from("resources")
-    .delete()
-    .eq("id", id);
+  const { error } = await supabase.from("resources").delete().eq("id", id);
 
   if (error) {
     console.error("Error deleting resource:", error);
@@ -78,7 +76,7 @@ export async function deleteResource(id: string): Promise<void> {
 
 export async function addResourceToGroup(resourceId: string, groupId: string): Promise<void> {
   const { error } = await supabase
-    .from('resources_groups')
+    .from("resources_groups")
     .insert({ resource_id: resourceId, group_id: groupId })
     .select();
 
@@ -90,10 +88,10 @@ export async function addResourceToGroup(resourceId: string, groupId: string): P
 
 export async function removeResourceFromGroup(resourceId: string, groupId: string): Promise<void> {
   const { error } = await supabase
-    .from('resources_groups')
+    .from("resources_groups")
     .delete()
-    .eq('resource_id', resourceId)
-    .eq('group_id', groupId);
+    .eq("resource_id", resourceId)
+    .eq("group_id", groupId);
 
   if (error) {
     console.error("Error removing resource from group:", error);
@@ -103,14 +101,14 @@ export async function removeResourceFromGroup(resourceId: string, groupId: strin
 
 export async function getResourceGroups(resourceId: string): Promise<string[]> {
   const { data, error } = await supabase
-    .from('resources_groups')
-    .select('group_id')
-    .eq('resource_id', resourceId);
+    .from("resources_groups")
+    .select("group_id")
+    .eq("resource_id", resourceId);
 
   if (error) {
     console.error("Error fetching resource groups:", error);
     throw error;
   }
 
-  return data.map(item => item.group_id);
+  return data.map((item) => item.group_id);
 }

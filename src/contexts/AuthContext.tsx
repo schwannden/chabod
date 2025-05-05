@@ -14,21 +14,21 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
 
   useEffect(() => {
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, currentSession) => {
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, currentSession) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
 
-        if (currentSession?.user) {
-          // Fetch user profile after a short delay to prevent deadlock with Supabase client
-          setTimeout(async () => {
-            await fetchUserProfile(currentSession.user.id);
-          }, 0);
-        } else {
-          setProfile(null);
-        }
+      if (currentSession?.user) {
+        // Fetch user profile after a short delay to prevent deadlock with Supabase client
+        setTimeout(async () => {
+          await fetchUserProfile(currentSession.user.id);
+        }, 0);
+      } else {
+        setProfile(null);
       }
-    );
+    });
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
@@ -38,7 +38,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       if (currentSession?.user) {
         fetchUserProfile(currentSession.user.id);
       }
-      
+
       setIsLoading(false);
     });
 
@@ -49,11 +49,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
 
   const fetchUserProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
+      const { data, error } = await supabase.from("profiles").select("*").eq("id", userId).single();
 
       if (error) {
         console.error("Error fetching profile:", error);

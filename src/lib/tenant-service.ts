@@ -4,7 +4,7 @@ import { Tenant, TenantWithUsage } from "./types";
 /**
  * Fetches all tenants that a user is a member of
  */
-export async function getUserTenants(userId: string): Promise<(TenantWithUsage)[]> {
+export async function getUserTenants(userId: string): Promise<TenantWithUsage[]> {
   const { data: tenantMembers, error: memberError } = await supabase
     .from("tenant_members")
     .select("tenant_id")
@@ -23,10 +23,12 @@ export async function getUserTenants(userId: string): Promise<(TenantWithUsage)[
 
   const { data: tenants, error: tenantError } = await supabase
     .from("tenants")
-    .select(`
+    .select(
+      `
       *,
       price_tier:price_tiers(*)
-    `)
+    `,
+    )
     .in("id", tenantIds);
 
   if (tenantError) {
@@ -64,13 +66,13 @@ export async function getUserTenants(userId: string): Promise<(TenantWithUsage)[
         console.error("Error counting events:", eventError);
       }
 
-      return { 
-        ...tenant, 
+      return {
+        ...tenant,
         memberCount: memberCount || 0,
         groupCount: groupCount || 0,
-        eventCount: eventCount || 0
+        eventCount: eventCount || 0,
       };
-    })
+    }),
   );
 
   return tenantsWithCounts;
@@ -79,7 +81,11 @@ export async function getUserTenants(userId: string): Promise<(TenantWithUsage)[
 /**
  * Creates a new tenant
  */
-export async function createTenant(name: string, slug: string, ownerId: string): Promise<Tenant | null> {
+export async function createTenant(
+  name: string,
+  slug: string,
+  ownerId: string,
+): Promise<Tenant | null> {
   // Get the free tier ID first
   const { data: freeTier, error: tierError } = await supabase
     .from("price_tiers")
@@ -114,7 +120,11 @@ export async function createTenant(name: string, slug: string, ownerId: string):
 /**
  * Updates an existing tenant
  */
-export async function updateTenant(tenantId: string, name: string, slug: string): Promise<Tenant | null> {
+export async function updateTenant(
+  tenantId: string,
+  name: string,
+  slug: string,
+): Promise<Tenant | null> {
   const { data, error } = await supabase
     .from("tenants")
     .update({
@@ -138,10 +148,7 @@ export async function updateTenant(tenantId: string, name: string, slug: string)
  * Deletes a tenant
  */
 export async function deleteTenant(tenantId: string): Promise<void> {
-  const { error } = await supabase
-    .from("tenants")
-    .delete()
-    .eq("id", tenantId);
+  const { error } = await supabase.from("tenants").delete().eq("id", tenantId);
 
   if (error) {
     console.error("Error deleting tenant:", error);
@@ -154,11 +161,7 @@ export async function deleteTenant(tenantId: string): Promise<void> {
  */
 export async function getTenantBySlug(slug: string): Promise<Tenant | null> {
   try {
-    const { data, error } = await supabase
-      .from("tenants")
-      .select("*")
-      .eq("slug", slug)
-      .single();
+    const { data, error } = await supabase.from("tenants").select("*").eq("slug", slug).single();
 
     if (error) {
       if (error.code === "PGRST116") {

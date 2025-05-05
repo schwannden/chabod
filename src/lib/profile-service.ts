@@ -5,7 +5,10 @@ import { Profile } from "./types";
  * Updates a user's profile
  * @throws Error when the profile doesn't exist
  */
-export async function updateUserProfile(userId: string, updates: Partial<Profile>): Promise<Profile | null> {
+export async function updateUserProfile(
+  userId: string,
+  updates: Partial<Profile>,
+): Promise<Profile | null> {
   const { data, error } = await supabase
     .from("profiles")
     .update({

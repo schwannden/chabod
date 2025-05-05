@@ -7,4 +7,4 @@ export const SessionContext = createContext<SessionContextType>({
   profile: null,
   isLoading: true,
   signOut: async () => {},
-}); 
+});

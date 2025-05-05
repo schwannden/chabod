@@ -1,6 +1,5 @@
-
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export function useTenantRole(tenantSlug: string | undefined, userId: string | undefined) {
   const [role, setRole] = useState<string | null>(null);
@@ -9,7 +8,7 @@ export function useTenantRole(tenantSlug: string | undefined, userId: string | u
   useEffect(() => {
     async function fetchTenantRole() {
       if (!tenantSlug || !userId) {
-        console.log('Missing tenantSlug or userId:', { tenantSlug, userId });
+        console.log("Missing tenantSlug or userId:", { tenantSlug, userId });
         setRole(null);
         setIsLoading(false);
         return;
@@ -39,21 +38,21 @@ export function useTenantRole(tenantSlug: string | undefined, userId: string | u
 
         // Then get the role using the tenant ID
         const { data, error } = await supabase
-          .from('tenant_members')
-          .select('role')
-          .eq('tenant_id', tenantData.id)
-          .eq('user_id', userId)
+          .from("tenant_members")
+          .select("role")
+          .eq("tenant_id", tenantData.id)
+          .eq("user_id", userId)
           .single();
 
         if (error) {
-          console.error('Error fetching tenant role:', error);
+          console.error("Error fetching tenant role:", error);
           setRole(null);
         } else {
-          console.log('Tenant role data:', data);
+          console.log("Tenant role data:", data);
           setRole(data?.role || null);
         }
       } catch (error) {
-        console.error('Error in fetchTenantRole:', error);
+        console.error("Error in fetchTenantRole:", error);
         setRole(null);
       } finally {
         setIsLoading(false);

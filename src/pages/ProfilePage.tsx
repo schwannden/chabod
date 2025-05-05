@@ -24,7 +24,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchTenant = async () => {
       if (!slug) return;
-      
+
       try {
         const tenantData = await getTenantBySlug(slug);
         setTenant(tenantData);
@@ -83,10 +83,7 @@ export default function ProfilePage() {
           <div className="text-center">
             <h1 className="text-3xl font-bold mb-4">找不到租戶</h1>
             <p className="mb-6">租戶 "{slug}" 不存在或已被刪除。</p>
-            <button
-              onClick={() => navigate("/")}
-              className="text-primary hover:underline"
-            >
+            <button onClick={() => navigate("/")} className="text-primary hover:underline">
               返回首頁
             </button>
           </div>

@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthTabs } from "@/components/Auth/AuthTabs";
