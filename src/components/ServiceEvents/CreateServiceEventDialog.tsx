@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -13,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ServiceEventOwnerSelect, ServiceEventOwner } from "./ServiceEventOwnerSelect";
 import { Separator } from "@/components/ui/separator";
 import { ServiceEventForm, ServiceEventFormValues } from "./ServiceEventForm";
+import { createServiceEventWithOwners } from "@/lib/services/service-event-crud";
 
 interface CreateServiceEventDialogProps {
   isOpen: boolean;

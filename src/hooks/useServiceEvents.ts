@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ServiceEventWithService } from "@/lib/services/types";
 import { useToast } from "@/components/ui/use-toast";
+import { getServiceEventsWithServices } from "@/lib/services/service-event-queries";
 
 interface UseServiceEventsProps {
   tenantId: string | null;
@@ -25,65 +26,29 @@ export function useServiceEvents({
 
   useEffect(() => {
     const fetchServiceEvents = async () => {
-      if (!tenantId) return;
+      if (!tenantId) {
+        setIsLoading(false);
+        return;
+      }
       
       try {
         setIsLoading(true);
         
-        // Start with the basic query - avoid using join syntax that might cause recursion
-        let query = supabase
-          .from("service_events")
-          .select("*");
+        // Format dates if present
+        const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : undefined;
+        const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : undefined;
         
-        // Apply date filters if present
-        if (startDate) {
-          const formattedStartDate = startDate.toISOString().split('T')[0];
-          query = query.gte("date", formattedStartDate);
-        }
-
-        if (endDate) {
-          const formattedEndDate = endDate.toISOString().split('T')[0];
-          query = query.lte("date", formattedEndDate);
-        }
-
-        // Service filter
-        if (selectedService !== "all") {
-          query = query.eq("service_id", selectedService);
-        }
-
-        const { data: eventsData, error: eventsError } = await query;
-        
-        if (eventsError) throw eventsError;
-        
-        // If no events or no service filter, return early
-        if (!eventsData?.length) {
-          setServiceEvents([]);
-          setIsLoading(false);
-          return;
-        }
-        
-        // Get service details in a separate query
-        const serviceIds = [...new Set(eventsData.map(event => event.service_id))];
-        const { data: servicesData, error: servicesError } = await supabase
-          .from("services")
-          .select("id, name")
-          .in("id", serviceIds);
-          
-        if (servicesError) throw servicesError;
-        
-        // Create a map for quick lookups
-        const serviceMap = new Map(servicesData?.map(s => [s.id, s]) || []);
-        
-        // Join the data manually
-        const enrichedEvents = eventsData.map(event => ({
-          ...event,
-          service: serviceMap.get(event.service_id) || { id: event.service_id, name: "Unknown" }
-        }));
+        // Get service events with service information
+        const events = await getServiceEventsWithServices(
+          tenantId, 
+          selectedService, 
+          formattedStartDate, 
+          formattedEndDate
+        );
         
         // If no group filtering, return all events
         if (selectedGroup === "all") {
-          setServiceEvents(enrichedEvents);
-          setIsLoading(false);
+          setServiceEvents(events);
           return;
         }
         
@@ -95,10 +60,10 @@ export function useServiceEvents({
           
         if (serviceGroupsError) throw serviceGroupsError;
         
-        const serviceIds2 = serviceGroups?.map(sg => sg.service_id) || [];
+        const serviceIds = serviceGroups?.map(sg => sg.service_id) || [];
         
-        const filteredEvents = enrichedEvents.filter(event => 
-          serviceIds2.includes(event.service_id)
+        const filteredEvents = events.filter(event => 
+          serviceIds.includes(event.service_id)
         );
         
         setServiceEvents(filteredEvents);

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { updateServiceEvent } from "@/lib/services/service-events";
+import { updateServiceEvent } from "@/lib/services/service-event-crud";
 import { ServiceEventForm, ServiceEventFormValues } from "./ServiceEventForm";
 
 interface ServiceEventEditDialogProps {

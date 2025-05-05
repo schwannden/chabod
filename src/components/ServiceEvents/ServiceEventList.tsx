@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ServiceEventWithService } from "@/lib/services/types";
 import { Loader2 } from "lucide-react";
@@ -8,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { ServiceEventRow } from "./ServiceEventRow";
 import { Table, TableHeader, TableBody, TableRow, TableHead } from "@/components/ui/table";
+import { deleteServiceEvent } from "@/lib/services/service-event-crud";
 
 interface ServiceEventListProps {
   serviceEvents: ServiceEventWithService[];
@@ -95,21 +95,7 @@ export function ServiceEventList({
 
   const handleDeleteEvent = async (eventId: string) => {
     try {
-      // First delete the event owners to avoid foreign key constraints
-      const { error: ownersError } = await supabase
-        .from("service_event_owners")
-        .delete()
-        .eq("service_event_id", eventId);
-
-      if (ownersError) throw ownersError;
-
-      // Then delete the event itself
-      const { error } = await supabase
-        .from("service_events")
-        .delete()
-        .eq("id", eventId);
-
-      if (error) throw error;
+      await deleteServiceEvent(eventId);
 
       toast({
         title: "事件刪除成功",
