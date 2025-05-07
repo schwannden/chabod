@@ -1,1 +1,7 @@
+# Run formatting and linting
+npm run format
+npm run lint:fix
 npm run lint .
+
+# Add changes made by formatters/linters back to staging
+git add -A
