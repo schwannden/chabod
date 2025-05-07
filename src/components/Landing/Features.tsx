@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info } from "lucide-react";
 
@@ -35,29 +34,14 @@ export function Features() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <FeatureCard 
-            title="會友管理" 
-            description="輕鬆管理教會成員資料，追蹤參與度及聯絡資訊" 
-          />
-          <FeatureCard 
-            title="小組管理" 
-            description="組織和管理教會小組，掌握小組動態" 
-          />
-          <FeatureCard 
-            title="活動管理" 
-            description="規劃及組織教會活動，管理報名與出席" 
-          />
-          <FeatureCard 
-            title="資源管理" 
-            description="有效管理教會資源，包括場地、設備等" 
-          />
-          <FeatureCard 
-            title="服事管理" 
-            description="安排志工與服事人員，確保教會運作順暢" 
-          />
-          <FeatureCard 
-            title="多語言支援" 
-            description="支援中文介面，適合台灣及華人教會使用" 
+          <FeatureCard title="會友管理" description="管理教會成員資料，一切以人為本" />
+          <FeatureCard title="分組管理" description="自訂管理教會組織，分類事工與教會活動" />
+          <FeatureCard title="活動管理" description="對內活動安排不衝突，對外宣傳更輕鬆" />
+          <FeatureCard title="資源管理" description="數位資產傳承，簡化行政工作" />
+          <FeatureCard title="服事管理" description="安排服事人員，確保教會運作順暢" />
+          <FeatureCard
+            title="多語言支援(中文、英文)"
+            description="支援中文介面，適合華人教會使用"
           />
         </div>
       </div>

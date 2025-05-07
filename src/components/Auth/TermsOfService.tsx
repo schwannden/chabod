@@ -25,7 +25,7 @@ export function TermsOfService({ accepted, onChange }: TermsOfServiceProps) {
   return (
     <div className="space-y-2">
       <Label>信仰告白（註冊需同意）</Label>
-      <div className="max-h-40 overflow-y-auto bg-muted px-3 py-2 rounded border text-sm whitespace-pre-line">
+      <div className="max-h-40 overflow-y-auto bg-muted px-2 rounded border text-sm whitespace-pre-line">
         {termsOfServiceText}
       </div>
       <div className="flex items-start space-x-2 mt-2">
@@ -37,7 +37,15 @@ export function TermsOfService({ accepted, onChange }: TermsOfServiceProps) {
           aria-required="true"
         />
         <Label htmlFor="terms" className="cursor-pointer select-none">
-          我已閱讀並同意以上信仰告白
+          我已閱讀並同意以上信仰告白及
+          <a
+            href="/legal/terms-of-service.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary font-bold hover:underline"
+          >
+            服務條款
+          </a>
         </Label>
       </div>
     </div>

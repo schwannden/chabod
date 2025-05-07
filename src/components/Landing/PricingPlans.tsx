@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,7 +28,9 @@ function PricingCard({
   buttonLink,
 }: PricingCardProps) {
   return (
-    <Card className={`border-0 ${highlighted ? 'shadow-xl ring-2 ring-primary' : 'shadow-md'} relative`}>
+    <Card
+      className={`border-0 ${highlighted ? "shadow-xl ring-2 ring-primary" : "shadow-md"} relative`}
+    >
       {highlighted && (
         <div className="absolute -top-4 left-0 right-0 text-center">
           <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded-full">
@@ -41,9 +42,9 @@ function PricingCard({
         <CardTitle>{title}</CardTitle>
         <div className="mt-4">
           <span className="text-3xl font-bold">
-            {typeof price === 'number' ? `NT$${price}` : price}
+            {typeof price === "number" ? `NT$${price}` : price}
           </span>
-          {typeof price === 'number' && <span className="ml-1">/ 月</span>}
+          {typeof price === "number" && <span className="ml-1">/ 月</span>}
         </div>
         <CardDescription className="mt-2">{description}</CardDescription>
       </CardHeader>
@@ -89,14 +90,49 @@ export function PricingPlans() {
     loadPriceTiers();
   }, []);
 
-  // Find specific tiers by name
-  const freeTier = priceTiers.find(tier => tier.name === "Free") || null;
-  const standardTier = priceTiers.find(tier => tier.name === "Standard") || null;
-  const proTier = priceTiers.find(tier => tier.name === "Professional") || null;
-
   if (isLoading) {
     return <div className="py-20 text-center">載入價格方案中...</div>;
   }
+
+  // Helper function to get tier features
+  const getTierFeatures = (tier: PriceTier) => {
+    const features = [
+      `會友人數上限: ${tier.user_limit} 人`,
+      `小組數量上限: ${tier.group_limit} 個`,
+      `活動數量上限: ${tier.event_limit} 個`,
+    ];
+
+    if (tier.name === "Free") {
+      features.push("所有基本管理", "社群支援");
+    } else if (tier.name === "Starter") {
+      features.push("所有免費方案功能");
+    } else if (tier.name === "Standard") {
+      features.push("所有Starter功能", "優先支援");
+    } else if (tier.name === "Advanced") {
+      features.push("所有Standard功能", "優先支援");
+    } else if (tier.name === "Pro") {
+      features.push("所有Advanced功能", "專屬支援經理");
+    }
+
+    return features;
+  };
+
+  // Helper function to get tier button properties
+  const getTierButtonProps = (tier: PriceTier) => {
+    if (tier.name === "Free") {
+      return {
+        text: "立即開始",
+        variant: "outline" as const,
+        link: "/auth?tab=signup",
+      };
+    } else {
+      return {
+        text: "聯絡我們",
+        variant: "default" as const,
+        link: "mailto:support@fruitful-tools.com",
+      };
+    }
+  };
 
   return (
     <section id="pricing" className="py-20 px-4 bg-background">
@@ -111,57 +147,26 @@ export function PricingPlans() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          <PricingCard 
-            title={freeTier?.name || "基礎方案"} 
-            price="免費" 
-            description="適合小型團契或剛起步的教會"
-            features={[
-              `會友人數上限: ${freeTier?.user_limit || 50} 人`,
-              `小組數量上限: ${freeTier?.group_limit || 10} 個`,
-              `活動數量上限: ${freeTier?.event_limit || 20} 個`,
-              "基本會友管理",
-              "社群支援"
-            ]}
-            buttonText="立即開始"
-            buttonVariant="outline"
-            buttonLink="/auth?tab=signup"
-          />
-          
-          <PricingCard 
-            title={standardTier?.name || "標準方案"} 
-            price={standardTier?.price_monthly || 1000} 
-            description="適合中型教會的完整功能"
-            features={[
-              `會友人數上限: ${standardTier?.user_limit || 300} 人`,
-              `小組數量上限: ${standardTier?.group_limit || 30} 個`,
-              `活動數量上限: ${standardTier?.event_limit || 100} 個`,
-              "所有基礎方案功能",
-              "進階會友管理",
-              "完整活動管理",
-              "優先支援"
-            ]}
-            buttonText="聯絡我們"
-            buttonVariant="default"
-            highlighted={true}
-          />
-          
-          <PricingCard 
-            title={proTier?.name || "專業方案"} 
-            price={proTier?.price_monthly || 2500} 
-            description="適合大型教會的高級功能"
-            features={[
-              `會友人數上限: ${proTier?.user_limit || "無限"} 人`,
-              `小組數量上限: ${proTier?.group_limit || "無限"} 個`,
-              `活動數量上限: ${proTier?.event_limit || "無限"} 個`,
-              "所有標準方案功能",
-              "多教會管理",
-              "自訂報表",
-              "專屬支援經理"
-            ]}
-            buttonText="聯絡我們"
-            buttonVariant="outline"
-          />
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {priceTiers.map((tier, index) => {
+            const buttonProps = getTierButtonProps(tier);
+            const price = tier.name === "Free" ? "免費" : tier.price_monthly;
+            const isHighlighted = tier.name === "Standard";
+
+            return (
+              <PricingCard
+                key={tier.id || index}
+                title={tier.name}
+                price={price}
+                description={tier.description}
+                features={getTierFeatures(tier)}
+                buttonText={buttonProps.text}
+                buttonVariant={buttonProps.variant}
+                buttonLink={buttonProps.link}
+                highlighted={isHighlighted}
+              />
+            );
+          })}
         </div>
       </div>
     </section>

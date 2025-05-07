@@ -5,10 +5,7 @@ import { Tenant, TenantWithUsage, PriceTier } from "./types";
  * Fetches all price tiers
  */
 export async function getPriceTiers(): Promise<PriceTier[]> {
-  const { data, error } = await supabase
-    .from("price_tiers")
-    .select("*")
-    .order("price_monthly");
+  const { data, error } = await supabase.from("price_tiers").select("*").order("price_monthly");
 
   if (error) {
     console.error("Error fetching price tiers:", error);

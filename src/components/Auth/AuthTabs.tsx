@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { SignInForm } from "./SignInForm";
 import { SignUpForm } from "./SignUpForm";
@@ -12,7 +11,13 @@ interface AuthTabsProps {
   initialTab?: "signin" | "signup";
 }
 
-export function AuthTabs({ tenantSlug, tenantName, inviteToken, onSuccess, initialTab = "signin" }: AuthTabsProps) {
+export function AuthTabs({
+  tenantSlug,
+  tenantName,
+  inviteToken,
+  onSuccess,
+  initialTab = "signin",
+}: AuthTabsProps) {
   const [activeTab, setActiveTab] = useState<"signin" | "signup">(initialTab);
 
   const handleSignInClick = () => setActiveTab("signin");
