@@ -1,5 +1,22 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Tenant, TenantWithUsage } from "./types";
+import { Tenant, TenantWithUsage, PriceTier } from "./types";
+
+/**
+ * Fetches all price tiers
+ */
+export async function getPriceTiers(): Promise<PriceTier[]> {
+  const { data, error } = await supabase
+    .from("price_tiers")
+    .select("*")
+    .order("price_monthly");
+
+  if (error) {
+    console.error("Error fetching price tiers:", error);
+    return [];
+  }
+
+  return data || [];
+}
 
 /**
  * Fetches all tenants that a user is a member of
