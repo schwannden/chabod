@@ -95,7 +95,7 @@ export function PricingPlans() {
   const proTier = priceTiers.find(tier => tier.name === "Professional") || null;
 
   if (isLoading) {
-    return <div>Loading pricing plans...</div>;
+    return <div className="py-20 text-center">載入價格方案中...</div>;
   }
 
   return (
@@ -117,10 +117,10 @@ export function PricingPlans() {
             price="免費" 
             description="適合小型團契或剛起步的教會"
             features={[
-              `最多 ${freeTier?.user_limit || 50} 位會友`,
+              `會友人數上限: ${freeTier?.user_limit || 50} 人`,
+              `小組數量上限: ${freeTier?.group_limit || 10} 個`,
+              `活動數量上限: ${freeTier?.event_limit || 20} 個`,
               "基本會友管理",
-              "小組管理",
-              "活動管理（基本功能）",
               "社群支援"
             ]}
             buttonText="立即開始"
@@ -133,12 +133,12 @@ export function PricingPlans() {
             price={standardTier?.price_monthly || 1000} 
             description="適合中型教會的完整功能"
             features={[
-              `最多 ${standardTier?.user_limit || 300} 位會友`,
+              `會友人數上限: ${standardTier?.user_limit || 300} 人`,
+              `小組數量上限: ${standardTier?.group_limit || 30} 個`,
+              `活動數量上限: ${standardTier?.event_limit || 100} 個`,
               "所有基礎方案功能",
               "進階會友管理",
               "完整活動管理",
-              "資源管理",
-              "服事管理",
               "優先支援"
             ]}
             buttonText="聯絡我們"
@@ -151,13 +151,13 @@ export function PricingPlans() {
             price={proTier?.price_monthly || 2500} 
             description="適合大型教會的高級功能"
             features={[
-              `無限會友數量`,
+              `會友人數上限: ${proTier?.user_limit || "無限"} 人`,
+              `小組數量上限: ${proTier?.group_limit || "無限"} 個`,
+              `活動數量上限: ${proTier?.event_limit || "無限"} 個`,
               "所有標準方案功能",
               "多教會管理",
               "自訂報表",
-              "API 整合",
-              "專屬支援經理",
-              "自訂網域"
+              "專屬支援經理"
             ]}
             buttonText="聯絡我們"
             buttonVariant="outline"
