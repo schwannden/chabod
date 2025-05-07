@@ -144,6 +144,7 @@ export default function LandingPage() {
                 ]}
                 buttonText="立即開始"
                 buttonVariant="outline"
+                buttonLink="/auth?tab=signup"
               />
               
               <PricingCard 
@@ -220,12 +221,12 @@ export default function LandingPage() {
               <h3 className="font-bold mb-4">聯絡我們</h3>
               <p className="text-muted-foreground">
                 有任何問題或建議？<br />
-                請寄信至 <a href="mailto:info@chabod.app" className="text-primary hover:underline">info@chabod.app</a>
+                請寄信至 <a href="mailto:support@chabod.fruitful-tools.com" className="text-primary hover:underline">support@chabod.fruitful-tools.com</a>
               </p>
             </div>
           </div>
           <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Chabod. 保留所有權利。
+            © 2025 Chabod Limited. 保留所有權利。
           </div>
         </div>
       </footer>
@@ -255,6 +256,7 @@ interface PricingCardProps {
   buttonText: string;
   buttonVariant: "default" | "outline";
   highlighted?: boolean;
+  buttonLink?: string;
 }
 
 function PricingCard({
@@ -265,6 +267,7 @@ function PricingCard({
   buttonText,
   buttonVariant,
   highlighted = false,
+  buttonLink,
 }: PricingCardProps) {
   return (
     <Card className={`border-0 ${highlighted ? 'shadow-xl ring-2 ring-primary' : 'shadow-md'} relative`}>
@@ -291,9 +294,15 @@ function PricingCard({
             </li>
           ))}
         </ul>
-        <Button variant={buttonVariant} className="w-full">
-          {buttonText}
-        </Button>
+        {buttonLink ? (
+          <Button asChild variant={buttonVariant} className="w-full">
+            <Link to={buttonLink}>{buttonText}</Link>
+          </Button>
+        ) : (
+          <Button variant={buttonVariant} className="w-full">
+            {buttonText}
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

@@ -1,5 +1,6 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { AuthTabs } from "@/components/Auth/AuthTabs";
 import { NavBar } from "@/components/Layout/NavBar";
 import { useSession } from "@/hooks/useSession";
@@ -7,6 +8,8 @@ import { useSession } from "@/hooks/useSession";
 export default function AuthPage() {
   const { user, isLoading } = useSession();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get("tab") === "signup" ? "signup" : "signin";
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -29,7 +32,7 @@ export default function AuthPage() {
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto mt-8">
           <h1 className="text-3xl font-bold text-center mb-8">歡迎使用 Chabod 教會管理系統</h1>
-          <AuthTabs onSuccess={handleAuthSuccess} />
+          <AuthTabs onSuccess={handleAuthSuccess} initialTab={initialTab} />
         </div>
       </main>
     </div>
