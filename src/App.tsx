@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SessionProvider } from "@/contexts/AuthContext";
 import DashboardPage from "./pages/DashboardPage";
 import AuthPage from "./pages/AuthPage";
+import LandingPage from "./pages/LandingPage";
 import TenantDashboard from "./pages/tenant/DashboardPage";
 import TenantAuth from "./pages/tenant/AuthPage";
 import MembersPage from "./pages/tenant/MembersPage";
@@ -30,7 +32,8 @@ export default function App() {
           <BrowserRouter>
             <Routes>
               {/* Root routes */}
-              <Route path="/" element={<DashboardPage />} />
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/profile" element={<ProfilePage />} />
 

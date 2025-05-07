@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -6,7 +7,7 @@ const Index = () => {
 
   useEffect(() => {
     // Redirect to the dashboard page
-    navigate("/");
+    navigate("/dashboard");
   }, [navigate]);
 
   return (
