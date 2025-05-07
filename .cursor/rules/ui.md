@@ -1,0 +1,55 @@
+# UI Rules
+
+This rule provides standards for frontend components, ensuring consistent styling and animations.
+
+## Component Styling
+
+When working in the components directory:
+
+- Always use Tailwind for styling
+- Always use shadcn for component templates
+- Avoid modifying components directly in `components/ui` as these are shadcn UI components
+- When component styling is needed, use components from `components/ui` and overwrite the styling with Tailwind
+- Follow established naming conventions for components (PascalCase for component files and functions)
+- Group related components in dedicated directories (e.g., `Events/`, `Services/`, etc.)
+- Use composition patterns with shadcn components for complex UI elements
+
+## Types
+
+When working with Types:
+
+- Check `src/lib/types.ts` first to avoid duplicate type definitions
+- Extend existing types when related entities need additional properties
+- Use TypeScript interfaces for component props
+- Follow the established naming pattern for complex types (e.g., `EntityWithRelated`)
+- Use strong typing for all component props and function parameters
+
+## API and Data Handling
+
+When working with API:
+
+- Use Zod for all form validation and data schema validation
+- Check `src/lib` for existing API services before creating new ones
+- Do not perform Supabase queries in page or component files
+- Always write queries in service files and import them in UI components
+- Follow the established pattern for error handling in service functions
+- Use React Query for data fetching and caching when appropriate
+
+## State Management
+
+- Use React hooks for component-level state
+- Use context providers for application-wide state
+- Follow the established pattern for form handling with React Hook Form
+
+## General Conventions
+
+- Maintain consistent error handling patterns across the application
+- Follow established naming conventions for files and functions
+- Keep components focused on a single responsibility
+- Extract reusable logic into custom hooks when appropriate
+
+## UX Convention
+
+- Upon delete, prompt alert to confirm
+- If the delete of a record will delete other records based on cascading rule defined in supabase table, be clear in the alert message
+- Remember to auto refresh the list/table when records are updated/created/deleted

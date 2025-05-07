@@ -1,0 +1,45 @@
+# Project Structure Rules
+
+This rule provides standards for code organization and project structure.
+
+## Directory Structure
+
+- `src/components/`: UI components organized by feature or domain
+  - `ui/`: shadcn UI components (do not modify directly)
+  - Feature directories (e.g., `Events/`, `Services/`): domain-specific components
+  - `shared/`: reusable components used across multiple features
+  - `Layout/`: layout components like headers, footers, and page templates
+- `src/lib/`: Services, utilities, and type definitions
+  - Service files for database operations
+  - Utility functions for common operations
+  - Type definitions in `types.ts`
+- `src/contexts/`: React context providers for application state
+- `src/hooks/`: Custom React hooks
+- `src/pages/`: Top-level page components
+- `src/integrations/`: External integrations like Supabase
+
+## File Naming
+
+- Use PascalCase for component files and React components
+- Use camelCase for utility files and functions
+- Use kebab-case for CSS files
+- Use descriptive names that reflect the component's purpose
+- Group related files in dedicated directories
+- Use consistent naming patterns across the codebase
+
+## Code Organization
+
+- Keep files focused on a single responsibility
+- Extract complex logic into separate utility functions or hooks
+- Group related functionality in dedicated directories
+- Use index.ts files to simplify imports when appropriate
+- Maintain consistent patterns for imports and exports
+
+## Feature Development
+
+- When adding a new feature, follow the established patterns:
+  1. Define types in `src/lib/types.ts` if needed
+  2. Create service functions in `src/lib/` for data operations
+  3. Create UI components in `src/components/`
+  4. Add page components in `src/pages/` if needed
+  5. Add routes in the router configuration
