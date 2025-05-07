@@ -13,12 +13,12 @@ export default function AuthPage() {
   useEffect(() => {
     if (!isLoading && user) {
       // User is already logged in, redirect to dashboard
-      navigate("/");
+      navigate("/dashboard");
     }
   }, [user, isLoading, navigate]);
 
   const handleAuthSuccess = () => {
-    navigate("/");
+    navigate("/dashboard");
   };
 
   if (isLoading) {

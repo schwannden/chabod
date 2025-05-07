@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/useSession";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -24,6 +24,7 @@ interface NavBarProps {
 export function NavBar({ tenant, onSignOut }: NavBarProps) {
   const { user, profile, signOut } = useSession();
   const navigate = useNavigate();
+  const location = useLocation();
   // Use the slug, not the ID for the tenant role lookup
   const { role } = useTenantRole(tenant?.slug, user?.id);
 
@@ -63,7 +64,8 @@ export function NavBar({ tenant, onSignOut }: NavBarProps) {
     }
   };
 
-  const showManageTenants = tenant?.slug && role === "owner";
+  const showManageTenants =
+    (tenant?.slug && role === "owner") || (user && location.pathname === "/");
 
   return (
     <header className="bg-background border-b sticky top-0 z-10">
@@ -74,7 +76,7 @@ export function NavBar({ tenant, onSignOut }: NavBarProps) {
               {tenant.name}
             </Link>
           ) : (
-            <Link to="/" className="text-xl font-semibold text-primary">
+            <Link to="/dashboard" className="text-xl font-semibold text-primary">
               Chabod
             </Link>
           )}
@@ -107,7 +109,7 @@ export function NavBar({ tenant, onSignOut }: NavBarProps) {
 
                 {showManageTenants && (
                   <DropdownMenuItem asChild>
-                    <Link to="/" className="flex items-center cursor-pointer">
+                    <Link to="/dashboard" className="flex items-center cursor-pointer">
                       <Building className="mr-2 h-4 w-4" />
                       <span>管理教會</span>
                     </Link>
