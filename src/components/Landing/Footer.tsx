@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 
 export function Footer() {
   return (
@@ -25,9 +24,14 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <Link to="/auth" className="text-muted-foreground hover:text-primary">
-                  登入
-                </Link>
+                <a
+                  href="/legal/terms-of-service.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary"
+                >
+                  Terms of Service
+                </a>
               </li>
             </ul>
           </div>
