@@ -5,13 +5,10 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { TenantForm, TenantFormData } from "./TenantForm";
 import { Tenant } from "@/lib/types";
 import { updateTenant } from "@/lib/tenant-utils";
 
@@ -28,75 +25,30 @@ export function TenantUpdateDialog({
   onClose,
   onTenantUpdated,
 }: TenantUpdateDialogProps) {
-  const [name, setName] = useState(tenant.name);
-  const [slug, setSlug] = useState(tenant.slug);
+  const [initialValues, setInitialValues] = useState<TenantFormData>({
+    name: tenant.name,
+    slug: tenant.slug,
+  });
   const [isUpdating, setIsUpdating] = useState(false);
-  const [errors, setErrors] = useState<{
-    name?: string;
-    slug?: string;
-  }>({});
   const { toast } = useToast();
 
   useEffect(() => {
     if (isOpen) {
-      setName(tenant.name);
-      setSlug(tenant.slug);
-      setErrors({});
+      setInitialValues({
+        name: tenant.name,
+        slug: tenant.slug,
+      });
     }
   }, [tenant, isOpen]);
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setName(value);
-    setErrors((prev) => ({ ...prev, name: undefined }));
-  };
-
-  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toLowerCase();
-    // Only allow lowercase letters, numbers and hyphens
-    const sanitizedValue = value.replace(/[^a-z0-9-]/g, "");
-    setSlug(sanitizedValue);
-    setErrors((prev) => ({ ...prev, slug: undefined }));
-  };
-
-  const validateInputs = () => {
-    const newErrors: { name?: string; slug?: string } = {};
-    let isValid = true;
-
-    // Validate name (trim and check if empty)
-    const trimmedName = name.trim();
-    if (!trimmedName) {
-      newErrors.name = "教會名稱不能為空";
-      isValid = false;
-    }
-
-    // Validate slug (check pattern and empty)
-    const trimmedSlug = slug.trim();
-    if (!trimmedSlug) {
-      newErrors.slug = "Slug 不能為空";
-      isValid = false;
-    } else if (!/^[a-z0-9-]+$/.test(trimmedSlug)) {
-      newErrors.slug = "Slug 只能包含小寫字母、數字和連字號";
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return { isValid, trimmedName, trimmedSlug };
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const { isValid, trimmedName, trimmedSlug } = validateInputs();
-    if (!isValid) return;
-
+  const handleSubmit = async (formData: TenantFormData) => {
     setIsUpdating(true);
 
     try {
-      await updateTenant(tenant.id, trimmedName, trimmedSlug);
+      await updateTenant(tenant.id, formData.name, formData.slug);
       toast({
         title: "更新成功",
-        description: `${trimmedName} 已更新。`,
+        description: `${formData.name} 已更新。`,
       });
       onTenantUpdated();
       onClose();
@@ -120,43 +72,14 @@ export function TenantUpdateDialog({
           <DialogDescription>Update the details of your tenant organization.</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Tenant Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={handleNameChange}
-              placeholder="My Organization"
-              required
-            />
-            {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="slug">Tenant Slug</Label>
-            <Input
-              id="slug"
-              value={slug}
-              onChange={handleSlugChange}
-              placeholder="my-organization"
-              required
-            />
-            {errors.slug && <p className="text-sm text-destructive">{errors.slug}</p>}
-            <p className="text-xs text-muted-foreground">
-              This will be used in the URL: /tenant/{slug || tenant.slug}
-            </p>
-          </div>
-
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isUpdating}>
-              {isUpdating ? "更新中..." : "更新教會資訊"}
-            </Button>
-          </DialogFooter>
-        </form>
+        <TenantForm
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          isProcessing={isUpdating}
+          processingText="更新中..."
+          submitText="更新教會資訊"
+          onCancel={onClose}
+        />
       </DialogContent>
     </Dialog>
   );
