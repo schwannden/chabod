@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -29,11 +30,16 @@ export function TenantCreateDialog({
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [errors, setErrors] = useState<{
+    name?: string;
+    slug?: string;
+  }>({});
   const { toast } = useToast();
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setName(value);
+    setErrors((prev) => ({ ...prev, name: undefined }));
 
     // Auto-generate slug from name (lowercase, replace spaces with hyphens)
     const slugValue = value
@@ -41,32 +47,61 @@ export function TenantCreateDialog({
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9-]/g, "");
     setSlug(slugValue);
+    setErrors((prev) => ({ ...prev, slug: undefined }));
+  };
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.toLowerCase();
+    // Only allow lowercase letters, numbers and hyphens
+    const sanitizedValue = value.replace(/[^a-z0-9-]/g, "");
+    setSlug(sanitizedValue);
+    setErrors((prev) => ({ ...prev, slug: undefined }));
+  };
+
+  const validateInputs = () => {
+    const newErrors: { name?: string; slug?: string } = {};
+    let isValid = true;
+
+    // Validate name (trim and check if empty)
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      newErrors.name = "教會名稱不能為空";
+      isValid = false;
+    }
+
+    // Validate slug (check pattern and empty)
+    const trimmedSlug = slug.trim();
+    if (!trimmedSlug) {
+      newErrors.slug = "Slug 不能為空";
+      isValid = false;
+    } else if (!/^[a-z0-9-]+$/.test(trimmedSlug)) {
+      newErrors.slug = "Slug 只能包含小寫字母、數字和連字號";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return { isValid, trimmedName, trimmedSlug };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name.trim() || !slug.trim()) {
-      toast({
-        title: "Validation error",
-        description: "Name and slug are required",
-        variant: "destructive",
-      });
-      return;
-    }
+    const { isValid, trimmedName, trimmedSlug } = validateInputs();
+    if (!isValid) return;
 
     setIsCreating(true);
 
     try {
-      await createTenant(name, slug, userId);
+      await createTenant(trimmedName, trimmedSlug, userId);
       toast({
         title: "Tenant created",
-        description: `${name} has been created successfully.`,
+        description: `${trimmedName} has been created successfully.`,
       });
       onTenantCreated();
       onClose();
       setName("");
       setSlug("");
+      setErrors({});
     } catch (error) {
       const errorMessage = error?.message || "未知錯誤";
       toast({
@@ -99,6 +134,7 @@ export function TenantCreateDialog({
               placeholder="My Organization"
               required
             />
+            {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
           </div>
 
           <div className="space-y-2">
@@ -106,12 +142,11 @@ export function TenantCreateDialog({
             <Input
               id="slug"
               value={slug}
-              onChange={(e) => setSlug(e.target.value)}
+              onChange={handleSlugChange}
               placeholder="my-organization"
               required
-              pattern="^[a-z0-9-]+$"
-              title="Lowercase letters, numbers, and hyphens only"
             />
+            {errors.slug && <p className="text-sm text-destructive">{errors.slug}</p>}
             <p className="text-xs text-muted-foreground">
               這將會被用於 URL: /tenant/{slug || "example"}
             </p>

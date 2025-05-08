@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -30,32 +31,72 @@ export function TenantUpdateDialog({
   const [name, setName] = useState(tenant.name);
   const [slug, setSlug] = useState(tenant.slug);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [errors, setErrors] = useState<{
+    name?: string;
+    slug?: string;
+  }>({});
   const { toast } = useToast();
 
   useEffect(() => {
-    setName(tenant.name);
-    setSlug(tenant.slug);
+    if (isOpen) {
+      setName(tenant.name);
+      setSlug(tenant.slug);
+      setErrors({});
+    }
   }, [tenant, isOpen]);
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setName(value);
+    setErrors((prev) => ({ ...prev, name: undefined }));
+  };
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.toLowerCase();
+    // Only allow lowercase letters, numbers and hyphens
+    const sanitizedValue = value.replace(/[^a-z0-9-]/g, "");
+    setSlug(sanitizedValue);
+    setErrors((prev) => ({ ...prev, slug: undefined }));
+  };
+
+  const validateInputs = () => {
+    const newErrors: { name?: string; slug?: string } = {};
+    let isValid = true;
+
+    // Validate name (trim and check if empty)
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      newErrors.name = "教會名稱不能為空";
+      isValid = false;
+    }
+
+    // Validate slug (check pattern and empty)
+    const trimmedSlug = slug.trim();
+    if (!trimmedSlug) {
+      newErrors.slug = "Slug 不能為空";
+      isValid = false;
+    } else if (!/^[a-z0-9-]+$/.test(trimmedSlug)) {
+      newErrors.slug = "Slug 只能包含小寫字母、數字和連字號";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return { isValid, trimmedName, trimmedSlug };
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name.trim() || !slug.trim()) {
-      toast({
-        title: "Validation error",
-        description: "Name and slug are required",
-        variant: "destructive",
-      });
-      return;
-    }
+    const { isValid, trimmedName, trimmedSlug } = validateInputs();
+    if (!isValid) return;
 
     setIsUpdating(true);
 
     try {
-      await updateTenant(tenant.id, name, slug);
+      await updateTenant(tenant.id, trimmedName, trimmedSlug);
       toast({
         title: "更新成功",
-        description: `${name} 已更新。`,
+        description: `${trimmedName} 已更新。`,
       });
       onTenantUpdated();
       onClose();
@@ -85,10 +126,11 @@ export function TenantUpdateDialog({
             <Input
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={handleNameChange}
               placeholder="My Organization"
               required
             />
+            {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
           </div>
 
           <div className="space-y-2">
@@ -96,12 +138,11 @@ export function TenantUpdateDialog({
             <Input
               id="slug"
               value={slug}
-              onChange={(e) => setSlug(e.target.value)}
+              onChange={handleSlugChange}
               placeholder="my-organization"
               required
-              pattern="^[a-z0-9-]+$"
-              title="Lowercase letters, numbers, and hyphens only"
             />
+            {errors.slug && <p className="text-sm text-destructive">{errors.slug}</p>}
             <p className="text-xs text-muted-foreground">
               This will be used in the URL: /tenant/{slug || tenant.slug}
             </p>
