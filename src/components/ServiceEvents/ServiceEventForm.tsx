@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { format } from "date-fns";
@@ -92,7 +93,23 @@ export function ServiceEventForm({
     setSelectedOwners([]);
   };
 
+  const handleSubtitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Allow typing with spaces but will be trimmed on form submission
+    form.setValue("subtitle", e.target.value);
+  };
+
+  const handleSubtitleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    // Trim whitespace when field loses focus
+    if (e.target.value) {
+      form.setValue("subtitle", e.target.value.trim());
+    }
+  };
+
   const handleFormSubmit = (values: ServiceEventFormValues) => {
+    // Trim subtitle if it exists before submitting
+    if (values.subtitle) {
+      values.subtitle = values.subtitle.trim();
+    }
     onSubmit(values);
   };
 
@@ -179,7 +196,11 @@ export function ServiceEventForm({
             <FormItem>
               <FormLabel>備註 (選填)</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input 
+                  {...field} 
+                  onChange={handleSubtitleChange}
+                  onBlur={handleSubtitleBlur}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

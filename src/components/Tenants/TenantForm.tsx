@@ -52,6 +52,7 @@ export function TenantForm({
     // Auto-generate slug from name if enabled
     if (autoGenerateSlug) {
       const slugValue = value
+        .trim()
         .toLowerCase()
         .replace(/\s+/g, "-")
         .replace(/[^a-z0-9-]/g, "");

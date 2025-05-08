@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Save, X } from "lucide-react";
@@ -21,21 +22,36 @@ export function MemberNameEditor({
   onCancel,
   isLoading,
 }: MemberNameEditorProps) {
+  const handleFirstNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFirstName(e.target.value);
+  };
+
+  const handleLastNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLastName(e.target.value);
+  };
+  
+  const handleSave = () => {
+    // Trim whitespace before saving
+    setFirstName(firstName.trim());
+    setLastName(lastName.trim());
+    onSave();
+  };
+
   return (
     <div className="flex gap-2 items-center">
       <Input
         value={firstName}
-        onChange={(e) => setFirstName(e.target.value)}
+        onChange={handleFirstNameChange}
         placeholder="名字"
         className="w-full max-w-[150px]"
       />
       <Input
         value={lastName}
-        onChange={(e) => setLastName(e.target.value)}
+        onChange={handleLastNameChange}
         placeholder="姓氏"
         className="w-full max-w-[150px]"
       />
-      <Button variant="ghost" size="icon" onClick={onSave} disabled={isLoading}>
+      <Button variant="ghost" size="icon" onClick={handleSave} disabled={isLoading}>
         <Save className="h-4 w-4" />
       </Button>
       <Button variant="ghost" size="icon" onClick={onCancel} disabled={isLoading}>

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import {
   Dialog,
@@ -60,7 +61,7 @@ export function CreateServiceEventDialog({
         date: values.date,
         start_time: values.startTime,
         end_time: values.endTime,
-        subtitle: values.subtitle || null,
+        subtitle: values.subtitle ? values.subtitle.trim() : null,
       };
 
       // Convert owners to the required format

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,7 +14,7 @@ import { getServiceGroups, getServiceNotes, getServiceRoles } from "@/lib/servic
 
 // Make sure name and tenant_id are required fields
 export const serviceFormSchema = z.object({
-  name: z.string().min(1, "名稱為必填"),
+  name: z.string().min(1, "名稱為必填").transform(value => value.trim()),
   tenant_id: z.string(),
   default_start_time: z.string().optional(),
   default_end_time: z.string().optional(),

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import {
   Dialog,
@@ -56,8 +57,9 @@ export function EditResourceDialog({
   }, [isOpen, resource.id]);
 
   const validateUrl = (url: string) => {
+    const trimmedUrl = url.trim();
     try {
-      new URL(url);
+      new URL(trimmedUrl);
       setUrlError("");
       return true;
     } catch {
@@ -69,7 +71,11 @@ export function EditResourceDialog({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name || !url || !icon) {
+    const trimmedName = name.trim();
+    const trimmedDescription = description.trim();
+    const trimmedUrl = url.trim();
+
+    if (!trimmedName || !trimmedUrl || !icon) {
       toast({
         title: "錯誤",
         description: "資源名稱、網址和圖示不能為空",
@@ -78,7 +84,7 @@ export function EditResourceDialog({
       return;
     }
 
-    if (!validateUrl(url)) {
+    if (!validateUrl(trimmedUrl)) {
       return;
     }
 
@@ -86,9 +92,9 @@ export function EditResourceDialog({
 
     try {
       const updatedResource = await updateResource(resource.id, {
-        name,
-        description,
-        url,
+        name: trimmedName,
+        description: trimmedDescription || null,
+        url: trimmedUrl,
         icon,
       });
 

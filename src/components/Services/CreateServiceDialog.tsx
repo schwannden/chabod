@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import {
@@ -49,9 +50,12 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
       setIsSubmitting(true);
       const formData = form.getValues();
 
+      // Trim name value before submission
+      const name = formData.name.trim();
+
       // Direct call to service-core
       await createService({
-        name: formData.name,
+        name: name,
         tenant_id: formData.tenant_id,
         default_start_time: formData.default_start_time || null,
         default_end_time: formData.default_end_time || null,

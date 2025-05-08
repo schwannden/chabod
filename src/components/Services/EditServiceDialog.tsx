@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -48,9 +49,12 @@ export function EditServiceDialog({
       setIsSubmitting(true);
       const formData = form.getValues();
 
+      // Trim name value before submission
+      const name = formData.name.trim();
+
       // Direct call to updateService
       await updateService(service.id, {
-        name: formData.name,
+        name: name,
         default_start_time: formData.default_start_time || null,
         default_end_time: formData.default_end_time || null,
       });

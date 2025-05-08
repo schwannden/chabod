@@ -52,7 +52,10 @@ export function GroupTable({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCreateGroup = async () => {
-    if (!newGroupName.trim()) {
+    const trimmedName = newGroupName.trim();
+    const trimmedDescription = newGroupDescription.trim();
+    
+    if (!trimmedName) {
       toast({
         title: "Error",
         description: "Group name is required",
@@ -63,7 +66,7 @@ export function GroupTable({
 
     setIsSubmitting(true);
     try {
-      await createGroup(tenantId, newGroupName, newGroupDescription);
+      await createGroup(tenantId, trimmedName, trimmedDescription);
       toast({
         title: "Success",
         description: "Group created successfully",
@@ -86,7 +89,11 @@ export function GroupTable({
 
   const handleUpdateGroup = async () => {
     if (!selectedGroup) return;
-    if (!newGroupName.trim()) {
+    
+    const trimmedName = newGroupName.trim();
+    const trimmedDescription = newGroupDescription.trim();
+    
+    if (!trimmedName) {
       toast({
         title: "Error",
         description: "Group name is required",
@@ -97,7 +104,7 @@ export function GroupTable({
 
     setIsSubmitting(true);
     try {
-      await updateGroup(selectedGroup.id, newGroupName, newGroupDescription);
+      await updateGroup(selectedGroup.id, trimmedName, trimmedDescription);
       toast({
         title: "Success",
         description: "Group updated successfully",
@@ -154,6 +161,22 @@ export function GroupTable({
 
   const navigateToGroupMembers = (groupId: string) => {
     navigate(`/tenant/${window.location.pathname.split("/")[2]}/groups/${groupId}`);
+  };
+  
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewGroupName(e.target.value);
+  };
+  
+  const handleNameBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    setNewGroupName(e.target.value.trim());
+  };
+  
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNewGroupDescription(e.target.value);
+  };
+  
+  const handleDescriptionBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+    setNewGroupDescription(e.target.value.trim());
   };
 
   return (
@@ -237,7 +260,8 @@ export function GroupTable({
               <Input
                 id="name"
                 value={newGroupName}
-                onChange={(e) => setNewGroupName(e.target.value)}
+                onChange={handleNameChange}
+                onBlur={handleNameBlur}
                 placeholder="輸入群組名稱"
               />
             </div>
@@ -246,7 +270,8 @@ export function GroupTable({
               <Textarea
                 id="description"
                 value={newGroupDescription}
-                onChange={(e) => setNewGroupDescription(e.target.value)}
+                onChange={handleDescriptionChange}
+                onBlur={handleDescriptionBlur}
                 placeholder="輸入群組描述"
                 rows={3}
               />
@@ -275,7 +300,8 @@ export function GroupTable({
               <Input
                 id="edit-name"
                 value={newGroupName}
-                onChange={(e) => setNewGroupName(e.target.value)}
+                onChange={handleNameChange}
+                onBlur={handleNameBlur}
               />
             </div>
             <div className="space-y-2">
@@ -283,7 +309,8 @@ export function GroupTable({
               <Textarea
                 id="edit-description"
                 value={newGroupDescription}
-                onChange={(e) => setNewGroupDescription(e.target.value)}
+                onChange={handleDescriptionChange}
+                onBlur={handleDescriptionBlur}
                 rows={3}
               />
             </div>

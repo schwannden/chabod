@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,6 +46,30 @@ export function ResourceDetailsFields({
 }: ResourceDetailsFieldsProps) {
   const IconComponent = AVAILABLE_ICONS.find((i) => i.value === icon)?.icon;
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onNameChange(e.target.value);
+  };
+  
+  const handleNameBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    onNameChange(e.target.value.trim());
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onDescriptionChange(e.target.value);
+  };
+  
+  const handleDescriptionBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+    onDescriptionChange(e.target.value.trim());
+  };
+
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onUrlChange(e.target.value);
+  };
+  
+  const handleUrlBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    onUrlChange(e.target.value.trim());
+  };
+
   return (
     <div className="grid gap-4 py-4">
       <div className="grid gap-2">
@@ -80,7 +105,8 @@ export function ResourceDetailsFields({
         <Input
           id="name"
           value={name}
-          onChange={(e) => onNameChange(e.target.value)}
+          onChange={handleNameChange}
+          onBlur={handleNameBlur}
           placeholder="輸入資源名稱"
           required
         />
@@ -91,7 +117,8 @@ export function ResourceDetailsFields({
         <Textarea
           id="description"
           value={description}
-          onChange={(e) => onDescriptionChange(e.target.value)}
+          onChange={handleDescriptionChange}
+          onBlur={handleDescriptionBlur}
           placeholder="輸入資源描述"
           rows={3}
         />
@@ -103,7 +130,8 @@ export function ResourceDetailsFields({
           id="url"
           type="url"
           value={url}
-          onChange={(e) => onUrlChange(e.target.value)}
+          onChange={handleUrlChange}
+          onBlur={handleUrlBlur}
           placeholder="輸入資源連結"
           required
           className={urlError ? "border-red-500" : ""}

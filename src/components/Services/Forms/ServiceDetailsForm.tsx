@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -15,6 +16,16 @@ interface ServiceDetailsFormProps {
 }
 
 export function ServiceDetailsForm({ form }: ServiceDetailsFormProps) {
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Trim the name on blur, but allow typing with spaces
+    form.setValue("name", e.target.value);
+  };
+
+  const handleNameBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    // Trim whitespace when field loses focus
+    form.setValue("name", e.target.value.trim());
+  };
+
   return (
     <Form {...form}>
       <form className="space-y-4">
@@ -25,7 +36,11 @@ export function ServiceDetailsForm({ form }: ServiceDetailsFormProps) {
             <FormItem>
               <FormLabel>名稱</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input 
+                  {...field} 
+                  onChange={handleNameChange}
+                  onBlur={handleNameBlur}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

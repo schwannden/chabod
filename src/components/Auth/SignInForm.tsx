@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -38,11 +39,24 @@ export function SignInForm({
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Ensure email is trimmed before submitting
+    const trimmedEmail = email.trim();
+    
+    if (!trimmedEmail) {
+      toast({
+        title: "登入失敗",
+        description: "電子郵件不能為空",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: trimmedEmail,
         password,
       });
 
@@ -97,10 +111,23 @@ export function SignInForm({
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Ensure email is trimmed before submitting
+    const trimmedEmail = email.trim();
+    
+    if (!trimmedEmail) {
+      toast({
+        title: "重設密碼失敗",
+        description: "電子郵件不能為空",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
         redirectTo: window.location.origin + "/auth",
       });
 
