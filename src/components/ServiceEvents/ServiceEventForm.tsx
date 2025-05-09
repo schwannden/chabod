@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { format } from "date-fns";
@@ -196,11 +195,7 @@ export function ServiceEventForm({
             <FormItem>
               <FormLabel>備註 (選填)</FormLabel>
               <FormControl>
-                <Input 
-                  {...field} 
-                  onChange={handleSubtitleChange}
-                  onBlur={handleSubtitleBlur}
-                />
+                <Input {...field} onChange={handleSubtitleChange} onBlur={handleSubtitleBlur} />
               </FormControl>
               <FormMessage />
             </FormItem>

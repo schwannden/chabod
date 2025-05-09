@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -54,10 +53,10 @@ export function SignUpForm({
       });
       return;
     }
-    
+
     // Trim the full name before submitting
     const trimmedFullName = fullName.trim();
-    
+
     if (!trimmedFullName) {
       toast({
         title: "姓名不能為空",
@@ -66,7 +65,7 @@ export function SignUpForm({
       });
       return;
     }
-    
+
     setLoading(true);
 
     try {

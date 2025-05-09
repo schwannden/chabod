@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Save, X } from "lucide-react";
@@ -29,7 +28,7 @@ export function MemberNameEditor({
   const handleLastNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLastName(e.target.value);
   };
-  
+
   const handleSave = () => {
     // Trim whitespace before saving
     setFirstName(firstName.trim());

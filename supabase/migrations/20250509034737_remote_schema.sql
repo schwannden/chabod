@@ -460,7 +460,8 @@ CREATE TABLE IF NOT EXISTS "public"."service_event_owners" (
     "user_id" "uuid" NOT NULL,
     "service_role_id" "uuid" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "tenant_id" "uuid" NOT NULL
 );
 
 
@@ -475,7 +476,8 @@ CREATE TABLE IF NOT EXISTS "public"."service_events" (
     "start_time" time without time zone NOT NULL,
     "end_time" time without time zone NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "tenant_id" "uuid" NOT NULL
 );
 
 
@@ -514,7 +516,8 @@ CREATE TABLE IF NOT EXISTS "public"."service_roles" (
     "service_id" "uuid" NOT NULL,
     "tenant_id" "uuid" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "description" "text"
 );
 
 
@@ -707,6 +710,10 @@ ALTER TABLE ONLY "public"."tenants"
 
 
 
+CREATE INDEX "idx_tenants_slug" ON "public"."tenants" USING "btree" ("slug");
+
+
+
 CREATE OR REPLACE TRIGGER "handle_updated_at_service_admins" BEFORE UPDATE ON "public"."service_admins" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
 
 
@@ -819,6 +826,11 @@ ALTER TABLE ONLY "public"."service_admins"
 
 
 
+ALTER TABLE ONLY "public"."service_admins"
+    ADD CONSTRAINT "service_admins_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."service_event_owners"
     ADD CONSTRAINT "service_event_owners_service_event_id_fkey" FOREIGN KEY ("service_event_id") REFERENCES "public"."service_events"("id") ON DELETE CASCADE;
 
@@ -829,8 +841,23 @@ ALTER TABLE ONLY "public"."service_event_owners"
 
 
 
+ALTER TABLE ONLY "public"."service_event_owners"
+    ADD CONSTRAINT "service_event_owners_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."service_event_owners"
+    ADD CONSTRAINT "service_event_owners_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."service_events"
     ADD CONSTRAINT "service_events_service_id_fkey" FOREIGN KEY ("service_id") REFERENCES "public"."services"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."service_events"
+    ADD CONSTRAINT "service_events_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE CASCADE;
 
 
 
@@ -879,6 +906,11 @@ ALTER TABLE ONLY "public"."tenant_members"
 
 
 
+ALTER TABLE ONLY "public"."tenant_members"
+    ADD CONSTRAINT "tenant_members_user_id_profiles_fk" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."tenants"
     ADD CONSTRAINT "tenants_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "auth"."users"("id");
 
@@ -911,35 +943,23 @@ CREATE POLICY "Anyone can view public events" ON "public"."events" FOR SELECT US
 
 
 
+CREATE POLICY "Authenticated tenant user can view service event owners" ON "public"."service_event_owners" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "public"."tenant_members"
+  WHERE (("tenant_members"."tenant_id" = "service_event_owners"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"())))));
+
+
+
+CREATE POLICY "Authenticated tenant user can view service events" ON "public"."service_events" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "public"."tenant_members"
+  WHERE (("tenant_members"."tenant_id" = "service_events"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"())))));
+
+
+
 CREATE POLICY "Authenticated users can view private events" ON "public"."events" FOR SELECT USING ((("auth"."role"() = 'authenticated'::"text") AND ("visibility" = 'private'::"public"."event_visibility")));
 
 
 
 CREATE POLICY "Creators and tenant owners can modify events" ON "public"."events" USING ((("created_by" = "auth"."uid"()) OR ( SELECT "public"."is_tenant_owner"("events"."tenant_id", "auth"."uid"()) AS "is_tenant_owner"))) WITH CHECK ((("created_by" = "auth"."uid"()) OR ( SELECT "public"."is_tenant_owner"("events"."tenant_id", "auth"."uid"()) AS "is_tenant_owner")));
-
-
-
-CREATE POLICY "Event owners can manage service event owners" ON "public"."service_event_owners" USING ((EXISTS ( SELECT 1
-   FROM "public"."service_event_owners" "eo"
-  WHERE (("eo"."service_event_id" = "service_event_owners"."service_event_id") AND ("eo"."user_id" = "auth"."uid"())))));
-
-
-
-CREATE POLICY "Event owners can update their events" ON "public"."service_events" FOR UPDATE USING ((EXISTS ( SELECT 1
-   FROM "public"."service_event_owners"
-  WHERE (("service_event_owners"."service_event_id" = "service_events"."id") AND ("service_event_owners"."user_id" = "auth"."uid"())))));
-
-
-
-CREATE POLICY "Event owners can view and update their events" ON "public"."service_events" FOR SELECT USING ((EXISTS ( SELECT 1
-   FROM "public"."service_event_owners"
-  WHERE (("service_event_owners"."service_event_id" = "service_events"."id") AND ("service_event_owners"."user_id" = "auth"."uid"())))));
-
-
-
-CREATE POLICY "Event owners can view service event owners" ON "public"."service_event_owners" FOR SELECT USING ((EXISTS ( SELECT 1
-   FROM "public"."service_event_owners" "eo"
-  WHERE (("eo"."service_event_id" = "service_event_owners"."service_event_id") AND ("eo"."user_id" = "auth"."uid"())))));
 
 
 
@@ -1009,7 +1029,7 @@ CREATE POLICY "Service admins can be viewed by tenant members" ON "public"."serv
 
 
 
-CREATE POLICY "Service admins can manage service event owners" ON "public"."service_event_owners" USING ((EXISTS ( SELECT 1
+CREATE POLICY "Service admins can manage service event owners" ON "public"."service_event_owners" TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM ("public"."service_events" "se"
      JOIN "public"."service_admins" "sa" ON (("sa"."service_id" = "se"."service_id")))
   WHERE (("se"."id" = "service_event_owners"."service_event_id") AND ("sa"."user_id" = "auth"."uid"())))));
@@ -1134,18 +1154,15 @@ CREATE POLICY "Tenant owners can manage resource-group associations" ON "public"
 
 
 
-CREATE POLICY "Tenant owners can manage service event owners" ON "public"."service_event_owners" USING ((EXISTS ( SELECT 1
-   FROM (("public"."service_events" "se"
-     JOIN "public"."services" "s" ON (("s"."id" = "se"."service_id")))
-     JOIN "public"."tenant_members" "tm" ON (("tm"."tenant_id" = "s"."tenant_id")))
-  WHERE (("se"."id" = "service_event_owners"."service_event_id") AND ("tm"."user_id" = "auth"."uid"()) AND ("tm"."role" = 'owner'::"text")))));
+CREATE POLICY "Tenant owners can manage service event owners" ON "public"."service_event_owners" TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "public"."tenant_members" "tm"
+  WHERE (("tm"."tenant_id" = "service_event_owners"."tenant_id") AND ("tm"."user_id" = "auth"."uid"()) AND ("tm"."role" = 'owner'::"text")))));
 
 
 
-CREATE POLICY "Tenant owners can manage service events" ON "public"."service_events" USING ((EXISTS ( SELECT 1
-   FROM ("public"."services" "s"
-     JOIN "public"."tenant_members" "tm" ON (("tm"."tenant_id" = "s"."tenant_id")))
-  WHERE (("s"."id" = "service_events"."service_id") AND ("tm"."user_id" = "auth"."uid"()) AND ("tm"."role" = 'owner'::"text")))));
+CREATE POLICY "Tenant owners can manage service events" ON "public"."service_events" TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "public"."tenant_members" "tm"
+  WHERE (("tm"."tenant_id" = "service_events"."tenant_id") AND ("tm"."user_id" = "auth"."uid"()) AND ("tm"."role" = 'owner'::"text")))));
 
 
 
@@ -1185,7 +1202,10 @@ CREATE POLICY "Users can read their own tenant memberships" ON "public"."tenant_
 
 
 
-CREATE POLICY "Users can update their own profile" ON "public"."profiles" FOR UPDATE USING (("auth"."uid"() = "id"));
+CREATE POLICY "Users can update own profile or owners can update members" ON "public"."profiles" FOR UPDATE USING ((("auth"."uid"() = "id") OR (EXISTS ( SELECT 1
+   FROM ("public"."tenant_members" "tm1"
+     JOIN "public"."tenant_members" "tm2" ON (("tm1"."tenant_id" = "tm2"."tenant_id")))
+  WHERE (("tm1"."user_id" = "auth"."uid"()) AND ("tm1"."role" = 'owner'::"text") AND ("tm2"."user_id" = "profiles"."id"))))));
 
 
 

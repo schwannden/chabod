@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,7 +48,7 @@ export function ResourceDetailsFields({
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onNameChange(e.target.value);
   };
-  
+
   const handleNameBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     onNameChange(e.target.value.trim());
   };
@@ -57,7 +56,7 @@ export function ResourceDetailsFields({
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onDescriptionChange(e.target.value);
   };
-  
+
   const handleDescriptionBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     onDescriptionChange(e.target.value.trim());
   };
@@ -65,7 +64,7 @@ export function ResourceDetailsFields({
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onUrlChange(e.target.value);
   };
-  
+
   const handleUrlBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     onUrlChange(e.target.value.trim());
   };

@@ -20,6 +20,20 @@ curl https://get.volta.sh | bash
 volta install node
 ```
 
+## Setup Loca Supabase
+
+1. `supabase start`
+2. `supabase migration up`
+3. Create a `.env.local` file with your local Supabase credentials:
+   ```bash
+   # Extract Supabase URL
+   echo "VITE_SUPABASE_URL=http://localhost:54321" > .env.local
+   
+   # Extract and add Supabase anon key
+   echo "VITE_SUPABASE_ANON_KEY=$(supabase status | grep "anon key:" | awk '{print $3}')" >> .env.local
+   ```
+4. If you wish to reset db with seed data: `supabase db reset`
+
 ## Development Environment Setup
 
 1. Fork the repository
@@ -45,29 +59,21 @@ We recommend using [Cursor](https://cursor.sh/) as your IDE for this project as 
 
 ## Development Workflow
 
-1. Create a new branch for your feature or bugfix:
+1. Create a new branch:
    ```bash
-   git checkout -b feature/your-feature-name
+   git checkout -b {type}/{pr-name}
    ```
+   type should be docs/feat/fix/refactor/build/chore, depending on your task type.
 
 2. Make your changes
 
 3. Run tests and linting before committing:
    ```bash
-   npm run lint
-   ```
-
-4. Fix any linting issues:
-   ```bash
+   npm run format
    npm run lint:fix
    ```
 
-5. Format your code:
-   ```bash
-   npm run format
-   ```
-
-6. Commit your changes using conventional commit messages
+4. Commit your changes using conventional commit messages
 
 ## Available Scripts
 

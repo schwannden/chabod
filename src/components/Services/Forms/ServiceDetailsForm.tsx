@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -36,11 +35,7 @@ export function ServiceDetailsForm({ form }: ServiceDetailsFormProps) {
             <FormItem>
               <FormLabel>名稱</FormLabel>
               <FormControl>
-                <Input 
-                  {...field} 
-                  onChange={handleNameChange}
-                  onBlur={handleNameBlur}
-                />
+                <Input {...field} onChange={handleNameChange} onBlur={handleNameBlur} />
               </FormControl>
               <FormMessage />
             </FormItem>

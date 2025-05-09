@@ -1,2 +1,0 @@
-alter table "public"."tenant_members" add constraint "tenant_members_user_id_profiles_fk" FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE not valid;
-alter table "public"."tenant_members" validate constraint "tenant_members_user_id_profiles_fk";

@@ -5,4 +5,5 @@
 # dotenvx
 .env.keys
 .env.local
-.env.*.local
+.env.production
+.env.development

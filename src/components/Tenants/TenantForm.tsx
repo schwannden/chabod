@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -97,12 +96,12 @@ export function TenantForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const { isValid, trimmedName, trimmedSlug } = validateInputs();
-    
+
     if (!isValid) return;
-    
-    onSubmit({ 
+
+    onSubmit({
       name: trimmedName,
-      slug: trimmedSlug
+      slug: trimmedSlug,
     });
   };
 

@@ -54,7 +54,7 @@ export function GroupTable({
   const handleCreateGroup = async () => {
     const trimmedName = newGroupName.trim();
     const trimmedDescription = newGroupDescription.trim();
-    
+
     if (!trimmedName) {
       toast({
         title: "Error",
@@ -89,10 +89,10 @@ export function GroupTable({
 
   const handleUpdateGroup = async () => {
     if (!selectedGroup) return;
-    
+
     const trimmedName = newGroupName.trim();
     const trimmedDescription = newGroupDescription.trim();
-    
+
     if (!trimmedName) {
       toast({
         title: "Error",
@@ -162,19 +162,19 @@ export function GroupTable({
   const navigateToGroupMembers = (groupId: string) => {
     navigate(`/tenant/${window.location.pathname.split("/")[2]}/groups/${groupId}`);
   };
-  
+
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewGroupName(e.target.value);
   };
-  
+
   const handleNameBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     setNewGroupName(e.target.value.trim());
   };
-  
+
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNewGroupDescription(e.target.value);
   };
-  
+
   const handleDescriptionBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     setNewGroupDescription(e.target.value.trim());
   };
