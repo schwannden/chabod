@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -30,7 +31,8 @@ export function TenantCreateDialog({
     setIsCreating(true);
 
     try {
-      await createTenant(formData.name, formData.slug, userId);
+      // Fixing this line - removing the extra argument
+      await createTenant(formData.name, formData.slug);
       toast({
         title: "Tenant created",
         description: `${formData.name} has been created successfully.`,
