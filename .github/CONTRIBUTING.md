@@ -6,7 +6,8 @@ Thank you for your interest in contributing to Chabod! This document provides gu
 
 - [Node.js](https://nodejs.org/) (we recommend using Volta for version management)
   - [Volta](https://volta.sh/) - for consistent Node.js and npm versions
-- [Cursor](https://cursor.sh/) - recommended IDE as our project has specific Cursor configurations
+- [Supabaswe Cli](https://supabase.com/docs/guides/local-development/cli/getting-started) - to start supabase and setup all databases locally.
+- (Optional)[Cursor](https://cursor.sh/) - recommended IDE as our project has specific Cursor configurations
 
 ## Setting Up Volta
 
@@ -20,11 +21,10 @@ curl https://get.volta.sh | bash
 volta install node
 ```
 
-## Setup Loca Supabase
+## Setup Local Supabase (First Time)
 
 1. `supabase start`
-2. `supabase migration up`
-3. Create a `.env.local` file with your local Supabase credentials:
+2. Create a `.env.local` file with your local Supabase credentials:
    ```bash
    # Extract Supabase URL
    echo "VITE_SUPABASE_URL=http://localhost:54321" > .env.local
@@ -32,26 +32,27 @@ volta install node
    # Extract and add Supabase anon key
    echo "VITE_SUPABASE_ANON_KEY=$(supabase status | grep "anon key:" | awk '{print $3}')" >> .env.local
    ```
-4. If you wish to reset db with seed data: `supabase db reset`
 
 ## Development Environment Setup
 
 1. Fork the repository
 2. Clone your fork:
+
    ```bash
    git clone https://github.com/YOUR-USERNAME/chabod.git
    cd chabod
    ```
 
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
+3. Install dependencies: `npm install`
+4. Start the development server: `npm run dev`
 
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
+## Sync from Database
+
+See [Official Docs](https://supabase.com/docs/reference/cli/supabase-db)
+
+1. `supabase link --project-ref cbqslwwonnlkvblpvyrc`
+2. `supabase db pull`
+3. `supabase migration up`
 
 ## IDE Setup
 
