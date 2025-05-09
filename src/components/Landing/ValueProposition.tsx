@@ -1,11 +1,35 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
+
+import { useNamingInfo } from "@/hooks/useNamingInfo";
 
 export function ValueProposition() {
+  const { isTooltipOpen, setIsTooltipOpen, namingExplanation } = useNamingInfo();
   return (
     <section className="py-20 px-4 bg-primary/5">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold mb-4">我們的核心價值</h2>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <h2 className="text-3xl font-bold">我們的核心價值</h2>
+            <TooltipProvider>
+              <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
+                <TooltipTrigger asChild onClick={() => setIsTooltipOpen(!isTooltipOpen)}>
+                  <div className="flex items-center gap-2 cursor-pointer">
+                    <Info className="h-6 w-6 text-primary" />
+                    <span className="text-sm text-primary font-medium">點擊了解命名由來</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent
+                  className="max-w-md text-sm p-4 text-left"
+                  side="bottom"
+                  sideOffset={5}
+                >
+                  {namingExplanation}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Chabod 團隊致力於開發真正滿足教會需求的數位工具
           </p>
