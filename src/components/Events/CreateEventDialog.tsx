@@ -1,6 +1,5 @@
-
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -31,22 +30,26 @@ export function CreateEventDialog({
   trigger,
 }: CreateEventDialogProps) {
   const [open, setOpen] = useState(false);
-  
+
   // Extract group IDs from the initial values if provided
-  const initialGroupIds = initialValues?.groups?.map(group => group.id) || [];
-  
-  const { form, isLoading, onSubmit } = useEventForm(tenantId, () => {
-    setOpen(false);
-    onEventCreated();
-  }, initialGroupIds);
+  const initialGroupIds = initialValues?.groups?.map((group) => group.id) || [];
+
+  const { form, isLoading, onSubmit } = useEventForm(
+    tenantId,
+    () => {
+      setOpen(false);
+      onEventCreated();
+    },
+    initialGroupIds,
+  );
 
   // Set form values when the dialog opens and initialValues are provided
   React.useEffect(() => {
     if (open && initialValues && form) {
       // Format date properly
-      const dateValue = initialValues.date 
-        ? typeof initialValues.date === 'string' 
-          ? parse(initialValues.date, 'yyyy-MM-dd', new Date()) 
+      const dateValue = initialValues.date
+        ? typeof initialValues.date === "string"
+          ? parse(initialValues.date, "yyyy-MM-dd", new Date())
           : new Date(initialValues.date)
         : new Date();
 

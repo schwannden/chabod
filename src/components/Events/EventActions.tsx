@@ -1,4 +1,3 @@
-
 import React from "react";
 import { EventWithGroups, Group } from "@/lib/types";
 import { Trash2, MoreVertical, Pencil, Copy } from "lucide-react";
@@ -57,7 +56,7 @@ export function EventActions({
           </EditEventDialog>
 
           {onCopyEvent && (
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onSelect={(e) => {
                 e.preventDefault();
                 onCopyEvent(event);

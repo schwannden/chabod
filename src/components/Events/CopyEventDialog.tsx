@@ -1,12 +1,6 @@
-
 import * as React from "react";
 import { useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { useEventForm } from "@/hooks/useEventForm";
@@ -32,20 +26,24 @@ export function CopyEventDialog({
   onOpenChange,
 }: CopyEventDialogProps) {
   // Extract group IDs from the event
-  const initialGroupIds = event?.groups?.map(group => group.id) || [];
-  
-  const { form, isLoading, onSubmit } = useEventForm(tenantId, () => {
-    onOpenChange(false);
-    onEventCreated();
-  }, initialGroupIds);
+  const initialGroupIds = event?.groups?.map((group) => group.id) || [];
+
+  const { form, isLoading, onSubmit } = useEventForm(
+    tenantId,
+    () => {
+      onOpenChange(false);
+      onEventCreated();
+    },
+    initialGroupIds,
+  );
 
   // Set form values when the dialog opens
   useEffect(() => {
     if (open && event && form) {
       // Format date properly
-      const dateValue = event.date 
-        ? typeof event.date === 'string' 
-          ? parse(event.date, 'yyyy-MM-dd', new Date()) 
+      const dateValue = event.date
+        ? typeof event.date === "string"
+          ? parse(event.date, "yyyy-MM-dd", new Date())
           : new Date(event.date)
         : new Date();
 

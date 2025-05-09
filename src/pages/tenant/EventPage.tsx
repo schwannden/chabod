@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useSession } from "@/hooks/useSession";
@@ -14,7 +13,6 @@ import { GenericEventPage } from "@/components/shared/GenericEventPage";
 import { useEventFilters } from "@/hooks/useEventFilters";
 import { getTenantGroups } from "@/lib/group-service";
 import { CopyEventDialog } from "@/components/Events/CopyEventDialog";
-import { Dialog } from "@/components/ui/dialog";
 
 export default function EventPage() {
   const { slug } = useParams<{ slug: string }>();

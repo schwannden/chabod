@@ -1,8 +1,14 @@
-
 import React from "react";
 import { format } from "date-fns";
 import { EventWithGroups, Group } from "@/lib/types";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Calendar, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { EventActions } from "./EventActions";
@@ -27,7 +33,7 @@ export function EventCard({
 }: EventCardProps) {
   const formattedDate = format(new Date(event.date), "MMMM d, yyyy");
   const hasTime = event.start_time || event.end_time;
-  
+
   let timeDisplay = "";
   if (event.start_time && event.end_time) {
     timeDisplay = `${event.start_time} - ${event.end_time}`;
@@ -40,15 +46,15 @@ export function EventCard({
   return (
     <Card className={cn("relative", event.visibility === "private" && "border-primary/30")}>
       {isEditable && (
-        <EventActions 
-          event={event} 
-          onEventUpdated={onEventUpdated} 
+        <EventActions
+          event={event}
+          onEventUpdated={onEventUpdated}
           onDeleteEvent={onDeleteEvent}
           onCopyEvent={onCopyEvent}
-          allGroups={allGroups} 
+          allGroups={allGroups}
         />
       )}
-      
+
       <CardHeader>
         <CardTitle>{event.name}</CardTitle>
         <CardDescription className="flex items-center gap-1">
@@ -61,13 +67,13 @@ export function EventCard({
           )}
         </CardDescription>
       </CardHeader>
-      
+
       {event.description && (
         <CardContent>
           <p className="text-sm text-muted-foreground">{event.description}</p>
         </CardContent>
       )}
-      
+
       {(event.event_link || (event.groups && event.groups.length > 0)) && (
         <CardFooter className="flex flex-wrap gap-2">
           {event.event_link && (
@@ -80,13 +86,15 @@ export function EventCard({
               Event Link
             </a>
           )}
-          
-          {event.groups && event.groups.length > 0 && event.groups.map((group) => (
-            <Badge key={group.id} variant="outline">
-              {group.name}
-            </Badge>
-          ))}
-          
+
+          {event.groups &&
+            event.groups.length > 0 &&
+            event.groups.map((group) => (
+              <Badge key={group.id} variant="outline">
+                {group.name}
+              </Badge>
+            ))}
+
           {event.visibility === "private" && (
             <Badge variant="secondary" className="ml-auto">
               Private
