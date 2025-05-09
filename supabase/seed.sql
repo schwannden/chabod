@@ -21,17 +21,19 @@ VALUES
   ('f1c713ff-cbb3-412a-858c-0f17dbde5f6a', 'peace@fruitful-tools.com', '果和平', '和平', '果');
 
 INSERT INTO "public"."tenants"
-  ("id", "name", "slug", "owner_id", "price_tier_id")
+  ("id", "name", "slug", "price_tier_id")
 VALUES
-  ('87332c35-a227-42f9-93cf-bf652f146dde', '多節果子教會', 'fruitful-church', '0b56e2b5-e3cf-43d0-9aca-f8a538fb512b', 'dae40b57-0e84-475d-88db-a33063f70957'),
-  ('c2e64a3f-2004-4f9c-8f41-0a61fbc6540b', '免費教會', 'free-church', 'd2e0a602-1214-4399-96ad-7d4f3dca75e5', '0d8a9b6d-094d-48ef-9664-fe4d35ce3389');
+  ('87332c35-a227-42f9-93cf-bf652f146dde', '多節果子教會', 'fruitful-church', 'dae40b57-0e84-475d-88db-a33063f70957'),
+  ('c2e64a3f-2004-4f9c-8f41-0a61fbc6540b', '免費教會', 'free-church', '0d8a9b6d-094d-48ef-9664-fe4d35ce3389');
   
 INSERT INTO
   "public"."tenant_members" ("tenant_id", "user_id", "role")
 VALUES
-  ('87332c35-a227-42f9-93cf-bf652f146dde', 'f1c713ff-cbb3-412a-858c-0f17dbde5f6a', 'member'),
+  ('87332c35-a227-42f9-93cf-bf652f146dde', '0b56e2b5-e3cf-43d0-9aca-f8a538fb512b', 'owner'),
   ('87332c35-a227-42f9-93cf-bf652f146dde', 'd2e0a602-1214-4399-96ad-7d4f3dca75e5', 'member'),
   ('87332c35-a227-42f9-93cf-bf652f146dde', 'e7a6bea4-7f8b-436c-b87a-6846468aef8e', 'member'),
+  ('87332c35-a227-42f9-93cf-bf652f146dde', 'f1c713ff-cbb3-412a-858c-0f17dbde5f6a', 'member'),
+  ('c2e64a3f-2004-4f9c-8f41-0a61fbc6540b', 'd2e0a602-1214-4399-96ad-7d4f3dca75e5', 'owner'),
   ('c2e64a3f-2004-4f9c-8f41-0a61fbc6540b', '0b56e2b5-e3cf-43d0-9aca-f8a538fb512b', 'member');
 
 INSERT INTO "public"."groups"

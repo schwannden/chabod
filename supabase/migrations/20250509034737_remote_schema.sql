@@ -148,20 +148,6 @@ $$;
 ALTER FUNCTION "public"."check_tenant_user_limit"("tenant_uuid" "uuid") OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."handle_new_tenant"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-BEGIN
-  INSERT INTO public.tenant_members (tenant_id, user_id, role)
-  VALUES (NEW.id, NEW.owner_id, 'owner');
-  RETURN NEW;
-END;
-$$;
-
-
-ALTER FUNCTION "public"."handle_new_tenant"() OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."handle_new_user"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -557,7 +543,6 @@ CREATE TABLE IF NOT EXISTS "public"."tenants" (
     "slug" "text" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "owner_id" "uuid" NOT NULL,
     "price_tier_id" "uuid" NOT NULL
 );
 
@@ -742,10 +727,6 @@ CREATE OR REPLACE TRIGGER "handle_updated_at_services" BEFORE UPDATE ON "public"
 
 
 
-CREATE OR REPLACE TRIGGER "on_tenant_created" AFTER INSERT ON "public"."tenants" FOR EACH ROW EXECUTE FUNCTION "public"."handle_new_tenant"();
-
-
-
 CREATE OR REPLACE TRIGGER "set_resources_updated_at" BEFORE UPDATE ON "public"."resources" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
 
 
@@ -912,11 +893,6 @@ ALTER TABLE ONLY "public"."tenant_members"
 
 
 ALTER TABLE ONLY "public"."tenants"
-    ADD CONSTRAINT "tenants_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "auth"."users"("id");
-
-
-
-ALTER TABLE ONLY "public"."tenants"
     ADD CONSTRAINT "tenants_price_tier_id_fkey" FOREIGN KEY ("price_tier_id") REFERENCES "public"."price_tiers"("id");
 
 
@@ -977,28 +953,27 @@ CREATE POLICY "Only event creators and tenant owners can modify event groups" ON
 
 
 
-CREATE POLICY "Only owners can delete tenants" ON "public"."tenants" FOR DELETE USING (("auth"."uid"() = "owner_id"));
+-- Tenants RLS
 
+CREATE POLICY "Only owners can delete tenants" ON "public"."tenants" FOR DELETE 
+USING ("public"."is_tenant_owner_check"("id"));
 
+CREATE POLICY "Only owners can update tenants" ON "public"."tenants" FOR UPDATE 
+USING ("public"."is_tenant_owner_check"("id"));
 
-CREATE POLICY "Only owners can update tenants" ON "public"."tenants" FOR UPDATE USING (("auth"."uid"() = "owner_id"));
+-- Resources RLS
 
+CREATE POLICY "Only tenant owners can create resources" ON "public"."resources" FOR INSERT
+WITH CHECK ("public"."is_tenant_owner_check"("tenant_id"));
 
+CREATE POLICY "Only tenant owners can delete resources" ON "public"."resources" FOR DELETE
+USING ("public"."is_tenant_owner_check"("tenant_id"));
 
-CREATE POLICY "Only tenant owners can create resources" ON "public"."resources" FOR INSERT WITH CHECK ("public"."is_tenant_owner_check"("tenant_id"));
-
-
-
-CREATE POLICY "Only tenant owners can delete resources" ON "public"."resources" FOR DELETE USING ("public"."is_tenant_owner_check"("tenant_id"));
-
-
-
-CREATE POLICY "Only tenant owners can update resources" ON "public"."resources" FOR UPDATE USING ("public"."is_tenant_owner_check"("tenant_id"));
-
+CREATE POLICY "Only tenant owners can update resources" ON "public"."resources" FOR UPDATE
+USING ("public"."is_tenant_owner_check"("tenant_id"));
 
 
 CREATE POLICY "Owners and creators can delete events" ON "public"."events" FOR DELETE USING ((("created_by" = "auth"."uid"()) OR "public"."is_tenant_owner"("tenant_id")));
-
 
 
 CREATE POLICY "Owners and creators can manage event group associations" ON "public"."events_groups" USING ((EXISTS ( SELECT 1
@@ -1188,10 +1163,6 @@ CREATE POLICY "Users can create events" ON "public"."events" FOR INSERT WITH CHE
 
 
 
-CREATE POLICY "Users can create tenants" ON "public"."tenants" FOR INSERT WITH CHECK (("auth"."uid"() = "owner_id"));
-
-
-
 CREATE POLICY "Users can read tenants they are members of" ON "public"."tenants" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
   WHERE (("tenant_members"."tenant_id" = "tenants"."id") AND ("tenant_members"."user_id" = "auth"."uid"())))));
@@ -1238,9 +1209,9 @@ CREATE POLICY "Users can view tenant members they belong to" ON "public"."tenant
 
 
 
-CREATE POLICY "Users can view their own tenants" ON "public"."tenants" FOR SELECT USING ((("auth"."uid"() = "owner_id") OR (EXISTS ( SELECT 1
+CREATE POLICY "Users can view their own tenants" ON "public"."tenants" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
-  WHERE (("tenant_members"."tenant_id" = "tenant_members"."id") AND ("tenant_members"."user_id" = "auth"."uid"()))))));
+   WHERE (("tenant_members"."tenant_id" = "tenants"."id") AND ("tenant_members"."user_id" = "auth"."uid"())))));
 
 
 
@@ -1505,12 +1476,6 @@ GRANT ALL ON FUNCTION "public"."check_tenant_group_limit"("tenant_uuid" "uuid") 
 GRANT ALL ON FUNCTION "public"."check_tenant_user_limit"("tenant_uuid" "uuid") TO "anon";
 GRANT ALL ON FUNCTION "public"."check_tenant_user_limit"("tenant_uuid" "uuid") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."check_tenant_user_limit"("tenant_uuid" "uuid") TO "service_role";
-
-
-
-GRANT ALL ON FUNCTION "public"."handle_new_tenant"() TO "anon";
-GRANT ALL ON FUNCTION "public"."handle_new_tenant"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."handle_new_tenant"() TO "service_role";
 
 
 

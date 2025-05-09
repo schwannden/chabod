@@ -712,7 +712,6 @@ export type Database = {
           created_at: string;
           id: string;
           name: string;
-          owner_id: string;
           price_tier_id: string;
           slug: string;
           updated_at: string;
@@ -721,7 +720,6 @@ export type Database = {
           created_at?: string;
           id?: string;
           name: string;
-          owner_id: string;
           price_tier_id: string;
           slug: string;
           updated_at?: string;
@@ -730,7 +728,6 @@ export type Database = {
           created_at?: string;
           id?: string;
           name?: string;
-          owner_id?: string;
           price_tier_id?: string;
           slug?: string;
           updated_at?: string;

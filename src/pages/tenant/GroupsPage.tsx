@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSession } from "@/hooks/useSession";
 import { GroupTable } from "@/components/Groups/GroupTable";
-import { getTenantBySlug } from "@/lib/tenant-utils";
+import { getTenantBySlug, fetchIsTenantOwner } from "@/lib/tenant-utils";
 import { getTenantGroups } from "@/lib/group-service";
 import { Tenant, GroupWithMemberCount } from "@/lib/types";
 import { TenantPageLayout } from "@/components/Layout/TenantPageLayout";
@@ -35,7 +35,8 @@ export default function GroupsPage() {
         }
         setTenant(tenantData);
 
-        setIsTenantOwner(tenantData.owner_id === user.id);
+        const isOwner = await fetchIsTenantOwner(tenantData.id, user.id);
+        setIsTenantOwner(isOwner);
 
         const groupsData = await getTenantGroups(tenantData.id);
         setGroups(groupsData);

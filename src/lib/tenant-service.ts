@@ -95,11 +95,7 @@ export async function getUserTenants(userId: string): Promise<TenantWithUsage[]>
 /**
  * Creates a new tenant
  */
-export async function createTenant(
-  name: string,
-  slug: string,
-  ownerId: string,
-): Promise<Tenant | null> {
+export async function createTenant(name: string, slug: string): Promise<Tenant | null> {
   // Get the free tier ID first
   const { data: freeTier, error: tierError } = await supabase
     .from("price_tiers")
@@ -117,7 +113,6 @@ export async function createTenant(
     .insert({
       name,
       slug,
-      owner_id: ownerId,
       price_tier_id: freeTier.id, // Add the free tier ID
     })
     .select()
@@ -189,5 +184,29 @@ export async function getTenantBySlug(slug: string): Promise<Tenant | null> {
   } catch (error) {
     console.error("Error in getTenantBySlug:", error);
     return null;
+  }
+}
+
+/**
+ * Checks if a user is the owner of a tenant
+ */
+export async function fetchIsTenantOwner(tenantId: string, userId: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabase
+      .from("tenant_members")
+      .select("role")
+      .eq("tenant_id", tenantId)
+      .eq("user_id", userId)
+      .single();
+
+    if (error) {
+      console.error("Error checking tenant ownership:", error);
+      return false;
+    }
+
+    return data?.role === "owner";
+  } catch (error) {
+    console.error("Error in fetchIsTenantOwner:", error);
+    return false;
   }
 }

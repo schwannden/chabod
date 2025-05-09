@@ -5,7 +5,7 @@ import { NavBar } from "@/components/Layout/NavBar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Tenant, Profile, GroupMemberWithProfile } from "@/lib/types";
-import { getTenantBySlug, getTenantMembers } from "@/lib/tenant-utils";
+import { getTenantBySlug, getTenantMembers, fetchIsTenantOwner } from "@/lib/tenant-utils";
 import { addUserToGroup, getGroupMembers, removeUserFromGroup } from "@/lib/group-service";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, UserMinus } from "lucide-react";
@@ -68,7 +68,8 @@ export default function GroupMembersPage() {
         }
         setTenant(tenantData);
 
-        setIsTenantOwner(tenantData.owner_id === user.id);
+        const isOwner = await fetchIsTenantOwner(tenantData.id, user.id);
+        setIsTenantOwner(isOwner);
 
         const { data: groupData, error: groupError } = await supabase
           .from("groups")
