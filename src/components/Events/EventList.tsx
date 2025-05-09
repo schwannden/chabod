@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Group, EventWithGroups } from "@/lib/types";
 import { Loader2 } from "lucide-react";
@@ -14,6 +15,7 @@ interface EventListProps {
   tenantId: string;
   onEventUpdated: () => void;
   allGroups: Group[];
+  onCopyEvent?: (event: EventWithGroups) => void;
 }
 
 export function EventList({
@@ -22,6 +24,7 @@ export function EventList({
   tenantId,
   onEventUpdated,
   allGroups,
+  onCopyEvent,
 }: EventListProps) {
   const { user } = useSession();
   const { toast } = useToast();
@@ -139,6 +142,7 @@ export function EventList({
           isEditable={editableEvents[event.id] || false}
           onEventUpdated={onEventUpdated}
           onDeleteEvent={handleDeleteEvent}
+          onCopyEvent={onCopyEvent}
           allGroups={allGroups}
         />
       ))}

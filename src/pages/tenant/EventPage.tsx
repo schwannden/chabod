@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
+
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useSession } from "@/hooks/useSession";
 import { CreateEventDialog } from "@/components/Events/CreateEventDialog";
@@ -21,6 +22,8 @@ export default function EventPage() {
   const [isEventsLoading, setIsEventsLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { toast } = useToast();
+  const [eventToCopy, setEventToCopy] = useState<EventWithGroups | undefined>(undefined);
+  const [showCopyDialog, setShowCopyDialog] = useState(false);
 
   // Use our custom filters hook
   const { selectedGroup, setSelectedGroup, startDate, setStartDate, endDate, setEndDate } =
@@ -102,6 +105,11 @@ export default function EventPage() {
     setRefreshTrigger((prev) => prev + 1);
   };
 
+  const handleCopyEvent = (event: EventWithGroups) => {
+    setEventToCopy(event);
+    setShowCopyDialog(true);
+  };
+
   // Return the refactored page using the generic component
   return slug ? (
     <GenericEventPage
@@ -126,18 +134,104 @@ export default function EventPage() {
           tenantId={slug}
           onEventUpdated={handleEventUpdated}
           allGroups={allGroups || []}
+          onCopyEvent={user ? handleCopyEvent : undefined}
         />
       }
       actionButton={
         user ? (
-          <CreateEventDialog
-            tenantId={slug}
-            onEventCreated={handleEventUpdated}
-            allGroups={allGroups || []}
-          />
+          <>
+            <CreateEventDialog
+              tenantId={slug}
+              onEventCreated={handleEventUpdated}
+              allGroups={allGroups || []}
+            />
+            {showCopyDialog && eventToCopy && (
+              <Dialog open={showCopyDialog} onOpenChange={setShowCopyDialog}>
+                <DialogContent className="sm:max-w-[500px]">
+                  <DialogHeader className="sticky top-0 z-10 bg-background pb-4">
+                    <DialogTitle>Copy Event</DialogTitle>
+                  </DialogHeader>
+                  <EventForm 
+                    tenantId={slug}
+                    initialEvent={eventToCopy}
+                    onSuccess={() => {
+                      setShowCopyDialog(false);
+                      setEventToCopy(undefined);
+                      handleEventUpdated();
+                    }}
+                    onCancel={() => {
+                      setShowCopyDialog(false);
+                      setEventToCopy(undefined);
+                    }}
+                    allGroups={allGroups || []}
+                  />
+                </DialogContent>
+              </Dialog>
+            )}
+          </>
         ) : null
       }
       fetchBaseData={fetchAllGroups}
     />
   ) : null;
+}
+
+// New component for event form when copying
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { parse } from "date-fns";
+
+interface EventFormProps {
+  tenantId: string;
+  initialEvent: EventWithGroups;
+  onSuccess: () => void;
+  onCancel: () => void;
+  allGroups: Group[];
+}
+
+function EventForm({ tenantId, initialEvent, onSuccess, onCancel, allGroups }: EventFormProps) {
+  // Extract group IDs from the initial values
+  const initialGroupIds = initialEvent?.groups?.map(group => group.id) || [];
+  
+  const { form, isLoading, onSubmit } = useEventForm(tenantId, onSuccess, initialGroupIds);
+
+  // Set form values when the component mounts with initialEvent
+  useEffect(() => {
+    if (initialEvent && form) {
+      // Format date properly
+      const dateValue = initialEvent.date 
+        ? typeof initialEvent.date === 'string' 
+          ? parse(initialEvent.date, 'yyyy-MM-dd', new Date()) 
+          : new Date(initialEvent.date)
+        : new Date();
+
+      // Populate form with values from the provided event
+      form.reset({
+        name: initialEvent.name,
+        description: initialEvent.description || "",
+        date: dateValue,
+        isFullDay: !initialEvent.start_time && !initialEvent.end_time,
+        start_time: initialEvent.start_time || "",
+        end_time: initialEvent.end_time || "",
+        event_link: initialEvent.event_link || "",
+        visibility: initialEvent.visibility,
+        groups: initialGroupIds,
+      });
+    }
+  }, [initialEvent, form]);
+
+  return (
+    <Form {...form}>
+      <form onSubmit={onSubmit} className="space-y-4 pb-2">
+        <EventDetailsFields form={form} groups={allGroups} />
+        <div className="sticky bottom-0 pt-2 bg-background flex justify-end gap-2">
+          <Button variant="outline" type="button" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "Creating..." : "Create Copy"}
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
 }

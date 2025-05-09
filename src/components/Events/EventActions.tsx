@@ -1,6 +1,7 @@
+
 import React from "react";
 import { EventWithGroups, Group } from "@/lib/types";
-import { Trash2, MoreVertical, Pencil } from "lucide-react";
+import { Trash2, MoreVertical, Pencil, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EditEventDialog } from "./EditEventDialog";
 import {
@@ -25,6 +26,7 @@ interface EventActionsProps {
   event: EventWithGroups;
   onEventUpdated: () => void;
   onDeleteEvent: (eventId: string) => Promise<void>;
+  onCopyEvent?: (event: EventWithGroups) => void;
   allGroups: Group[];
 }
 
@@ -32,6 +34,7 @@ export function EventActions({
   event,
   onEventUpdated,
   onDeleteEvent,
+  onCopyEvent,
   allGroups,
 }: EventActionsProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
@@ -52,6 +55,18 @@ export function EventActions({
               Edit event
             </DropdownMenuItem>
           </EditEventDialog>
+
+          {onCopyEvent && (
+            <DropdownMenuItem 
+              onSelect={(e) => {
+                e.preventDefault();
+                onCopyEvent(event);
+              }}
+            >
+              <Copy className="mr-2 h-4 w-4" />
+              Copy event
+            </DropdownMenuItem>
+          )}
 
           <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
             <AlertDialogTrigger asChild>
