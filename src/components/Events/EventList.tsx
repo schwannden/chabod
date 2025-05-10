@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Group, EventWithGroups } from "@/lib/types";
 import { Loader2 } from "lucide-react";
@@ -43,7 +44,11 @@ export function EventList({
 
   useEffect(() => {
     const checkPermissions = async () => {
-      if (!user || events.length === 0) return;
+      // Skip permission check if user is not authenticated or no events to check
+      if (!user || events.length === 0) {
+        setEditableEvents({});
+        return;
+      }
 
       const permissions: Record<string, boolean> = {};
 
@@ -83,7 +88,7 @@ export function EventList({
         console.error("Error checking edit permissions:", error);
         // Initialize with event creators having permission
         events.forEach((event) => {
-          permissions[event.id] = event.created_by === user.id;
+          permissions[event.id] = event.created_by === user?.id;
         });
         setEditableEvents(permissions);
       }
