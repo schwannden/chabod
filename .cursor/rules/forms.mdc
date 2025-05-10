@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
 # Form Handling Rules
 
 This rule provides standards for form implementation and validation.

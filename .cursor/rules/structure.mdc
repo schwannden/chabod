@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
 # Project Structure Rules
 
 This rule provides standards for code organization and project structure.

@@ -89,11 +89,13 @@ export function EventCard({
 
           {event.groups &&
             event.groups.length > 0 &&
-            event.groups.map((group) => (
-              <Badge key={group.id} variant="outline">
-                {group.name}
-              </Badge>
-            ))}
+            event.groups.map((group) =>
+              group ? (
+                <Badge key={group.id} variant="outline">
+                  {group.name}
+                </Badge>
+              ) : null,
+            )}
 
           {event.visibility === "private" && (
             <Badge variant="secondary" className="ml-auto">
