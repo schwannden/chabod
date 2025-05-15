@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { deleteTenant } from "@/lib/tenant-utils";
 import { TenantUpdateDialog } from "./TenantUpdateDialog";
 import { PricePlansDialog } from "./PricePlansDialog";
+import { HighRiskDeleteDialog } from "@/components/shared/HighRiskDeleteDialog";
 
 interface TenantCardProps {
   tenant: TenantWithUsage;
@@ -25,15 +26,12 @@ interface TenantCardProps {
 export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantCardProps) {
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAllPlansDialogOpen, setIsAllPlansDialogOpen] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this tenant? This action cannot be undone.")) {
-      return;
-    }
-
     setIsDeleting(true);
     try {
       await deleteTenant(tenant.id);
@@ -50,6 +48,7 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
       });
     } finally {
       setIsDeleting(false);
+      setIsDeleteDialogOpen(false);
     }
   };
 
@@ -83,7 +82,7 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
               <Button
                 size="icon"
                 variant="destructive"
-                onClick={handleDelete}
+                onClick={() => setIsDeleteDialogOpen(true)}
                 disabled={isDeleting}
               >
                 <Trash2 className="h-4 w-4" />
@@ -164,6 +163,17 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
         tenant={tenant}
         isOpen={isAllPlansDialogOpen}
         onOpenChange={setIsAllPlansDialogOpen}
+      />
+      
+      <HighRiskDeleteDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleDelete}
+        title="刪除教會"
+        description={`您確定要刪除 ${tenant.name} 嗎？這將永久刪除所有關聯的資料，包括會友、小組、活動等資訊。`}
+        confirmationText={tenant.slug}
+        confirmationPlaceholder="請輸入教會的 slug 以確認"
+        isLoading={isDeleting}
       />
     </>
   );

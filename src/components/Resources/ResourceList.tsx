@@ -37,18 +37,8 @@ import { Resource, Group } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { deleteResource } from "@/lib/resource-service";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { EditResourceDialog } from "./EditResourceDialog";
+import { ConfirmDeleteDialog } from "@/components/shared/ConfirmDeleteDialog";
 
 type LucideIcon = React.ForwardRefExoticComponent<
   Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
@@ -96,11 +86,18 @@ export function ResourceList({
   const { toast } = useToast();
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [deleteResourceId, setDeleteResourceId] = useState<string | null>(null);
+  const [deleteResourceName, setDeleteResourceName] = useState("");
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
+    if (!deleteResourceId) return;
+    
     try {
-      await deleteResource(id);
-      onResourceDeleted(id);
+      setIsDeleting(true);
+      await deleteResource(deleteResourceId);
+      onResourceDeleted(deleteResourceId);
       toast({
         title: "資源已刪除",
         description: "資源已成功刪除",
@@ -112,7 +109,16 @@ export function ResourceList({
         description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteDialogOpen(false);
     }
+  };
+
+  const openDeleteDialog = (resource: Resource) => {
+    setDeleteResourceId(resource.id);
+    setDeleteResourceName(resource.name);
+    setIsDeleteDialogOpen(true);
   };
 
   const handleEdit = (resource: Resource) => {
@@ -187,27 +193,14 @@ export function ResourceList({
                     <Button variant="outline" size="sm" onClick={() => handleEdit(resource)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>確認刪除</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            確定要刪除 "{resource.name}" 資源嗎？此操作無法撤銷。
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>取消</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDelete(resource.id)}>
-                            刪除
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-destructive"
+                      onClick={() => openDeleteDialog(resource)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 )}
               </CardFooter>
@@ -215,6 +208,15 @@ export function ResourceList({
           );
         })}
       </div>
+
+      <ConfirmDeleteDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleDelete}
+        title="確認刪除"
+        description={`確定要刪除 "${deleteResourceName}" 資源嗎？此操作無法撤銷。`}
+        isLoading={isDeleting}
+      />
 
       {editingResource && (
         <EditResourceDialog

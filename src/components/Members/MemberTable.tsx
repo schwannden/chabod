@@ -60,10 +60,6 @@ export function MemberTable({ members, isCurrentUserOwner, onMemberUpdated }: Me
   };
 
   const handleDeleteMember = async (memberId: string, memberName: string) => {
-    if (!confirm(`確定要移除 ${memberName || "此會友"} 嗎？`)) {
-      return;
-    }
-
     setLoadingMemberId(memberId);
 
     try {
@@ -211,9 +207,8 @@ export function MemberTable({ members, isCurrentUserOwner, onMemberUpdated }: Me
                   isEditing={editingMemberId === member.id}
                   isLoading={loadingMemberId === member.id}
                   onEditClick={() => startEditing(member)}
-                  onDeleteClick={() =>
-                    handleDeleteMember(member.id, member.profile?.full_name || "")
-                  }
+                  onDeleteClick={() => handleDeleteMember(member.id, member.profile?.full_name || "")}
+                  memberName={member.profile?.full_name || ""}
                 />
               </TableCell>
             </TableRow>

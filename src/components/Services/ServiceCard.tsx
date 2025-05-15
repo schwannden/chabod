@@ -1,3 +1,5 @@
+
+import { useState } from "react";
 import { Service } from "@/lib/services";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,13 +13,8 @@ import {
 import { deleteService } from "@/lib/services";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useState } from "react";
-import {
-  ServiceAdminView,
-  ServiceGroupView,
-  ServiceNoteView,
-  ServiceRoleView,
-} from "./ServiceViews";
+import { ServiceAdminView, ServiceGroupView, ServiceNoteView, ServiceRoleView } from "./ServiceViews";
+import { ServiceDeleteDialog } from "./ServiceDeleteDialog";
 
 interface ServiceCardProps {
   service: Service;
@@ -27,15 +24,21 @@ interface ServiceCardProps {
 
 export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
   const [activeSheet, setActiveSheet] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     try {
+      setIsDeleting(true);
       await deleteService(service.id);
       toast.success("服事類型已刪除");
       onDeleted();
     } catch (error) {
       console.error("Error deleting service:", error);
       toast.error("刪除服事類型時發生錯誤");
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteDialogOpen(false);
     }
   };
 
@@ -61,7 +64,10 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
               <Pencil className="mr-2 h-4 w-4" />
               編輯基本資料
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive" onClick={handleDelete}>
+            <DropdownMenuItem 
+              className="text-destructive" 
+              onClick={() => setIsDeleteDialogOpen(true)}
+            >
               <Trash className="mr-2 h-4 w-4" />
               刪除
             </DropdownMenuItem>
@@ -151,6 +157,14 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
           </Sheet>
         </div>
       </CardContent>
+      
+      <ServiceDeleteDialog
+        service={service}
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleDelete}
+        isLoading={isDeleting}
+      />
     </Card>
   );
 }

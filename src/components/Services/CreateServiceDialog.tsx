@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import {
@@ -11,8 +12,10 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 import { useServiceForm } from "./hooks/useServiceForm";
-import { createService } from "@/lib/services";
+import { createServiceWithAssociations } from "@/lib/services";
 import { ServiceForm } from "./Forms/ServiceForm";
+import { NoteFormValues } from "./Forms/ServiceNotesForm";
+import { RoleFormValues } from "./Forms/ServiceRolesForm";
 
 interface CreateServiceDialogProps {
   tenantId: string;
@@ -52,13 +55,31 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
       // Trim name value before submission
       const name = formData.name.trim();
 
-      // Direct call to service-core
-      await createService({
-        name: name,
-        tenant_id: formData.tenant_id,
-        default_start_time: formData.default_start_time || null,
-        default_end_time: formData.default_end_time || null,
-      });
+      // Ensure notes have the required text property
+      const validatedNotes = notes.map(note => ({
+        text: note.text || "", // Ensure text is never undefined
+        link: note.link,
+      })) as { text: string; link?: string }[];
+
+      // Ensure roles have the required name property
+      const validatedRoles = roles.map(role => ({
+        name: role.name || "", // Ensure name is never undefined
+        description: role.description,
+      })) as { name: string; description?: string }[];
+
+      // Create service with all associations
+      await createServiceWithAssociations(
+        {
+          name: name,
+          tenant_id: formData.tenant_id,
+          default_start_time: formData.default_start_time || null,
+          default_end_time: formData.default_end_time || null,
+        },
+        selectedAdmins,
+        selectedGroups,
+        validatedNotes,
+        validatedRoles
+      );
 
       toast.success("服事類型已創建");
       handleDialogClose();
