@@ -93,7 +93,7 @@ export function ResourceList({
 
   const handleDelete = async () => {
     if (!deleteResourceId) return;
-    
+
     try {
       setIsDeleting(true);
       await deleteResource(deleteResourceId);
@@ -193,9 +193,9 @@ export function ResourceList({
                     <Button variant="outline" size="sm" onClick={() => handleEdit(resource)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       className="text-destructive"
                       onClick={() => openDeleteDialog(resource)}
                     >

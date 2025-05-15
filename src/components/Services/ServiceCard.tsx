@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Service } from "@/lib/services";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +12,12 @@ import {
 import { deleteService } from "@/lib/services";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { ServiceAdminView, ServiceGroupView, ServiceNoteView, ServiceRoleView } from "./ServiceViews";
+import {
+  ServiceAdminView,
+  ServiceGroupView,
+  ServiceNoteView,
+  ServiceRoleView,
+} from "./ServiceViews";
 import { ServiceDeleteDialog } from "./ServiceDeleteDialog";
 
 interface ServiceCardProps {
@@ -64,8 +68,8 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
               <Pencil className="mr-2 h-4 w-4" />
               編輯基本資料
             </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="text-destructive" 
+            <DropdownMenuItem
+              className="text-destructive"
               onClick={() => setIsDeleteDialogOpen(true)}
             >
               <Trash className="mr-2 h-4 w-4" />
@@ -157,7 +161,7 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
           </Sheet>
         </div>
       </CardContent>
-      
+
       <ServiceDeleteDialog
         service={service}
         isOpen={isDeleteDialogOpen}

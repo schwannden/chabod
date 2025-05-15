@@ -1,4 +1,3 @@
-
 import React from "react";
 import { EventWithGroups, Group } from "@/lib/types";
 import { Trash2, MoreVertical, Pencil, Copy } from "lucide-react";
@@ -71,11 +70,11 @@ export function EventActions({
             </DropdownMenuItem>
           )}
 
-          <DropdownMenuItem 
+          <DropdownMenuItem
             onSelect={(e) => {
               e.preventDefault();
               setIsDeleteDialogOpen(true);
-            }} 
+            }}
             className="text-destructive"
           >
             <Trash2 className="mr-2 h-4 w-4" />

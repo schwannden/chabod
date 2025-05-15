@@ -1,4 +1,3 @@
-
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -27,11 +26,11 @@ export function formatDate(
     year: "numeric",
     month: "short",
     day: "numeric",
-  }
+  },
 ): string {
   if (!date) return "";
   const dateObj = typeof date === "object" ? date : new Date(date);
-  
+
   try {
     return new Intl.DateTimeFormat("zh-TW", options).format(dateObj);
   } catch (err) {

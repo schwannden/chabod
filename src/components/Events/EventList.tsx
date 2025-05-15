@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Group, EventWithGroups } from "@/lib/types";
 import { Loader2 } from "lucide-react";

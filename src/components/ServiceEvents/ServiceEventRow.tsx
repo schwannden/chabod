@@ -1,4 +1,3 @@
-
 import { format } from "date-fns";
 import { ServiceEventWithService } from "@/lib/services/types";
 import { TableRow, TableCell } from "@/components/ui/table";
@@ -56,11 +55,7 @@ export function ServiceEventRow({
               <Button variant="ghost" size="icon" onClick={() => setIsEditDialogOpen(true)}>
                 <Edit className="h-4 w-4" />
               </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setIsDeleteDialogOpen(true)}
-              >
+              <Button variant="ghost" size="icon" onClick={() => setIsDeleteDialogOpen(true)}>
                 <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
             </div>
@@ -77,7 +72,7 @@ export function ServiceEventRow({
           services={services}
         />
       )}
-      
+
       <ConfirmDeleteDialog
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}

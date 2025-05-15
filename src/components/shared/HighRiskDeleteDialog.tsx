@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   AlertDialog,
@@ -11,7 +10,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
-import { Trash2, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 
 interface HighRiskDeleteDialogProps {
   isOpen: boolean;

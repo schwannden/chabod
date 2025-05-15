@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   AlertDialog,
@@ -37,7 +36,9 @@ export function ServiceDeleteDialog({
             確認刪除服事類型
           </AlertDialogTitle>
           <AlertDialogDescription className="space-y-4">
-            <p>您確定要刪除 <strong>{service.name}</strong> 服事類型嗎？此操作無法撤銷。</p>
+            <p>
+              您確定要刪除 <strong>{service.name}</strong> 服事類型嗎？此操作無法撤銷。
+            </p>
             <div className="rounded-md bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-900/20 dark:text-amber-200">
               <div className="flex items-start">
                 <AlertTriangle className="mr-2 h-4 w-4 mt-0.5" />

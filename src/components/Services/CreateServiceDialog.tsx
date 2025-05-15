@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import {
@@ -14,8 +13,6 @@ import { toast } from "sonner";
 import { useServiceForm } from "./hooks/useServiceForm";
 import { createServiceWithAssociations } from "@/lib/services";
 import { ServiceForm } from "./Forms/ServiceForm";
-import { NoteFormValues } from "./Forms/ServiceNotesForm";
-import { RoleFormValues } from "./Forms/ServiceRolesForm";
 
 interface CreateServiceDialogProps {
   tenantId: string;
@@ -56,13 +53,13 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
       const name = formData.name.trim();
 
       // Ensure notes have the required text property
-      const validatedNotes = notes.map(note => ({
+      const validatedNotes = notes.map((note) => ({
         text: note.text || "", // Ensure text is never undefined
         link: note.link,
       })) as { text: string; link?: string }[];
 
       // Ensure roles have the required name property
-      const validatedRoles = roles.map(role => ({
+      const validatedRoles = roles.map((role) => ({
         name: role.name || "", // Ensure name is never undefined
         description: role.description,
       })) as { name: string; description?: string }[];
@@ -78,7 +75,7 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
         selectedAdmins,
         selectedGroups,
         validatedNotes,
-        validatedRoles
+        validatedRoles,
       );
 
       toast.success("服事類型已創建");

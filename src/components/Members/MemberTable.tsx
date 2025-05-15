@@ -207,7 +207,9 @@ export function MemberTable({ members, isCurrentUserOwner, onMemberUpdated }: Me
                   isEditing={editingMemberId === member.id}
                   isLoading={loadingMemberId === member.id}
                   onEditClick={() => startEditing(member)}
-                  onDeleteClick={() => handleDeleteMember(member.id, member.profile?.full_name || "")}
+                  onDeleteClick={() =>
+                    handleDeleteMember(member.id, member.profile?.full_name || "")
+                  }
                   memberName={member.profile?.full_name || ""}
                 />
               </TableCell>

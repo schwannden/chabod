@@ -164,7 +164,7 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
         isOpen={isAllPlansDialogOpen}
         onOpenChange={setIsAllPlansDialogOpen}
       />
-      
+
       <HighRiskDeleteDialog
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
