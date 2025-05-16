@@ -1,87 +1,96 @@
-export * from "../types";
+import { Database } from "@/integrations/supabase/types";
+import { User } from "@supabase/supabase-js";
+import { Session } from "@supabase/supabase-js";
 
-// Define the ServiceNote type that matches the database schema
-export interface ServiceNote {
-  id: string;
-  service_id: string;
-  tenant_id: string;
-  text: string;
-  link?: string;
-  created_at: string;
-  updated_at: string;
-}
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+export type Tenant = Database["public"]["Tables"]["tenants"]["Row"];
+export type TenantMember = Database["public"]["Tables"]["tenant_members"]["Row"];
+export type Invitation = Database["public"]["Tables"]["invitations"]["Row"];
+export type Group = Database["public"]["Tables"]["groups"]["Row"];
+export type GroupMember = Database["public"]["Tables"]["group_members"]["Row"];
 
-// Define the ServiceRole type that matches the database schema
-export interface ServiceRole {
-  id: string;
-  service_id: string;
-  tenant_id: string;
-  name: string;
-  description?: string; // Added description field
-  created_at: string;
-  updated_at: string;
-}
+export type Event = Database["public"]["Tables"]["events"]["Row"];
+export type EventGroup = Database["public"]["Tables"]["events_groups"]["Row"];
 
-// Define the ServiceGroup type that matches the database schema
-export interface ServiceGroup {
-  id: string;
-  service_id: string;
-  group_id: string;
-  created_at: string;
-  updated_at: string;
-}
+export type EventWithGroups = Event & {
+  groups?: Group[];
+};
 
-// Define the ServiceEvent type that matches the database schema
-export interface ServiceEvent {
-  id: string;
-  service_id: string;
-  tenant_id: string;
-  date: string;
-  start_time: string;
-  end_time: string;
-  subtitle?: string;
-  created_at: string;
-  updated_at: string;
-}
+export type TenantWithUsage = Tenant & {
+  memberCount: number;
+  groupCount?: number;
+  eventCount?: number;
+  price_tier?: {
+    name: string;
+    price_monthly: number;
+    user_limit: number;
+    group_limit: number;
+    event_limit: number;
+  };
+};
 
-// Define the ServiceEventOwner type that matches the database schema
-export interface ServiceEventOwner {
-  id: string;
-  service_event_id: string;
-  user_id: string;
-  service_role_id: string;
-  tenant_id: string;
-  created_at: string;
-  updated_at: string;
-}
+export type TenantMemberWithProfile = TenantMember & {
+  profile: Profile;
+};
 
-// Define a common UserProfile type
-export interface UserProfile {
-  id?: string; // Optional, might not always be present depending on join
-  email: string | null;
-  full_name: string | null;
-}
+export type GroupWithMemberCount = Group & {
+  memberCount: number;
+};
 
-export interface ServiceEventOwnerWithDetails extends ServiceEventOwner {
-  profile: UserProfile | null; // Profile information, allow null if join might fail
-  role: ServiceRole; // Role information
-}
+export type GroupMemberWithProfile = GroupMember & {
+  profile: Profile;
+};
 
-export interface ServiceEventWithOwners extends ServiceEvent {
+export type PriceTier = Database["public"]["Tables"]["price_tiers"]["Row"];
+
+export type TenantWithPriceTier = Tenant & {
+  price_tier: PriceTier;
+};
+
+export type Resource = Database["public"]["Tables"]["resources"]["Row"];
+export type ResourceGroup = Database["public"]["Tables"]["resources_groups"]["Row"];
+
+export type ResourceWithGroups = Resource & {
+  groups?: string[];
+};
+
+export type Service = Database["public"]["Tables"]["services"]["Row"];
+export type ServiceAdmin = Database["public"]["Tables"]["service_admins"]["Row"];
+export type ServiceNote = Database["public"]["Tables"]["service_notes"]["Row"];
+export type ServiceGroup = Database["public"]["Tables"]["service_groups"]["Row"];
+export type ServiceRole = Database["public"]["Tables"]["service_roles"]["Row"];
+
+export type ServiceEvent = Database["public"]["Tables"]["service_events"]["Row"];
+export type ServiceEventOwner = Database["public"]["Tables"]["service_event_owners"]["Row"];
+
+// Define UserProfile type which is an alias for Profile
+export type UserProfile = Profile;
+
+export type ServiceEventOwnerWithDetails = ServiceEventOwner & {
+  profile: Profile;
+  role: ServiceRole;
+};
+
+export type ServiceEventWithOwners = ServiceEvent & {
   owners: ServiceEventOwnerWithDetails[];
-}
+};
 
-export interface ServiceEventWithService extends ServiceEvent {
+// Add ServiceEventWithService type which was missing
+export type ServiceEventWithService = ServiceEvent & {
   service: {
     id: string;
     name: string;
   };
-}
+};
 
-// Interface to define the structure of an owner when adding to an event
-export interface ServiceEventOwnerFormValue {
-  userId: string;
-  roleId: string;
-  profile: UserProfile | null; // Use UserProfile, allow null
-  role: ServiceRole;
-}
+export type SessionContextType = {
+  session: Session | null;
+  user: User | null;
+  profile: Profile | null;
+  isLoading: boolean;
+  signOut: () => Promise<void>;
+};
+
+export type ServiceWithGroups = Service & {
+  groups?: string[];
+};

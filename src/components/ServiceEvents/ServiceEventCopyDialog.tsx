@@ -1,57 +1,48 @@
-import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ServiceEventForm } from "./ServiceEventForm";
 import { ServiceEventWithService } from "@/lib/services/types";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { getServiceEventOwners } from "@/lib/services/service-event-owners";
-import { ServiceEventForm, ServiceEventFormValues } from "./ServiceEventForm";
+import { DialogFooter } from "@/components/ui/dialog";
 import { ServiceEventOwnerSelect } from "./ServiceEventOwnerSelect";
-import { useServiceEventForm } from "@/hooks/useServiceEventForm";
+import { useServiceEventForm, ServiceEventFormValues } from "@/hooks/useServiceEventForm";
+import { useEffect, useState } from "react";
+import { getServiceEventOwners } from "@/lib/services/service-event-owners";
+import { useToast } from "@/components/ui/use-toast";
 
-interface ServiceEventEditDialogProps {
+interface ServiceEventCopyDialogProps {
   event: ServiceEventWithService;
   isOpen: boolean;
   onClose: () => void;
-  onEventUpdated: () => void;
-  services: { id: string; name: string }[];
+  onEventCreated: () => void;
 }
 
-export function ServiceEventEditDialog({
+export function ServiceEventCopyDialog({
   event,
   isOpen,
   onClose,
-  onEventUpdated,
-  services,
-}: ServiceEventEditDialogProps) {
+  onEventCreated,
+}: ServiceEventCopyDialogProps) {
   const { toast } = useToast();
   const [isLoadingOwners, setIsLoadingOwners] = useState(true);
 
-  const { isSubmitting, setSelectedServiceId, selectedOwners, setSelectedOwners, handleSubmit } =
-    useServiceEventForm(
-      event.tenant_id,
-      event.id,
-      () => {
-        onEventUpdated();
-        onClose();
-      },
-      event.service_id,
-    );
+  const {
+    isSubmitting,
+    selectedServiceId,
+    setSelectedServiceId,
+    selectedOwners,
+    setSelectedOwners,
+    handleSubmit,
+  } = useServiceEventForm(
+    event.tenant_id,
+    undefined,
+    () => {
+      onEventCreated();
+      onClose();
+    },
+    event.service_id,
+  );
 
-  const initialValues: ServiceEventFormValues = {
-    serviceId: event.service_id,
-    date: event.date,
-    startTime: event.start_time,
-    endTime: event.end_time,
-    subtitle: event.subtitle || "",
-  };
-
-  // Load existing owners when dialog opens
+  // Fetch existing owners when opening the dialog
   useEffect(() => {
     const fetchOwners = async () => {
       if (isOpen) {
@@ -84,39 +75,46 @@ export function ServiceEventEditDialog({
     fetchOwners();
   }, [isOpen, event.id, toast, setSelectedOwners]);
 
-  const onSubmit = (values: ServiceEventFormValues) => {
-    // Call handleSubmit directly with the form values
-    handleSubmit(
-      {
-        serviceId: values.serviceId,
-        date: values.date,
-        startTime: values.startTime,
-        endTime: values.endTime,
-        subtitle: values.subtitle,
-      },
-      true,
-    ); // true indicates it's an edit operation
+  const onSubmit = async (values: ServiceEventFormValues) => {
+    await handleSubmit(values, true); // true indicates it's a copy operation
   };
+
+  // Mock services array with just the current service
+  const services = [
+    {
+      id: event.service_id,
+      name: event.service.name,
+      default_start_time: event.start_time,
+      default_end_time: event.end_time,
+    },
+  ];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>編輯服事排班</DialogTitle>
+          <DialogTitle>複製服事排班</DialogTitle>
         </DialogHeader>
-
         <ServiceEventForm
+          initialValues={{
+            date: event.date,
+            startTime: event.start_time,
+            endTime: event.end_time,
+            subtitle: event.subtitle || "",
+            serviceId: event.service_id,
+          }}
           onSubmit={onSubmit}
+          isLoading={isSubmitting}
+          submitButtonText="複製排班"
+          disableServiceSelection={true}
           services={services}
-          selectedServiceId={initialValues.serviceId}
+          selectedServiceId={selectedServiceId}
           setSelectedServiceId={setSelectedServiceId}
+          selectedOwners={selectedOwners}
+          setSelectedOwners={setSelectedOwners}
           tenantId={event.tenant_id}
           isSubmitting={isSubmitting}
           onCancel={onClose}
-          initialValues={initialValues}
-          isEditMode={true}
-          selectedOwners={selectedOwners}
-          setSelectedOwners={setSelectedOwners}
         >
           <div className="space-y-4 mb-4">
             <div className="text-sm font-medium mb-1">服事人員分配</div>
@@ -137,7 +135,7 @@ export function ServiceEventEditDialog({
               取消
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "提交中..." : "保存"}
+              {isSubmitting ? "提交中..." : "複製"}
             </Button>
           </DialogFooter>
         </ServiceEventForm>

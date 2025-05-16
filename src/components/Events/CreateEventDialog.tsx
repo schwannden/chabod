@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -32,7 +32,9 @@ export function CreateEventDialog({
   const [open, setOpen] = useState(false);
 
   // Extract group IDs from the initial values if provided
-  const initialGroupIds = initialValues?.groups?.map((group) => group.id) || [];
+  const initialGroupIds = useMemo(() => {
+    return initialValues?.groups?.map((group) => group.id) || [];
+  }, [initialValues?.groups]);
 
   const { form, isLoading, onSubmit } = useEventForm(
     tenantId,
@@ -66,7 +68,7 @@ export function CreateEventDialog({
         groups: initialGroupIds,
       });
     }
-  }, [open, initialValues, form]);
+  }, [open, initialValues, form, initialGroupIds]);
 
   // Create a unique ID for this dialog if using for copy
   const dialogId = initialValues ? `copy-event-${initialValues.id}` : "create-event";

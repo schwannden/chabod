@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,9 @@ export function CopyEventDialog({
   onOpenChange,
 }: CopyEventDialogProps) {
   // Extract group IDs from the event
-  const initialGroupIds = event?.groups?.map((group) => group.id) || [];
+  const initialGroupIds = useMemo(() => {
+    return event?.groups?.map((group) => group.id) || [];
+  }, [event?.groups]);
 
   const { form, isLoading, onSubmit } = useEventForm(
     tenantId,
@@ -60,7 +62,7 @@ export function CopyEventDialog({
         groups: initialGroupIds,
       });
     }
-  }, [open, event, form]);
+  }, [open, event, form, initialGroupIds]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

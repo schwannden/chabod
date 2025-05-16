@@ -136,7 +136,7 @@ export function ServiceEventList({
   return (
     <Card className="mt-6">
       <CardHeader>
-        <CardTitle>服事排班列表</CardTitle>
+        <CardTitle>服事表</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="rounded-md border">
@@ -147,6 +147,7 @@ export function ServiceEventList({
                 <TableHead>時間</TableHead>
                 <TableHead>服事</TableHead>
                 <TableHead>副標題</TableHead>
+                <TableHead>服事人員</TableHead>
                 <TableHead className="w-[100px]">操作</TableHead>
               </TableRow>
             </TableHeader>

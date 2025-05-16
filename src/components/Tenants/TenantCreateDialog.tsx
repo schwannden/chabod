@@ -17,12 +17,7 @@ interface TenantCreateDialogProps {
   onTenantCreated: () => void;
 }
 
-export function TenantCreateDialog({
-  isOpen,
-  onClose,
-  userId,
-  onTenantCreated,
-}: TenantCreateDialogProps) {
+export function TenantCreateDialog({ isOpen, onClose, onTenantCreated }: TenantCreateDialogProps) {
   const [isCreating, setIsCreating] = useState(false);
   const { toast } = useToast();
 

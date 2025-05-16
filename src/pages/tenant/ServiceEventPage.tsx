@@ -6,7 +6,7 @@ import { Group, Service } from "@/lib/types";
 import { useToast } from "@/components/ui/use-toast";
 import { ServiceEventCalendar } from "@/components/ServiceEvents/ServiceEventCalendar";
 import { ServiceEventFilterBar } from "@/components/ServiceEvents/ServiceEventFilterBar";
-import { CreateServiceEventDialog } from "@/components/ServiceEvents/CreateServiceEventDialog";
+import { ServiceEventCreateDialog } from "@/components/ServiceEvents/ServiceEventCreateDialog";
 import { useTenantRole } from "@/hooks/useTenantRole";
 import { useEventFilters } from "@/hooks/useEventFilters";
 import { useServiceEvents } from "@/hooks/useServiceEvents";
@@ -143,7 +143,7 @@ export default function ServiceEventPage() {
       }
       dialog={
         isDialogOpen && (
-          <CreateServiceEventDialog
+          <ServiceEventCreateDialog
             isOpen={isDialogOpen}
             onClose={() => setIsDialogOpen(false)}
             onEventCreated={handleEventUpdated}

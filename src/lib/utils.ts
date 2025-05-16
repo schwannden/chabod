@@ -38,3 +38,17 @@ export function formatDate(
     return String(date);
   }
 }
+
+/**
+ * Get display name for a user - returns full name if available, email otherwise
+ * @param profile - The user profile object containing name and email
+ * @returns string - The display name
+ */
+export function getUserDisplayName(profile: {
+  full_name?: string | null;
+  email?: string | null;
+}): string {
+  if (profile?.full_name) return profile.full_name;
+  if (profile?.email) return profile.email;
+  return "未知用戶";
+}

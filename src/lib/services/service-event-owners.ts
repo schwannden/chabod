@@ -95,20 +95,37 @@ export async function getServiceEventOwners(
         supabase.from("service_roles").select("*").eq("id", owner.service_role_id).maybeSingle(),
       ]);
 
-      if (profileResult.error || roleResult.error) {
-        console.warn(`Skipping owner ${owner.id} due to error fetching details`);
-        continue;
-      }
-
-      if (profileResult.data && roleResult.data) {
-        ownersWithDetails.push({
-          ...owner,
-          profile: profileResult.data,
-          role: roleResult.data,
-        });
-      }
+      // Always add the owner even if we couldn't get profile or role data
+      // This ensures we still display something even if data is incomplete
+      ownersWithDetails.push({
+        ...owner,
+        profile: profileResult.data || null,
+        role: roleResult.data || {
+          id: owner.service_role_id,
+          name: "Unknown Role",
+          service_id: "",
+          tenant_id: owner.tenant_id,
+          created_at: "",
+          updated_at: "",
+          description: null, // Add the missing description field with a default value
+        },
+      });
     } catch (e) {
       console.error(`Error processing owner ${owner.id}:`, e);
+      // Add the owner with null/placeholder data if there was an error
+      ownersWithDetails.push({
+        ...owner,
+        profile: null,
+        role: {
+          id: owner.service_role_id,
+          name: "Unknown Role",
+          service_id: "",
+          tenant_id: owner.tenant_id,
+          created_at: "",
+          updated_at: "",
+          description: null, // Add the missing description field with a default value
+        },
+      });
     }
   }
 

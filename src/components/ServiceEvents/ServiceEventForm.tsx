@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { format } from "date-fns";
 import {
   Form,
   FormControl,
@@ -18,14 +17,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ServiceEventOwner } from "./ServiceEventOwnerSelect";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 
-export interface ServiceEventFormValues {
-  serviceId: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  subtitle?: string;
-}
+// Define the form schema with Zod for validation
+const serviceEventSchema = z.object({
+  serviceId: z.string().min(1, "Service type is required"),
+  date: z.string().min(1, "Date is required"),
+  startTime: z.string().min(1, "Start time is required"),
+  endTime: z.string().min(1, "End time is required"),
+  subtitle: z.string().optional(),
+});
+
+export type ServiceEventFormValues = z.infer<typeof serviceEventSchema>;
 
 interface ServiceEventFormProps {
   onSubmit: (values: ServiceEventFormValues) => void;
@@ -47,6 +51,9 @@ interface ServiceEventFormProps {
   defaultEndTime?: string;
   initialValues?: ServiceEventFormValues;
   isEditMode?: boolean;
+  isLoading?: boolean;
+  submitButtonText?: string;
+  disableServiceSelection?: boolean;
 }
 
 export function ServiceEventForm({
@@ -60,10 +67,12 @@ export function ServiceEventForm({
   defaultEndTime,
   initialValues,
   isEditMode,
+  disableServiceSelection,
 }: ServiceEventFormProps) {
-  const today = format(new Date(), "yyyy-MM-dd");
+  const today = new Date().toISOString().split("T")[0]; // Format as YYYY-MM-DD
 
   const form = useForm<ServiceEventFormValues>({
+    resolver: zodResolver(serviceEventSchema),
     defaultValues: initialValues || {
       serviceId: selectedServiceId || "",
       date: today,
@@ -92,18 +101,6 @@ export function ServiceEventForm({
     setSelectedOwners([]);
   };
 
-  const handleSubtitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Allow typing with spaces but will be trimmed on form submission
-    form.setValue("subtitle", e.target.value);
-  };
-
-  const handleSubtitleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    // Trim whitespace when field loses focus
-    if (e.target.value) {
-      form.setValue("subtitle", e.target.value.trim());
-    }
-  };
-
   const handleFormSubmit = (values: ServiceEventFormValues) => {
     // Trim subtitle if it exists before submitting
     if (values.subtitle) {
@@ -118,13 +115,13 @@ export function ServiceEventForm({
         <FormField
           control={form.control}
           name="serviceId"
-          render={() => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel>服事類型</FormLabel>
               <Select
                 onValueChange={(value) => handleServiceChange(value)}
-                value={selectedServiceId}
-                disabled={isEditMode}
+                value={field.value}
+                disabled={isEditMode || disableServiceSelection}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -195,7 +192,7 @@ export function ServiceEventForm({
             <FormItem>
               <FormLabel>備註 (選填)</FormLabel>
               <FormControl>
-                <Input {...field} onChange={handleSubtitleChange} onBlur={handleSubtitleBlur} />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

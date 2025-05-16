@@ -12,7 +12,7 @@ import { createServiceEventWithOwners } from "@/lib/services/service-event-crud"
 import { ServiceEventForm, ServiceEventFormValues } from "./ServiceEventForm";
 import { ServiceEventOwner, ServiceEventOwnerSelect } from "./ServiceEventOwnerSelect";
 
-interface CreateServiceEventDialogProps {
+interface ServiceEventCreateDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onEventCreated: () => void;
@@ -25,13 +25,13 @@ interface CreateServiceEventDialogProps {
   }[];
 }
 
-export function CreateServiceEventDialog({
+export function ServiceEventCreateDialog({
   isOpen,
   onClose,
   onEventCreated,
   tenantId,
   services,
-}: CreateServiceEventDialogProps) {
+}: ServiceEventCreateDialogProps) {
   const [selectedServiceId, setSelectedServiceId] = useState<string>(
     services.length > 0 ? services[0].id : "",
   );
