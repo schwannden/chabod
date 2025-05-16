@@ -1,5 +1,7 @@
 # Welcome to Chabod - A SaaS for Church CMS
 
+![chabod-banner](/public/static/images/twitter-card.png)
+
 ## Project info
 
 **URL**: https://chabod.fruitful-tools.com
