@@ -1,5 +1,3 @@
-
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -15,55 +13,18 @@ SET row_security = off;
 COMMENT ON SCHEMA "public" IS 'standard public schema';
 
 
-
 CREATE EXTENSION IF NOT EXISTS "pg_graphql" WITH SCHEMA "graphql";
-
-
-
-
-
-
 CREATE EXTENSION IF NOT EXISTS "pg_stat_statements" WITH SCHEMA "extensions";
-
-
-
-
-
-
 CREATE EXTENSION IF NOT EXISTS "pgcrypto" WITH SCHEMA "extensions";
-
-
-
-
-
-
 CREATE EXTENSION IF NOT EXISTS "pgjwt" WITH SCHEMA "extensions";
-
-
-
-
-
-
 CREATE EXTENSION IF NOT EXISTS "supabase_vault" WITH SCHEMA "vault";
-
-
-
-
-
-
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA "extensions";
-
-
-
-
 
 
 CREATE TYPE "public"."event_visibility" AS ENUM (
     'public',
     'private'
 );
-
-
 ALTER TYPE "public"."event_visibility" OWNER TO "postgres";
 
 
@@ -89,8 +50,6 @@ BEGIN
   RETURN current_count < max_limit;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."check_tenant_event_limit"("tenant_uuid" "uuid") OWNER TO "postgres";
 
 
@@ -116,8 +75,6 @@ BEGIN
   RETURN current_count < max_limit;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."check_tenant_group_limit"("tenant_uuid" "uuid") OWNER TO "postgres";
 
 
@@ -143,8 +100,6 @@ BEGIN
   RETURN current_count < max_limit;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."check_tenant_user_limit"("tenant_uuid" "uuid") OWNER TO "postgres";
 
 
@@ -157,8 +112,6 @@ BEGIN
   RETURN NEW;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."handle_new_user"() OWNER TO "postgres";
 
 
@@ -170,8 +123,6 @@ BEGIN
     RETURN NEW;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."handle_updated_at"() OWNER TO "postgres";
 
 
@@ -185,28 +136,7 @@ BEGIN
   );
 END;
 $$;
-
-
 ALTER FUNCTION "public"."is_tenant_member"("tenant_uuid" "uuid", "user_uuid" "uuid") OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "public"."is_tenant_member_user"("tenant_uuid" "uuid", "user_uuid" "uuid") RETURNS boolean
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-DECLARE
-  is_member BOOLEAN;
-BEGIN
-  SELECT EXISTS (
-    SELECT 1 FROM public.tenant_members
-    WHERE tenant_id = tenant_uuid AND user_id = user_uuid
-  ) INTO is_member;
-  
-  RETURN is_member;
-END;
-$$;
-
-
-ALTER FUNCTION "public"."is_tenant_member_user"("tenant_uuid" "uuid", "user_uuid" "uuid") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid") RETURNS boolean
@@ -221,67 +151,15 @@ BEGIN
     );
 END;
 $$;
-
-
 ALTER FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid") OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid", "user_uuid" "uuid") RETURNS boolean
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-BEGIN
-  RETURN EXISTS (
-    SELECT 1 FROM public.tenant_members
-    WHERE tenant_id = tenant_uuid AND user_id = user_uuid AND role = 'owner'
-  );
-END;
-$$;
-
-
-ALTER FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid", "user_uuid" "uuid") OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "public"."is_tenant_owner_check"("tenant_uuid" "uuid") RETURNS boolean
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-BEGIN
-  RETURN EXISTS (
-    SELECT 1 FROM public.tenant_members
-    WHERE tenant_id = tenant_uuid 
-    AND user_id = auth.uid()
-    AND role = 'owner'
-  );
-END;
-$$;
-
-
-ALTER FUNCTION "public"."is_tenant_owner_check"("tenant_uuid" "uuid") OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "public"."is_tenant_owner_user"("tenant_uuid" "uuid", "user_uuid" "uuid") RETURNS boolean
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
-DECLARE
-  is_owner BOOLEAN;
-BEGIN
-  SELECT EXISTS (
-    SELECT 1 FROM public.tenant_members
-    WHERE tenant_id = tenant_uuid AND user_id = user_uuid AND role = 'owner'
-  ) INTO is_owner;
-  
-  RETURN is_owner;
-END;
-$$;
-
-
-ALTER FUNCTION "public"."is_tenant_owner_user"("tenant_uuid" "uuid", "user_uuid" "uuid") OWNER TO "postgres";
-
-
+-- When a user is removed from a tenant, remove them from all groups in that tenant
+-- we need this as a functino, not as cascade rule, because when a user is removed fro a tenant, it might still exists in the system.
 CREATE OR REPLACE FUNCTION "public"."remove_user_from_groups"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
 BEGIN
-  -- When a user is removed from a tenant, remove them from all groups in that tenant
   DELETE FROM public.group_members gm
   USING public.groups g
   WHERE gm.group_id = g.id
@@ -291,8 +169,6 @@ BEGIN
   RETURN OLD;
 END;
 $$;
-
-
 ALTER FUNCTION "public"."remove_user_from_groups"() OWNER TO "postgres";
 
 SET default_tablespace = '';
@@ -314,8 +190,6 @@ CREATE TABLE IF NOT EXISTS "public"."events" (
     "visibility" "public"."event_visibility" DEFAULT 'public'::"public"."event_visibility" NOT NULL,
     "tenant_id" "uuid" NOT NULL
 );
-
-
 ALTER TABLE "public"."events" OWNER TO "postgres";
 
 
@@ -325,8 +199,6 @@ CREATE TABLE IF NOT EXISTS "public"."events_groups" (
     "group_id" "uuid" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
-
-
 ALTER TABLE "public"."events_groups" OWNER TO "postgres";
 
 
@@ -337,8 +209,6 @@ CREATE TABLE IF NOT EXISTS "public"."group_members" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
-
-
 ALTER TABLE "public"."group_members" OWNER TO "postgres";
 
 
@@ -350,8 +220,6 @@ CREATE TABLE IF NOT EXISTS "public"."groups" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
-
-
 ALTER TABLE "public"."groups" OWNER TO "postgres";
 
 
@@ -364,8 +232,6 @@ CREATE TABLE IF NOT EXISTS "public"."invitations" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "expires_at" timestamp with time zone DEFAULT ("now"() + '7 days'::interval) NOT NULL
 );
-
-
 ALTER TABLE "public"."invitations" OWNER TO "postgres";
 
 
@@ -382,8 +248,6 @@ CREATE TABLE IF NOT EXISTS "public"."price_tiers" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
-
-
 ALTER TABLE "public"."price_tiers" OWNER TO "postgres";
 
 
@@ -396,8 +260,6 @@ CREATE TABLE IF NOT EXISTS "public"."profiles" (
     "first_name" "text",
     "last_name" "text"
 );
-
-
 ALTER TABLE "public"."profiles" OWNER TO "postgres";
 
 
@@ -411,8 +273,6 @@ CREATE TABLE IF NOT EXISTS "public"."resources" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
-
-
 ALTER TABLE "public"."resources" OWNER TO "postgres";
 
 
@@ -423,8 +283,6 @@ CREATE TABLE IF NOT EXISTS "public"."resources_groups" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
-
-
 ALTER TABLE "public"."resources_groups" OWNER TO "postgres";
 
 
@@ -435,8 +293,6 @@ CREATE TABLE IF NOT EXISTS "public"."service_admins" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
-
-
 ALTER TABLE "public"."service_admins" OWNER TO "postgres";
 
 
@@ -449,8 +305,6 @@ CREATE TABLE IF NOT EXISTS "public"."service_event_owners" (
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "tenant_id" "uuid" NOT NULL
 );
-
-
 ALTER TABLE "public"."service_event_owners" OWNER TO "postgres";
 
 
@@ -465,8 +319,6 @@ CREATE TABLE IF NOT EXISTS "public"."service_events" (
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "tenant_id" "uuid" NOT NULL
 );
-
-
 ALTER TABLE "public"."service_events" OWNER TO "postgres";
 
 
@@ -477,8 +329,6 @@ CREATE TABLE IF NOT EXISTS "public"."service_groups" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
-
-
 ALTER TABLE "public"."service_groups" OWNER TO "postgres";
 
 
@@ -491,8 +341,6 @@ CREATE TABLE IF NOT EXISTS "public"."service_notes" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
-
-
 ALTER TABLE "public"."service_notes" OWNER TO "postgres";
 
 
@@ -505,8 +353,6 @@ CREATE TABLE IF NOT EXISTS "public"."service_roles" (
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "description" "text"
 );
-
-
 ALTER TABLE "public"."service_roles" OWNER TO "postgres";
 
 
@@ -519,8 +365,6 @@ CREATE TABLE IF NOT EXISTS "public"."services" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
-
-
 ALTER TABLE "public"."services" OWNER TO "postgres";
 
 
@@ -532,8 +376,6 @@ CREATE TABLE IF NOT EXISTS "public"."tenant_members" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
-
-
 ALTER TABLE "public"."tenant_members" OWNER TO "postgres";
 
 
@@ -545,15 +387,11 @@ CREATE TABLE IF NOT EXISTS "public"."tenants" (
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "price_tier_id" "uuid" NOT NULL
 );
-
-
 ALTER TABLE "public"."tenants" OWNER TO "postgres";
 
 
 ALTER TABLE ONLY "public"."events_groups"
     ADD CONSTRAINT "events_groups_event_id_group_id_key" UNIQUE ("event_id", "group_id");
-
-
 
 ALTER TABLE ONLY "public"."events_groups"
     ADD CONSTRAINT "events_groups_pkey" PRIMARY KEY ("id");
@@ -568,8 +406,6 @@ ALTER TABLE ONLY "public"."events"
 ALTER TABLE ONLY "public"."group_members"
     ADD CONSTRAINT "group_members_group_id_user_id_key" UNIQUE ("group_id", "user_id");
 
-
-
 ALTER TABLE ONLY "public"."group_members"
     ADD CONSTRAINT "group_members_pkey" PRIMARY KEY ("id");
 
@@ -582,8 +418,6 @@ ALTER TABLE ONLY "public"."groups"
 
 ALTER TABLE ONLY "public"."invitations"
     ADD CONSTRAINT "invitations_pkey" PRIMARY KEY ("id");
-
-
 
 ALTER TABLE ONLY "public"."invitations"
     ADD CONSTRAINT "invitations_token_key" UNIQUE ("token");
@@ -603,8 +437,6 @@ ALTER TABLE ONLY "public"."profiles"
 ALTER TABLE ONLY "public"."resources_groups"
     ADD CONSTRAINT "resources_groups_pkey" PRIMARY KEY ("id");
 
-
-
 ALTER TABLE ONLY "public"."resources_groups"
     ADD CONSTRAINT "resources_groups_resource_id_group_id_key" UNIQUE ("resource_id", "group_id");
 
@@ -618,8 +450,6 @@ ALTER TABLE ONLY "public"."resources"
 ALTER TABLE ONLY "public"."service_admins"
     ADD CONSTRAINT "service_admins_pkey" PRIMARY KEY ("id");
 
-
-
 ALTER TABLE ONLY "public"."service_admins"
     ADD CONSTRAINT "service_admins_service_id_user_id_key" UNIQUE ("service_id", "user_id");
 
@@ -628,8 +458,6 @@ ALTER TABLE ONLY "public"."service_admins"
 ALTER TABLE ONLY "public"."service_event_owners"
     ADD CONSTRAINT "service_event_owners_pkey" PRIMARY KEY ("id");
 
-
-
 ALTER TABLE ONLY "public"."service_event_owners"
     ADD CONSTRAINT "service_event_owners_service_event_id_user_id_service_role__key" UNIQUE ("service_event_id", "user_id", "service_role_id");
 
@@ -637,8 +465,6 @@ ALTER TABLE ONLY "public"."service_event_owners"
 
 ALTER TABLE ONLY "public"."service_events"
     ADD CONSTRAINT "service_events_pkey" PRIMARY KEY ("id");
-
-
 
 ALTER TABLE ONLY "public"."service_groups"
     ADD CONSTRAINT "service_groups_group_id_service_id_key" UNIQUE ("group_id", "service_id");
@@ -658,8 +484,6 @@ ALTER TABLE ONLY "public"."service_notes"
 ALTER TABLE ONLY "public"."service_roles"
     ADD CONSTRAINT "service_roles_name_service_id_tenant_id_key" UNIQUE ("name", "service_id", "tenant_id");
 
-
-
 ALTER TABLE ONLY "public"."service_roles"
     ADD CONSTRAINT "service_roles_pkey" PRIMARY KEY ("id");
 
@@ -667,8 +491,6 @@ ALTER TABLE ONLY "public"."service_roles"
 
 ALTER TABLE ONLY "public"."services"
     ADD CONSTRAINT "services_name_tenant_id_key" UNIQUE ("name", "tenant_id");
-
-
 
 ALTER TABLE ONLY "public"."services"
     ADD CONSTRAINT "services_pkey" PRIMARY KEY ("id");
@@ -678,8 +500,6 @@ ALTER TABLE ONLY "public"."services"
 ALTER TABLE ONLY "public"."tenant_members"
     ADD CONSTRAINT "tenant_members_pkey" PRIMARY KEY ("id");
 
-
-
 ALTER TABLE ONLY "public"."tenant_members"
     ADD CONSTRAINT "tenant_members_tenant_id_user_id_key" UNIQUE ("tenant_id", "user_id");
 
@@ -688,62 +508,26 @@ ALTER TABLE ONLY "public"."tenant_members"
 ALTER TABLE ONLY "public"."tenants"
     ADD CONSTRAINT "tenants_pkey" PRIMARY KEY ("id");
 
-
-
 ALTER TABLE ONLY "public"."tenants"
     ADD CONSTRAINT "tenants_slug_key" UNIQUE ("slug");
-
-
 
 CREATE INDEX "idx_tenants_slug" ON "public"."tenants" USING "btree" ("slug");
 
 
 
 CREATE OR REPLACE TRIGGER "handle_updated_at_service_admins" BEFORE UPDATE ON "public"."service_admins" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
-
-
-
 CREATE OR REPLACE TRIGGER "handle_updated_at_service_event_owners" BEFORE UPDATE ON "public"."service_event_owners" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
-
-
-
 CREATE OR REPLACE TRIGGER "handle_updated_at_service_events" BEFORE UPDATE ON "public"."service_events" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
-
-
-
 CREATE OR REPLACE TRIGGER "handle_updated_at_service_groups" BEFORE UPDATE ON "public"."service_groups" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
-
-
-
 CREATE OR REPLACE TRIGGER "handle_updated_at_service_notes" BEFORE UPDATE ON "public"."service_notes" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
-
-
-
 CREATE OR REPLACE TRIGGER "handle_updated_at_service_roles" BEFORE UPDATE ON "public"."service_roles" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
-
-
-
 CREATE OR REPLACE TRIGGER "handle_updated_at_services" BEFORE UPDATE ON "public"."services" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
+CREATE OR REPLACE TRIGGER "handle_updated_at_resources" BEFORE UPDATE ON "public"."resources" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
+CREATE OR REPLACE TRIGGER "handle_updated_at_events" BEFORE UPDATE ON "public"."events" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
+CREATE OR REPLACE TRIGGER "handle_updated_at_price_tiers" BEFORE UPDATE ON "public"."price_tiers" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
+CREATE OR REPLACE TRIGGER "handle_updated_at_resources_groups" BEFORE UPDATE ON "public"."resources_groups" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
 
-
-
-CREATE OR REPLACE TRIGGER "set_resources_updated_at" BEFORE UPDATE ON "public"."resources" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
-
-
-
-CREATE OR REPLACE TRIGGER "set_updated_at" BEFORE UPDATE ON "public"."events" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
-
-
-
-CREATE OR REPLACE TRIGGER "set_updated_at" BEFORE UPDATE ON "public"."price_tiers" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
-
-
-
-CREATE OR REPLACE TRIGGER "set_updated_at_timestamp" BEFORE UPDATE ON "public"."resources_groups" FOR EACH ROW EXECUTE FUNCTION "public"."handle_updated_at"();
-
-
-
-CREATE OR REPLACE TRIGGER "tr_remove_user_from_groups" AFTER DELETE ON "public"."tenant_members" FOR EACH ROW EXECUTE FUNCTION "public"."remove_user_from_groups"();
+CREATE OR REPLACE TRIGGER "remove_user_from_groups" AFTER DELETE ON "public"."tenant_members" FOR EACH ROW EXECUTE FUNCTION "public"."remove_user_from_groups"();
 
 
 
@@ -755,222 +539,148 @@ ALTER TABLE ONLY "public"."events"
 ALTER TABLE ONLY "public"."events_groups"
     ADD CONSTRAINT "events_groups_event_id_fkey" FOREIGN KEY ("event_id") REFERENCES "public"."events"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."events_groups"
     ADD CONSTRAINT "events_groups_group_id_fkey" FOREIGN KEY ("group_id") REFERENCES "public"."groups"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."events"
     ADD CONSTRAINT "events_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id");
 
-
-
 ALTER TABLE ONLY "public"."group_members"
     ADD CONSTRAINT "group_members_group_id_fkey" FOREIGN KEY ("group_id") REFERENCES "public"."groups"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."groups"
     ADD CONSTRAINT "groups_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."invitations"
     ADD CONSTRAINT "invitations_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."profiles"
     ADD CONSTRAINT "profiles_id_fkey" FOREIGN KEY ("id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."resources_groups"
     ADD CONSTRAINT "resources_groups_group_id_fkey" FOREIGN KEY ("group_id") REFERENCES "public"."groups"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."resources_groups"
     ADD CONSTRAINT "resources_groups_resource_id_fkey" FOREIGN KEY ("resource_id") REFERENCES "public"."resources"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."resources"
     ADD CONSTRAINT "resources_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."service_admins"
     ADD CONSTRAINT "service_admins_service_id_fkey" FOREIGN KEY ("service_id") REFERENCES "public"."services"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."service_admins"
     ADD CONSTRAINT "service_admins_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."service_event_owners"
     ADD CONSTRAINT "service_event_owners_service_event_id_fkey" FOREIGN KEY ("service_event_id") REFERENCES "public"."service_events"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."service_event_owners"
     ADD CONSTRAINT "service_event_owners_service_role_id_fkey" FOREIGN KEY ("service_role_id") REFERENCES "public"."service_roles"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."service_event_owners"
     ADD CONSTRAINT "service_event_owners_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."service_event_owners"
     ADD CONSTRAINT "service_event_owners_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."service_events"
     ADD CONSTRAINT "service_events_service_id_fkey" FOREIGN KEY ("service_id") REFERENCES "public"."services"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."service_events"
     ADD CONSTRAINT "service_events_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."service_groups"
     ADD CONSTRAINT "service_groups_group_id_fkey" FOREIGN KEY ("group_id") REFERENCES "public"."groups"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."service_groups"
     ADD CONSTRAINT "service_groups_service_id_fkey" FOREIGN KEY ("service_id") REFERENCES "public"."services"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."service_notes"
     ADD CONSTRAINT "service_notes_service_id_fkey" FOREIGN KEY ("service_id") REFERENCES "public"."services"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."service_notes"
     ADD CONSTRAINT "service_notes_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."service_roles"
     ADD CONSTRAINT "service_roles_service_id_fkey" FOREIGN KEY ("service_id") REFERENCES "public"."services"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."service_roles"
     ADD CONSTRAINT "service_roles_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."services"
     ADD CONSTRAINT "services_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."tenant_members"
     ADD CONSTRAINT "tenant_members_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."tenant_members"
     ADD CONSTRAINT "tenant_members_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
-
-
 ALTER TABLE ONLY "public"."tenant_members"
     ADD CONSTRAINT "tenant_members_user_id_profiles_fk" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
-
-
 
 ALTER TABLE ONLY "public"."tenants"
     ADD CONSTRAINT "tenants_price_tier_id_fkey" FOREIGN KEY ("price_tier_id") REFERENCES "public"."price_tiers"("id");
 
 
-
+-- RLS Policies
+-- TODO: check this RLS
 CREATE POLICY "Allow membership verification" ON "public"."tenant_members" FOR SELECT USING (true);
-
-
 
 CREATE POLICY "Allow public tenant reads" ON "public"."tenants" FOR SELECT TO "anon" USING (true);
 
+CREATE POLICY "All can view price tiers" ON "public"."price_tiers" FOR SELECT USING (true);
 
-
-CREATE POLICY "Allow read access to price_tiers for all users" ON "public"."price_tiers" FOR SELECT TO "authenticated" USING (true);
-
-
-
+-- TODO: this appears to be not working, as we need that everyone can view roups as well
 CREATE POLICY "Anyone can view groups for public events" ON "public"."events_groups" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."events"
   WHERE (("events"."id" = "events_groups"."event_id") AND ("events"."visibility" = 'public'::"public"."event_visibility")))));
 
-
-
 CREATE POLICY "Anyone can view public events" ON "public"."events" FOR SELECT USING (("visibility" = 'public'::"public"."event_visibility"));
-
-
 
 CREATE POLICY "Authenticated tenant user can view service event owners" ON "public"."service_event_owners" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
   WHERE (("tenant_members"."tenant_id" = "service_event_owners"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"())))));
 
-
-
 CREATE POLICY "Authenticated tenant user can view service events" ON "public"."service_events" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
   WHERE (("tenant_members"."tenant_id" = "service_events"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"())))));
 
-
-
 CREATE POLICY "Authenticated users can view private events" ON "public"."events" FOR SELECT USING ((("auth"."role"() = 'authenticated'::"text") AND ("visibility" = 'private'::"public"."event_visibility")));
 
-
-
-CREATE POLICY "Creators and tenant owners can modify events" ON "public"."events" USING ((("created_by" = "auth"."uid"()) OR ( SELECT "public"."is_tenant_owner"("events"."tenant_id", "auth"."uid"()) AS "is_tenant_owner"))) WITH CHECK ((("created_by" = "auth"."uid"()) OR ( SELECT "public"."is_tenant_owner"("events"."tenant_id", "auth"."uid"()) AS "is_tenant_owner")));
-
-
+CREATE POLICY "Creators and tenant owners can modify events" ON "public"."events" USING ((("created_by" = "auth"."uid"()) OR ( SELECT "public"."is_tenant_owner"("events"."tenant_id") AS "is_tenant_owner"))) WITH CHECK ((("created_by" = "auth"."uid"()) OR ( SELECT "public"."is_tenant_owner"("events"."tenant_id") AS "is_tenant_owner")));
 
 CREATE POLICY "Only allow administrators to modify price_tiers" ON "public"."price_tiers" TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
   WHERE (("tenant_members"."user_id" = "auth"."uid"()) AND ("tenant_members"."role" = 'owner'::"text")))));
 
-
-
 CREATE POLICY "Only event creators and tenant owners can modify event groups" ON "public"."events_groups" USING ((EXISTS ( SELECT 1
    FROM "public"."events" "e"
-  WHERE (("e"."id" = "events_groups"."event_id") AND (("e"."created_by" = "auth"."uid"()) OR ( SELECT "public"."is_tenant_owner"("e"."tenant_id", "auth"."uid"()) AS "is_tenant_owner")))))) WITH CHECK ((EXISTS ( SELECT 1
+  WHERE (("e"."id" = "events_groups"."event_id") AND (("e"."created_by" = "auth"."uid"()) OR ( SELECT "public"."is_tenant_owner"("e"."tenant_id") AS "is_tenant_owner")))))) WITH CHECK ((EXISTS ( SELECT 1
    FROM "public"."events" "e"
-  WHERE (("e"."id" = "events_groups"."event_id") AND (("e"."created_by" = "auth"."uid"()) OR ( SELECT "public"."is_tenant_owner"("e"."tenant_id", "auth"."uid"()) AS "is_tenant_owner"))))));
+  WHERE (("e"."id" = "events_groups"."event_id") AND (("e"."created_by" = "auth"."uid"()) OR ( SELECT "public"."is_tenant_owner"("e"."tenant_id") AS "is_tenant_owner"))))));
 
 
 
 -- Tenants RLS
 
 CREATE POLICY "Only owners can delete tenants" ON "public"."tenants" FOR DELETE 
-USING ("public"."is_tenant_owner_check"("id"));
+USING ("public"."is_tenant_owner"("id"));
 
 CREATE POLICY "Only owners can update tenants" ON "public"."tenants" FOR UPDATE 
-USING ("public"."is_tenant_owner_check"("id"));
+USING ("public"."is_tenant_owner"("id"));
 
 -- Resources RLS
 
 CREATE POLICY "Only tenant owners can create resources" ON "public"."resources" FOR INSERT
-WITH CHECK ("public"."is_tenant_owner_check"("tenant_id"));
+WITH CHECK ("public"."is_tenant_owner"("tenant_id"));
 
 CREATE POLICY "Only tenant owners can delete resources" ON "public"."resources" FOR DELETE
-USING ("public"."is_tenant_owner_check"("tenant_id"));
+USING ("public"."is_tenant_owner"("tenant_id"));
 
 CREATE POLICY "Only tenant owners can update resources" ON "public"."resources" FOR UPDATE
-USING ("public"."is_tenant_owner_check"("tenant_id"));
+USING ("public"."is_tenant_owner"("tenant_id"));
 
 
 CREATE POLICY "Owners and creators can delete events" ON "public"."events" FOR DELETE USING ((("created_by" = "auth"."uid"()) OR "public"."is_tenant_owner"("tenant_id")));
@@ -983,10 +693,6 @@ CREATE POLICY "Owners and creators can manage event group associations" ON "publ
 
 
 CREATE POLICY "Owners and creators can update events" ON "public"."events" FOR UPDATE USING ((("created_by" = "auth"."uid"()) OR "public"."is_tenant_owner"("tenant_id")));
-
-
-
-CREATE POLICY "Public can view price tiers" ON "public"."price_tiers" FOR SELECT USING (true);
 
 
 
@@ -1101,11 +807,11 @@ CREATE POLICY "Tenant owners can delete invitations" ON "public"."invitations" F
 
 
 
-CREATE POLICY "Tenant owners can delete tenant members" ON "public"."tenant_members" FOR DELETE USING ("public"."is_tenant_owner_user"("tenant_id", "auth"."uid"()));
+CREATE POLICY "Tenant owners can delete tenant members" ON "public"."tenant_members" FOR DELETE USING ("public"."is_tenant_owner"("tenant_id"));
 
 
 
-CREATE POLICY "Tenant owners can insert tenant members" ON "public"."tenant_members" FOR INSERT WITH CHECK ("public"."is_tenant_owner_user"("tenant_id", "auth"."uid"()));
+CREATE POLICY "Tenant owners can insert tenant members" ON "public"."tenant_members" FOR INSERT WITH CHECK ("public"."is_tenant_owner"("tenant_id"));
 
 
 
@@ -1147,7 +853,7 @@ CREATE POLICY "Tenant owners can manage services" ON "public"."services" USING (
 
 
 
-CREATE POLICY "Tenant owners can update tenant members" ON "public"."tenant_members" FOR UPDATE USING ("public"."is_tenant_owner_user"("tenant_id", "auth"."uid"()));
+CREATE POLICY "Tenant owners can update tenant members" ON "public"."tenant_members" FOR UPDATE USING ("public"."is_tenant_owner"("tenant_id"));
 
 
 
@@ -1205,7 +911,7 @@ CREATE POLICY "Users can view public events" ON "public"."events" FOR SELECT USI
 
 
 
-CREATE POLICY "Users can view tenant members they belong to" ON "public"."tenant_members" FOR SELECT USING ((("user_id" = "auth"."uid"()) OR "public"."is_tenant_member_user"("tenant_id", "auth"."uid"())));
+CREATE POLICY "Users can view tenant members in their tenants" ON "public"."tenant_members" FOR SELECT USING ("public"."is_tenant_member"("tenant_id", "auth"."uid"()));
 
 
 
@@ -1228,58 +934,23 @@ CREATE POLICY "enforce_tenant_user_limit" ON "public"."tenant_members" FOR INSER
 
 
 ALTER TABLE "public"."events" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."events_groups" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."group_members" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."groups" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."invitations" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."price_tiers" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."profiles" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."resources" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."resources_groups" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."service_admins" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."service_event_owners" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."service_events" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."service_groups" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."service_notes" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."service_roles" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."services" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."tenant_members" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."tenants" ENABLE ROW LEVEL SECURITY;
-
 
 
 
@@ -1292,179 +963,9 @@ GRANT USAGE ON SCHEMA "public" TO "authenticated";
 GRANT USAGE ON SCHEMA "public" TO "service_role";
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 GRANT ALL ON FUNCTION "public"."check_tenant_event_limit"("tenant_uuid" "uuid") TO "anon";
 GRANT ALL ON FUNCTION "public"."check_tenant_event_limit"("tenant_uuid" "uuid") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."check_tenant_event_limit"("tenant_uuid" "uuid") TO "service_role";
-
 
 
 GRANT ALL ON FUNCTION "public"."check_tenant_group_limit"("tenant_uuid" "uuid") TO "anon";
@@ -1472,11 +973,9 @@ GRANT ALL ON FUNCTION "public"."check_tenant_group_limit"("tenant_uuid" "uuid") 
 GRANT ALL ON FUNCTION "public"."check_tenant_group_limit"("tenant_uuid" "uuid") TO "service_role";
 
 
-
 GRANT ALL ON FUNCTION "public"."check_tenant_user_limit"("tenant_uuid" "uuid") TO "anon";
 GRANT ALL ON FUNCTION "public"."check_tenant_user_limit"("tenant_uuid" "uuid") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."check_tenant_user_limit"("tenant_uuid" "uuid") TO "service_role";
-
 
 
 GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "anon";
@@ -1484,11 +983,9 @@ GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "service_role";
 
 
-
 GRANT ALL ON FUNCTION "public"."handle_updated_at"() TO "anon";
 GRANT ALL ON FUNCTION "public"."handle_updated_at"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."handle_updated_at"() TO "service_role";
-
 
 
 GRANT ALL ON FUNCTION "public"."is_tenant_member"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "anon";
@@ -1496,35 +993,8 @@ GRANT ALL ON FUNCTION "public"."is_tenant_member"("tenant_uuid" "uuid", "user_uu
 GRANT ALL ON FUNCTION "public"."is_tenant_member"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "service_role";
 
 
-
-GRANT ALL ON FUNCTION "public"."is_tenant_member_user"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "anon";
-GRANT ALL ON FUNCTION "public"."is_tenant_member_user"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "authenticated";
-GRANT ALL ON FUNCTION "public"."is_tenant_member_user"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "service_role";
-
-
-
-GRANT ALL ON FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid") TO "anon";
 GRANT ALL ON FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid") TO "service_role";
-
-
-
-GRANT ALL ON FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "anon";
-GRANT ALL ON FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "authenticated";
-GRANT ALL ON FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "service_role";
-
-
-
-GRANT ALL ON FUNCTION "public"."is_tenant_owner_check"("tenant_uuid" "uuid") TO "anon";
-GRANT ALL ON FUNCTION "public"."is_tenant_owner_check"("tenant_uuid" "uuid") TO "authenticated";
-GRANT ALL ON FUNCTION "public"."is_tenant_owner_check"("tenant_uuid" "uuid") TO "service_role";
-
-
-
-GRANT ALL ON FUNCTION "public"."is_tenant_owner_user"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "anon";
-GRANT ALL ON FUNCTION "public"."is_tenant_owner_user"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "authenticated";
-GRANT ALL ON FUNCTION "public"."is_tenant_owner_user"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "service_role";
-
 
 
 GRANT ALL ON FUNCTION "public"."remove_user_from_groups"() TO "anon";
@@ -1532,26 +1002,9 @@ GRANT ALL ON FUNCTION "public"."remove_user_from_groups"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."remove_user_from_groups"() TO "service_role";
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 GRANT ALL ON TABLE "public"."events" TO "anon";
 GRANT ALL ON TABLE "public"."events" TO "authenticated";
 GRANT ALL ON TABLE "public"."events" TO "service_role";
-
 
 
 GRANT ALL ON TABLE "public"."events_groups" TO "anon";
@@ -1559,11 +1012,9 @@ GRANT ALL ON TABLE "public"."events_groups" TO "authenticated";
 GRANT ALL ON TABLE "public"."events_groups" TO "service_role";
 
 
-
 GRANT ALL ON TABLE "public"."group_members" TO "anon";
 GRANT ALL ON TABLE "public"."group_members" TO "authenticated";
 GRANT ALL ON TABLE "public"."group_members" TO "service_role";
-
 
 
 GRANT ALL ON TABLE "public"."groups" TO "anon";
@@ -1571,11 +1022,9 @@ GRANT ALL ON TABLE "public"."groups" TO "authenticated";
 GRANT ALL ON TABLE "public"."groups" TO "service_role";
 
 
-
 GRANT ALL ON TABLE "public"."invitations" TO "anon";
 GRANT ALL ON TABLE "public"."invitations" TO "authenticated";
 GRANT ALL ON TABLE "public"."invitations" TO "service_role";
-
 
 
 GRANT ALL ON TABLE "public"."price_tiers" TO "anon";
@@ -1583,11 +1032,9 @@ GRANT ALL ON TABLE "public"."price_tiers" TO "authenticated";
 GRANT ALL ON TABLE "public"."price_tiers" TO "service_role";
 
 
-
 GRANT ALL ON TABLE "public"."profiles" TO "anon";
 GRANT ALL ON TABLE "public"."profiles" TO "authenticated";
 GRANT ALL ON TABLE "public"."profiles" TO "service_role";
-
 
 
 GRANT ALL ON TABLE "public"."resources" TO "anon";
@@ -1595,11 +1042,9 @@ GRANT ALL ON TABLE "public"."resources" TO "authenticated";
 GRANT ALL ON TABLE "public"."resources" TO "service_role";
 
 
-
 GRANT ALL ON TABLE "public"."resources_groups" TO "anon";
 GRANT ALL ON TABLE "public"."resources_groups" TO "authenticated";
 GRANT ALL ON TABLE "public"."resources_groups" TO "service_role";
-
 
 
 GRANT ALL ON TABLE "public"."service_admins" TO "anon";
@@ -1607,11 +1052,9 @@ GRANT ALL ON TABLE "public"."service_admins" TO "authenticated";
 GRANT ALL ON TABLE "public"."service_admins" TO "service_role";
 
 
-
 GRANT ALL ON TABLE "public"."service_event_owners" TO "anon";
 GRANT ALL ON TABLE "public"."service_event_owners" TO "authenticated";
 GRANT ALL ON TABLE "public"."service_event_owners" TO "service_role";
-
 
 
 GRANT ALL ON TABLE "public"."service_events" TO "anon";
@@ -1619,11 +1062,9 @@ GRANT ALL ON TABLE "public"."service_events" TO "authenticated";
 GRANT ALL ON TABLE "public"."service_events" TO "service_role";
 
 
-
 GRANT ALL ON TABLE "public"."service_groups" TO "anon";
 GRANT ALL ON TABLE "public"."service_groups" TO "authenticated";
 GRANT ALL ON TABLE "public"."service_groups" TO "service_role";
-
 
 
 GRANT ALL ON TABLE "public"."service_notes" TO "anon";
@@ -1631,11 +1072,9 @@ GRANT ALL ON TABLE "public"."service_notes" TO "authenticated";
 GRANT ALL ON TABLE "public"."service_notes" TO "service_role";
 
 
-
 GRANT ALL ON TABLE "public"."service_roles" TO "anon";
 GRANT ALL ON TABLE "public"."service_roles" TO "authenticated";
 GRANT ALL ON TABLE "public"."service_roles" TO "service_role";
-
 
 
 GRANT ALL ON TABLE "public"."services" TO "anon";
@@ -1643,23 +1082,14 @@ GRANT ALL ON TABLE "public"."services" TO "authenticated";
 GRANT ALL ON TABLE "public"."services" TO "service_role";
 
 
-
 GRANT ALL ON TABLE "public"."tenant_members" TO "anon";
 GRANT ALL ON TABLE "public"."tenant_members" TO "authenticated";
 GRANT ALL ON TABLE "public"."tenant_members" TO "service_role";
 
 
-
 GRANT ALL ON TABLE "public"."tenants" TO "anon";
 GRANT ALL ON TABLE "public"."tenants" TO "authenticated";
 GRANT ALL ON TABLE "public"."tenants" TO "service_role";
-
-
-
-
-
-
-
 
 
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "postgres";
@@ -1668,52 +1098,16 @@ ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQ
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "service_role";
 
 
-
-
-
-
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "postgres";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "anon";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "authenticated";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "service_role";
 
 
-
-
-
-
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "postgres";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "anon";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "authenticated";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "service_role";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 RESET ALL;

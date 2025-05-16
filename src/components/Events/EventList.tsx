@@ -63,7 +63,6 @@ export function EventList({
         // Check if the user is a tenant owner
         const { data: isOwner, error: ownerError } = await supabase.rpc("is_tenant_owner", {
           tenant_uuid: tenant.id,
-          user_uuid: user.id,
         });
 
         if (ownerError) {

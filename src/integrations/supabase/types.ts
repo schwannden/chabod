@@ -763,20 +763,8 @@ export type Database = {
         Args: { tenant_uuid: string; user_uuid: string };
         Returns: boolean;
       };
-      is_tenant_member_user: {
-        Args: { tenant_uuid: string; user_uuid: string };
-        Returns: boolean;
-      };
       is_tenant_owner: {
         Args: { tenant_uuid: string } | { tenant_uuid: string; user_uuid: string };
-        Returns: boolean;
-      };
-      is_tenant_owner_check: {
-        Args: { tenant_uuid: string };
-        Returns: boolean;
-      };
-      is_tenant_owner_user: {
-        Args: { tenant_uuid: string; user_uuid: string };
         Returns: boolean;
       };
     };

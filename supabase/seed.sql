@@ -85,8 +85,8 @@ VALUES
 INSERT INTO "public"."service_events"
   ("id", "service_id", "subtitle", "date", "start_time", "end_time", "tenant_id")
 VALUES
-  ('b435a298-294f-4f62-a8c4-7965f0af9cb1', '37105f07-80d5-4755-b5d5-bc8278a4f4d7', null, CURRENT_DATE + 3, '09:30:00', '11:30:00', '87332c35-a227-42f9-93cf-bf652f146dde'),
-  ('c140be1b-9b9d-47e6-b022-058af98d391c', 'a18bbdb8-b5aa-417e-a561-d86bc7bbb073', null, CURRENT_DATE + 14, '19:30:00', '20:30:00', '87332c35-a227-42f9-93cf-bf652f146dde');
+  ('b435a298-294f-4f62-a8c4-7965f0af9cb1', '37105f07-80d5-4755-b5d5-bc8278a4f4d7', '約翰一書', CURRENT_DATE + 3, '09:30:00', '11:30:00', '87332c35-a227-42f9-93cf-bf652f146dde'),
+  ('c140be1b-9b9d-47e6-b022-058af98d391c', 'a18bbdb8-b5aa-417e-a561-d86bc7bbb073', '可領聖餐', CURRENT_DATE + 14, '19:30:00', '20:30:00', '87332c35-a227-42f9-93cf-bf652f146dde');
 
 INSERT INTO "public"."service_event_owners"
   ("service_event_id", "user_id", "service_role_id", "tenant_id")
