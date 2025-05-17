@@ -98,7 +98,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <NavBar tenant={tenant ? { name: tenant.name, slug: tenant.slug } : undefined} />
+      <NavBar />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold">你的個人資料</h1>

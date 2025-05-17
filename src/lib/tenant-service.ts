@@ -18,32 +18,11 @@ export async function getPriceTiers(): Promise<PriceTier[]> {
 /**
  * Fetches all tenants that a user is a member of
  */
-export async function getUserTenants(userId: string): Promise<TenantWithUsage[]> {
-  const { data: tenantMembers, error: memberError } = await supabase
-    .from("tenant_members")
-    .select("tenant_id")
-    .eq("user_id", userId);
-
-  if (memberError) {
-    console.error("Error fetching tenant memberships:", memberError);
-    return [];
-  }
-
-  const tenantIds = tenantMembers.map((tm) => tm.tenant_id);
-
-  if (tenantIds.length === 0) {
-    return [];
-  }
-
-  const { data: tenants, error: tenantError } = await supabase
-    .from("tenants")
-    .select(
-      `
+export async function getTenants(): Promise<TenantWithUsage[]> {
+  const { data: tenants, error: tenantError } = await supabase.from("tenants").select(`
       *,
       price_tier:price_tiers(*)
-    `,
-    )
-    .in("id", tenantIds);
+    `);
 
   if (tenantError) {
     console.error("Error fetching tenants:", tenantError);
@@ -187,24 +166,29 @@ export async function getTenantBySlug(slug: string): Promise<Tenant | null> {
   }
 }
 
+export async function getUserRoleInTenant(tenantId: string, userId: string): Promise<string> {
+  const { data, error } = await supabase
+    .from("tenant_members")
+    .select("role")
+    .eq("tenant_id", tenantId)
+    .eq("user_id", userId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching user role:", error);
+    return null;
+  }
+
+  return data?.role;
+}
+
 /**
  * Checks if a user is the owner of a tenant
  */
 export async function fetchIsTenantOwner(tenantId: string, userId: string): Promise<boolean> {
   try {
-    const { data, error } = await supabase
-      .from("tenant_members")
-      .select("role")
-      .eq("tenant_id", tenantId)
-      .eq("user_id", userId)
-      .single();
-
-    if (error) {
-      console.error("Error checking tenant ownership:", error);
-      return false;
-    }
-
-    return data?.role === "owner";
+    const role = await getUserRoleInTenant(tenantId, userId);
+    return role === "owner";
   } catch (error) {
     console.error("Error in fetchIsTenantOwner:", error);
     return false;

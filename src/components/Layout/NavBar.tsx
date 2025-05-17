@@ -1,4 +1,4 @@
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/useSession";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,23 +10,34 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogOut, User, Building } from "lucide-react";
-import { useTenantRole } from "@/hooks/useTenantRole";
+import { Tenant } from "@/lib/types";
+import { useEffect, useState } from "react";
+import { getTenantBySlug, getUserRoleInTenant } from "@/lib/tenant-service";
 
 interface NavBarProps {
-  tenant?: {
-    name: string;
-    slug: string;
-    id?: string;
-  };
   onSignOut?: () => void;
 }
 
-export function NavBar({ tenant, onSignOut }: NavBarProps) {
+export function NavBar({ onSignOut }: NavBarProps) {
+  const { slug } = useParams<{ slug: string }>();
   const { user, profile, signOut } = useSession();
   const navigate = useNavigate();
   const location = useLocation();
-  // Use the slug, not the ID for the tenant role lookup
-  const { role } = useTenantRole(tenant?.slug, user?.id);
+
+  const [tenant, setTenant] = useState<Tenant | null>(null);
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (slug && user) {
+      getTenantBySlug(slug).then((tenant) => setTenant(tenant));
+    }
+  }, [slug, user]);
+
+  useEffect(() => {
+    if (tenant && user) {
+      getUserRoleInTenant(tenant.id, user.id).then((role) => setRole(role));
+    }
+  }, [tenant, user]);
 
   const handleSignOut = async () => {
     if (onSignOut) {

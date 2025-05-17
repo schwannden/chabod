@@ -103,7 +103,7 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <NavBar tenant={tenant ? { name: tenant.name, slug: tenant.slug } : undefined} />
+      <NavBar />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto mt-8">
           {tenant && (

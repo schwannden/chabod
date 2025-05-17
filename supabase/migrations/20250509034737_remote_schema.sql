@@ -126,17 +126,18 @@ $$;
 ALTER FUNCTION "public"."handle_updated_at"() OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."is_tenant_member"("tenant_uuid" "uuid", "user_uuid" "uuid") RETURNS boolean
+CREATE OR REPLACE FUNCTION "public"."is_tenant_member"("tenant_uuid" "uuid") RETURNS boolean
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
 BEGIN
   RETURN EXISTS (
     SELECT 1 FROM public.tenant_members
-    WHERE tenant_id = tenant_uuid AND user_id = user_uuid
+    WHERE tenant_id = tenant_uuid
+    AND user_id = auth.uid()
   );
 END;
 $$;
-ALTER FUNCTION "public"."is_tenant_member"("tenant_uuid" "uuid", "user_uuid" "uuid") OWNER TO "postgres";
+ALTER FUNCTION "public"."is_tenant_member"("tenant_uuid" "uuid") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid") RETURNS boolean
@@ -447,14 +448,7 @@ CREATE POLICY "Tenant owners can update tenant members" ON "public"."tenant_memb
 
 CREATE POLICY "Users can read their own tenant memberships" ON "public"."tenant_members" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
 
--- TODO: check this RLS
-CREATE POLICY "Allow membership verification" ON "public"."tenant_members" FOR SELECT USING (true);
-
-CREATE POLICY "Users can view tenant members in their tenants" ON "public"."tenant_members" FOR SELECT USING ("public"."is_tenant_member"("tenant_id", "auth"."uid"()));
-
-CREATE POLICY "Users can view their own tenants" ON "public"."tenants" FOR SELECT USING ((EXISTS ( SELECT 1
-   FROM "public"."tenant_members"
-   WHERE (("tenant_members"."tenant_id" = "tenants"."id") AND ("tenant_members"."user_id" = "auth"."uid"())))));
+CREATE POLICY "Users can view their own tenants" ON "public"."tenants" FOR SELECT USING ("public"."is_tenant_member"("id"));
 
 CREATE POLICY "enforce_tenant_event_limit" ON "public"."events" FOR INSERT WITH CHECK ("public"."check_tenant_event_limit"("tenant_id"));
 
@@ -694,9 +688,8 @@ GRANT ALL ON FUNCTION "public"."handle_updated_at"() TO "anon";
 GRANT ALL ON FUNCTION "public"."handle_updated_at"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."handle_updated_at"() TO "service_role";
 
-GRANT ALL ON FUNCTION "public"."is_tenant_member"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "anon";
-GRANT ALL ON FUNCTION "public"."is_tenant_member"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "authenticated";
-GRANT ALL ON FUNCTION "public"."is_tenant_member"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "service_role";
+GRANT ALL ON FUNCTION "public"."is_tenant_member"("tenant_uuid" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."is_tenant_member"("tenant_uuid" "uuid") TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid") TO "service_role";

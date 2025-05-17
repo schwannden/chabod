@@ -4,7 +4,7 @@ import { useSession } from "@/hooks/useSession";
 import { NavBar } from "@/components/Layout/NavBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tenant } from "@/lib/types";
-import { getTenantBySlug, getUserTenants } from "@/lib/tenant-utils";
+import { getTenantBySlug, getTenants } from "@/lib/tenant-utils";
 import { Loader2, Users, Calendar, Group, FileText, Handshake } from "lucide-react";
 
 export default function DashboardPage() {
@@ -26,7 +26,7 @@ export default function DashboardPage() {
 
       try {
         // Check if user is a member of this tenant first
-        const userTenants = await getUserTenants(user.id);
+        const userTenants = await getTenants();
         const currentTenant = userTenants.find((t) => t.slug === slug);
 
         if (!currentTenant) {
@@ -130,13 +130,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <NavBar
-        tenant={{
-          name: tenant?.name || "",
-          slug: tenant?.slug || "",
-        }}
-        onSignOut={handleSignOut}
-      />
+      <NavBar onSignOut={handleSignOut} />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold">{tenant?.name} 首頁</h1>

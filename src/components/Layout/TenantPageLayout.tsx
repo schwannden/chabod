@@ -35,13 +35,7 @@ export function TenantPageLayout({
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <NavBar
-        tenant={{
-          name: tenantName,
-          slug: tenantSlug,
-          id: "",
-        }}
-      />
+      <NavBar />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-6 space-y-6">
           <TenantBreadcrumb

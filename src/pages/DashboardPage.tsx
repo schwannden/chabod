@@ -6,7 +6,7 @@ import { TenantCard } from "@/components/Tenants/TenantCard";
 import { TenantCreateDialog } from "@/components/Tenants/TenantCreateDialog";
 import { Button } from "@/components/ui/button";
 import { TenantWithUsage } from "@/lib/types";
-import { getUserTenants } from "@/lib/tenant-utils";
+import { getTenants } from "@/lib/tenant-utils";
 import { Plus } from "lucide-react";
 
 export default function DashboardPage() {
@@ -28,7 +28,7 @@ export default function DashboardPage() {
       if (!user) return;
 
       try {
-        const tenantsData = await getUserTenants(user.id);
+        const tenantsData = await getTenants();
         setTenants(tenantsData);
       } catch (error) {
         console.error("Error fetching tenants:", error);
@@ -45,7 +45,7 @@ export default function DashboardPage() {
   const handleTenantChange = async () => {
     if (!user) return;
     setIsTenantsLoading(true);
-    const tenantsData = await getUserTenants(user.id);
+    const tenantsData = await getTenants();
     setTenants(tenantsData);
     setIsTenantsLoading(false);
   };
