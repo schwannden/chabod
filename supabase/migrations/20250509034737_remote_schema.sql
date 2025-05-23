@@ -420,7 +420,7 @@ CREATE OR REPLACE TRIGGER "remove_user_from_groups" AFTER DELETE ON "public"."te
 -- RLS Policies
 
 -- Tenants RLS
-CREATE POLICY "Allow public tenant reads" ON "public"."tenants" FOR SELECT TO "anon" USING (true);
+CREATE POLICY "Allow public tenant reads" ON "public"."tenants" FOR SELECT USING (true);
 
 CREATE POLICY "Only owners can delete tenants" ON "public"."tenants" FOR DELETE 
 USING ("public"."is_tenant_owner"("id"));
@@ -447,8 +447,6 @@ CREATE POLICY "Tenant owners can insert tenant members" ON "public"."tenant_memb
 CREATE POLICY "Tenant owners can update tenant members" ON "public"."tenant_members" FOR UPDATE USING ("public"."is_tenant_owner"("tenant_id"));
 
 CREATE POLICY "Users can read their own tenant memberships" ON "public"."tenant_members" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
-
-CREATE POLICY "Users can view their own tenants" ON "public"."tenants" FOR SELECT USING ("public"."is_tenant_member"("id"));
 
 CREATE POLICY "enforce_tenant_event_limit" ON "public"."events" FOR INSERT WITH CHECK ("public"."check_tenant_event_limit"("tenant_id"));
 

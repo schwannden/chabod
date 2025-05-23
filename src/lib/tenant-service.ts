@@ -19,15 +19,33 @@ export async function getPriceTiers(): Promise<PriceTier[]> {
  * Fetches all tenants that a user is a member of
  */
 export async function getTenants(): Promise<TenantWithUsage[]> {
-  const { data: tenants, error: tenantError } = await supabase.from("tenants").select(`
+  // Get the current user
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    console.error("Error fetching user or no user authenticated:", userError);
+    return [];
+  }
+
+  const { data: tenants, error: tenantError } = await supabase
+    .from("tenants")
+    .select(
+      `
       *,
-      price_tier:price_tiers(*)
-    `);
+      price_tier:price_tiers(*),
+      tenant_members!inner(user_id)
+    `,
+    )
+    .eq("tenant_members.user_id", user.id);
 
   if (tenantError) {
     console.error("Error fetching tenants:", tenantError);
     return [];
   }
+  console.log("tenants", tenants);
 
   const tenantsWithCounts = await Promise.all(
     tenants.map(async (tenant) => {
