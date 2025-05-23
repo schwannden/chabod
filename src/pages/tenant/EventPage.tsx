@@ -5,13 +5,13 @@ import { CreateEventDialog } from "@/components/Events/CreateEventDialog";
 import { EventFilterBar } from "@/components/Events/EventFilterBar";
 import { EventList } from "@/components/Events/EventList";
 import { Group, EventWithGroups } from "@/lib/types";
-import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
 import { EventCalendar } from "@/components/Events/EventCalendar";
 import { GenericEventPage } from "@/components/shared/GenericEventPage";
 import { useEventFilters } from "@/hooks/useEventFilters";
 import { getTenantGroups } from "@/lib/group-service";
+import { getTenantEvents } from "@/lib/event-service";
 import { CopyEventDialog } from "@/components/Events/CopyEventDialog";
 
 export default function EventPage() {
@@ -21,6 +21,7 @@ export default function EventPage() {
   const [allGroups, setAllGroups] = useState<Group[]>([]);
   const [isEventsLoading, setIsEventsLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [tenantId, setTenantId] = useState<string | null>(null);
   const { toast } = useToast();
   const [eventToCopy, setEventToCopy] = useState<EventWithGroups | undefined>(undefined);
   const [showCopyDialog, setShowCopyDialog] = useState(false);
@@ -29,62 +30,45 @@ export default function EventPage() {
   const { selectedGroup, setSelectedGroup, startDate, setStartDate, endDate, setEndDate } =
     useEventFilters();
 
-  const fetchEvents = useCallback(async () => {
-    try {
-      setIsEventsLoading(true);
+  const fetchEvents = useCallback(
+    async (currentTenantId: string) => {
+      try {
+        setIsEventsLoading(true);
 
-      // Build a query that joins events with events_groups and groups
-      let query = supabase.from("events").select(`
-          *,
-          events_groups!inner(
-            group:groups(*)
-          )
-        `);
+        // Format dates for the service function
+        const formattedStartDate = startDate ? format(startDate, "yyyy-MM-dd") : undefined;
+        const formattedEndDate = endDate ? format(endDate, "yyyy-MM-dd") : undefined;
 
-      // Apply date filters if provided
-      if (startDate) {
-        query = query.gte("date", format(startDate, "yyyy-MM-dd"));
-      }
-
-      if (endDate) {
-        query = query.lte("date", format(endDate, "yyyy-MM-dd"));
-      }
-
-      // Get the data first
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      // Now filter by group if needed
-      let filteredData = data.map((event) => ({
-        ...event,
-        groups: event.events_groups.map((eventGroup) => eventGroup.group),
-      }));
-      if (selectedGroup !== "all") {
-        filteredData = filteredData?.filter((event) =>
-          event.events_groups?.some((eg) => eg.group.id === selectedGroup),
+        // Use the service function to fetch events
+        const eventsData = await getTenantEvents(
+          currentTenantId,
+          selectedGroup,
+          formattedStartDate,
+          formattedEndDate,
         );
-      }
 
-      setEvents(filteredData);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-      setEvents([]);
-      toast({
-        title: "Error",
-        description: "Failed to load events. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsEventsLoading(false);
-    }
-  }, [selectedGroup, startDate, endDate, toast]);
+        setEvents(eventsData);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+        setEvents([]);
+        toast({
+          title: "Error",
+          description: "Failed to load events. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsEventsLoading(false);
+      }
+    },
+    [selectedGroup, startDate, endDate, toast],
+  );
 
   const fetchAllGroups = useCallback(
-    async (tenantId: string) => {
+    async (currentTenantId: string) => {
       try {
-        const groups = await getTenantGroups(tenantId);
+        const groups = await getTenantGroups(currentTenantId);
         setAllGroups(groups || []);
+        setTenantId(currentTenantId);
       } catch (error) {
         console.error("Error fetching groups:", error);
         toast({
@@ -98,8 +82,10 @@ export default function EventPage() {
   );
 
   useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents, refreshTrigger]);
+    if (tenantId) {
+      fetchEvents(tenantId);
+    }
+  }, [fetchEvents, refreshTrigger, tenantId]);
 
   const handleEventUpdated = () => {
     setRefreshTrigger((prev) => prev + 1);

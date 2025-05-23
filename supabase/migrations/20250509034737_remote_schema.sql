@@ -156,7 +156,7 @@ ALTER FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid") OWNER TO "postgr
 
 
 -- When a user is removed from a tenant, remove them from all groups in that tenant
--- we need this as a functino, not as cascade rule, because when a user is removed fro a tenant, it might still exists in the system.
+-- we need this as a function, not as a cascade rule, because when a user is removed fro a tenant, it might still exists in the system.
 CREATE OR REPLACE FUNCTION "public"."remove_user_from_groups"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -446,7 +446,12 @@ CREATE POLICY "Tenant owners can insert tenant members" ON "public"."tenant_memb
 
 CREATE POLICY "Tenant owners can update tenant members" ON "public"."tenant_members" FOR UPDATE USING ("public"."is_tenant_owner"("tenant_id"));
 
-CREATE POLICY "Users can read their own tenant memberships" ON "public"."tenant_members" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can read tenant memberships" ON "public"."tenant_members" 
+FOR SELECT TO "authenticated" 
+USING (
+  "auth"."uid"() = "user_id" OR 
+  "public"."is_tenant_member"("tenant_id")
+);
 
 CREATE POLICY "enforce_tenant_event_limit" ON "public"."events" FOR INSERT WITH CHECK ("public"."check_tenant_event_limit"("tenant_id"));
 
