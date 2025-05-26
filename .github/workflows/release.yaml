@@ -1,0 +1,31 @@
+name: Release Please
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      skip-github-release:
+        description: 'Skip creating a GitHub release'
+        required: false
+        type: boolean
+        default: false
+      skip-github-pull-request:
+        description: 'Skip creating a GitHub pull request'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+    release-please:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: googleapis/release-please-action@v4
+          if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'release:') }}
+          with:
+            token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
