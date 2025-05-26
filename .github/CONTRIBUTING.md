@@ -42,7 +42,7 @@ volta install node
    ```bash
    # Extract Supabase URL
    echo "VITE_SUPABASE_URL=http://localhost:54321" > .env.local
-   
+
    # Extract and add Supabase anon key
    echo "VITE_SUPABASE_ANON_KEY=$(supabase status | grep "anon key:" | awk '{print $3}')" >> .env.local
    ```
@@ -68,7 +68,7 @@ see [Official Docs](https://supabase.com/docs/reference/cli/supabase-db) for mor
    git checkout -b {type}/{pr-name}
    ```
 
-   type should be one of `docs`/`feat`/`fix`/`refactor`/`build`/`chore`, depending on your task type.
+   type should be one of `feat`/`fix`/`build`/`chore`/`refactor`/`docs`/`test`, depending on your task type.
 
 2. Make your changes
 
@@ -79,7 +79,17 @@ see [Official Docs](https://supabase.com/docs/reference/cli/supabase-db) for mor
    npm run lint:fix
    ```
 
-4. Commit your changes using [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) messages
+4. Commit your changes using [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) messages.
+
+   ```
+   <type>: <short summary>
+   ```
+
+   Examples:
+
+   - `feat: add new prayer entry feature`
+   - `fix: resolve bug in edit prayer form`
+   - Refer to [release please config](https://github.com/schwannden/chabod/blob/main/release-please-config.json#L12) for more types.
 
 ## Pull Request Process
 
