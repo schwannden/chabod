@@ -1,7 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Info } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useNamingInfo } from "@/hooks/useNamingInfo";
 
 interface FeatureCardProps {
   title: string;
@@ -22,29 +19,11 @@ function FeatureCard({ title, description }: FeatureCardProps) {
 }
 
 export function Features() {
-  const { isTooltipOpen, setIsTooltipOpen, namingExplanation } = useNamingInfo();
-
   return (
     <section id="features" className="py-20 px-4 bg-background">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold mb-4 inline-flex items-center gap-2">
-            功能概覽
-            <TooltipProvider>
-              <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
-                <TooltipTrigger asChild onClick={() => setIsTooltipOpen(!isTooltipOpen)}>
-                  <Info className="h-6 w-6 text-primary cursor-pointer" />
-                </TooltipTrigger>
-                <TooltipContent
-                  className="max-w-md text-sm p-4 text-left"
-                  side="bottom"
-                  sideOffset={5}
-                >
-                  {namingExplanation}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </h2>
+          <h2 className="text-3xl font-bold mb-4 inline-flex items-center gap-2">功能概覽</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Chabod 提供教會所需的全方位功能，讓管理更輕鬆
           </p>
