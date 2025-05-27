@@ -47,7 +47,7 @@ volta install node
    echo "VITE_SUPABASE_ANON_KEY=$(supabase status | grep "anon key:" | awk '{print $3}')" >> .env.local
    ```
 
-2. Install dependencies: `npm install`
+2. Install dependencies: `npm install --legacy-peer-deps`
 3. Setup husky: `npm prepare`
 4. Start the development server: `npm run dev`
 
