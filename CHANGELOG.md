@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.2.1](https://github.com/schwannden/chabod/compare/v0.2.0...v0.2.1) (2025-05-27)
+
+
+### Bug Fixes
+
+* remove duplicate tooltip ([4fc664a](https://github.com/schwannden/chabod/commit/4fc664a2c8eaf1069033a990c34a574c8b981c22))
+
+
+### Build Related
+
+* **deps-dev:** bump @eslint/js from 9.13.0 to 9.27.0 ([#25](https://github.com/schwannden/chabod/issues/25)) ([038bbea](https://github.com/schwannden/chabod/commit/038bbeaa9c40e93d0a7ec56537e3a34a1ffd7cdd))
+* **deps-dev:** bump eslint-plugin-react-refresh from 0.4.14 to 0.4.20 ([#23](https://github.com/schwannden/chabod/issues/23)) ([16fda27](https://github.com/schwannden/chabod/commit/16fda27f67768c4cc534bb60fce5768f7facb4ad))
+* **deps-dev:** bump tailwindcss from 4.1.5 to 4.1.7 ([#26](https://github.com/schwannden/chabod/issues/26)) ([223b557](https://github.com/schwannden/chabod/commit/223b557d23e0d4820dc1142c364f42024ecede69))
+* **deps:** bump @radix-ui/react-accordion from 1.2.1 to 1.2.11 ([#21](https://github.com/schwannden/chabod/issues/21)) ([4e5bf44](https://github.com/schwannden/chabod/commit/4e5bf4459df837a815f5dbca3b3409e7d229f04c))
+* **deps:** bump @radix-ui/react-separator from 1.1.0 to 1.1.7 ([#29](https://github.com/schwannden/chabod/issues/29)) ([55f1a8b](https://github.com/schwannden/chabod/commit/55f1a8bb75cba935324a9b29f58a77c58f1b6c3d))
+* **deps:** bump @radix-ui/react-switch from 1.1.1 to 1.2.5 ([#22](https://github.com/schwannden/chabod/issues/22)) ([cfc37d5](https://github.com/schwannden/chabod/commit/cfc37d576f46b347b580b868c3119d7462cd397e))
+* **deps:** bump @radix-ui/react-toggle from 1.1.0 to 1.1.9 ([#24](https://github.com/schwannden/chabod/issues/24)) ([55ed9b1](https://github.com/schwannden/chabod/commit/55ed9b1c439c58c76459648f3c6e373fe2bb81e3))
+* **deps:** bump @supabase/supabase-js from 2.49.4 to 2.49.8 ([#27](https://github.com/schwannden/chabod/issues/27)) ([15e95fd](https://github.com/schwannden/chabod/commit/15e95fddedde9c92bbd3a45b92a5118d31bde871))
+* **deps:** bump sonner from 1.5.0 to 2.0.3 ([#20](https://github.com/schwannden/chabod/issues/20)) ([42fcfd3](https://github.com/schwannden/chabod/commit/42fcfd35fe2c647e1754e312982e9dcc22989030))
+* **deps:** bump vite from 5.4.19 to 6.3.5 ([#30](https://github.com/schwannden/chabod/issues/30)) ([62362b5](https://github.com/schwannden/chabod/commit/62362b517206824bf4566cf42af1105423ee72ae))
+
+
+### Documentation
+
+* adding project background ([bf61fa5](https://github.com/schwannden/chabod/commit/bf61fa5fcb51e8c6441a14ac3358fce08de28f7f))
+* fix twitter-card slogan ([702b566](https://github.com/schwannden/chabod/commit/702b56657f8f631cb6089795525ad5e2e22918c7))
+
 ## [0.2.0](https://github.com/schwannden/chabod/compare/v0.1.0...v0.2.0) (2025-05-26)
 
 
