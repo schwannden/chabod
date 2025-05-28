@@ -76,7 +76,9 @@ export function NavBar({ onSignOut }: NavBarProps) {
   };
 
   const showManageTenants =
-    (tenant?.slug && role === "owner") || (user && location.pathname === "/");
+    (tenant?.slug && role === "owner") ||
+    (user && location.pathname === "/") ||
+    location.pathname == "/profile";
 
   return (
     <header className="bg-background border-b sticky top-0 z-10">

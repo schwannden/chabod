@@ -49,10 +49,8 @@ export function TenantCreateDialog({ isOpen, onClose, onTenantCreated }: TenantC
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create New Tenant</DialogTitle>
-          <DialogDescription>
-            Create a new tenant organization that you will own and manage.
-          </DialogDescription>
+          <DialogTitle>建立新教會</DialogTitle>
+          <DialogDescription>建立一個新的教會，您將成為其所有者並管理它。</DialogDescription>
         </DialogHeader>
 
         <TenantForm

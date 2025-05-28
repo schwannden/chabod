@@ -172,6 +172,22 @@ END;
 $$;
 ALTER FUNCTION "public"."remove_user_from_groups"() OWNER TO "postgres";
 
+-- Function to automatically create tenant owner when tenant is created
+CREATE OR REPLACE FUNCTION "public"."create_tenant_owner"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$
+BEGIN
+  -- Only create tenant owner if there's an authenticated user, this allows seeding to work
+  IF auth.uid() IS NOT NULL THEN
+    INSERT INTO public.tenant_members (tenant_id, user_id, role)
+    VALUES (NEW.id, auth.uid(), 'owner');
+  END IF;
+  
+  RETURN NEW;
+END;
+$$;
+ALTER FUNCTION "public"."create_tenant_owner"() OWNER TO "postgres";
+
 SET default_tablespace = '';
 
 SET default_table_access_method = "heap";
@@ -323,6 +339,10 @@ CREATE OR REPLACE TRIGGER "handle_updated_at_resources_groups" BEFORE UPDATE ON 
 
 CREATE OR REPLACE TRIGGER "remove_user_from_groups" AFTER DELETE ON "public"."tenant_members" FOR EACH ROW EXECUTE FUNCTION "public"."remove_user_from_groups"();
 
+CREATE OR REPLACE TRIGGER "create_tenant_owner" AFTER INSERT ON "public"."tenants" FOR EACH ROW EXECUTE FUNCTION "public"."create_tenant_owner"();
+
+CREATE OR REPLACE TRIGGER "on_auth_user_created" AFTER INSERT ON "auth"."users" FOR EACH ROW EXECUTE FUNCTION "public"."handle_new_user"();
+
 -- RLS Policies
 
 -- Tenants RLS
@@ -333,6 +353,10 @@ USING ("public"."is_tenant_owner"("id"));
 
 CREATE POLICY "Only owners can update tenants" ON "public"."tenants" FOR UPDATE 
 USING ("public"."is_tenant_owner"("id"));
+
+CREATE POLICY "Authenticated users can create tenants" ON "public"."tenants" FOR INSERT 
+TO "authenticated" 
+WITH CHECK (true);
 
 CREATE POLICY "Tenant owners can create invitations" ON "public"."invitations" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
@@ -349,6 +373,15 @@ CREATE POLICY "Tenant owners can view invitations" ON "public"."invitations" FOR
 CREATE POLICY "Tenant owners can delete tenant members" ON "public"."tenant_members" FOR DELETE USING ("public"."is_tenant_owner"("tenant_id"));
 
 CREATE POLICY "Tenant owners can insert tenant members" ON "public"."tenant_members" FOR INSERT WITH CHECK ("public"."is_tenant_owner"("tenant_id"));
+
+CREATE POLICY "Allow initial owner creation" ON "public"."tenant_members" FOR INSERT 
+WITH CHECK (
+  role = 'owner' AND 
+  NOT EXISTS (
+    SELECT 1 FROM public.tenant_members tm
+    WHERE tm.tenant_id = tenant_members.tenant_id
+  )
+);
 
 CREATE POLICY "Tenant owners can update tenant members" ON "public"."tenant_members" FOR UPDATE USING ("public"."is_tenant_owner"("tenant_id"));
 
@@ -457,6 +490,8 @@ ALTER TABLE "public"."price_tiers" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."profiles" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."resources" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."resources_groups" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."tenant_members" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."tenants" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER PUBLICATION "supabase_realtime" OWNER TO "postgres";
@@ -497,6 +532,10 @@ GRANT ALL ON FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid") TO "servi
 GRANT ALL ON FUNCTION "public"."remove_user_from_groups"() TO "anon";
 GRANT ALL ON FUNCTION "public"."remove_user_from_groups"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."remove_user_from_groups"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."create_tenant_owner"() TO "anon";
+GRANT ALL ON FUNCTION "public"."create_tenant_owner"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."create_tenant_owner"() TO "service_role";
 
 GRANT ALL ON TABLE "public"."events" TO "anon";
 GRANT ALL ON TABLE "public"."events" TO "authenticated";

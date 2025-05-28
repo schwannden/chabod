@@ -109,25 +109,13 @@ export function TenantForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="name">教會名稱</Label>
-        <Input
-          id="name"
-          value={name}
-          onChange={handleNameChange}
-          placeholder="My Organization"
-          required
-        />
+        <Input id="name" value={name} onChange={handleNameChange} placeholder="教會名稱" required />
         {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="slug">Slug</Label>
-        <Input
-          id="slug"
-          value={slug}
-          onChange={handleSlugChange}
-          placeholder="my-organization"
-          required
-        />
+        <Input id="slug" value={slug} onChange={handleSlugChange} placeholder="教會代號" required />
         {errors.slug && <p className="text-sm text-destructive">{errors.slug}</p>}
         <p className="text-xs text-muted-foreground">
           這將會被用於 URL: /tenant/{slug || "example"}

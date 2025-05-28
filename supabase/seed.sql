@@ -11,14 +11,10 @@ SELECT auth.create_user('d2e0a602-1214-4399-96ad-7d4f3dca75e5', 'love@fruitful-t
 SELECT auth.create_user('e7a6bea4-7f8b-436c-b87a-6846468aef8e', 'joy@fruitful-tools.com', 'strongAndFruitfulPassword');
 SELECT auth.create_user('f1c713ff-cbb3-412a-858c-0f17dbde5f6a', 'peace@fruitful-tools.com', 'strongAndFruitfulPassword');
 
-
-INSERT INTO "public"."profiles"
-  ("id", "email", "full_name", "first_name", "last_name")
-VALUES 
-  ('0b56e2b5-e3cf-43d0-9aca-f8a538fb512b', 'admin@fruitful-tools.com', '果頭', '頭', '果'), 
-  ('d2e0a602-1214-4399-96ad-7d4f3dca75e5', 'love@fruitful-tools.com', '果仁愛', '仁愛', '果'), 
-  ('e7a6bea4-7f8b-436c-b87a-6846468aef8e', 'joy@fruitful-tools.com', '果喜樂', '喜樂', '果'), 
-  ('f1c713ff-cbb3-412a-858c-0f17dbde5f6a', 'peace@fruitful-tools.com', '果和平', '和平', '果');
+UPDATE "public"."profiles" SET "first_name" = '頭', "last_name" = '果', "full_name" = '頭果' WHERE "id" = '0b56e2b5-e3cf-43d0-9aca-f8a538fb512b';
+UPDATE "public"."profiles" SET "first_name" = '仁愛', "last_name" = '果', "full_name" = '仁愛果' WHERE "id" = 'd2e0a602-1214-4399-96ad-7d4f3dca75e5';
+UPDATE "public"."profiles" SET "first_name" = '喜樂', "last_name" = '果', "full_name" = '喜樂果' WHERE "id" = 'e7a6bea4-7f8b-436c-b87a-6846468aef8e';
+UPDATE "public"."profiles" SET "first_name" = '和平', "last_name" = '果', "full_name" = '和平果' WHERE "id" = 'f1c713ff-cbb3-412a-858c-0f17dbde5f6a';
 
 INSERT INTO "public"."tenants"
   ("id", "name", "slug", "price_tier_id")
