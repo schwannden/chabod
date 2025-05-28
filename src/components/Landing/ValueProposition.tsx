@@ -20,13 +20,7 @@ export function ValueProposition() {
                     <span className="text-sm text-primary font-medium">點擊了解命名由來</span>
                   </div>
                 </TooltipTrigger>
-                <TooltipContent
-                  className="max-w-md text-sm p-4 text-left"
-                  side="bottom"
-                  sideOffset={5}
-                >
-                  {namingExplanation}
-                </TooltipContent>
+                <TooltipContent className="max-w-sm">{namingExplanation}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>

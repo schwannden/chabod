@@ -17,11 +17,7 @@ export function Hero() {
               <TooltipTrigger asChild onClick={() => setIsTooltipOpen(!isTooltipOpen)}>
                 <Info className="h-5 w-5 text-primary cursor-pointer" />
               </TooltipTrigger>
-              <TooltipContent
-                className="max-w-md text-sm p-4 text-left"
-                side="bottom"
-                sideOffset={5}
-              >
+              <TooltipContent className="max-w-sm" side="bottom" sideOffset={5}>
                 {namingExplanation}
               </TooltipContent>
             </Tooltip>

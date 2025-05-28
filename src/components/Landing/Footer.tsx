@@ -11,7 +11,7 @@ export function Footer() {
           </div>
           <div>
             <h3 className="font-bold mb-4">連結</h3>
-            <ul className="space-y-2">
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-y-1">
               <li>
                 <a href="#features" className="text-muted-foreground hover:text-primary">
                   功能
@@ -24,12 +24,22 @@ export function Footer() {
               </li>
               <li>
                 <a
+                  href="https://github.com/schwannden/chabod"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                >
+                  參與貢獻
+                </a>
+              </li>
+              <li>
+                <a
                   href="/legal/terms-of-service.html"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-primary"
                 >
-                  Terms of Service
+                  合約條款
                 </a>
               </li>
             </ul>
