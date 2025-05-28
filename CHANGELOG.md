@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.2](https://github.com/schwannden/chabod/compare/v0.2.1...v0.2.2) (2025-05-28)
+
+
+### Bug Fixes
+
+* tooltip styling and footer ([1ddbba0](https://github.com/schwannden/chabod/commit/1ddbba01289abf432070fb0727823be65da98d22))
+
+
+### Documentation
+
+* temporary fix for broken dependencies ([978a8fc](https://github.com/schwannden/chabod/commit/978a8fcef0d8890796f412d2ad4c279e48e961aa))
+
 ## [0.2.1](https://github.com/schwannden/chabod/compare/v0.2.0...v0.2.1) (2025-05-27)
 
 
