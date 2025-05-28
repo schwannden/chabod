@@ -15,15 +15,22 @@ import { updateUserProfile } from "@/lib/profile-service";
 import { MemberNameEditor } from "./MemberNameEditor";
 import { MemberRoleSelect } from "./MemberRoleSelect";
 import { MemberTableActions } from "./MemberTableActions";
+import { User } from "@supabase/supabase-js";
 
 interface MemberTableProps {
+  user: User;
   members: TenantMemberWithProfile[];
   currentUserId: string;
   isCurrentUserOwner: boolean;
   onMemberUpdated: () => void;
 }
 
-export function MemberTable({ members, isCurrentUserOwner, onMemberUpdated }: MemberTableProps) {
+export function MemberTable({
+  user,
+  members,
+  isCurrentUserOwner,
+  onMemberUpdated,
+}: MemberTableProps) {
   const [loadingMemberId, setLoadingMemberId] = useState<string | null>(null);
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
   const [firstName, setFirstName] = useState<string>("");
@@ -203,7 +210,7 @@ export function MemberTable({ members, isCurrentUserOwner, onMemberUpdated }: Me
 
               <TableCell className="text-right">
                 <MemberTableActions
-                  isCurrentUserOwner={isCurrentUserOwner}
+                  isCurrentUserOwner={isCurrentUserOwner || member.user_id === user.id}
                   isEditing={editingMemberId === member.id}
                   isLoading={loadingMemberId === member.id}
                   onEditClick={() => startEditing(member)}

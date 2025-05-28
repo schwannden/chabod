@@ -132,6 +132,7 @@ export default function MembersPage() {
       />
 
       <MemberTable
+        user={user}
         members={filteredMembers}
         currentUserId={user?.id || ""}
         isCurrentUserOwner={isOwner}
