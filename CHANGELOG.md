@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.3](https://github.com/schwannden/chabod/compare/v0.2.2...v0.2.3) (2025-05-28)
+
+
+### Bug Fixes
+
+* event rls ([fdb815f](https://github.com/schwannden/chabod/commit/fdb815fcb048367158f38b4ae0d0516923883c1e))
+* resource and groups rls ([1357fa2](https://github.com/schwannden/chabod/commit/1357fa2ab641f17d3495cacd2a8a9809a3d6d886))
+* user can update their own profile ([d917ff7](https://github.com/schwannden/chabod/commit/d917ff72d035031a1a3e54e0a33ee7460d356969))
+
+
+### Refactors
+
+* db migration files ([3e473e4](https://github.com/schwannden/chabod/commit/3e473e46b29c2a808ebf05b7b822063a507cd67a))
+
 ## [0.2.2](https://github.com/schwannden/chabod/compare/v0.2.1...v0.2.2) (2025-05-28)
 
 
