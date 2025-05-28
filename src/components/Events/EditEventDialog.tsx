@@ -51,11 +51,7 @@ export function EditEventDialog({
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  console.log("EditEventDialog rendering with event:", event.id);
-  console.log("AllGroups prop:", allGroups);
-
   const safeGroups = Array.isArray(allGroups) ? allGroups : [];
-  console.log("Safe groups after check:", safeGroups);
 
   // Initialize form with existing groups if available
   const initialGroupIds = event.groups?.map((group) => group.id) || [];

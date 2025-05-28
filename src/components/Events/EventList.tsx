@@ -97,6 +97,7 @@ export function EventList({
 
   const handleDeleteEvent = async (eventId: string) => {
     try {
+      console.log("Deleting event:", eventId);
       const { error } = await supabase.from("events").delete().eq("id", eventId);
 
       if (error) throw error;

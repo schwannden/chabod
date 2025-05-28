@@ -380,48 +380,44 @@ CREATE POLICY "Users can view profiles of tenant members" ON "public"."profiles"
 -- price_tiers RLS
 CREATE POLICY "All can view price tiers" ON "public"."price_tiers" FOR SELECT USING (true);
 
-CREATE POLICY "Only allow administrators to modify price_tiers" ON "public"."price_tiers" TO "authenticated" USING ((EXISTS ( SELECT 1
-   FROM "public"."tenant_members"
-  WHERE (("tenant_members"."user_id" = "auth"."uid"()) AND ("tenant_members"."role" = 'owner'::"text")))));
-
 -- events RLS
--- TODO: this appears to be not working, as we need that everyone can view roups as well
+CREATE POLICY "Anyone can view public events" ON "public"."events" FOR SELECT USING (("visibility" = 'public'::"public"."event_visibility"));
+
 CREATE POLICY "Anyone can view groups for public events" ON "public"."events_groups" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."events"
   WHERE (("events"."id" = "events_groups"."event_id") AND ("events"."visibility" = 'public'::"public"."event_visibility")))));
 
-CREATE POLICY "Anyone can view public events" ON "public"."events" FOR SELECT USING (("visibility" = 'public'::"public"."event_visibility"));
-
-CREATE POLICY "Authenticated users can view private events" ON "public"."events" FOR SELECT USING ((("auth"."role"() = 'authenticated'::"text") AND ("visibility" = 'private'::"public"."event_visibility")));
-
-CREATE POLICY "Creators and tenant owners can modify events" ON "public"."events" USING ((("created_by" = "auth"."uid"()) OR ( SELECT "public"."is_tenant_owner"("events"."tenant_id") AS "is_tenant_owner"))) WITH CHECK ((("created_by" = "auth"."uid"()) OR ( SELECT "public"."is_tenant_owner"("events"."tenant_id") AS "is_tenant_owner")));
-
-CREATE POLICY "Only event creators and tenant owners can modify event groups" ON "public"."events_groups" USING ((EXISTS ( SELECT 1
-   FROM "public"."events" "e"
-  WHERE (("e"."id" = "events_groups"."event_id") AND (("e"."created_by" = "auth"."uid"()) OR ( SELECT "public"."is_tenant_owner"("e"."tenant_id") AS "is_tenant_owner")))))) WITH CHECK ((EXISTS ( SELECT 1
-   FROM "public"."events" "e"
-  WHERE (("e"."id" = "events_groups"."event_id") AND (("e"."created_by" = "auth"."uid"()) OR ( SELECT "public"."is_tenant_owner"("e"."tenant_id") AS "is_tenant_owner"))))));
-
-CREATE POLICY "Owners and creators can delete events" ON "public"."events" FOR DELETE USING ((("created_by" = "auth"."uid"()) OR "public"."is_tenant_owner"("tenant_id")));
-
-CREATE POLICY "Owners and creators can manage event group associations" ON "public"."events_groups" USING ((EXISTS ( SELECT 1
-   FROM "public"."events" "e"
-  WHERE (("e"."id" = "events_groups"."event_id") AND (("e"."created_by" = "auth"."uid"()) OR "public"."is_tenant_owner"("e"."tenant_id"))))));
-
-CREATE POLICY "Owners and creators can update events" ON "public"."events" FOR UPDATE USING ((("created_by" = "auth"."uid"()) OR "public"."is_tenant_owner"("tenant_id")));
+CREATE POLICY "Tenant members can view all events" ON "public"."events" FOR SELECT USING ("public"."is_tenant_member"("tenant_id"));
 
 CREATE POLICY "Tenant members can view all event groups" ON "public"."events_groups" FOR SELECT USING ((EXISTS ( SELECT 1
-   FROM ("public"."events" "e"
-     JOIN "public"."tenant_members" "tm" ON (("tm"."tenant_id" = "e"."tenant_id")))
-  WHERE (("e"."id" = "events_groups"."event_id") AND ("tm"."user_id" = "auth"."uid"())))));
+   FROM "public"."events" "e"
+  WHERE (("e"."id" = "events_groups"."event_id") AND "public"."is_tenant_member"("e"."tenant_id")))));
 
-CREATE POLICY "Tenant members can view all events" ON "public"."events" FOR SELECT USING ((( SELECT (EXISTS ( SELECT 1
-           FROM "public"."tenant_members"
-          WHERE (("tenant_members"."tenant_id" = "events"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"())))) AS "exists") IS TRUE));
+CREATE POLICY "Event creator can manage their own events" ON "public"."events" FOR ALL USING ("created_by" = "auth"."uid"()) WITH CHECK ("created_by" = "auth"."uid"());
 
-CREATE POLICY "Users can create events" ON "public"."events" FOR INSERT WITH CHECK ((("auth"."role"() = 'authenticated'::"text") AND ("tenant_id" IS NOT NULL) AND (EXISTS ( SELECT 1
-   FROM "public"."tenant_members"
-  WHERE (("tenant_members"."tenant_id" = "events"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"()))))));
+CREATE POLICY "Tenant owners can manage events within the tenant" ON "public"."events" FOR ALL USING ("public"."is_tenant_owner"("tenant_id")) WITH CHECK ("public"."is_tenant_owner"("tenant_id"));
+
+CREATE POLICY "Event creator their own event groups" ON "public"."events_groups" 
+FOR ALL
+USING ((EXISTS ( SELECT 1
+   FROM "public"."events" "e"
+  WHERE (("e"."id" = "events_groups"."event_id") AND ("e"."created_by" = "auth"."uid"())))));
+
+CREATE POLICY "Tenant owners can manage event groups within the tenant" ON "public"."events_groups" 
+FOR ALL
+USING (EXISTS ( SELECT 1
+   FROM "public"."events" "e"
+  WHERE (("e"."id" = "events_groups"."event_id") AND "public"."is_tenant_owner"("e"."tenant_id"))));
+
+CREATE POLICY "Users can create events within their tenants" ON "public"."events" FOR INSERT 
+TO "authenticated"
+WITH CHECK ("public"."is_tenant_member"("tenant_id"));
+
+CREATE POLICY "Users can create event groups within their tenants" ON "public"."events_groups" FOR INSERT 
+TO "authenticated" 
+WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."events" "e"
+  WHERE (("e"."id" = "events_groups"."event_id") AND "public"."is_tenant_member"("e"."tenant_id")))));
 
 -- resources RLS
 
