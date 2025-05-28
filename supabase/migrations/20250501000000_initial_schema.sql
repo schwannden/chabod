@@ -297,8 +297,8 @@ CREATE TABLE IF NOT EXISTS "public"."resources" (
     "tenant_id" "uuid" NOT NULL REFERENCES "public"."tenants"("id") ON DELETE CASCADE,
     "name" "text" NOT NULL,
     "description" "text",
-    "url" "text" NOT NULL,
-    "icon" "text" NOT NULL,
+    "url" "text",
+    "icon" "text",
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
@@ -421,50 +421,31 @@ WITH CHECK ((EXISTS ( SELECT 1
 
 -- resources RLS
 
-CREATE POLICY "Only tenant owners can create resources" ON "public"."resources" FOR INSERT
-WITH CHECK ("public"."is_tenant_owner"("tenant_id"));
-
-CREATE POLICY "Only tenant owners can delete resources" ON "public"."resources" FOR DELETE
-USING ("public"."is_tenant_owner"("tenant_id"));
-
-CREATE POLICY "Only tenant owners can update resources" ON "public"."resources" FOR UPDATE
-USING ("public"."is_tenant_owner"("tenant_id"));
-
-CREATE POLICY "Tenant members can view resources" ON "public"."resources" FOR SELECT USING ((EXISTS ( SELECT 1
-   FROM "public"."tenant_members"
-  WHERE (("tenant_members"."tenant_id" = "resources"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"())))));
-
-CREATE POLICY "Tenant members can view resource-group associations" ON "public"."resources_groups" FOR SELECT USING ((EXISTS ( SELECT 1
-   FROM ("public"."resources" "r"
-     JOIN "public"."tenant_members" "tm" ON (("r"."tenant_id" = "tm"."tenant_id")))
-  WHERE (("r"."id" = "resources_groups"."resource_id") AND ("tm"."user_id" = "auth"."uid"())))));
+CREATE POLICY "Only tenant owners can manage resources" ON "public"."resources" USING ("public"."is_tenant_owner"("tenant_id"));
 
 CREATE POLICY "Tenant owners can manage resource-group associations" ON "public"."resources_groups" USING ((EXISTS ( SELECT 1
-   FROM ("public"."resources" "r"
-     JOIN "public"."tenant_members" "tm" ON (("r"."tenant_id" = "tm"."tenant_id")))
-  WHERE (("r"."id" = "resources_groups"."resource_id") AND ("tm"."user_id" = "auth"."uid"()) AND ("tm"."role" = 'owner'::"text")))));
+   FROM "public"."resources" "r"
+  WHERE (("r"."id" = "resources_groups"."resource_id") AND "public"."is_tenant_owner"("r"."tenant_id")))));
+
+CREATE POLICY "Tenant members can view resources" ON "public"."resources" FOR SELECT USING ("public"."is_tenant_member"("tenant_id"));
+
+CREATE POLICY "Tenant members can view resource-group associations" ON "public"."resources_groups" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."resources" "r"
+  WHERE (("r"."id" = "resources_groups"."resource_id") AND "public"."is_tenant_member"("r"."tenant_id")))));
 
 -- groups RLS
 
-CREATE POLICY "Tenant owners can manage groups" ON "public"."groups" USING ((EXISTS ( SELECT 1
-   FROM "public"."tenant_members"
-  WHERE (("tenant_members"."tenant_id" = "groups"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"()) AND ("tenant_members"."role" = 'owner'::"text")))));
+CREATE POLICY "Tenant owners can manage groups" ON "public"."groups" USING ("public"."is_tenant_owner"("tenant_id"));
 
 CREATE POLICY "Tenant owners can manage group members" ON "public"."group_members" USING ((EXISTS ( SELECT 1
-   FROM ("public"."groups" "g"
-     JOIN "public"."tenant_members" "tm" ON (("g"."tenant_id" = "tm"."tenant_id")))
-  WHERE (("group_members"."group_id" = "g"."id") AND ("tm"."user_id" = "auth"."uid"()) AND ("tm"."role" = 'owner'::"text")))));
+   FROM "public"."groups" "g"
+  WHERE (("group_members"."group_id" = "g"."id") AND "public"."is_tenant_owner"("g"."tenant_id")))));
 
-CREATE POLICY "Users can view groups in their tenants" ON "public"."groups" FOR SELECT USING ((EXISTS ( SELECT 1
-   FROM "public"."tenant_members"
-  WHERE (("tenant_members"."tenant_id" = "groups"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"())))));
+CREATE POLICY "Users can view groups in their tenants" ON "public"."groups" FOR SELECT USING ("public"."is_tenant_member"("tenant_id"));
 
 CREATE POLICY "Users can view group members in their tenants" ON "public"."group_members" FOR SELECT USING ((EXISTS ( SELECT 1
-   FROM ("public"."groups" "g"
-     JOIN "public"."tenant_members" "tm" ON (("g"."tenant_id" = "tm"."tenant_id")))
-  WHERE (("group_members"."group_id" = "g"."id") AND ("tm"."user_id" = "auth"."uid"())))));
-
-
+   FROM "public"."groups" "g"
+  WHERE (("group_members"."group_id" = "g"."id") AND "public"."is_tenant_member"("g"."tenant_id")))));
 
 
 ALTER TABLE "public"."events" ENABLE ROW LEVEL SECURITY;
@@ -476,7 +457,6 @@ ALTER TABLE "public"."price_tiers" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."profiles" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."resources" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."resources_groups" ENABLE ROW LEVEL SECURITY;
-
 
 
 ALTER PUBLICATION "supabase_realtime" OWNER TO "postgres";

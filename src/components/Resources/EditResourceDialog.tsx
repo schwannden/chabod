@@ -34,7 +34,7 @@ export function EditResourceDialog({
 }: EditResourceDialogProps) {
   const [name, setName] = useState(resource.name);
   const [description, setDescription] = useState(resource.description || "");
-  const [url, setUrl] = useState(resource.url);
+  const [url, setUrl] = useState(resource.url || "");
   const [icon, setIcon] = useState(resource.icon);
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,6 +57,10 @@ export function EditResourceDialog({
 
   const validateUrl = (url: string) => {
     const trimmedUrl = url.trim();
+    if (!trimmedUrl) {
+      setUrlError("");
+      return true; // Empty URL is now valid
+    }
     try {
       new URL(trimmedUrl);
       setUrlError("");
@@ -74,16 +78,16 @@ export function EditResourceDialog({
     const trimmedDescription = description.trim();
     const trimmedUrl = url.trim();
 
-    if (!trimmedName || !trimmedUrl || !icon) {
+    if (!trimmedName || !icon) {
       toast({
         title: "錯誤",
-        description: "資源名稱、網址和圖示不能為空",
+        description: "資源名稱和圖示不能為空",
         variant: "destructive",
       });
       return;
     }
 
-    if (!validateUrl(trimmedUrl)) {
+    if (trimmedUrl && !validateUrl(trimmedUrl)) {
       return;
     }
 
@@ -93,7 +97,7 @@ export function EditResourceDialog({
       const updatedResource = await updateResource(resource.id, {
         name: trimmedName,
         description: trimmedDescription || null,
-        url: trimmedUrl,
+        url: trimmedUrl || null,
         icon,
       });
 
@@ -148,7 +152,11 @@ export function EditResourceDialog({
             onDescriptionChange={setDescription}
             onUrlChange={(value) => {
               setUrl(value);
-              if (value) validateUrl(value);
+              if (value.trim()) {
+                validateUrl(value);
+              } else {
+                setUrlError("");
+              }
             }}
             onIconChange={setIcon}
             onGroupToggle={handleGroupToggle}

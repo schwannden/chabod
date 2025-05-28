@@ -298,32 +298,32 @@ export type Database = {
         Row: {
           created_at: string;
           description: string | null;
-          icon: string;
+          icon: string | null;
           id: string;
           name: string;
           tenant_id: string;
           updated_at: string;
-          url: string;
+          url: string | null;
         };
         Insert: {
           created_at?: string;
           description?: string | null;
-          icon: string;
+          icon?: string | null;
           id?: string;
           name: string;
           tenant_id: string;
           updated_at?: string;
-          url: string;
+          url?: string | null;
         };
         Update: {
           created_at?: string;
           description?: string | null;
-          icon?: string;
+          icon?: string | null;
           id?: string;
           name?: string;
           tenant_id?: string;
           updated_at?: string;
-          url?: string;
+          url?: string | null;
         };
         Relationships: [
           {

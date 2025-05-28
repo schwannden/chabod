@@ -124,7 +124,7 @@ export function ResourceDetailsFields({
       </div>
 
       <div className="grid gap-2">
-        <Label htmlFor="url">網址</Label>
+        <Label htmlFor="url">網址 (選填)</Label>
         <Input
           id="url"
           type="url"
@@ -132,7 +132,6 @@ export function ResourceDetailsFields({
           onChange={handleUrlChange}
           onBlur={handleUrlBlur}
           placeholder="輸入資源連結"
-          required
           className={urlError ? "border-red-500" : ""}
         />
         {urlError && <p className="text-sm text-red-500">{urlError}</p>}

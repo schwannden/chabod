@@ -177,19 +177,21 @@ export function ResourceList({
                 {resource.description && <CardDescription>{resource.description}</CardDescription>}
               </CardHeader>
               <CardFooter className="flex justify-between pt-2">
-                <Button variant="outline" size="sm" asChild>
-                  <a
-                    href={resource.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center"
-                  >
-                    <ExternalLink className="h-4 w-4 mr-1" />
-                    打開連結
-                  </a>
-                </Button>
+                {resource.url && (
+                  <Button variant="outline" size="sm" asChild>
+                    <a
+                      href={resource.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center"
+                    >
+                      <ExternalLink className="h-4 w-4 mr-1" />
+                      打開連結
+                    </a>
+                  </Button>
+                )}
                 {canManage && (
-                  <div className="flex gap-2">
+                  <div className={`flex gap-2 ${!resource.url ? "ml-auto" : ""}`}>
                     <Button variant="outline" size="sm" onClick={() => handleEdit(resource)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
