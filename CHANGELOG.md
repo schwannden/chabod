@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.4](https://github.com/schwannden/chabod/compare/v0.2.3...v0.2.4) (2025-05-28)
+
+
+### Bug Fixes
+
+* create tenant ([ed22afa](https://github.com/schwannden/chabod/commit/ed22afaeb1e760dace54313bf50cff162a34f1a8))
+* routing on github pages ([1b80ea3](https://github.com/schwannden/chabod/commit/1b80ea34516a76b4c456039671541c8ea6d1ba36))
+
 ## [0.2.3](https://github.com/schwannden/chabod/compare/v0.2.2...v0.2.3) (2025-05-28)
 
 
