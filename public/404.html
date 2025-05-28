@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chabod</title>
+    <meta name="description" content="專為現代教會設計的全方位管理平台，傳承數位資產，簡化行政工作。" />
+    <meta name="author" content="Fruitful Tools" />
+
+    <meta property="og:title" content="Chabod" />
+    <meta property="og:description" content="專為現代教會設計的全方位管理平台，傳承數位資產，簡化行政工作。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://chabod.fruitful-tools.com/public/static/images/twitter-card.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://chabod.fruitful-tools.com/public/static/images/twitter-card.png" />
+    
+    <script>
+      // Store the current path and redirect to index.html
+      // React Router will handle the routing client-side
+      sessionStorage.setItem('redirectPath', location.pathname + location.search + location.hash);
+      location.replace('/');
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html> 
