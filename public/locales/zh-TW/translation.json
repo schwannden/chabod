@@ -1,0 +1,89 @@
+
+{
+  "common": {
+    "loading": "載入中...",
+    "error": "錯誤",
+    "cancel": "取消",
+    "save": "儲存",
+    "delete": "刪除",
+    "edit": "編輯",
+    "create": "建立",
+    "search": "搜尋",
+    "close": "關閉",
+    "confirm": "確認"
+  },
+  "nav": {
+    "dashboard": "儀表板",
+    "profile": "個人資料",
+    "settings": "設定",
+    "logout": "登出",
+    "login": "登入",
+    "signup": "註冊"
+  },
+  "landing": {
+    "hero": {
+      "title": "Chabod",
+      "subtitle": "專為現代教會設計的全方位管理平台，傳承數位資產，簡化行政工作。",
+      "getStarted": "立即開始",
+      "learnMore": "了解更多"
+    },
+    "features": {
+      "title": "功能概覽",
+      "subtitle": "Chabod 提供教會所需的全方位功能，讓管理更輕鬆",
+      "memberManagement": "會友管理",
+      "memberManagementDesc": "管理教會成員資料，一切以人為本",
+      "groupManagement": "分組管理",
+      "groupManagementDesc": "自訂管理教會組織，分類事工與教會活動",
+      "eventManagement": "活動管理",
+      "eventManagementDesc": "對內活動安排不衝突，對外宣傳更輕鬆",
+      "resourceManagement": "資源管理",
+      "resourceManagementDesc": "數位資產傳承，簡化行政工作",
+      "serviceManagement": "服事管理",
+      "serviceManagementDesc": "安排服事人員，確保教會運作順暢",
+      "multiLanguage": "多語言支援(中文、英文)",
+      "multiLanguageDesc": "支援中文介面，適合華人教會使用"
+    },
+    "values": {
+      "title": "我們的核心價值",
+      "subtitle": "Chabod 團隊致力於開發真正滿足教會需求的數位工具",
+      "peopleCentered": "以人為本",
+      "peopleCenteredDesc": "工具不會取代必要的人際互動",
+      "faithInheritance": "信仰傳承",
+      "faithInheritanceDesc": "教會已經存在兩千年，還會繼續存在，神會呼召年輕的世代來愛神，愛教會"
+    },
+    "pricing": {
+      "title": "價格方案",
+      "subtitle": "彈性的價格方案，滿足不同規模教會的需求",
+      "free": "免費",
+      "getStarted": "立即開始",
+      "contactUs": "聯絡我們"
+    },
+    "cta": {
+      "title": "開始使用 Chabod 進行教會管理",
+      "subtitle": "凱撒的歸凱撒，上帝的歸上帝，可以數位化的交給Chabod",
+      "signUp": "立即註冊"
+    }
+  },
+  "auth": {
+    "welcome": "歡迎使用 Chabod 教會管理系統",
+    "signIn": "登入",
+    "signUp": "註冊",
+    "email": "電子郵件",
+    "password": "密碼",
+    "forgotPassword": "忘記密碼？",
+    "termsOfService": "信仰告白（註冊需同意）",
+    "agreeToTerms": "我已閱讀並同意以上信仰告白及",
+    "serviceTerms": "服務條款"
+  },
+  "tenant": {
+    "createNew": "建立新教會",
+    "createDescription": "建立一個新的教會，您將成為其所有者並管理它。",
+    "name": "教會名稱",
+    "slug": "Slug",
+    "creating": "建立中...",
+    "createChurch": "建立教會",
+    "created": "教會已建立",
+    "createdSuccess": "{{name}} 已成功建立。",
+    "errorCreating": "建立教會時發生錯誤"
+  }
+}

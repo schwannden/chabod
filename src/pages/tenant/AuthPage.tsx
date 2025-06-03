@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthTabs } from "@/components/Auth/AuthTabs";
@@ -7,6 +8,7 @@ import { getTenantBySlug } from "@/lib/tenant-utils";
 import { Tenant } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { checkUserTenantAccess } from "@/lib/member-service";
+import { useTranslation } from "react-i18next";
 
 export default function AuthPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -16,6 +18,7 @@ export default function AuthPage() {
   const [isTenantLoading, setIsTenantLoading] = useState(true);
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -79,7 +82,7 @@ export default function AuthPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">Loading...</span>
+        <span className="ml-2">{t('common.loading')}</span>
       </div>
     );
   }

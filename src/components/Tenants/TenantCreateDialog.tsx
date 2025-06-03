@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -9,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { TenantForm, TenantFormData } from "./TenantForm";
 import { createTenant } from "@/lib/tenant-utils";
+import { useTranslation } from "react-i18next";
 
 interface TenantCreateDialogProps {
   isOpen: boolean;
@@ -20,6 +22,7 @@ interface TenantCreateDialogProps {
 export function TenantCreateDialog({ isOpen, onClose, onTenantCreated }: TenantCreateDialogProps) {
   const [isCreating, setIsCreating] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleSubmit = async (formData: TenantFormData) => {
     setIsCreating(true);
@@ -28,15 +31,15 @@ export function TenantCreateDialog({ isOpen, onClose, onTenantCreated }: TenantC
       // Fixing this line - removing the extra argument
       await createTenant(formData.name, formData.slug);
       toast({
-        title: "Tenant created",
-        description: `${formData.name} has been created successfully.`,
+        title: t('tenant.created'),
+        description: t('tenant.createdSuccess', { name: formData.name }),
       });
       onTenantCreated();
       onClose();
     } catch (error) {
       const errorMessage = error?.message || "未知錯誤";
       toast({
-        title: "Error creating tenant",
+        title: t('tenant.errorCreating'),
         description: errorMessage,
         variant: "destructive",
       });
@@ -49,16 +52,16 @@ export function TenantCreateDialog({ isOpen, onClose, onTenantCreated }: TenantC
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>建立新教會</DialogTitle>
-          <DialogDescription>建立一個新的教會，您將成為其所有者並管理它。</DialogDescription>
+          <DialogTitle>{t('tenant.createNew')}</DialogTitle>
+          <DialogDescription>{t('tenant.createDescription')}</DialogDescription>
         </DialogHeader>
 
         <TenantForm
           initialValues={{ name: "", slug: "" }}
           onSubmit={handleSubmit}
           isProcessing={isCreating}
-          processingText="建立中..."
-          submitText="建立教會"
+          processingText={t('tenant.creating')}
+          submitText={t('tenant.createChurch')}
           onCancel={onClose}
           autoGenerateSlug={true}
         />

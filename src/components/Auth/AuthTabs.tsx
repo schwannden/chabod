@@ -1,7 +1,9 @@
+
 import { useState } from "react";
 import { SignInForm } from "./SignInForm";
 import { SignUpForm } from "./SignUpForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTranslation } from "react-i18next";
 
 interface AuthTabsProps {
   tenantSlug?: string;
@@ -19,6 +21,7 @@ export function AuthTabs({
   initialTab = "signin",
 }: AuthTabsProps) {
   const [activeTab, setActiveTab] = useState<"signin" | "signup">(initialTab);
+  const { t } = useTranslation();
 
   const handleSignInClick = () => setActiveTab("signin");
   const handleSignUpClick = () => setActiveTab("signup");
@@ -30,8 +33,8 @@ export function AuthTabs({
       className="w-full max-w-md mx-auto"
     >
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="signin">登入</TabsTrigger>
-        <TabsTrigger value="signup">註冊</TabsTrigger>
+        <TabsTrigger value="signin">{t('auth.signIn')}</TabsTrigger>
+        <TabsTrigger value="signup">{t('auth.signUp')}</TabsTrigger>
       </TabsList>
       <TabsContent value="signin">
         <SignInForm

@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 // Alternative: import { HashRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { SessionProvider } from "@/contexts/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import DashboardPage from "./pages/DashboardPage";
 import AuthPage from "./pages/AuthPage";
 import LandingPage from "./pages/LandingPage";
@@ -20,6 +21,9 @@ import EventPage from "./pages/tenant/EventPage";
 import ResourcePage from "./pages/tenant/ResourcePage";
 import ServicePage from "./pages/tenant/ServicePage";
 import ServiceEventPage from "./pages/tenant/ServiceEventPage";
+
+// Import i18n configuration
+import { i18nPromise } from "./lib/i18n";
 
 const queryClient = new QueryClient();
 
@@ -61,7 +65,30 @@ function AppRoutes() {
   );
 }
 
+function LoadingScreen() {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+        <p>載入中...</p>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
+  const [isI18nReady, setIsI18nReady] = useState(false);
+
+  useEffect(() => {
+    i18nPromise.then(() => {
+      setIsI18nReady(true);
+    });
+  }, []);
+
+  if (!isI18nReady) {
+    return <LoadingScreen />;
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

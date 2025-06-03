@@ -1,0 +1,89 @@
+
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "close": "Close",
+    "confirm": "Confirm"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "login": "Login",
+    "signup": "Sign Up"
+  },
+  "landing": {
+    "hero": {
+      "title": "Chabod",
+      "subtitle": "A comprehensive management platform designed for modern churches, inheriting digital assets and simplifying administrative work.",
+      "getStarted": "Get Started",
+      "learnMore": "Learn More"
+    },
+    "features": {
+      "title": "Feature Overview",
+      "subtitle": "Chabod provides comprehensive features that churches need, making management easier",
+      "memberManagement": "Member Management",
+      "memberManagementDesc": "Manage church member information, everything is people-centered",
+      "groupManagement": "Group Management",
+      "groupManagementDesc": "Customize church organization management, categorize ministries and church activities",
+      "eventManagement": "Event Management",
+      "eventManagementDesc": "Internal event scheduling without conflicts, easier external promotion",
+      "resourceManagement": "Resource Management",
+      "resourceManagementDesc": "Digital asset inheritance, simplified administrative work",
+      "serviceManagement": "Service Management",
+      "serviceManagementDesc": "Arrange service personnel to ensure smooth church operations",
+      "multiLanguage": "Multi-language Support (Chinese, English)",
+      "multiLanguageDesc": "Supports Chinese interface, suitable for Chinese churches"
+    },
+    "values": {
+      "title": "Our Core Values",
+      "subtitle": "The Chabod team is committed to developing digital tools that truly meet church needs",
+      "peopleCentered": "People-Centered",
+      "peopleCenteredDesc": "Tools will not replace necessary interpersonal interactions",
+      "faithInheritance": "Faith Inheritance",
+      "faithInheritanceDesc": "The church has existed for two thousand years and will continue to exist. God will call the younger generation to love God and love the church"
+    },
+    "pricing": {
+      "title": "Pricing Plans",
+      "subtitle": "Flexible pricing plans to meet the needs of churches of different sizes",
+      "free": "Free",
+      "getStarted": "Get Started",
+      "contactUs": "Contact Us"
+    },
+    "cta": {
+      "title": "Start Using Chabod for Church Management",
+      "subtitle": "Render unto Caesar what is Caesar's, and unto God what is God's. What can be digitized, leave it to Chabod",
+      "signUp": "Sign Up Now"
+    }
+  },
+  "auth": {
+    "welcome": "Welcome to Chabod Church Management System",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "termsOfService": "Faith Declaration (Registration Required)",
+    "agreeToTerms": "I have read and agree to the above faith declaration and",
+    "serviceTerms": "Terms of Service"
+  },
+  "tenant": {
+    "createNew": "Create New Church",
+    "createDescription": "Create a new church where you will be the owner and manager.",
+    "name": "Church Name",
+    "slug": "Slug",
+    "creating": "Creating...",
+    "createChurch": "Create Church",
+    "created": "Tenant created",
+    "createdSuccess": "{{name}} has been created successfully.",
+    "errorCreating": "Error creating tenant"
+  }
+}

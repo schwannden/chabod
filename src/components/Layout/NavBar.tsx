@@ -1,152 +1,86 @@
-import { Link, useNavigate, useLocation, useParams } from "react-router-dom";
+
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/useSession";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { LogOut, User, Building } from "lucide-react";
-import { Tenant } from "@/lib/types";
-import { useEffect, useState } from "react";
-import { getTenantBySlug, getUserRoleInTenant } from "@/lib/tenant-service";
+import { LogOut, User } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
-interface NavBarProps {
-  onSignOut?: () => void;
-}
-
-export function NavBar({ onSignOut }: NavBarProps) {
-  const { slug } = useParams<{ slug: string }>();
-  const { user, profile, signOut } = useSession();
-  const navigate = useNavigate();
+export function NavBar() {
+  const { user } = useSession();
   const location = useLocation();
-
-  const [tenant, setTenant] = useState<Tenant | null>(null);
-  const [role, setRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (slug && user) {
-      getTenantBySlug(slug).then((tenant) => setTenant(tenant));
-    }
-  }, [slug, user]);
-
-  useEffect(() => {
-    if (tenant && user) {
-      getUserRoleInTenant(tenant.id, user.id).then((role) => setRole(role));
-    }
-  }, [tenant, user]);
+  const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleSignOut = async () => {
-    if (onSignOut) {
-      await onSignOut();
-    } else {
-      await signOut();
-      if (tenant) {
-        navigate(`/tenant/${tenant.slug}/auth`);
-      } else {
-        navigate("/");
-      }
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "已登出",
+        description: "您已成功登出。",
+      });
+    } catch (error) {
+      console.error("Sign out error:", error);
+      toast({
+        title: "登出錯誤",
+        description: "登出時發生錯誤，請重試。",
+        variant: "destructive",
+      });
     }
   };
-
-  const getDisplayName = () => {
-    if (profile?.first_name) return profile.first_name;
-    if (user?.email) {
-      const username = user.email.split("@")[0];
-      return username.slice(0, 2).toUpperCase();
-    }
-    return "U";
-  };
-
-  const getInitials = () => {
-    if (profile?.first_name) return profile.first_name[0].toUpperCase();
-    if (user?.email) return user.email.slice(0, 2).toUpperCase();
-    return "U";
-  };
-
-  const getProfileLink = () => {
-    if (tenant) {
-      return `/tenant/${tenant.slug}/profile`;
-    } else {
-      return "/profile";
-    }
-  };
-
-  const showManageTenants =
-    (tenant?.slug && role === "owner") ||
-    (user && location.pathname === "/") ||
-    location.pathname == "/profile";
 
   return (
-    <header className="bg-background border-b sticky top-0 z-10">
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <div className="flex items-center">
-          {tenant ? (
-            <Link to={`/tenant/${tenant.slug}`} className="text-lg font-semibold">
-              {tenant.name}
-            </Link>
-          ) : (
-            <Link to="/dashboard" className="text-xl font-semibold text-primary">
+    <nav className="border-b bg-background">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center space-x-4">
+            <Link to="/" className="text-xl font-bold text-primary">
               Chabod
             </Link>
-          )}
-        </div>
+          </div>
 
-        <div>
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                  <Avatar>
-                    <AvatarImage src={profile?.avatar_url || ""} />
-                    <AvatarFallback>{getInitials()}</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end">
-                <div className="px-2 py-1.5">
-                  <p className="text-sm font-medium">{getDisplayName()}</p>
-                  <p className="text-xs text-muted-foreground">{profile?.email || user?.email}</p>
-                </div>
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem asChild>
-                  <Link to={getProfileLink()} className="flex items-center cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>個人資料</span>
+          <div className="flex items-center space-x-4">
+            <LanguageSwitcher />
+            
+            {user ? (
+              <div className="flex items-center space-x-2">
+                <Button asChild variant="ghost" size="sm">
+                  <Link to="/dashboard">
+                    <User className="h-4 w-4 mr-2" />
+                    {t('nav.dashboard')}
                   </Link>
-                </DropdownMenuItem>
-
-                {showManageTenants && (
-                  <DropdownMenuItem asChild>
-                    <Link to="/dashboard" className="flex items-center cursor-pointer">
-                      <Building className="mr-2 h-4 w-4" />
-                      <span>管理教會</span>
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem
-                  onClick={handleSignOut}
-                  className="text-red-600 hover:text-red-700 cursor-pointer"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>登出</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button asChild>
-              <Link to="/auth">登入</Link>
-            </Button>
-          )}
+                </Button>
+                <Button asChild variant="ghost" size="sm">
+                  <Link to="/profile">
+                    {t('nav.profile')}
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  {t('nav.logout')}
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Button asChild variant="ghost" size="sm">
+                  <Link 
+                    to={`/auth${location.pathname !== '/' ? `?redirect=${encodeURIComponent(location.pathname)}` : ''}`}
+                  >
+                    {t('nav.login')}
+                  </Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link to="/auth?tab=signup">
+                    {t('nav.signup')}
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </header>
+    </nav>
   );
 }
