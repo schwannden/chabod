@@ -11,7 +11,41 @@ let defaultPriceTier: {
   event_limit: number;
 } | null = null;
 
-export const getDefaultPriceTier = async () => {
+export interface TestGroup extends Record<string, unknown> {
+  id: string;
+  name: string;
+  description: string;
+  tenant_id: string;
+}
+
+export interface TestResource extends Record<string, unknown> {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  icon: string;
+  tenant_id: string;
+}
+
+export interface TestEvent extends Record<string, unknown> {
+  id: string;
+  name: string;
+  description: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  visibility: "public" | "private";
+  tenant_id: string;
+  created_by: string;
+}
+
+export const getDefaultPriceTier = async (): Promise<{
+  id: string;
+  name: string;
+  user_limit: number;
+  group_limit: number;
+  event_limit: number;
+}> => {
   if (defaultPriceTier) return defaultPriceTier;
 
   const { data, error } = await serviceRoleClient
@@ -37,13 +71,13 @@ export const getDefaultPriceTier = async () => {
       .select()
       .single();
 
-    if (createError) throw createError;
+    if (createError || !newTier) throw new Error("Failed to create default price tier");
     defaultPriceTier = newTier;
+    return newTier;
   } else {
     defaultPriceTier = data;
+    return data;
   }
-
-  return defaultPriceTier;
 };
 
 export const createTestUser = async (
@@ -217,7 +251,7 @@ export const addUserToTenant = async (
   userId: string,
   tenantId: string,
   role: "owner" | "member" = "member",
-) => {
+): Promise<void> => {
   // Verify the profile exists for the user
   const { data: profile, error: profileError } = await serviceRoleClient
     .from("profiles")
@@ -251,7 +285,7 @@ export const createTestGroup = async (
     name: string;
     description: string;
   }> = {},
-) => {
+): Promise<TestGroup> => {
   const uniqueId = uuidv4();
   const name = overrides.name || `Test Group ${uniqueId.slice(0, 8)}`;
 
@@ -277,7 +311,7 @@ export const createTestResource = async (
     url: string;
     icon: string;
   }> = {},
-) => {
+): Promise<TestResource> => {
   const uniqueId = uuidv4();
   const name = overrides.name || `Test Resource ${uniqueId.slice(0, 8)}`;
 
@@ -307,7 +341,7 @@ export const createTestEvent = async (
     end_date: string;
     visibility: "public" | "private";
   }> = {},
-) => {
+): Promise<TestEvent> => {
   const uniqueId = uuidv4();
   const title = overrides.title || `Test Event ${uniqueId.slice(0, 8)}`;
 
@@ -330,7 +364,7 @@ export const createTestEvent = async (
   return event;
 };
 
-export const cleanupTestUser = async (userId: string) => {
+export const cleanupTestUser = async (userId: string): Promise<void> => {
   try {
     // Delete from profiles first (due to foreign key constraints)
     await serviceRoleClient.from("profiles").delete().eq("id", userId);
@@ -345,7 +379,7 @@ export const cleanupTestUser = async (userId: string) => {
   }
 };
 
-export const cleanupTestTenant = async (tenantId: string) => {
+export const cleanupTestTenant = async (tenantId: string): Promise<void> => {
   try {
     // Tenant deletion should cascade to related records
     const { error } = await serviceRoleClient.from("tenants").delete().eq("id", tenantId);

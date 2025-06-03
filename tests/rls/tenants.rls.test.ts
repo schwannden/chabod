@@ -1,28 +1,22 @@
-import { describe, it, expect, beforeEach } from "@jest/globals";
-import { checkTestEnvironment, serviceRoleClient, anonClient } from "../setup";
-import {
-  createTestUser,
-  createTestTenant,
-  addUserToTenant,
-  cleanupTestUser,
-  cleanupTestTenant,
-  getDefaultPriceTier,
-} from "../helpers/test-data-factory";
+import { createRLSTest } from "../helpers/rls-test-base";
+import { getDefaultPriceTier } from "../helpers/test-data-factory";
+import { serviceRoleClient, anonClient } from "../setup";
 
+// Standard CRUD tests generated automatically using the new base class
+// Note: Tenants are special since they don't belong to other tenants
+const rlsTest = createRLSTest();
+
+// For tenants, we need custom creation logic since they don't have a tenant_id
 describe("Tenants RLS Policies", () => {
-  beforeEach(() => {
-    checkTestEnvironment();
-  });
-
-  describe('Tenant Creation Policy: "Authenticated users can create tenants"', () => {
+  describe("Tenant Creation Policy", () => {
     it("should allow authenticated users to create tenants", async () => {
-      const testUser = await createTestUser();
-      const defaultTier = await getDefaultPriceTier();
-
-      if (!defaultTier) throw new Error("Failed to get default price tier");
+      await rlsTest.setupTestContext();
 
       try {
-        const { data, error } = await testUser.client
+        const { owner } = rlsTest.getContext();
+        const defaultTier = await getDefaultPriceTier();
+
+        const { data, error } = await owner.client
           .from("tenants")
           .insert({
             name: "Test Tenant Creation",
@@ -36,35 +30,34 @@ describe("Tenants RLS Policies", () => {
         expect(data).toBeDefined();
         expect(data.name).toBe("Test Tenant Creation");
 
-        // Cleanup
-        await cleanupTestTenant(data.id);
+        // Cleanup the created tenant
+        await serviceRoleClient.from("tenants").delete().eq("id", data.id);
       } finally {
-        await cleanupTestUser(testUser.id);
+        await rlsTest.cleanupTestContext();
       }
     });
 
-    it("should reject unauthenticated users from creating tenants", async () => {
+    it("should prevent anonymous users from creating tenants", async () => {
       const defaultTier = await getDefaultPriceTier();
 
-      if (!defaultTier) throw new Error("Failed to get default price tier");
-
-      const { error: insertError } = await anonClient.from("tenants").insert({
+      const { error } = await anonClient.from("tenants").insert({
         name: "Unauthorized Tenant",
         slug: `test-unauth-${Date.now()}`,
         price_tier_id: defaultTier.id,
       });
 
-      expect(insertError).toBeDefined();
-      expect(insertError?.message).toContain("new row violates row-level security policy");
+      expect(error).toBeDefined();
+      expect(error?.message).toContain("new row violates row-level security policy");
     });
   });
 
-  describe('Tenant Update Policy: "Only owners can update tenants"', () => {
+  describe("Tenant Update Policy", () => {
     it("should allow tenant owners to update their tenants", async () => {
-      const owner = await createTestUser();
-      const tenant = await createTestTenant(owner.id);
+      await rlsTest.setupTestContext();
 
       try {
+        const { owner, tenant } = rlsTest.getContext();
+
         const { data, error } = await owner.client
           .from("tenants")
           .update({ name: "Updated Tenant Name" })
@@ -76,19 +69,15 @@ describe("Tenants RLS Policies", () => {
         expect(data).toBeDefined();
         expect(data.name).toBe("Updated Tenant Name");
       } finally {
-        await cleanupTestTenant(tenant.id);
-        await cleanupTestUser(owner.id);
+        await rlsTest.cleanupTestContext();
       }
     });
 
-    it("should prevent non-owners from updating tenants", async () => {
-      const owner = await createTestUser();
-      const member = await createTestUser();
-      const tenant = await createTestTenant(owner.id);
+    it("should prevent members from updating tenants", async () => {
+      await rlsTest.setupTestContext();
 
       try {
-        // Add member to tenant (non-owner)
-        await addUserToTenant(member.id, tenant.id, "member");
+        const { member, tenant } = rlsTest.getContext();
 
         const { data, error } = await member.client
           .from("tenants")
@@ -98,20 +87,17 @@ describe("Tenants RLS Policies", () => {
 
         // Should return empty array (no rows updated) due to RLS policy
         expect(data).toEqual([]);
-        // Error may be null but operation should not succeed
       } finally {
-        await cleanupTestTenant(tenant.id);
-        await cleanupTestUser(owner.id);
-        await cleanupTestUser(member.id);
+        await rlsTest.cleanupTestContext();
       }
     });
 
-    it("should prevent users outside the tenant from updating", async () => {
-      const owner = await createTestUser();
-      const outsider = await createTestUser();
-      const tenant = await createTestTenant(owner.id);
+    it("should prevent outsiders from updating tenants", async () => {
+      await rlsTest.setupTestContext();
 
       try {
+        const { outsider, tenant } = rlsTest.getContext();
+
         const { data, error } = await outsider.client
           .from("tenants")
           .update({ name: "Outsider Update" })
@@ -120,21 +106,19 @@ describe("Tenants RLS Policies", () => {
 
         // Should return empty array (no rows updated) due to RLS policy
         expect(data).toEqual([]);
-        // Error may be null but operation should not succeed
       } finally {
-        await cleanupTestTenant(tenant.id);
-        await cleanupTestUser(owner.id);
-        await cleanupTestUser(outsider.id);
+        await rlsTest.cleanupTestContext();
       }
     });
   });
 
-  describe('Tenant Delete Policy: "Only owners can delete tenants"', () => {
+  describe("Tenant Delete Policy", () => {
     it("should allow tenant owners to delete their tenants", async () => {
-      const owner = await createTestUser();
-      const tenant = await createTestTenant(owner.id);
+      await rlsTest.setupTestContext();
 
       try {
+        const { owner, tenant } = rlsTest.getContext();
+
         const { error } = await owner.client.from("tenants").delete().eq("id", tenant.id);
 
         expect(error).toBeNull();
@@ -149,17 +133,24 @@ describe("Tenants RLS Policies", () => {
         expect(selectError?.code).toBe("PGRST116"); // Not found
         expect(data).toBeNull();
       } finally {
-        await cleanupTestUser(owner.id);
+        // Skip cleanup since we deleted the tenant in the test
+        const { owner, member, outsider } = rlsTest.getContext();
+        await Promise.all([
+          serviceRoleClient.from("profiles").delete().eq("id", owner.id),
+          serviceRoleClient.from("profiles").delete().eq("id", member.id),
+          serviceRoleClient.from("profiles").delete().eq("id", outsider.id),
+        ]);
+        await serviceRoleClient.auth.admin.deleteUser(owner.id);
+        await serviceRoleClient.auth.admin.deleteUser(member.id);
+        await serviceRoleClient.auth.admin.deleteUser(outsider.id);
       }
     });
 
-    it("should prevent non-owners from deleting tenants", async () => {
-      const owner = await createTestUser();
-      const member = await createTestUser();
-      const tenant = await createTestTenant(owner.id);
+    it("should prevent members from deleting tenants", async () => {
+      await rlsTest.setupTestContext();
 
       try {
-        await addUserToTenant(member.id, tenant.id, "member");
+        const { member, tenant } = rlsTest.getContext();
 
         const { data, error } = await member.client
           .from("tenants")
@@ -169,7 +160,6 @@ describe("Tenants RLS Policies", () => {
 
         // Should return empty array (no rows deleted) due to RLS policy
         expect(data).toEqual([]);
-        // Error may be null but operation should not succeed
 
         // Verify tenant still exists
         const { data: stillExists } = await serviceRoleClient
@@ -180,21 +170,17 @@ describe("Tenants RLS Policies", () => {
 
         expect(stillExists).toBeDefined();
       } finally {
-        await cleanupTestTenant(tenant.id);
-        await cleanupTestUser(owner.id);
-        await cleanupTestUser(member.id);
+        await rlsTest.cleanupTestContext();
       }
     });
   });
 
-  describe('Tenant Select Policy: "Allow public tenant reads"', () => {
-    it("should allow users to view tenants they are members of", async () => {
-      const owner = await createTestUser();
-      const member = await createTestUser();
-      const tenant = await createTestTenant(owner.id);
+  describe("Tenant Select Policy", () => {
+    it("should allow tenant members to view their tenant", async () => {
+      await rlsTest.setupTestContext();
 
       try {
-        await addUserToTenant(member.id, tenant.id, "member");
+        const { owner, member, tenant } = rlsTest.getContext();
 
         // Owner should see the tenant
         const { data: ownerData, error: ownerError } = await owner.client
@@ -216,18 +202,16 @@ describe("Tenants RLS Policies", () => {
         expect(memberError).toBeNull();
         expect(memberData).toBeDefined();
       } finally {
-        await cleanupTestTenant(tenant.id);
-        await cleanupTestUser(owner.id);
-        await cleanupTestUser(member.id);
+        await rlsTest.cleanupTestContext();
       }
     });
 
     it("should allow anyone to view tenants (public read policy)", async () => {
-      const owner = await createTestUser();
-      const outsider = await createTestUser();
-      const tenant = await createTestTenant(owner.id);
+      await rlsTest.setupTestContext();
 
       try {
+        const { outsider, tenant } = rlsTest.getContext();
+
         // Based on the current RLS policy "Allow public tenant reads"
         // outsiders can view tenants
         const { data, error } = await outsider.client
@@ -240,23 +224,21 @@ describe("Tenants RLS Policies", () => {
         expect(data).toBeDefined();
         expect(data.id).toBe(tenant.id);
       } finally {
-        await cleanupTestTenant(tenant.id);
-        await cleanupTestUser(owner.id);
-        await cleanupTestUser(outsider.id);
+        await rlsTest.cleanupTestContext();
       }
     });
   });
 
-  describe("Tenant Member Management Policies", () => {
+  describe("Tenant Member Management", () => {
     it("should automatically create tenant owner when tenant is created", async () => {
-      const user = await createTestUser();
-      const defaultTier = await getDefaultPriceTier();
-
-      if (!defaultTier) throw new Error("Failed to get default price tier");
+      await rlsTest.setupTestContext();
 
       try {
+        const { owner } = rlsTest.getContext();
+        const defaultTier = await getDefaultPriceTier();
+
         // Create tenant using the user's authenticated client
-        const { data: tenant, error } = await user.client
+        const { data: tenant, error } = await owner.client
           .from("tenants")
           .insert({
             name: "Auto Owner Test",
@@ -274,17 +256,17 @@ describe("Tenants RLS Policies", () => {
           .from("tenant_members")
           .select("*")
           .eq("tenant_id", tenant.id)
-          .eq("user_id", user.id)
+          .eq("user_id", owner.id)
           .single();
 
         expect(memberError).toBeNull();
         expect(membership).toBeDefined();
         expect(membership.role).toBe("owner");
 
-        // Cleanup
-        await cleanupTestTenant(tenant.id);
+        // Cleanup the created tenant
+        await serviceRoleClient.from("tenants").delete().eq("id", tenant.id);
       } finally {
-        await cleanupTestUser(user.id);
+        await rlsTest.cleanupTestContext();
       }
     });
   });

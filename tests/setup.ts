@@ -1,5 +1,6 @@
 import { config } from "dotenv";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { beforeEach, afterEach, afterAll } from "@jest/globals";
 
 // Load environment variables
 config({ path: ".env.test" });
@@ -73,6 +74,36 @@ export const createAuthenticatedClient = (accessToken: string): SupabaseClient =
   });
 };
 
+// Utility to check if test environment is properly configured
+export const checkTestEnvironment = () => {
+  if (!TEST_CONFIG.supabaseUrl || !TEST_CONFIG.supabaseAnonKey) {
+    throw new Error(
+      "Test environment not properly configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY",
+    );
+  }
+
+  if (!TEST_CONFIG.supabaseServiceKey) {
+    throw new Error("SUPABASE_SERVICE_ROLE_KEY is required for tests");
+  }
+};
+
+export const cleanupTestData = async () => {
+  try {
+    // Delete test tenants and related data (cascades should handle relations)
+    await serviceRoleClient.from("tenants").delete().like("slug", "test-%");
+
+    // Delete test users from profiles
+    await serviceRoleClient.from("profiles").delete().like("email", "%@test.example.com");
+  } catch (error) {
+    console.warn("Cleanup data error:", error);
+  }
+};
+
+// Global setup that runs before each test
+beforeEach(() => {
+  checkTestEnvironment();
+});
+
 // Clean up test data after each test suite
 afterEach(async () => {
   // This will be implemented in individual test files as needed
@@ -87,28 +118,3 @@ afterAll(async () => {
     console.warn("Cleanup warning:", error);
   }
 });
-
-export const cleanupTestData = async () => {
-  try {
-    // Delete test tenants and related data (cascades should handle relations)
-    await serviceRoleClient.from("tenants").delete().like("slug", "test-%");
-
-    // Delete test users from profiles
-    await serviceRoleClient.from("profiles").delete().like("email", "%@test.example.com");
-  } catch (error) {
-    console.warn("Cleanup data error:", error);
-  }
-};
-
-// Utility to check if test environment is properly configured
-export const checkTestEnvironment = () => {
-  if (!TEST_CONFIG.supabaseUrl || !TEST_CONFIG.supabaseAnonKey) {
-    throw new Error(
-      "Test environment not properly configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY",
-    );
-  }
-
-  if (!TEST_CONFIG.supabaseServiceKey) {
-    throw new Error("SUPABASE_SERVICE_ROLE_KEY is required for tests");
-  }
-};
