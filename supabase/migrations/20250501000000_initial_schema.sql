@@ -41,10 +41,15 @@ BEGIN
   WHERE tenant_id = tenant_uuid;
   
   -- Get the event limit from the price tier
-  SELECT pt.event_limit INTO max_limit
+  SELECT COALESCE(pt.event_limit, 0) INTO max_limit
   FROM public.tenants t
   JOIN public.price_tiers pt ON t.price_tier_id = pt.id
   WHERE t.id = tenant_uuid;
+  
+  -- If no limit found, default to 0 (block creation)
+  IF max_limit IS NULL THEN
+    RETURN FALSE;
+  END IF;
   
   -- Return true if we're under the limit
   RETURN current_count < max_limit;
@@ -129,11 +134,22 @@ ALTER FUNCTION "public"."handle_updated_at"() OWNER TO "postgres";
 CREATE OR REPLACE FUNCTION "public"."is_tenant_member"("tenant_uuid" "uuid") RETURNS boolean
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
+DECLARE
+  current_user_id uuid;
 BEGIN
+  -- Get the current user ID
+  current_user_id := auth.uid();
+  
+  -- If no authenticated user, return false
+  IF current_user_id IS NULL THEN
+    RETURN FALSE;
+  END IF;
+  
+  -- Check if user is a member of the tenant
   RETURN EXISTS (
     SELECT 1 FROM public.tenant_members
     WHERE tenant_id = tenant_uuid
-    AND user_id = auth.uid()
+    AND user_id = current_user_id
   );
 END;
 $$;
@@ -187,6 +203,41 @@ BEGIN
 END;
 $$;
 ALTER FUNCTION "public"."create_tenant_owner"() OWNER TO "postgres";
+
+-- Helper function to validate event creation in tests
+CREATE OR REPLACE FUNCTION "public"."validate_event_creation"(
+  "tenant_uuid" "uuid",
+  "user_uuid" "uuid"
+) 
+RETURNS TABLE(
+  is_member boolean,
+  under_limit boolean,
+  can_create boolean
+)
+LANGUAGE "plpgsql" 
+SECURITY DEFINER
+AS $$
+DECLARE
+  member_check boolean;
+  limit_check boolean;
+BEGIN
+  -- Check if user is tenant member
+  SELECT EXISTS (
+    SELECT 1 FROM public.tenant_members
+    WHERE tenant_id = tenant_uuid
+    AND user_id = user_uuid
+  ) INTO member_check;
+  
+  -- Check if under event limit
+  SELECT public.check_tenant_event_limit(tenant_uuid) INTO limit_check;
+  
+  -- Return all checks
+  RETURN QUERY SELECT 
+    member_check as is_member,
+    limit_check as under_limit,
+    (member_check AND limit_check) as can_create;
+END;
+$$;
 
 SET default_tablespace = '';
 
@@ -372,7 +423,7 @@ CREATE POLICY "Tenant owners can view invitations" ON "public"."invitations" FOR
 
 CREATE POLICY "Tenant owners can delete tenant members" ON "public"."tenant_members" FOR DELETE USING ("public"."is_tenant_owner"("tenant_id"));
 
-CREATE POLICY "Tenant owners can insert tenant members" ON "public"."tenant_members" FOR INSERT WITH CHECK ("public"."is_tenant_owner"("tenant_id"));
+CREATE POLICY "Tenant owners can insert tenant members" ON "public"."tenant_members" FOR INSERT WITH CHECK ("public"."is_tenant_owner"("tenant_id") AND "public"."check_tenant_user_limit"("tenant_id"));
 
 CREATE POLICY "Allow initial owner creation" ON "public"."tenant_members" FOR INSERT 
 WITH CHECK (
@@ -392,11 +443,7 @@ USING (
   "public"."is_tenant_member"("tenant_id")
 );
 
-CREATE POLICY "enforce_tenant_event_limit" ON "public"."events" FOR INSERT WITH CHECK ("public"."check_tenant_event_limit"("tenant_id"));
-
 CREATE POLICY "enforce_tenant_group_limit" ON "public"."groups" FOR INSERT WITH CHECK ("public"."check_tenant_group_limit"("tenant_id"));
-
-CREATE POLICY "enforce_tenant_user_limit" ON "public"."tenant_members" FOR INSERT WITH CHECK ("public"."check_tenant_user_limit"("tenant_id"));
 
 -- profiles RLS
 
@@ -426,9 +473,27 @@ CREATE POLICY "Tenant members can view all event groups" ON "public"."events_gro
    FROM "public"."events" "e"
   WHERE (("e"."id" = "events_groups"."event_id") AND "public"."is_tenant_member"("e"."tenant_id")))));
 
-CREATE POLICY "Event creator can manage their own events" ON "public"."events" FOR ALL USING ("created_by" = "auth"."uid"()) WITH CHECK ("created_by" = "auth"."uid"());
+CREATE POLICY "Event creator can update and delete their own events" ON "public"."events" 
+FOR UPDATE 
+TO "public"
+USING ("created_by" = "auth"."uid"())
+WITH CHECK ("created_by" = "auth"."uid"());
 
-CREATE POLICY "Tenant owners can manage events within the tenant" ON "public"."events" FOR ALL USING ("public"."is_tenant_owner"("tenant_id")) WITH CHECK ("public"."is_tenant_owner"("tenant_id"));
+CREATE POLICY "Event creator can delete their own events" ON "public"."events" 
+FOR DELETE 
+TO "public"
+USING ("created_by" = "auth"."uid"());
+
+CREATE POLICY "Tenant owners can update events within the tenant" ON "public"."events" 
+FOR UPDATE 
+TO "public"
+USING ("public"."is_tenant_owner"("tenant_id"))
+WITH CHECK ("public"."is_tenant_owner"("tenant_id"));
+
+CREATE POLICY "Tenant owners can delete events within the tenant" ON "public"."events" 
+FOR DELETE 
+TO "public"
+USING ("public"."is_tenant_owner"("tenant_id"));
 
 CREATE POLICY "Event creator their own event groups" ON "public"."events_groups" 
 FOR ALL
@@ -444,7 +509,19 @@ USING (EXISTS ( SELECT 1
 
 CREATE POLICY "Users can create events within their tenants" ON "public"."events" FOR INSERT 
 TO "authenticated"
-WITH CHECK ("public"."is_tenant_member"("tenant_id"));
+WITH CHECK (
+  -- Must be a tenant member
+  "public"."is_tenant_member"("tenant_id") 
+  -- Must match the created_by field (ensures user can only create events for themselves)
+  AND "created_by" = "auth"."uid"()
+  -- Must not exceed tenant event limits (this combines the separate limit policy)
+  AND "public"."check_tenant_event_limit"("tenant_id")
+);
+
+CREATE POLICY "Block anonymous event creation" ON "public"."events"
+FOR INSERT
+TO "anon"
+WITH CHECK (FALSE);
 
 CREATE POLICY "Users can create event groups within their tenants" ON "public"."events_groups" FOR INSERT 
 TO "authenticated" 
@@ -536,6 +613,10 @@ GRANT ALL ON FUNCTION "public"."remove_user_from_groups"() TO "service_role";
 GRANT ALL ON FUNCTION "public"."create_tenant_owner"() TO "anon";
 GRANT ALL ON FUNCTION "public"."create_tenant_owner"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."create_tenant_owner"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."validate_event_creation"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."validate_event_creation"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "service_role";
+GRANT ALL ON FUNCTION "public"."validate_event_creation"("tenant_uuid" "uuid", "user_uuid" "uuid") TO "anon";
 
 GRANT ALL ON TABLE "public"."events" TO "anon";
 GRANT ALL ON TABLE "public"."events" TO "authenticated";
