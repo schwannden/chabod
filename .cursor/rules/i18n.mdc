@@ -11,7 +11,7 @@ This rule provides standards for implementing internationalization using React i
 
 - Use React i18next for all internationalization
 - Translation files are located in `src/locales/` directory
-- Supported languages: English (`en.json`) and Chinese (`zh.json`)
+- Supported languages: English (`en`) and Chinese (`zh-TW`)
 - Import translations using `import { useTranslation } from "react-i18next"`
 
 ## Hook Usage

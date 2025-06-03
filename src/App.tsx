@@ -23,7 +23,6 @@ import ServiceEventPage from "./pages/tenant/ServiceEventPage";
 
 // Import i18n configuration
 import { i18nPromise } from "./lib/i18n";
-import { useTranslation } from "react-i18next";
 
 const queryClient = new QueryClient();
 
@@ -66,13 +65,11 @@ function AppRoutes() {
 }
 
 function LoadingScreen() {
-  const { t } = useTranslation();
-
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-        <p>{t("common.loading", { defaultValue: "Loading..." })}</p>
+        <p>Loading...</p>
       </div>
     </div>
   );
@@ -80,15 +77,27 @@ function LoadingScreen() {
 
 export default function App() {
   const [isI18nReady, setIsI18nReady] = useState(false);
+  const [i18nError, setI18nError] = useState<string | null>(null);
 
   useEffect(() => {
-    i18nPromise.then(() => {
-      setIsI18nReady(true);
-    });
+    i18nPromise
+      .then(() => {
+        setIsI18nReady(true);
+      })
+      .catch((error) => {
+        console.error("Failed to initialize i18n:", error);
+        setI18nError("Failed to load translations");
+        // Still allow the app to load even if translations fail
+        setIsI18nReady(true);
+      });
   }, []);
 
   if (!isI18nReady) {
     return <LoadingScreen />;
+  }
+
+  if (i18nError) {
+    console.warn("App loaded with i18n error:", i18nError);
   }
 
   return (
