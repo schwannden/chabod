@@ -28,10 +28,9 @@ if [ ! -f ".env.test" ]; then
     
     if [ -f ".env.test.example" ]; then
         cp .env.test.example .env.test
-        echo -e "${YELLOW}📝 Please edit .env.test with your test environment values${NC}"
-        exit 1
+        echo -e "${GREEN}✅ Created .env.test from example${NC}"
     else
-        echo -e "${RED}❌ .env.test.example not found. Creating basic template...${NC}"
+        echo -e "${YELLOW}📝 Creating basic .env.test template...${NC}"
         cat > .env.test << EOF
 # Test Environment Configuration
 VITE_SUPABASE_URL=http://localhost:54321
@@ -39,8 +38,7 @@ VITE_SUPABASE_ANON_KEY=your_anon_key_here
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:54322/postgres
 EOF
-        echo -e "${YELLOW}📝 Please edit .env.test with your test environment values${NC}"
-        exit 1
+        echo -e "${GREEN}✅ Created basic .env.test template${NC}"
     fi
 fi
 
@@ -68,10 +66,26 @@ SERVICE_KEY=$(supabase status | grep "service_role key" | awk '{print $3}')
 echo "Anon Key: ${ANON_KEY:0:20}..."
 echo "Service Key: ${SERVICE_KEY:0:20}..."
 
-# Check if .env.test has the correct keys
+# Check if .env.test has placeholder values and update them
 if grep -q "your_anon_key_here" .env.test || grep -q "your_service_role_key_here" .env.test; then
-    echo -e "${RED}❌ Please update .env.test with the actual API keys shown above${NC}"
-    exit 1
+    echo -e "${YELLOW}🔧 Updating .env.test with actual API keys...${NC}"
+    
+    # Create a backup
+    cp .env.test .env.test.backup
+    
+    # Update the keys using sed
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        sed -i '' "s/your_anon_key_here/$ANON_KEY/g" .env.test
+        sed -i '' "s/your_service_role_key_here/$SERVICE_KEY/g" .env.test
+    else
+        # Linux
+        sed -i "s/your_anon_key_here/$ANON_KEY/g" .env.test
+        sed -i "s/your_service_role_key_here/$SERVICE_KEY/g" .env.test
+    fi
+    
+    echo -e "${GREEN}✅ Updated .env.test with actual API keys${NC}"
+    echo -e "${YELLOW}📝 Backup saved as .env.test.backup${NC}"
 fi
 
 echo ""

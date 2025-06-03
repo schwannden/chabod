@@ -302,69 +302,6 @@ it("should respect entity visibility settings", async () => {
 });
 ```
 
-## Migration from Legacy Tests
-
-### Before (Legacy Pattern)
-
-```typescript
-describe("Groups RLS Policies", () => {
-  it("should allow tenant owners to create groups", async () => {
-    const owner = await createTestUser();
-    const tenant = await createTestTenant(owner.id);
-    try {
-      // 20+ lines of test logic
-    } finally {
-      await cleanupTestTenant(tenant.id);
-      await cleanupTestUser(owner.id);
-    }
-  });
-  // ... 20+ more similar tests
-});
-```
-
-### After (Refactored Pattern)
-
-```typescript
-const rlsTest = createRLSTest();
-
-// Generates all standard CRUD tests automatically
-rlsTest.createStandardRLSTestSuite({
-  entityName: "Group",
-  tableName: "groups",
-  createEntityFn: createTestGroup,
-  additionalEntityData: { description: "Test group" },
-});
-
-// Only custom business logic needs manual testing
-describe("Groups RLS Policies - Custom Tests", () => {
-  it("should enforce tenant group limit", async () => {
-    // Custom test implementation
-  });
-});
-```
-
-## Benefits of Current Structure
-
-### Code Reduction
-
-- **Before**: ~1000+ lines of duplicated test code across 5 files
-- **After**: ~200 lines of reusable base class + minimal custom logic per entity
-- **Reduction**: ~80% less code while maintaining same test coverage
-
-### Consistency Benefits
-
-- Standardized error handling across all tests
-- Consistent test context management
-- Uniform assertion patterns
-- Predictable test structure
-
-### Maintenance Benefits
-
-- Bug fixes in test logic only need to be made in one place
-- New RLS policies can be tested by calling `createStandardRLSTestSuite()`
-- Custom tests focus only on entity-specific business logic
-- Clear separation between standard and custom test patterns
-
 ## Running Tests
 
 ```bash
@@ -380,6 +317,51 @@ npm run test -- --testPathPattern="refactored"
 # Run tests in watch mode
 npm run test -- --watch
 ```
+
+## Automated RLS Test Runner
+
+The project includes an automated test runner script (`run-rls-tests.sh`) that simplifies the process of running RLS tests by handling environment setup, Supabase management, and test execution.
+
+### Features
+
+- **Automatic Supabase Management**: Checks if Supabase is running and starts it if needed
+- **Environment Configuration**: Creates and updates `.env.test` with proper configuration
+- **API Key Management**: Automatically extracts and updates API keys from running Supabase instance
+- **Flexible Test Execution**: Supports various test modes (coverage, watch, specific files)
+- **Cross-Platform Support**: Works on both macOS and Linux
+
+### Usage
+
+```bash
+# Basic usage - runs all RLS tests
+./tests/run-rls-tests.sh
+
+# Run with coverage reporting
+./tests/run-rls-tests.sh --coverage
+
+# Run in watch mode for development
+./tests/run-rls-tests.sh --watch
+
+# Run specific test file
+./tests/run-rls-tests.sh groups.rls.test.ts
+```
+
+### What the Script Does
+
+1. **Prerequisites Check**: Verifies Supabase CLI is installed
+2. **Environment Setup**:
+   - Creates `.env.test` if it doesn't exist
+   - Uses `.env.test.example` as template if available
+   - Creates basic template otherwise
+3. **Supabase Management**:
+   - Checks if Supabase is running
+   - Starts Supabase if needed
+   - Displays current status and connection info
+4. **API Key Management**:
+   - Extracts current API keys from running Supabase
+   - Updates `.env.test` with actual keys (replaces placeholders)
+   - Creates backup of previous `.env.test` before updates
+5. **Test Execution**: Runs tests with specified options
 
 ## Best Practices Summary
 
