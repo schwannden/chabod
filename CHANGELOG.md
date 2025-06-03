@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/schwannden/chabod/compare/v0.3.0...v0.3.1) (2025-06-03)
+
+
+### Bug Fixes
+
+* default language should be zh-TW ([62a2d18](https://github.com/schwannden/chabod/commit/62a2d18a341211d40bd912679cf60f895382fc38))
+
 ## [0.3.0](https://github.com/schwannden/chabod/compare/v0.2.4...v0.3.0) (2025-06-03)
 
 
