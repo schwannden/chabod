@@ -1,4 +1,4 @@
-import { serviceRoleClient, TestUser, TestTenant, TEST_CONFIG } from "../setup";
+import { serviceRoleClient, TestUser, TestTenant, TEST_CONFIG, TEST_SESSION_ID } from "../setup";
 import { v4 as uuidv4 } from "uuid";
 import { createClient } from "@supabase/supabase-js";
 
@@ -38,6 +38,13 @@ export interface TestEvent extends Record<string, unknown> {
   tenant_id: string;
   created_by: string;
 }
+
+// Helper to generate unique identifiers with session awareness
+const generateUniqueId = () => {
+  const uniqueId = uuidv4().slice(0, 8);
+  const timestamp = Date.now();
+  return `${TEST_SESSION_ID}-${uniqueId}-${timestamp}`;
+};
 
 export const getDefaultPriceTier = async (): Promise<{
   id: string;
@@ -88,10 +95,9 @@ export const createTestUser = async (
     lastName: string;
   }> = {},
 ): Promise<TestUser> => {
-  const uniqueId = uuidv4();
-  const timestamp = Date.now();
-  const email = overrides.email || `test-user-${uniqueId}-${timestamp}@test.example.com`;
-  const fullName = overrides.fullName || `Test User ${uniqueId.slice(0, 8)}`;
+  const uniqueId = generateUniqueId();
+  const email = overrides.email || `test-user-${uniqueId}@test.example.com`;
+  const fullName = overrides.fullName || `Test User ${uniqueId.slice(-8)}`;
   const firstName = overrides.firstName || "Test";
   const lastName = overrides.lastName || "User";
   const password = `test-password-${uniqueId}`;
@@ -184,10 +190,9 @@ export const createTestTenant = async (
   const defaultTier = await getDefaultPriceTier();
   if (!defaultTier) throw new Error("Failed to get default price tier");
 
-  const uniqueId = uuidv4();
-  const timestamp = Date.now();
-  const name = overrides.name || `Test Tenant ${uniqueId.slice(0, 8)}`;
-  const slug = overrides.slug || `test-tenant-${uniqueId.slice(0, 8)}-${timestamp}`;
+  const uniqueId = generateUniqueId();
+  const name = overrides.name || `Test Tenant ${uniqueId.slice(-8)}`;
+  const slug = overrides.slug || `${uniqueId}`;
 
   try {
     // Check for profile existence
@@ -286,8 +291,8 @@ export const createTestGroup = async (
     description: string;
   }> = {},
 ): Promise<TestGroup> => {
-  const uniqueId = uuidv4();
-  const name = overrides.name || `Test Group ${uniqueId.slice(0, 8)}`;
+  const uniqueId = generateUniqueId();
+  const name = overrides.name || `Test Group ${uniqueId.slice(-8)}`;
 
   const { data: group, error } = await serviceRoleClient
     .from("groups")
@@ -312,8 +317,8 @@ export const createTestResource = async (
     icon: string;
   }> = {},
 ): Promise<TestResource> => {
-  const uniqueId = uuidv4();
-  const name = overrides.name || `Test Resource ${uniqueId.slice(0, 8)}`;
+  const uniqueId = generateUniqueId();
+  const name = overrides.name || `Test Resource ${uniqueId.slice(-8)}`;
 
   const { data: resource, error } = await serviceRoleClient
     .from("resources")
@@ -342,8 +347,8 @@ export const createTestEvent = async (
     visibility: "public" | "private";
   }> = {},
 ): Promise<TestEvent> => {
-  const uniqueId = uuidv4();
-  const title = overrides.title || `Test Event ${uniqueId.slice(0, 8)}`;
+  const uniqueId = generateUniqueId();
+  const title = overrides.title || `Test Event ${uniqueId.slice(-8)}`;
 
   const { data: event, error } = await serviceRoleClient
     .from("events")

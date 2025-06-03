@@ -15,7 +15,7 @@ export default {
   ],
   setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],
   testTimeout: 30000,
-  maxWorkers: 1,
+  maxWorkers: "50%",
   transform: {
     "^.+\\.tsx?$": [
       "ts-jest",

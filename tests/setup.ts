@@ -1,9 +1,13 @@
 import { config } from "dotenv";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { beforeEach, afterEach, afterAll } from "@jest/globals";
+import { v4 as uuidv4 } from "uuid";
 
 // Load environment variables
 config({ path: ".env.test" });
+
+// Generate unique test session ID for this worker/process
+export const TEST_SESSION_ID = `test-${Date.now()}-${process.pid}-${uuidv4().slice(0, 8)}`;
 
 // Test configuration
 export const TEST_CONFIG = {
@@ -12,6 +16,8 @@ export const TEST_CONFIG = {
   supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
   testDbUrl:
     process.env.TEST_DATABASE_URL || "postgresql://postgres:postgres@localhost:54322/postgres",
+  // Add session prefix for test isolation
+  testSessionId: TEST_SESSION_ID,
 };
 
 // Global test utilities
@@ -87,16 +93,29 @@ export const checkTestEnvironment = () => {
   }
 };
 
-export const cleanupTestData = async () => {
+// Enhanced cleanup that's aware of test session
+export const cleanupTestData = async (sessionId?: string) => {
   try {
-    // Delete test tenants and related data (cascades should handle relations)
-    await serviceRoleClient.from("tenants").delete().like("slug", "test-%");
+    const searchPattern = sessionId ? `${sessionId}-%` : `test-${TEST_SESSION_ID}-%`;
 
-    // Delete test users from profiles
-    await serviceRoleClient.from("profiles").delete().like("email", "%@test.example.com");
+    // Delete test tenants and related data (cascades should handle relations)
+    await serviceRoleClient.from("tenants").delete().like("slug", searchPattern);
+
+    // Delete test users from profiles with session-specific emails
+    const emailPattern = sessionId
+      ? `%${sessionId}%@test.example.com`
+      : `%${TEST_SESSION_ID}%@test.example.com`;
+    await serviceRoleClient.from("profiles").delete().like("email", emailPattern);
+
+    console.log(`Cleaned up test data for session: ${sessionId || TEST_SESSION_ID}`);
   } catch (error) {
     console.warn("Cleanup data error:", error);
   }
+};
+
+// Cleanup for this specific test session
+export const cleanupCurrentTestSession = async () => {
+  await cleanupTestData(TEST_SESSION_ID);
 };
 
 // Global setup that runs before each test
@@ -106,15 +125,15 @@ beforeEach(() => {
 
 // Clean up test data after each test suite
 afterEach(async () => {
-  // This will be implemented in individual test files as needed
+  // Individual tests should handle their own cleanup
+  // This is here as a safety net for any leftover data
 });
 
-// Global cleanup
+// Global cleanup for this test session
 afterAll(async () => {
-  // Clean up any remaining test data
   try {
-    await cleanupTestData();
+    await cleanupCurrentTestSession();
   } catch (error) {
-    console.warn("Cleanup warning:", error);
+    console.warn("Session cleanup warning:", error);
   }
 });
