@@ -3,8 +3,13 @@ import { v4 as uuidv4 } from "uuid";
 import { createClient } from "@supabase/supabase-js";
 
 // Default price tier for testing
-let defaultPriceTier: { id: string; name: string; user_limit: number; event_limit: number } | null =
-  null;
+let defaultPriceTier: {
+  id: string;
+  name: string;
+  user_limit: number;
+  group_limit: number;
+  event_limit: number;
+} | null = null;
 
 export const getDefaultPriceTier = async () => {
   if (defaultPriceTier) return defaultPriceTier;

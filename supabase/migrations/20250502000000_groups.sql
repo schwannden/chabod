@@ -65,11 +65,21 @@ ALTER TABLE "public"."group_members" OWNER TO "postgres";
 CREATE OR REPLACE TRIGGER "remove_user_from_groups" AFTER DELETE ON "public"."tenant_members" FOR EACH ROW EXECUTE FUNCTION "public"."remove_user_from_groups"();
 
 -- RLS Policies
-CREATE POLICY "enforce_tenant_group_limit" ON "public"."groups" FOR INSERT WITH CHECK ("public"."check_tenant_group_limit"("tenant_id"));
+CREATE POLICY "Tenant owners can insert groups" ON "public"."groups" FOR INSERT WITH CHECK ("public"."is_tenant_owner"("tenant_id") AND "public"."check_tenant_group_limit"("tenant_id"));
 
-CREATE POLICY "Tenant owners can manage groups" ON "public"."groups" USING ("public"."is_tenant_owner"("tenant_id"));
+CREATE POLICY "Tenant owners can update groups" ON "public"."groups" FOR UPDATE USING ("public"."is_tenant_owner"("tenant_id"));
 
-CREATE POLICY "Tenant owners can manage group members" ON "public"."group_members" USING ((EXISTS ( SELECT 1
+CREATE POLICY "Tenant owners can delete groups" ON "public"."groups" FOR DELETE USING ("public"."is_tenant_owner"("tenant_id"));
+
+CREATE POLICY "Tenant owners can insert group members" ON "public"."group_members" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."groups" "g"
+  WHERE (("group_members"."group_id" = "g"."id") AND "public"."is_tenant_owner"("g"."tenant_id")))));
+
+CREATE POLICY "Tenant owners can update group members" ON "public"."group_members" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."groups" "g"
+  WHERE (("group_members"."group_id" = "g"."id") AND "public"."is_tenant_owner"("g"."tenant_id")))));
+
+CREATE POLICY "Tenant owners can delete group members" ON "public"."group_members" FOR DELETE USING ((EXISTS ( SELECT 1
    FROM "public"."groups" "g"
   WHERE (("group_members"."group_id" = "g"."id") AND "public"."is_tenant_owner"("g"."tenant_id")))));
 
