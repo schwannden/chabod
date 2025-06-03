@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.3.0](https://github.com/schwannden/chabod/compare/v0.2.4...v0.3.0) (2025-06-03)
+
+
+### Features
+
+* completing i18n ([3d82a9d](https://github.com/schwannden/chabod/commit/3d82a9de256a18101a5f3e804338a8596b65b1f1))
+* Implement i18n with react-i18next ([ae570da](https://github.com/schwannden/chabod/commit/ae570da033ddeb69566c3bd97f4263d1cba476aa))
+* remember default language ([09e3b32](https://github.com/schwannden/chabod/commit/09e3b327d2192078acfdccb25b788c5b3d108577))
+
+
+### Bug Fixes
+
+* initial loading tranlastion ([c7f162b](https://github.com/schwannden/chabod/commit/c7f162bc53b6e4545f8215ae276ed0d5d622ccc3))
+
+
+### Build Related
+
+* **deps-dev:** bump lint-staged from 16.0.0 to 16.1.0 ([#35](https://github.com/schwannden/chabod/issues/35)) ([fca74b5](https://github.com/schwannden/chabod/commit/fca74b56f98053e315d75021897a6a5ba115afa4))
+* **deps-dev:** bump supabase from 2.22.6 to 2.23.4 ([#41](https://github.com/schwannden/chabod/issues/41)) ([783a854](https://github.com/schwannden/chabod/commit/783a8546d95544aa17385866b8267b867b4cdc15))
+* **deps-dev:** bump typescript from 5.6.3 to 5.8.3 ([#36](https://github.com/schwannden/chabod/issues/36)) ([37efcac](https://github.com/schwannden/chabod/commit/37efcacb84b750d96b3f84b34a79acfb2da35bd9))
+* **deps:** bump @radix-ui/react-dropdown-menu from 2.1.2 to 2.1.15 ([#43](https://github.com/schwannden/chabod/issues/43)) ([2108869](https://github.com/schwannden/chabod/commit/2108869a0128f91681fe2daff69e1e38a7031a0b))
+* **deps:** bump @radix-ui/react-menubar from 1.1.2 to 1.1.15 ([#40](https://github.com/schwannden/chabod/issues/40)) ([8dde3e7](https://github.com/schwannden/chabod/commit/8dde3e785cf1f519190baed417dfede49ca4516d))
+* **deps:** bump @radix-ui/react-tooltip from 1.1.4 to 1.2.7 ([#42](https://github.com/schwannden/chabod/issues/42)) ([e364dd7](https://github.com/schwannden/chabod/commit/e364dd781822ee52445068b96fe94ec78f6b3f27))
+* **deps:** bump react and @types/react ([#38](https://github.com/schwannden/chabod/issues/38)) ([13d2872](https://github.com/schwannden/chabod/commit/13d2872edc8221c3a3aea3d574ac13e63a2152e2))
+* **deps:** bump react-day-picker from 9.6.7 to 9.7.0 ([#44](https://github.com/schwannden/chabod/issues/44)) ([4d16fc8](https://github.com/schwannden/chabod/commit/4d16fc80e71f7b1dba6c3ef45e80aeb708486e74))
+* **deps:** bump sonner from 2.0.3 to 2.0.5 ([#37](https://github.com/schwannden/chabod/issues/37)) ([4d5250a](https://github.com/schwannden/chabod/commit/4d5250abcac5d98e8b7d59af0092cec63294dcc8))
+* **deps:** bump tailwind-merge from 2.5.4 to 3.3.0 ([#39](https://github.com/schwannden/chabod/issues/39)) ([a39bf4d](https://github.com/schwannden/chabod/commit/a39bf4d0657cd707718e853537583105ba27a129))
+
 ## [0.2.4](https://github.com/schwannden/chabod/compare/v0.2.3...v0.2.4) (2025-05-28)
 
 
