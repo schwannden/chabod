@@ -269,6 +269,34 @@ export const createTestGroup = async (
   return group;
 };
 
+export const createTestResource = async (
+  tenantId: string,
+  overrides: Partial<{
+    name: string;
+    description: string;
+    url: string;
+    icon: string;
+  }> = {},
+) => {
+  const uniqueId = uuidv4();
+  const name = overrides.name || `Test Resource ${uniqueId.slice(0, 8)}`;
+
+  const { data: resource, error } = await serviceRoleClient
+    .from("resources")
+    .insert({
+      name,
+      description: overrides.description || "Test resource for RLS testing",
+      url: overrides.url || `https://example.com/${uniqueId}`,
+      icon: overrides.icon || "document",
+      tenant_id: tenantId,
+    })
+    .select()
+    .single();
+
+  if (error) throw new Error(`Resource creation failed: ${error.message}`);
+  return resource;
+};
+
 export const createTestEvent = async (
   tenantId: string,
   createdBy: string,

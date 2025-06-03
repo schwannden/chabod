@@ -28,12 +28,24 @@ CREATE OR REPLACE TRIGGER "handle_updated_at_resources_groups" BEFORE UPDATE ON 
 -- RLS Policies
 
 -- Resources RLS
-CREATE POLICY "Only tenant owners can manage resources" ON "public"."resources" USING ("public"."is_tenant_owner"("tenant_id"));
+CREATE POLICY "Tenant owners can insert resources" ON "public"."resources" FOR INSERT WITH CHECK ("public"."is_tenant_owner"("tenant_id"));
+
+CREATE POLICY "Tenant owners can update resources" ON "public"."resources" FOR UPDATE USING ("public"."is_tenant_owner"("tenant_id"));
+
+CREATE POLICY "Tenant owners can delete resources" ON "public"."resources" FOR DELETE USING ("public"."is_tenant_owner"("tenant_id"));
 
 CREATE POLICY "Tenant members can view resources" ON "public"."resources" FOR SELECT USING ("public"."is_tenant_member"("tenant_id"));
 
 -- Resources Groups RLS
-CREATE POLICY "Tenant owners can manage resource-group associations" ON "public"."resources_groups" USING ((EXISTS ( SELECT 1
+CREATE POLICY "Tenant owners can insert resource-group associations" ON "public"."resources_groups" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."resources" "r"
+  WHERE (("r"."id" = "resources_groups"."resource_id") AND "public"."is_tenant_owner"("r"."tenant_id")))));
+
+CREATE POLICY "Tenant owners can update resource-group associations" ON "public"."resources_groups" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."resources" "r"
+  WHERE (("r"."id" = "resources_groups"."resource_id") AND "public"."is_tenant_owner"("r"."tenant_id")))));
+
+CREATE POLICY "Tenant owners can delete resource-group associations" ON "public"."resources_groups" FOR DELETE USING ((EXISTS ( SELECT 1
    FROM "public"."resources" "r"
   WHERE (("r"."id" = "resources_groups"."resource_id") AND "public"."is_tenant_owner"("r"."tenant_id")))));
 
