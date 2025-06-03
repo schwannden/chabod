@@ -84,13 +84,17 @@ const initializeI18n = async () => {
     const savedLanguage = localStorage.getItem("i18nextLng");
     const defaultLanguage = "zh-TW"; // Traditional Chinese as fallback
 
-    // Normalize saved language if it exists
+    // Determine the initial language
+    let initialLanguage = defaultLanguage;
+
     if (savedLanguage) {
-      const normalizedLang = normalizeLanguageCode(savedLanguage);
-      if (normalizedLang !== savedLanguage) {
-        localStorage.setItem("i18nextLng", normalizedLang);
+      // If there's a saved language, normalize it
+      initialLanguage = normalizeLanguageCode(savedLanguage);
+      if (initialLanguage !== savedLanguage) {
+        localStorage.setItem("i18nextLng", initialLanguage);
       }
     }
+    // If no saved language, keep defaultLanguage (zh-TW) - don't detect from browser
 
     // Check if i18n is already initialized
     if (i18n.isInitialized) {
@@ -105,8 +109,8 @@ const initializeI18n = async () => {
         // Disable debug to reduce console noise
         debug: false,
 
-        // Set a default language initially
-        lng: defaultLanguage,
+        // Set the determined initial language
+        lng: initialLanguage,
         fallbackLng: defaultLanguage,
 
         interpolation: {
@@ -114,7 +118,8 @@ const initializeI18n = async () => {
         },
 
         detection: {
-          order: ["localStorage", "htmlTag", "navigator"],
+          // Only use localStorage, don't detect from browser/html if no saved preference
+          order: ["localStorage"],
           lookupLocalStorage: "i18nextLng",
           caches: ["localStorage"],
 
@@ -150,18 +155,15 @@ const initializeI18n = async () => {
         missingKeyHandler: false,
       });
 
-    // Handle language detection after initialization
-    const detectedLanguage = normalizeLanguageCode(
-      savedLanguage ||
-        document.documentElement.lang ||
-        navigator.language ||
-        navigator.languages?.[0] ||
-        defaultLanguage,
-    );
+    // Ensure the correct language is set and saved
+    if (i18n.language !== initialLanguage) {
+      await i18n.changeLanguage(initialLanguage);
+    }
 
-    // Change to detected/normalized language if different from current
-    if (i18n.language !== detectedLanguage) {
-      await i18n.changeLanguage(detectedLanguage);
+    // Save to localStorage if it wasn't there before
+    if (!savedLanguage) {
+      localStorage.setItem("i18nextLng", initialLanguage);
+      console.log("Set default language to localStorage:", initialLanguage);
     }
 
     console.log("i18n initialized successfully with language:", i18n.language);
