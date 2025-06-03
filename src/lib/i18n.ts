@@ -27,14 +27,24 @@ const loadTranslations = async () => {
 const initializeI18n = async () => {
   const resources = await loadTranslations();
 
+  // Check for existing language preference
+  const savedLanguage = localStorage.getItem("i18nextLng");
+  const defaultLanguage = "zh-TW"; // Traditional Chinese as fallback
+
+  // Clean up any inconsistent language codes (en-US -> en)
+  if (savedLanguage === "en-US") {
+    localStorage.setItem("i18nextLng", "en");
+  }
+
   await i18n
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
       debug: import.meta.env.MODE === "development",
 
-      lng: "zh-TW", // Set default language to Traditional Chinese
-      fallbackLng: "zh-TW",
+      // Don't force a language - let detection work
+      lng: undefined, // Let LanguageDetector handle this
+      fallbackLng: defaultLanguage,
 
       interpolation: {
         escapeValue: false, // React already does escaping
@@ -44,7 +54,6 @@ const initializeI18n = async () => {
         order: ["localStorage", "htmlTag", "navigator"],
         lookupLocalStorage: "i18nextLng",
         caches: ["localStorage"],
-        checkWhitelist: true,
       },
 
       resources,
@@ -57,9 +66,13 @@ const initializeI18n = async () => {
       defaultNS: "translation",
     });
 
-  // Force set to Traditional Chinese if no language preference found
-  if (!localStorage.getItem("i18nextLng")) {
-    i18n.changeLanguage("zh-TW");
+  // Only set default if no language preference exists at all
+  const finalSavedLanguage = localStorage.getItem("i18nextLng");
+  if (!finalSavedLanguage) {
+    console.log("No language preference found, setting default to:", defaultLanguage);
+    await i18n.changeLanguage(defaultLanguage);
+  } else {
+    console.log("Using saved language preference:", finalSavedLanguage);
   }
 };
 
