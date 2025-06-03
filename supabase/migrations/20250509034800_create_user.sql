@@ -1,6 +1,6 @@
 set check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION auth.create_user(user_id uuid, email text, password text)
+CREATE OR REPLACE FUNCTION public.create_user(user_id uuid, email text, password text)
  RETURNS void
  LANGUAGE plpgsql
 AS $function$

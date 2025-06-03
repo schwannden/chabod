@@ -6,10 +6,10 @@ VALUES
   ('6352529f-90f4-4622-aeb3-cf542931cd88', 'Advanced', '600.00', '6000.00', '適合中小型教會', '800', '40', '5000', 'true'),
   ('b1f987b3-f3b4-4c71-ae4d-68d990c1c79f', 'Pro', '1000.00', '10000.00', '適合大型教會', '10000', '200', '30000', 'true');
 
-SELECT auth.create_user('0b56e2b5-e3cf-43d0-9aca-f8a538fb512b', 'admin@fruitful-tools.com', 'strongAndFruitfulPassword');
-SELECT auth.create_user('d2e0a602-1214-4399-96ad-7d4f3dca75e5', 'love@fruitful-tools.com', 'strongAndFruitfulPassword');
-SELECT auth.create_user('e7a6bea4-7f8b-436c-b87a-6846468aef8e', 'joy@fruitful-tools.com', 'strongAndFruitfulPassword');
-SELECT auth.create_user('f1c713ff-cbb3-412a-858c-0f17dbde5f6a', 'peace@fruitful-tools.com', 'strongAndFruitfulPassword');
+SELECT public.create_user('0b56e2b5-e3cf-43d0-9aca-f8a538fb512b', 'admin@fruitful-tools.com', 'strongAndFruitfulPassword');
+SELECT public.create_user('d2e0a602-1214-4399-96ad-7d4f3dca75e5', 'love@fruitful-tools.com', 'strongAndFruitfulPassword');
+SELECT public.create_user('e7a6bea4-7f8b-436c-b87a-6846468aef8e', 'joy@fruitful-tools.com', 'strongAndFruitfulPassword');
+SELECT public.create_user('f1c713ff-cbb3-412a-858c-0f17dbde5f6a', 'peace@fruitful-tools.com', 'strongAndFruitfulPassword');
 
 UPDATE "public"."profiles" SET "first_name" = '頭', "last_name" = '果', "full_name" = '頭果' WHERE "id" = '0b56e2b5-e3cf-43d0-9aca-f8a538fb512b';
 UPDATE "public"."profiles" SET "first_name" = '仁愛', "last_name" = '果', "full_name" = '仁愛果' WHERE "id" = 'd2e0a602-1214-4399-96ad-7d4f3dca75e5';
