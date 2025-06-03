@@ -12,23 +12,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { inviteUserToTenant } from "@/lib/member-service";
+import { inviteMemberToTenant } from "@/lib/member-service";
+import { useTranslation } from "react-i18next";
 
 interface MemberInviteDialogProps {
-  tenantId: string;
   isOpen: boolean;
   onClose: () => void;
-  onMemberInvited: () => void;
+  tenantSlug: string;
+  onInviteSuccess: () => void;
 }
 
 export function MemberInviteDialog({
-  tenantId,
   isOpen,
   onClose,
-  onMemberInvited,
+  tenantSlug,
+  onInviteSuccess,
 }: MemberInviteDialogProps) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("一般會友");
+  const [role, setRole] = useState("member");
   const [isInviting, setIsInviting] = useState(false);
   const { toast } = useToast();
 
@@ -37,29 +39,28 @@ export function MemberInviteDialog({
 
     if (!email.trim()) {
       toast({
-        title: "驗證錯誤",
-        description: "電子郵件為必填",
+        title: t("members.validationError"),
+        description: t("members.emailRequired"),
         variant: "destructive",
       });
       return;
     }
 
     setIsInviting(true);
-
     try {
-      await inviteUserToTenant(tenantId, email, role);
+      await inviteMemberToTenant(tenantSlug, email, role);
       toast({
-        title: "邀請已傳送",
-        description: `邀請已傳送至 ${email}。`,
+        title: t("members.inviteSent"),
+        description: t("members.inviteSentSuccess", { email }),
       });
-      onMemberInvited();
-      onClose();
       setEmail("");
-      setRole("一般會友");
+      setRole("member");
+      onInviteSuccess();
+      onClose();
     } catch (error) {
       toast({
-        title: "傳送邀請時出錯",
-        description: error?.message || "發生未知錯誤",
+        title: t("members.inviteError"),
+        description: error?.message || t("members.unknownError"),
         variant: "destructive",
       });
     } finally {
@@ -71,36 +72,36 @@ export function MemberInviteDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>邀請會友</DialogTitle>
-          <DialogDescription>邀請新會友加入此教會。</DialogDescription>
+          <DialogTitle>{t("members.inviteMember")}</DialogTitle>
+          <DialogDescription>{t("members.inviteMemberDesc")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">電子郵件地址</Label>
+            <Label htmlFor="email">{t("members.emailAddress")}</Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="user@example.com"
+              placeholder="example@email.com"
               required
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>角色</Label>
-            <RadioGroup value={role} onValueChange={setRole} className="flex flex-col space-y-1">
+          <div className="space-y-3">
+            <Label>{t("members.role")}</Label>
+            <RadioGroup value={role} onValueChange={setRole}>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="一般會友" id="一般會友" />
-                <Label htmlFor="一般會友" className="cursor-pointer">
-                  一般會友
+                <RadioGroupItem value="member" id="member" />
+                <Label htmlFor="member" className="cursor-pointer">
+                  {t("members.generalMember")}
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="管理者" id="管理者" />
-                <Label htmlFor="管理者" className="cursor-pointer">
-                  管理者
+                <RadioGroupItem value="owner" id="owner" />
+                <Label htmlFor="owner" className="cursor-pointer">
+                  {t("members.admin")}
                 </Label>
               </div>
             </RadioGroup>
@@ -108,10 +109,10 @@ export function MemberInviteDialog({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
-              取消
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={isInviting}>
-              {isInviting ? "正在傳送邀請..." : "傳送邀請"}
+              {isInviting ? t("members.sendingInvite") : t("members.sendInvite")}
             </Button>
           </DialogFooter>
         </form>

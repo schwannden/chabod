@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useSession } from "@/hooks/useSession";
 import { NavBar } from "@/components/Layout/NavBar";
 import { TenantCard } from "@/components/Tenants/TenantCard";
@@ -10,6 +11,7 @@ import { getTenants } from "@/lib/tenant-utils";
 import { Plus } from "lucide-react";
 
 export default function DashboardPage() {
+  const { t } = useTranslation();
   const { user, isLoading } = useSession();
   const navigate = useNavigate();
   const [tenants, setTenants] = useState<TenantWithUsage[]>([]);
@@ -51,7 +53,9 @@ export default function DashboardPage() {
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">{t("common.loading")}</div>
+    );
   }
 
   return (
@@ -59,20 +63,22 @@ export default function DashboardPage() {
       <NavBar />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">你所管理的教會</h1>
+          <h1 className="text-3xl font-bold">{t("dashboard.churchesYouManage")}</h1>
           <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" /> 新增教會
+            <Plus className="mr-2 h-4 w-4" /> {t("dashboard.addChurch")}
           </Button>
         </div>
 
         {isTenantsLoading ? (
-          <div className="flex items-center justify-center py-12">載入教會列表...</div>
+          <div className="flex items-center justify-center py-12">
+            {t("dashboard.loadingChurchesList")}
+          </div>
         ) : tenants.length === 0 ? (
           <div className="bg-muted rounded-lg p-6 text-center">
-            <h3 className="text-lg font-medium mb-2">還沒有您所管理的教會</h3>
-            <p className="text-muted-foreground mb-4">新增你的第一個教會來開始使用</p>
+            <h3 className="text-lg font-medium mb-2">{t("dashboard.noChurchesYet")}</h3>
+            <p className="text-muted-foreground mb-4">{t("dashboard.addFirstChurch")}</p>
             <Button onClick={() => setIsCreateDialogOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" /> 新增教會
+              <Plus className="mr-2 h-4 w-4" /> {t("dashboard.addChurch")}
             </Button>
           </div>
         ) : (

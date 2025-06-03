@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 import { useServiceForm } from "./hooks/useServiceForm";
 import { createServiceWithAssociations } from "@/lib/services";
@@ -20,6 +21,7 @@ interface CreateServiceDialogProps {
 }
 
 export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialogProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const {
@@ -78,12 +80,19 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
         validatedRoles,
       );
 
-      toast.success("服事類型已創建");
+      toast({
+        title: t("services.serviceTypeCreated"),
+        description: "",
+      });
       handleDialogClose();
       onSuccess?.();
     } catch (error) {
       console.error("Error creating service:", error);
-      toast.error("創建服事類型時發生錯誤");
+      toast({
+        title: "Error",
+        description: t("services.createServiceTypeError"),
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -104,7 +113,7 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
       </DialogTrigger>
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-auto">
         <DialogHeader>
-          <DialogTitle>新增服事類型</DialogTitle>
+          <DialogTitle>{t("services.addServiceType")}</DialogTitle>
         </DialogHeader>
 
         <ServiceForm
@@ -124,7 +133,7 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
           onSubmit={handleSubmit}
           onCancel={handleDialogClose}
           isSubmitting={isSubmitting}
-          submitLabel="新增服事類型"
+          submitLabel={t("services.addServiceType")}
           isEditing={false}
         />
       </DialogContent>

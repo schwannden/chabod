@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
 
 interface FeatureCardProps {
   title: string;
@@ -19,25 +20,44 @@ function FeatureCard({ title, description }: FeatureCardProps) {
 }
 
 export function Features() {
+  const { t } = useTranslation();
+
   return (
     <section id="features" className="py-20 px-4 bg-background">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold mb-4 inline-flex items-center gap-2">功能概覽</h2>
+          <h2 className="text-3xl font-bold mb-4 inline-flex items-center gap-2">
+            {t("landing.features.title")}
+          </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Chabod 提供教會所需的全方位功能，讓管理更輕鬆
+            {t("landing.features.subtitle")}
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <FeatureCard title="會友管理" description="管理教會成員資料，一切以人為本" />
-          <FeatureCard title="分組管理" description="自訂管理教會組織，分類事工與教會活動" />
-          <FeatureCard title="活動管理" description="對內活動安排不衝突，對外宣傳更輕鬆" />
-          <FeatureCard title="資源管理" description="數位資產傳承，簡化行政工作" />
-          <FeatureCard title="服事管理" description="安排服事人員，確保教會運作順暢" />
           <FeatureCard
-            title="多語言支援(中文、英文)"
-            description="支援中文介面，適合華人教會使用"
+            title={t("landing.features.memberManagement")}
+            description={t("landing.features.memberManagementDesc")}
+          />
+          <FeatureCard
+            title={t("landing.features.groupManagement")}
+            description={t("landing.features.groupManagementDesc")}
+          />
+          <FeatureCard
+            title={t("landing.features.eventManagement")}
+            description={t("landing.features.eventManagementDesc")}
+          />
+          <FeatureCard
+            title={t("landing.features.resourceManagement")}
+            description={t("landing.features.resourceManagementDesc")}
+          />
+          <FeatureCard
+            title={t("landing.features.serviceManagement")}
+            description={t("landing.features.serviceManagementDesc")}
+          />
+          <FeatureCard
+            title={t("landing.features.multiLanguage")}
+            description={t("landing.features.multiLanguageDesc")}
           />
         </div>
       </div>

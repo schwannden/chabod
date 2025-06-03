@@ -8,51 +8,56 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "react-i18next";
 
 interface MemberFilterBarProps {
-  nameFilter: string;
-  setNameFilter: (value: string) => void;
-  emailFilter: string;
-  setEmailFilter: (value: string) => void;
+  searchName: string;
+  setSearchName: (value: string) => void;
+  searchEmail: string;
+  setSearchEmail: (value: string) => void;
   roleFilter: string;
   setRoleFilter: (value: string) => void;
 }
 
 export function MemberFilterBar({
-  nameFilter,
-  setNameFilter,
-  emailFilter,
-  setEmailFilter,
+  searchName,
+  setSearchName,
+  searchEmail,
+  setSearchEmail,
   roleFilter,
   setRoleFilter,
 }: MemberFilterBarProps) {
+  const { t } = useTranslation();
+
   return (
     <FilterLayout>
-      <FilterGroup label="名稱">
+      <FilterGroup label={t("members.name")}>
         <Input
-          placeholder="搜尋名稱"
-          value={nameFilter}
-          onChange={(e) => setNameFilter(e.target.value)}
+          placeholder={t("members.searchName")}
+          value={searchName}
+          onChange={(e) => setSearchName(e.target.value)}
+          className="max-w-sm"
         />
       </FilterGroup>
 
-      <FilterGroup label="email">
+      <FilterGroup label="Email">
         <Input
-          placeholder="搜尋email"
-          value={emailFilter}
-          onChange={(e) => setEmailFilter(e.target.value)}
+          placeholder={t("members.searchEmail")}
+          value={searchEmail}
+          onChange={(e) => setSearchEmail(e.target.value)}
+          className="max-w-sm"
         />
       </FilterGroup>
 
-      <FilterGroup label="角色">
+      <FilterGroup label={t("members.role")}>
         <Select value={roleFilter} onValueChange={setRoleFilter}>
-          <SelectTrigger>
-            <SelectValue placeholder="選擇角色" />
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder={t("members.selectRole")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">所有角色</SelectItem>
-            <SelectItem value="owner">管理者</SelectItem>
-            <SelectItem value="member">一般會友</SelectItem>
+            <SelectItem value="all">{t("members.allRoles")}</SelectItem>
+            <SelectItem value="owner">{t("members.admin")}</SelectItem>
+            <SelectItem value="member">{t("members.member")}</SelectItem>
           </SelectContent>
         </Select>
       </FilterGroup>

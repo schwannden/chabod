@@ -11,14 +11,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { AlertTriangle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface HighRiskDeleteDialogProps {
   isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
+  onClose: () => void;
   onConfirm: () => void;
-  title: string;
-  description: string;
-  confirmationText: string;
+  title?: string;
+  description?: string;
+  confirmationText?: string;
   confirmationPlaceholder?: string;
   destructiveActionLabel?: string;
   cancelActionLabel?: string;
@@ -27,57 +28,74 @@ interface HighRiskDeleteDialogProps {
 
 export function HighRiskDeleteDialog({
   isOpen,
-  onOpenChange,
+  onClose,
   onConfirm,
   title,
   description,
-  confirmationText,
-  confirmationPlaceholder = "請輸入確認文字",
-  destructiveActionLabel = "永久刪除",
-  cancelActionLabel = "取消",
+  confirmationText = "DELETE",
+  confirmationPlaceholder,
+  destructiveActionLabel,
+  cancelActionLabel,
   isLoading = false,
 }: HighRiskDeleteDialogProps) {
-  const [inputText, setInputText] = useState("");
-  const isConfirmDisabled = inputText !== confirmationText;
+  const { t } = useTranslation();
+  const [inputValue, setInputValue] = useState("");
+
+  const defaultConfirmationPlaceholder =
+    confirmationPlaceholder || t("shared.enterConfirmationPlaceholder");
+  const defaultDestructiveLabel = destructiveActionLabel || t("shared.permanentDelete");
+  const defaultCancelLabel = cancelActionLabel || t("shared.cancelButton");
+
+  const isConfirmationValid = inputValue === confirmationText;
+
+  const handleConfirm = () => {
+    if (isConfirmationValid) {
+      onConfirm();
+      setInputValue("");
+    }
+  };
+
+  const handleClose = () => {
+    setInputValue("");
+    onClose();
+  };
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
+    <AlertDialog open={isOpen} onOpenChange={handleClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2 text-destructive">
-            <AlertTriangle className="h-5 w-5" />
-            {title}
+            <AlertTriangle className="h-6 w-6" />
+            {title || t("shared.highRiskDelete")}
           </AlertDialogTitle>
-          <AlertDialogDescription className="space-y-4">
-            <p>{description}</p>
-            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-              <p className="font-medium">警告：此操作無法撤銷！</p>
-              <p>刪除後，所有相關資料將永久消失且無法恢復。</p>
+          <AlertDialogDescription className="space-y-3">
+            <div className="bg-destructive/10 p-3 rounded-lg border border-destructive/20">
+              <p className="font-medium">{t("shared.warningCannotUndo")}</p>
+              <p>{description || t("shared.deleteWarningDesc")}</p>
             </div>
-            <div className="pt-2">
-              <p className="mb-2 text-sm font-medium">
-                請輸入 <span className="font-bold">{confirmationText}</span> 以確認刪除：
-              </p>
+            <div>
+              {t("shared.enterConfirmationText")}{" "}
+              <span className="font-bold">{confirmationText}</span> {t("shared.toConfirmDelete")}
               <Input
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder={confirmationPlaceholder}
-                className="bg-background"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder={defaultConfirmationPlaceholder}
+                className="mt-2"
+                autoComplete="off"
               />
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>{cancelActionLabel}</AlertDialogCancel>
+          <AlertDialogCancel onClick={handleClose} disabled={isLoading}>
+            {defaultCancelLabel}
+          </AlertDialogCancel>
           <AlertDialogAction
-            onClick={(e) => {
-              e.preventDefault();
-              onConfirm();
-            }}
-            disabled={isConfirmDisabled || isLoading}
+            onClick={handleConfirm}
+            disabled={!isConfirmationValid || isLoading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isLoading ? "處理中..." : destructiveActionLabel}
+            {isLoading ? t("common.processing") : defaultDestructiveLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

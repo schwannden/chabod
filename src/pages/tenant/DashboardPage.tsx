@@ -1,6 +1,6 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useSession } from "@/hooks/useSession";
 import { NavBar } from "@/components/Layout/NavBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { getTenantBySlug, getTenants } from "@/lib/tenant-utils";
 import { Loader2, Users, Calendar, Group, FileText, Handshake } from "lucide-react";
 
 export default function DashboardPage() {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const { user, profile, isLoading, signOut } = useSession();
   const navigate = useNavigate();
@@ -63,42 +64,42 @@ export default function DashboardPage() {
 
   const organizationCards = [
     {
-      title: "會友",
+      title: t("dashboard.membersTitle"),
       icon: Users,
-      description: "管理您的教會會友",
+      description: t("dashboard.membersDesc"),
       link: `/tenant/${tenant?.slug}/members`,
     },
     {
-      title: "群組",
+      title: t("dashboard.groupsTitle"),
       icon: Group,
-      description: "將您的教會組織成群組",
+      description: t("dashboard.groupsDesc"),
       link: `/tenant/${tenant?.slug}/groups`,
     },
   ];
 
   const utilityCards = [
     {
-      title: "活動",
+      title: t("dashboard.eventsTitle"),
       icon: Calendar,
-      description: "安排和管理活動",
+      description: t("dashboard.eventsDesc"),
       link: `/tenant/${tenant?.slug}/events`,
     },
     {
-      title: "資源",
+      title: t("dashboard.resourcesTitle"),
       icon: FileText,
-      description: "管理資源超連結",
+      description: t("dashboard.resourcesDesc"),
       link: `/tenant/${tenant?.slug}/resources`,
     },
     {
-      title: "服事管理",
+      title: t("dashboard.serviceManagementTitle"),
       icon: Handshake,
-      description: "創建管理服事類型",
+      description: t("dashboard.serviceManagementDesc"),
       link: `/tenant/${tenant?.slug}/services`,
     },
     {
-      title: "服事表",
+      title: t("dashboard.serviceScheduleTitle"),
       icon: Calendar,
-      description: "各組服事表",
+      description: t("dashboard.serviceScheduleDesc"),
       link: `/tenant/${tenant?.slug}/service_events`,
     },
   ];
@@ -107,7 +108,7 @@ export default function DashboardPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">載入中...</span>
+        <span className="ml-2">{t("dashboard.loadingText")}</span>
       </div>
     );
   }
@@ -118,10 +119,10 @@ export default function DashboardPage() {
         <NavBar />
         <main className="flex-1 container mx-auto px-4 py-8 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-3xl font-bold mb-4">教會不存在</h1>
-            <p className="mb-6">教會 "{slug}" 不存在或已被刪除。</p>
+            <h1 className="text-3xl font-bold mb-4">{t("dashboard.churchNotFound")}</h1>
+            <p className="mb-6">{t("dashboard.churchNotFoundDesc", { slug })}</p>
             <button onClick={() => navigate("/")} className="text-primary hover:underline">
-              返回首頁
+              {t("dashboard.returnHome")}
             </button>
           </div>
         </main>
@@ -134,13 +135,17 @@ export default function DashboardPage() {
       <NavBar />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold">{tenant?.name} 首頁</h1>
-          <p className="text-muted-foreground">歡迎, {profile?.full_name || "用戶"}</p>
+          <h1 className="text-3xl font-bold">
+            {t("dashboard.tenantDashboard", { name: tenant?.name })}
+          </h1>
+          <p className="text-muted-foreground">
+            {t("dashboard.welcomeUser", { name: profile?.full_name || t("dashboard.defaultUser") })}
+          </p>
         </div>
 
         <div className="space-y-8">
           <section>
-            <h2 className="text-2xl font-semibold mb-4">組織管理</h2>
+            <h2 className="text-2xl font-semibold mb-4">{t("dashboard.organizationManagement")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {organizationCards.map((card) => (
                 <Card
@@ -161,7 +166,7 @@ export default function DashboardPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">工具</h2>
+            <h2 className="text-2xl font-semibold mb-4">{t("dashboard.tools")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {utilityCards.map((card) => (
                 <Card

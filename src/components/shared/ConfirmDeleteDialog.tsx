@@ -10,10 +10,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ConfirmDeleteDialogProps {
   isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
+  onClose: () => void;
   onConfirm: () => void;
   title?: string;
   description?: string;
@@ -24,26 +25,33 @@ interface ConfirmDeleteDialogProps {
 
 export function ConfirmDeleteDialog({
   isOpen,
-  onOpenChange,
+  onClose,
   onConfirm,
-  title = "確認刪除",
-  description = "您確定要刪除此項目嗎？此操作無法撤銷。",
-  destructiveActionLabel = "刪除",
-  cancelActionLabel = "取消",
+  title,
+  description,
+  destructiveActionLabel,
+  cancelActionLabel,
   isLoading = false,
 }: ConfirmDeleteDialogProps) {
+  const { t } = useTranslation();
+
+  const defaultTitle = title || t("shared.confirmDelete");
+  const defaultDescription = description || t("shared.confirmDeleteDesc");
+  const defaultDestructiveLabel = destructiveActionLabel || t("shared.deleteButton");
+  const defaultCancelLabel = cancelActionLabel || t("shared.cancelButton");
+
   return (
-    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
+    <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
             <Trash2 className="h-5 w-5 text-destructive" />
-            {title}
+            {defaultTitle}
           </AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          <AlertDialogDescription>{defaultDescription}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>{cancelActionLabel}</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>{defaultCancelLabel}</AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
@@ -52,7 +60,7 @@ export function ConfirmDeleteDialog({
             disabled={isLoading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isLoading ? "處理中..." : destructiveActionLabel}
+            {isLoading ? t("common.processing") : defaultDestructiveLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

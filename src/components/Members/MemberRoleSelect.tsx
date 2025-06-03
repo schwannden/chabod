@@ -1,3 +1,4 @@
+import React from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -6,43 +7,48 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface MemberRoleSelectProps {
-  role: string;
-  onRoleChange: (role: string) => void;
-  isCurrentUserOwner: boolean;
+  currentRole: string;
+  onRoleChange: (newRole: string) => void;
+  disabled?: boolean;
 }
 
-export function MemberRoleSelect({
-  role,
-  onRoleChange,
-  isCurrentUserOwner,
-}: MemberRoleSelectProps) {
-  const translateRole = (role: string): string => {
+export function MemberRoleSelect({ currentRole, onRoleChange, disabled }: MemberRoleSelectProps) {
+  const { t } = useTranslation();
+
+  const getRoleDisplayName = (role: string) => {
     switch (role) {
       case "owner":
-        return "管理者";
+        return t("members.admin");
       case "member":
-        return "一般會友";
+        return t("members.member");
       default:
-        return role;
+        return t("members.member");
     }
   };
-
-  if (!isCurrentUserOwner) {
-    return <span className="capitalize">{translateRole(role)}</span>;
-  }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="capitalize">
-          {translateRole(role)} <ChevronDown className="ml-1 h-4 w-4" />
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 justify-between min-w-[80px]"
+          disabled={disabled}
+        >
+          {getRoleDisplayName(currentRole)}
+          <ChevronDown className="h-3 w-3 ml-1" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
-        <DropdownMenuItem onClick={() => onRoleChange("管理者")}>管理者</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onRoleChange("一般會友")}>一般會友</DropdownMenuItem>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => onRoleChange("owner")}>
+          {t("members.admin")}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onRoleChange("member")}>
+          {t("members.member")}
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

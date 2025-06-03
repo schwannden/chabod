@@ -6,11 +6,7 @@ import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useResponsiveMonths } from "@/hooks/useResponsiveMonths";
-
-// Format year-month to format: "2024年4月"
-function formatYearMonth(date: Date) {
-  return format(date, "yyyy年M月");
-}
+import { useTranslation } from "react-i18next";
 
 // Base event interface with minimal required properties
 export interface BaseEvent {
@@ -31,9 +27,18 @@ export function GenericCalendar({
   renderTooltip,
   getDateKey = (event) => event.date,
 }: GenericCalendarProps) {
+  const { t } = useTranslation();
   const monthsToShow = useResponsiveMonths();
   const today = new Date();
   const [baseMonth, setBaseMonth] = React.useState<Date>(startOfMonth(today));
+
+  // Format year-month based on current language
+  const formatYearMonth = (date: Date) => {
+    return t("shared.monthFormat", {
+      year: format(date, "yyyy"),
+      month: format(date, "M"),
+    });
+  };
 
   // Group events by date
   const eventsByDate = React.useMemo(() => {
@@ -150,7 +155,7 @@ export function GenericCalendar({
         </button>
         <div className="font-bold text-lg">
           {formatYearMonth(baseMonth)}
-          {monthsToShow > 1 ? ` 共${monthsToShow}個月` : ""}
+          {monthsToShow > 1 ? t("shared.monthsTotal", { monthsToShow }) : ""}
         </div>
         <button
           onClick={handleNext}

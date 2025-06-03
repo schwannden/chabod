@@ -16,6 +16,7 @@ import { associateUserWithTenant } from "@/lib/tenant-utils";
 import { AuthEmailInput } from "./AuthEmailInput";
 import { AuthPasswordInput } from "./AuthPasswordInput";
 import { TermsOfService } from "./TermsOfService";
+import { useTranslation } from "react-i18next";
 
 interface SignUpFormProps {
   tenantSlug?: string;
@@ -32,6 +33,7 @@ export function SignUpForm({
   onSuccess,
   onSignInClick,
 }: SignUpFormProps) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -47,8 +49,8 @@ export function SignUpForm({
     e.preventDefault();
     if (!termsAccepted) {
       toast({
-        title: "請同意信仰告白",
-        description: "您必須同意信仰告白才能註冊帳號。",
+        title: t("auth.pleaseAgreeToFaith"),
+        description: t("auth.mustAgreeToRegister"),
         variant: "destructive",
       });
       return;
@@ -59,8 +61,8 @@ export function SignUpForm({
 
     if (!trimmedFullName) {
       toast({
-        title: "姓名不能為空",
-        description: "請輸入您的姓名",
+        title: t("auth.nameCannotBeEmpty"),
+        description: t("auth.pleaseEnterYourName"),
         variant: "destructive",
       });
       return;
@@ -81,14 +83,14 @@ export function SignUpForm({
           try {
             await associateUserWithTenant(signInData.user.id, tenantSlug, inviteToken);
             toast({
-              title: "帳號已與教會關聯",
-              description: `您的帳號已成功加入 ${tenantSlug}。`,
+              title: t("auth.accountLinkedToChurch"),
+              description: t("auth.accountSuccessfullyJoined", { tenantSlug }),
             });
           } catch (associateError) {
             // Sign out user if tenant association fails
             await supabase.auth.signOut();
-            const errorMessage = associateError?.message || "未知錯誤";
-            throw new Error(`無法將帳號加入教會：${errorMessage}`);
+            const errorMessage = associateError?.message || t("auth.unknownError");
+            throw new Error(t("auth.cannotJoinChurch", { errorMessage }));
           }
         }
 
@@ -111,13 +113,13 @@ export function SignUpForm({
 
       if (error) {
         // Translate common Supabase error codes to Chinese
-        let errorMessage = "發生未知錯誤";
+        let errorMessage = t("auth.unknownError");
         if (error.message?.includes("invalid email")) {
-          errorMessage = "電子郵件格式不正確";
+          errorMessage = t("auth.emailFormatIncorrect");
         } else if (error.message?.includes("password")) {
-          errorMessage = "密碼需至少 6 個字元";
+          errorMessage = t("auth.passwordMinLength");
         } else if (error.message?.includes("User already registered")) {
-          errorMessage = "此電子郵件已經註冊";
+          errorMessage = t("auth.emailAlreadyRegistered");
         } else if (error.message) {
           errorMessage = error.message;
         }
@@ -131,15 +133,15 @@ export function SignUpForm({
         } catch (associateError) {
           // Sign out user if tenant association fails
           await supabase.auth.signOut();
-          throw new Error(`無法將帳號加入教會：${associateError}`);
+          throw new Error(t("auth.cannotJoinChurch", { errorMessage: associateError }));
         }
       }
 
       toast({
-        title: "帳號建立成功！",
+        title: t("auth.accountCreatedSuccess"),
         description: tenantSlug
-          ? `您的帳號已建立並加入 ${tenantSlug}。`
-          : "請前往電子郵件收信並點擊確認連結。",
+          ? t("auth.accountCreatedAndJoined", { tenantSlug })
+          : t("auth.checkEmailForConfirmation"),
       });
 
       if (onSuccess) {
@@ -147,8 +149,8 @@ export function SignUpForm({
       }
     } catch (error) {
       toast({
-        title: "建立帳號失敗",
-        description: error?.message || "發生未知錯誤",
+        title: t("auth.createAccountFailed"),
+        description: error?.message || t("auth.unknownError"),
         variant: "destructive",
       });
     } finally {
@@ -159,18 +161,18 @@ export function SignUpForm({
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>建立帳號</CardTitle>
+        <CardTitle>{t("auth.signUpTitle")}</CardTitle>
         <CardDescription>
-          {tenantName ? `註冊加入 ${tenantName}` : "註冊 Chabod 教會管理系統帳號"}
+          {tenantName ? t("auth.signUpToJoin", { tenantName }) : t("auth.signUpToChabod")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSignUp} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="full-name">姓名</Label>
+            <Label htmlFor="full-name">{t("auth.fullName")}</Label>
             <Input
               id="full-name"
-              placeholder="輸入您的姓名"
+              placeholder={t("auth.enterYourName")}
               value={fullName}
               onChange={handleFullNameChange}
               required
@@ -180,13 +182,13 @@ export function SignUpForm({
           <AuthPasswordInput value={password} onChange={setPassword} required disabled={loading} />
           <TermsOfService accepted={termsAccepted} onChange={setTermsAccepted} />
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "建立帳號中..." : "建立帳號"}
+            {loading ? t("auth.creatingAccount") : t("auth.createAccount")}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="flex justify-center">
         <Button variant="link" onClick={onSignInClick}>
-          已經有帳號？點此登入
+          {t("auth.alreadyHaveAccount")}
         </Button>
       </CardFooter>
     </Card>

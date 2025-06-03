@@ -19,6 +19,7 @@ import {
   ServiceRoleView,
 } from "./ServiceViews";
 import { ServiceDeleteDialog } from "./ServiceDeleteDialog";
+import { useTranslation } from "react-i18next";
 
 interface ServiceCardProps {
   service: Service;
@@ -27,6 +28,7 @@ interface ServiceCardProps {
 }
 
 export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
+  const { t } = useTranslation();
   const [activeSheet, setActiveSheet] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -35,11 +37,18 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
     try {
       setIsDeleting(true);
       await deleteService(service.id);
-      toast.success("服事類型已刪除");
+      toast({
+        title: t("services.serviceTypeDeleted"),
+        description: "",
+      });
       onDeleted();
     } catch (error) {
       console.error("Error deleting service:", error);
-      toast.error("刪除服事類型時發生錯誤");
+      toast({
+        title: "Error",
+        description: t("services.deleteServiceTypeError"),
+        variant: "destructive",
+      });
     } finally {
       setIsDeleting(false);
       setIsDeleteDialogOpen(false);
@@ -54,7 +63,7 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
           <CardDescription>
             {service.default_start_time && service.default_end_time
               ? `${service.default_start_time} - ${service.default_end_time}`
-              : "未設定預設時間"}
+              : t("services.notSetDefaultTime")}
           </CardDescription>
         </div>
         <DropdownMenu>

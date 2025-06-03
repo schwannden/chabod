@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { ConfirmDeleteDialog } from "@/components/shared/ConfirmDeleteDialog";
+import { useTranslation } from "react-i18next";
 
 interface MemberTableActionsProps {
   isCurrentUserOwner: boolean;
@@ -21,6 +22,7 @@ export function MemberTableActions({
   memberName,
 }: MemberTableActionsProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { t } = useTranslation();
 
   if (!isCurrentUserOwner) {
     return null;
@@ -51,8 +53,8 @@ export function MemberTableActions({
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDelete}
-        title="移除會友"
-        description={`您確定要將 ${memberName || "此會友"} 從教會中移除嗎？此操作無法撤銷。`}
+        title={t("members.removeMember")}
+        description={t("members.removeMemberConfirm", { memberName })}
         isLoading={isLoading}
       />
     </div>

@@ -16,6 +16,7 @@ import { deleteTenant } from "@/lib/tenant-utils";
 import { TenantUpdateDialog } from "./TenantUpdateDialog";
 import { PricePlansDialog } from "./PricePlansDialog";
 import { HighRiskDeleteDialog } from "@/components/shared/HighRiskDeleteDialog";
+import { useTranslation } from "react-i18next";
 
 interface TenantCardProps {
   tenant: TenantWithUsage;
@@ -24,6 +25,7 @@ interface TenantCardProps {
 }
 
 export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantCardProps) {
+  const { t } = useTranslation();
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -64,8 +66,8 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
     const authUrl = `${window.location.origin}/tenant/${tenant.slug}/auth`;
     navigator.clipboard.writeText(authUrl);
     toast({
-      title: "URL 已複製到剪貼簿",
-      description: "教會登入頁面 URL 已複製到剪貼簿。",
+      title: t("tenant.urlCopied"),
+      description: t("tenant.churchLoginUrlCopied"),
     });
   };
 
@@ -94,15 +96,17 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
         <CardContent>
           <div className="flex items-center space-x-2">
             <Users className="h-4 w-4" />
-            <span>{tenant.memberCount} members</span>
+            <span>
+              {tenant.memberCount} {t("tenant.members")}
+            </span>
           </div>
           <p className="text-sm text-muted-foreground mt-2">
-            Created: {new Date(tenant.created_at).toLocaleDateString()}
+            {t("tenant.created")}: {new Date(tenant.created_at).toLocaleDateString()}
           </p>
 
           <div className="mt-4 pt-4 border-t">
             <div className="flex items-center justify-between">
-              <h4 className="font-medium mb-2">訂閱計畫</h4>
+              <h4 className="font-medium mb-2">{t("tenant.subscriptionPlan")}</h4>
               <Button
                 variant="ghost"
                 size="icon"
@@ -115,40 +119,44 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
             <div className="space-y-2">
               <p className="text-sm font-semibold">{tenant.price_tier?.name || "Free"}</p>
               <p className="text-sm text-muted-foreground">
-                ${tenant.price_tier?.price_monthly || 0}/month
+                ${tenant.price_tier?.price_monthly || 0}
+                {t("tenant.monthlyPrice")}
               </p>
               <div className="space-y-1">
                 <p className="text-xs">
-                  Members: {tenant.memberCount} / {tenant.price_tier?.user_limit || 0}
+                  {t("tenant.membersLimit")}: {tenant.memberCount} /{" "}
+                  {tenant.price_tier?.user_limit || 0}
                 </p>
                 <p className="text-xs">
-                  Groups: {tenant.groupCount || 0} / {tenant.price_tier?.group_limit || 0}
+                  {t("tenant.groupsLimit")}: {tenant.groupCount || 0} /{" "}
+                  {tenant.price_tier?.group_limit || 0}
                 </p>
                 <p className="text-xs">
-                  Events: {tenant.eventCount || 0} / {tenant.price_tier?.event_limit || 0}
+                  {t("tenant.eventsLimit")}: {tenant.eventCount || 0} /{" "}
+                  {tenant.price_tier?.event_limit || 0}
                 </p>
               </div>
             </div>
           </div>
 
           <div className="mt-4 pt-2 border-t">
-            <p className="text-sm font-medium mb-1">教會登入頁面 URL:</p>
+            <p className="text-sm font-medium mb-1">{t("tenant.churchLoginPageUrl")}:</p>
             <div className="flex items-center justify-between">
               <code className="text-xs bg-muted p-1 rounded break-all">
                 {window.location.origin}/tenant/{tenant.slug}/auth
               </code>
               <Button size="sm" variant="ghost" onClick={handleCopyAuthUrl}>
                 <Copy className="h-4 w-4 mr-1" />
-                Copy
+                {t("tenant.copy")}
               </Button>
             </div>
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={handleManageTenant}>
-            前往教會首頁
+            {t("tenant.goToChurchDashboard")}
           </Button>
-          <Button onClick={handleOpenTenantAuth}>前往教會登入頁面</Button>
+          <Button onClick={handleOpenTenantAuth}>{t("tenant.goToChurchLogin")}</Button>
         </CardFooter>
       </Card>
 
@@ -169,10 +177,10 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDelete}
-        title="刪除教會"
-        description={`您確定要刪除 ${tenant.name} 嗎？這將永久刪除所有關聯的資料，包括會友、小組、活動等資訊。`}
+        title={t("tenant.deleteChurch")}
+        description={t("tenant.deleteChurchConfirm", { tenantName: tenant.name })}
         confirmationText={tenant.slug}
-        confirmationPlaceholder="請輸入教會的 slug 以確認"
+        confirmationPlaceholder={t("tenant.enterChurchSlug")}
         isLoading={isDeleting}
       />
     </>

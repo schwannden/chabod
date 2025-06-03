@@ -14,6 +14,7 @@ import { associateUserWithTenant } from "@/lib/membership-service";
 import { checkUserTenantAccess } from "@/lib/member-service";
 import { AuthEmailInput } from "./AuthEmailInput";
 import { AuthPasswordInput } from "./AuthPasswordInput";
+import { useTranslation } from "react-i18next";
 
 interface SignInFormProps {
   tenantSlug?: string;
@@ -30,6 +31,7 @@ export function SignInForm({
   onSuccess,
   onSignUpClick,
 }: SignInFormProps) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,8 +46,8 @@ export function SignInForm({
 
     if (!trimmedEmail) {
       toast({
-        title: "登入失敗",
-        description: "電子郵件不能為空",
+        title: t("auth.loginFailed"),
+        description: t("auth.emailEmpty"),
         variant: "destructive",
       });
       return;
@@ -60,16 +62,16 @@ export function SignInForm({
       });
 
       if (error) {
-        let errorMessage = "電子郵件或密碼錯誤";
+        let errorMessage = t("auth.emailOrPasswordIncorrect");
         if (error.message?.includes("invalid email")) {
-          errorMessage = "電子郵件格式不正確";
+          errorMessage = t("auth.emailFormatIncorrect");
         } else if (
           error.message?.toLowerCase().includes("invalid login credentials") ||
           error.message?.toLowerCase().includes("invalid email or password")
         ) {
-          errorMessage = "電子郵件或密碼錯誤";
+          errorMessage = t("auth.emailOrPasswordIncorrect");
         } else if (error.message?.includes("User not confirmed")) {
-          errorMessage = "請先驗證您的電子郵件";
+          errorMessage = t("auth.pleaseVerifyEmail");
         } else if (error.message) {
           errorMessage = error.message;
         }
@@ -84,14 +86,14 @@ export function SignInForm({
 
           if (!hasAccess) {
             await supabase.auth.signOut();
-            throw new Error("您沒有權限進入此教會，請聯絡管理員或註冊新的帳號。");
+            throw new Error(t("auth.noPermissionToEnterChurch"));
           }
         }
       }
 
       toast({
-        title: "登入成功",
-        description: tenantName ? `歡迎回來，${tenantName}！` : "歡迎使用 Chabod！",
+        title: t("auth.loginSuccess"),
+        description: tenantName ? t("auth.welcomeBack", { tenantName }) : t("auth.welcomeToChabod"),
       });
 
       if (onSuccess) {
@@ -99,8 +101,8 @@ export function SignInForm({
       }
     } catch (error) {
       toast({
-        title: "登入失敗",
-        description: error?.message || "電子郵件或密碼錯誤",
+        title: t("auth.loginFailed"),
+        description: error?.message || t("auth.emailOrPasswordIncorrect"),
         variant: "destructive",
       });
     } finally {
@@ -116,8 +118,8 @@ export function SignInForm({
 
     if (!trimmedEmail) {
       toast({
-        title: "重設密碼失敗",
-        description: "電子郵件不能為空",
+        title: t("auth.resetPasswordFailed"),
+        description: t("auth.emailEmpty"),
         variant: "destructive",
       });
       return;
@@ -131,11 +133,11 @@ export function SignInForm({
       });
 
       if (error) {
-        let errorMessage = "發送重設密碼電子郵件時發生錯誤";
+        let errorMessage = t("auth.resetPasswordError");
         if (error.message?.includes("user not found")) {
-          errorMessage = "查無此電子郵件";
+          errorMessage = t("auth.userNotFound");
         } else if (error.message?.includes("invalid email")) {
-          errorMessage = "電子郵件格式不正確";
+          errorMessage = t("auth.emailFormatIncorrect");
         } else if (error.message) {
           errorMessage = error.message;
         }
@@ -143,16 +145,16 @@ export function SignInForm({
       }
 
       toast({
-        title: "重設密碼郵件已發送",
-        description: "請檢查您的電子郵件收件匣，點擊連結重設密碼。",
+        title: t("auth.resetPasswordEmailSent"),
+        description: t("auth.checkEmailForReset"),
       });
 
       setResetPasswordMode(false);
     } catch (error) {
-      const errorMessage = error?.message || "未知錯誤";
+      const errorMessage = error?.message || t("auth.unknownError");
       toast({
-        title: "重設密碼失敗",
-        description: errorMessage || "發送重設密碼電子郵件時發生錯誤",
+        title: t("auth.resetPasswordFailed"),
+        description: errorMessage || t("auth.resetPasswordError"),
         variant: "destructive",
       });
     } finally {
@@ -164,20 +166,20 @@ export function SignInForm({
     return (
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
-          <CardTitle>重設密碼</CardTitle>
-          <CardDescription>輸入您的電子郵件地址，我們將發送重設密碼的連結。</CardDescription>
+          <CardTitle>{t("auth.resetPassword")}</CardTitle>
+          <CardDescription>{t("auth.resetPasswordDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleResetPassword} className="space-y-4">
             <AuthEmailInput id="reset-email" value={email} onChange={setEmail} disabled={loading} />
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "發送中..." : "發送重設密碼連結"}
+              {loading ? t("auth.sending") : t("auth.sendResetPasswordLink")}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
           <Button variant="link" onClick={() => setResetPasswordMode(false)}>
-            返回登入
+            {t("auth.backToLogin")}
           </Button>
         </CardFooter>
       </Card>
@@ -187,9 +189,9 @@ export function SignInForm({
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>登入</CardTitle>
+        <CardTitle>{t("auth.signIn")}</CardTitle>
         <CardDescription>
-          {tenantName ? `登入到 ${tenantName}` : "登入到 Chabod 教會管理系統"}
+          {tenantName ? t("auth.signInTo", { tenantName }) : t("auth.signInToChabod")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -198,19 +200,17 @@ export function SignInForm({
           <AuthPasswordInput
             value={password}
             onChange={setPassword}
-            required
             disabled={loading}
-            showForgotPassword
             onForgotPassword={() => setResetPasswordMode(true)}
           />
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "登入中..." : "登入"}
+            {loading ? t("common.loading") : t("auth.signIn")}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="flex justify-center">
         <Button variant="link" onClick={onSignUpClick}>
-          還沒有帳號？點此註冊
+          {t("nav.signup")}
         </Button>
       </CardFooter>
     </Card>

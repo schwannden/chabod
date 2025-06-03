@@ -1,56 +1,53 @@
 import { useState, useEffect } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useSession } from "@/hooks/useSession";
+import { updateUserProfile } from "@/lib/profile-service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Profile } from "@/lib/types";
-import { updateUserProfile } from "@/lib/profile-service";
+import { useToast } from "@/components/ui/use-toast";
+import { useTranslation } from "react-i18next";
 
-interface ProfileFormProps {
-  profile: Profile;
-  onProfileUpdated: () => void;
-}
-
-export function ProfileForm({ profile, onProfileUpdated }: ProfileFormProps) {
-  const [fullName, setFullName] = useState(profile.full_name || "");
-  const [firstName, setFirstName] = useState(profile.first_name || "");
-  const [lastName, setLastName] = useState(profile.last_name || "");
-  const [email] = useState(profile.email); // Email cannot be changed directly
-  const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || "");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export function ProfileForm() {
+  const { user, profile, refetchProfile } = useSession();
   const { toast } = useToast();
+  const { t } = useTranslation();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    full_name: "",
+    first_name: "",
+    last_name: "",
+    avatar_url: "",
+  });
 
-  // Update state when profile prop changes
   useEffect(() => {
-    setFullName(profile.full_name || "");
-    setFirstName(profile.first_name || "");
-    setLastName(profile.last_name || "");
-    setAvatarUrl(profile.avatar_url || "");
+    if (profile) {
+      setFormData({
+        full_name: profile.full_name || "",
+        first_name: profile.first_name || "",
+        last_name: profile.last_name || "",
+        avatar_url: profile.avatar_url || "",
+      });
+    }
   }, [profile]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user?.id) return;
+
     setIsSubmitting(true);
-
     try {
-      await updateUserProfile(profile.id, {
-        full_name: fullName,
-        first_name: firstName,
-        last_name: lastName,
-        avatar_url: avatarUrl,
-      });
-
+      await updateUserProfile(user.id, formData);
+      await refetchProfile();
       toast({
-        title: "個人資料已更新",
-        description: "你的個人資料已成功更新。",
+        title: t("profile.profileUpdated"),
+        description: t("profile.profileUpdatedSuccess"),
       });
-
-      onProfileUpdated();
     } catch (error) {
+      console.error("Profile update error:", error);
       toast({
-        title: "更新個人資料時出錯",
-        description: error?.message || "發生未知錯誤",
+        title: t("profile.profileUpdateError"),
+        description: error?.message || t("profile.profileUpdateErrorDesc"),
         variant: "destructive",
       });
     } finally {
@@ -59,63 +56,61 @@ export function ProfileForm({ profile, onProfileUpdated }: ProfileFormProps) {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>你的個人資料</CardTitle>
-        <CardDescription>更新你的個人資訊</CardDescription>
+        <CardTitle>{t("profile.title")}</CardTitle>
+        <CardDescription>{t("profile.description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="full-name">全名</Label>
+          <div>
+            <Label htmlFor="full-name">{t("profile.fullName")}</Label>
             <Input
               id="full-name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="你的名字"
+              type="text"
+              value={formData.full_name}
+              onChange={(e) => setFormData((prev) => ({ ...prev, full_name: e.target.value }))}
+              placeholder={t("profile.yourName")}
             />
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="first-name">名字</Label>
+            <div>
+              <Label htmlFor="first-name">{t("profile.firstName")}</Label>
               <Input
                 id="first-name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                placeholder="名字"
+                type="text"
+                value={formData.first_name}
+                onChange={(e) => setFormData((prev) => ({ ...prev, first_name: e.target.value }))}
+                placeholder={t("profile.firstName_")}
               />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="last-name">姓氏</Label>
+            <div>
+              <Label htmlFor="last-name">{t("profile.lastName")}</Label>
               <Input
                 id="last-name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                placeholder="姓氏"
+                type="text"
+                value={formData.last_name}
+                onChange={(e) => setFormData((prev) => ({ ...prev, last_name: e.target.value }))}
+                placeholder={t("profile.lastName_")}
               />
             </div>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">電子郵件地址</Label>
-            <Input id="email" value={email} disabled className="bg-muted" />
-            <p className="text-xs text-muted-foreground">電子郵件無法更改。</p>
+          <div>
+            <Label htmlFor="email">{t("profile.email")}</Label>
+            <Input id="email" type="email" value={user?.email || ""} disabled />
+            <p className="text-xs text-muted-foreground">{t("profile.emailNote")}</p>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="avatar-url">頭像 URL</Label>
+          <div>
+            <Label htmlFor="avatar-url">{t("profile.avatarUrl")}</Label>
             <Input
               id="avatar-url"
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              placeholder="https://example.com/avatar.jpg"
+              type="url"
+              value={formData.avatar_url}
+              onChange={(e) => setFormData((prev) => ({ ...prev, avatar_url: e.target.value }))}
             />
           </div>
-
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "儲存中..." : "儲存變更"}
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? t("common.saving") : t("profile.saveChanges")}
           </Button>
         </form>
       </CardContent>

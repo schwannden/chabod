@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/table";
 import { Edit, Trash2, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 interface GroupTableProps {
   groups: GroupWithMemberCount[];
@@ -50,6 +51,7 @@ export function GroupTable({
   const [newGroupName, setNewGroupName] = useState("");
   const [newGroupDescription, setNewGroupDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useTranslation();
 
   const handleCreateGroup = async () => {
     const trimmedName = newGroupName.trim();
@@ -181,8 +183,11 @@ export function GroupTable({
 
   return (
     <div className="space-y-4">
-      {isTenantOwner && (
-        <div className="flex justify-end">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold">{t("groups.name")}</h1>
+        </div>
+        {isTenantOwner && (
           <Button
             onClick={() => {
               setNewGroupName("");
@@ -190,99 +195,107 @@ export function GroupTable({
               setIsCreateOpen(true);
             }}
           >
-            建立群組
+            {t("groups.createGroup")}
           </Button>
-        </div>
-      )}
+        )}
+      </div>
 
-      {groups.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">
-          沒有找到群組。 {isTenantOwner && "建立您的第一個群組以開始。"}
-        </div>
-      ) : (
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>名稱</TableHead>
-              <TableHead>描述</TableHead>
-              <TableHead>會友</TableHead>
-              <TableHead>建立時間</TableHead>
-              <TableHead className="text-right">操作</TableHead>
+              <TableHead>{t("groups.name")}</TableHead>
+              <TableHead>{t("groups.description")}</TableHead>
+              <TableHead>{t("groups.members")}</TableHead>
+              <TableHead>{t("groups.createdAt")}</TableHead>
+              <TableHead className="text-right">{t("groups.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {groups.map((group) => (
-              <TableRow key={group.id}>
-                <TableCell className="font-medium">{group.name}</TableCell>
-                <TableCell>{group.description || "-"}</TableCell>
-                <TableCell>{group.memberCount}</TableCell>
-                <TableCell>{new Date(group.created_at).toLocaleDateString()}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigateToGroupMembers(group.id)}
-                    >
-                      <Users className="h-4 w-4 mr-1" />
-                      Members
-                    </Button>
-
-                    {isTenantOwner && (
-                      <>
-                        <Button variant="outline" size="sm" onClick={() => openEditDialog(group)}>
-                          <Edit className="h-4 w-4" />
-                          <span className="sr-only">Edit</span>
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => openDeleteDialog(group)}>
-                          <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Delete</span>
-                        </Button>
-                      </>
-                    )}
-                  </div>
+            {groups.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8">
+                  {t("groups.noGroupsFound")} {isTenantOwner && t("groups.createFirstGroup")}
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              groups.map((group) => (
+                <TableRow key={group.id}>
+                  <TableCell className="font-medium">{group.name}</TableCell>
+                  <TableCell>{group.description || "-"}</TableCell>
+                  <TableCell>{group.memberCount}</TableCell>
+                  <TableCell>{new Date(group.created_at).toLocaleDateString()}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigateToGroupMembers(group.id)}
+                      >
+                        <Users className="h-4 w-4 mr-1" />
+                        Members
+                      </Button>
+
+                      {isTenantOwner && (
+                        <>
+                          <Button variant="outline" size="sm" onClick={() => openEditDialog(group)}>
+                            <Edit className="h-4 w-4" />
+                            <span className="sr-only">Edit</span>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openDeleteDialog(group)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Delete</span>
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
-      )}
+      </div>
 
       {/* Create Group Dialog */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>建立新群組</DialogTitle>
+            <DialogTitle>{t("groups.createNewGroup")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">群組名稱</Label>
+              <Label htmlFor="name">{t("groups.groupName")}</Label>
               <Input
                 id="name"
                 value={newGroupName}
                 onChange={handleNameChange}
                 onBlur={handleNameBlur}
-                placeholder="輸入群組名稱"
+                placeholder={t("groups.enterGroupName")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">描述（選填）</Label>
+              <Label htmlFor="description">{t("groups.descriptionOptional")}</Label>
               <Textarea
                 id="description"
                 value={newGroupDescription}
                 onChange={handleDescriptionChange}
                 onBlur={handleDescriptionBlur}
-                placeholder="輸入群組描述"
+                placeholder={t("groups.enterGroupDescription")}
                 rows={3}
               />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
-              取消
+              {t("common.cancel")}
             </Button>
             <Button onClick={handleCreateGroup} disabled={isSubmitting}>
-              {isSubmitting ? "建立中..." : "建立群組"}
+              {isSubmitting ? t("common.creating") : t("groups.createGroup_")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -292,11 +305,11 @@ export function GroupTable({
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>編輯群組</DialogTitle>
+            <DialogTitle>{t("groups.editGroup")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-name">群組名稱</Label>
+              <Label htmlFor="edit-name">{t("groups.groupName")}</Label>
               <Input
                 id="edit-name"
                 value={newGroupName}
@@ -305,7 +318,7 @@ export function GroupTable({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-description">描述（選填）</Label>
+              <Label htmlFor="edit-description">{t("groups.descriptionOptional")}</Label>
               <Textarea
                 id="edit-description"
                 value={newGroupDescription}
@@ -317,10 +330,10 @@ export function GroupTable({
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditOpen(false)}>
-              取消
+              {t("common.cancel")}
             </Button>
             <Button onClick={handleUpdateGroup} disabled={isSubmitting}>
-              {isSubmitting ? "儲存中..." : "儲存變更"}
+              {isSubmitting ? t("common.saving") : t("groups.saveChanges")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -330,17 +343,17 @@ export function GroupTable({
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>刪除群組</DialogTitle>
+            <DialogTitle>{t("groups.deleteGroup")}</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <p>您確定要刪除群組 "{selectedGroup?.name}" 嗎？此操作無法復原。</p>
+            <p>{t("groups.deleteGroupConfirm", { groupName: selectedGroup?.name })}</p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
-              取消
+              {t("common.cancel")}
             </Button>
             <Button variant="destructive" onClick={handleDeleteGroup} disabled={isSubmitting}>
-              {isSubmitting ? "刪除中..." : "刪除群組"}
+              {isSubmitting ? t("common.deleting") : t("groups.deleteGroup")}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,0 +1,234 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Internationalization (i18n) Rules
+
+This rule provides standards for implementing internationalization using React i18next in the application.
+
+## Translation Setup
+
+- Use React i18next for all internationalization
+- Translation files are located in `src/locales/` directory
+- Supported languages: English (`en.json`) and Chinese (`zh.json`)
+- Import translations using `import { useTranslation } from "react-i18next"`
+
+## Hook Usage
+
+- Always use the `useTranslation` hook at the component level
+- Destructure the `t` function: `const { t } = useTranslation()`
+- Use `t()` function for all user-facing text
+- Never use hardcoded strings in Chinese or any other language in components
+
+## Translation Key Conventions
+
+- Use hierarchical dot notation for translation keys: `section.subsection.key`
+- Follow established section patterns:
+  - `common.*` - Shared UI elements (loading, error, CRUD operations)
+  - `profile.*` - Profile-related translations
+  - `members.*` - Member management translations
+  - `groups.*` - Group management translations
+  - `services.*` - Service management translations
+  - `resources.*` - Resource management translations
+  - `events.*` - Event management translations
+  - `serviceEvents.*` - Service event specific translations
+- Use descriptive, meaningful key names that indicate the context
+- Use camelCase for multi-word keys: `firstName`, `emailAddress`, `defaultStartTime`
+
+## Parameter Interpolation
+
+- Use parameter interpolation for dynamic content: `t('key', { parameter: value })`
+- Define parameters in translation strings using double curly braces: `{{parameter}}`
+- Example: `t('members.inviteSentSuccess', { email })` with translation: `"Invitation sent to {{email}}"`
+- Always provide fallback values for optional parameters
+
+## Translation Implementation
+
+- Replace ALL hardcoded text with translation keys
+- This includes:
+  - Button text
+  - Form labels and placeholders
+  - Error messages
+  - Success messages
+  - Dialog titles and descriptions
+  - Table headers
+  - Navigation items
+  - Loading states
+  - Validation messages
+
+## Form Field Patterns
+
+- Form labels: `t('section.fieldName')` (e.g., `t('profile.fullName')`)
+- Form placeholders: `t('section.fieldName_')` with underscore suffix (e.g., `t('profile.firstName_')`)
+- Validation errors: `t('section.fieldNameError')` (e.g., `t('members.emailRequired')`)
+
+## Common UI Element Patterns
+
+- Loading states: `t('common.loading')`
+- Save/Update actions: `t('common.saving')`, `t('profile.saveChanges')`
+- CRUD operations: `t('common.create')`, `t('common.edit')`, `t('common.delete')`
+- Confirmation dialogs: `t('common.cancel')`, `t('common.confirm')`
+- Generic errors: `t('common.error')`, `t('common.unknownError')`
+
+## Dialog and Modal Patterns
+
+- Dialog titles: `t('section.dialogTitle')`
+- Dialog descriptions: `t('section.dialogDescription')`
+- Confirmation messages: `t('section.confirmAction')`
+- Warning messages: `t('section.warningMessage')`
+
+## Error Handling
+
+- Always provide meaningful error messages through translations
+- Use try/catch blocks with translated error messages
+- Provide fallback error messages: `error?.message || t('common.unknownError')`
+- Include context in error keys: `t('services.createServiceTypeError')`
+
+## Performance Considerations
+
+- Import `useTranslation` only once per component
+- Don't call `t()` function in render loops unnecessarily
+- Consider using `useMemo` for complex translation computations
+
+## File Organization
+
+- Keep translation files synchronized between languages
+- Organize translation keys logically by feature/component
+- Use consistent key naming across different language files
+- Add new translations to ALL language files simultaneously
+
+## Best Practices
+
+- Always test translations in both languages
+- Ensure translated text fits within UI constraints
+- Use semantic keys rather than literal translations as key names
+- Maintain translation key documentation when adding new features
+- Handle pluralization properly using i18next plural rules
+- Consider text length differences between languages in UI design
+
+## Examples
+
+### Basic Usage
+```tsx
+const { t } = useTranslation();
+
+return (
+  <Button>{t('common.save')}</Button>
+);
+```
+
+### With Parameters
+```tsx
+const { t } = useTranslation();
+
+toast({
+  title: t('members.inviteSent'),
+  description: t('members.inviteSentSuccess', { email }),
+});
+```
+
+### Form Fields
+```tsx
+const { t } = useTranslation();
+
+return (
+  <FormField
+    control={form.control}
+    name="name"
+    render={({ field }) => (
+      <FormItem>
+        <FormLabel>{t('services.name')}</FormLabel>
+        <FormControl>
+          <Input placeholder={t('services.enterServiceName')} {...field} />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
+```
+
+### Error Handling
+```tsx
+const { t } = useTranslation();
+
+try {
+  await updateProfile(data);
+  toast({
+    title: t('profile.profileUpdated'),
+    description: t('profile.profileUpdatedSuccess'),
+  });
+} catch (error) {
+  toast({
+    title: t('profile.profileUpdateError'),
+    description: error?.message || t('profile.profileUpdateErrorDesc'),
+    variant: "destructive",
+  });
+}
+```
+
+### Conditional Text
+```tsx
+const { t } = useTranslation();
+
+return (
+  <Button disabled={isSubmitting}>
+    {isSubmitting ? t('common.saving') : t('profile.saveChanges')}
+  </Button>
+);
+```
+
+### Complex Dialogs with Interpolation
+```tsx
+const { t } = useTranslation();
+
+return (
+  <AlertDialogDescription>
+    <div dangerouslySetInnerHTML={{ 
+      __html: t('services.deleteServiceTypeConfirm', { serviceName: service.name })
+    }} />
+    <div className="warning-section">
+      <p>{t('services.deleteServiceTypeWarning')}</p>
+      <ul>
+        <li>{t('services.relatedSchedules')}</li>
+        <li>{t('services.relatedNotes')}</li>
+        <li>{t('services.relatedRoles')}</li>
+      </ul>
+    </div>
+  </AlertDialogDescription>
+);
+```
+
+### Date/Time Formatting
+```tsx
+const { t } = useTranslation();
+
+// For date formatting with parameters
+const formattedDate = t('calendar.dateFormat', { 
+  year: date.getFullYear(),
+  month: date.getMonth() + 1,
+  day: date.getDate()
+});
+```
+
+## Migration Guidelines
+
+When converting existing hardcoded text to translations:
+
+1. **Identify all user-facing text** in the component
+2. **Group related text** by logical sections
+3. **Create meaningful key names** following the established patterns
+4. **Add translations to both language files** simultaneously
+5. **Test the component** in both languages
+6. **Verify text fits** within UI constraints
+
+## Debugging Translation Issues
+
+- Use browser dev tools to inspect missing translation keys
+- Check console for i18next warnings about missing keys
+- Verify translation keys exist in both language files
+- Test parameter interpolation with different data types
+- Ensure special characters are properly escaped in translations
+
+This rule ensures consistent internationalization implementation across the entire application while maintaining code readability and user experience quality. 

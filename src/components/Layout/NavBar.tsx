@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/useSession";
@@ -18,14 +17,14 @@ export function NavBar() {
     try {
       await supabase.auth.signOut();
       toast({
-        title: "已登出",
-        description: "您已成功登出。",
+        title: t("auth.loggedOut"),
+        description: t("auth.loggedOutSuccess"),
       });
     } catch (error) {
       console.error("Sign out error:", error);
       toast({
-        title: "登出錯誤",
-        description: "登出時發生錯誤，請重試。",
+        title: t("auth.logoutError"),
+        description: t("auth.logoutError"),
         variant: "destructive",
       });
     }
@@ -43,38 +42,34 @@ export function NavBar() {
 
           <div className="flex items-center space-x-4">
             <LanguageSwitcher />
-            
+
             {user ? (
               <div className="flex items-center space-x-2">
                 <Button asChild variant="ghost" size="sm">
                   <Link to="/dashboard">
                     <User className="h-4 w-4 mr-2" />
-                    {t('nav.dashboard')}
+                    {t("nav.dashboard")}
                   </Link>
                 </Button>
                 <Button asChild variant="ghost" size="sm">
-                  <Link to="/profile">
-                    {t('nav.profile')}
-                  </Link>
+                  <Link to="/profile">{t("nav.profile")}</Link>
                 </Button>
                 <Button variant="ghost" size="sm" onClick={handleSignOut}>
                   <LogOut className="h-4 w-4 mr-2" />
-                  {t('nav.logout')}
+                  {t("nav.logout")}
                 </Button>
               </div>
             ) : (
               <div className="flex items-center space-x-2">
                 <Button asChild variant="ghost" size="sm">
-                  <Link 
-                    to={`/auth${location.pathname !== '/' ? `?redirect=${encodeURIComponent(location.pathname)}` : ''}`}
+                  <Link
+                    to={`/auth${location.pathname !== "/" ? `?redirect=${encodeURIComponent(location.pathname)}` : ""}`}
                   >
-                    {t('nav.login')}
+                    {t("nav.login")}
                   </Link>
                 </Button>
                 <Button asChild size="sm">
-                  <Link to="/auth?tab=signup">
-                    {t('nav.signup')}
-                  </Link>
+                  <Link to="/auth?tab=signup">{t("nav.signup")}</Link>
                 </Button>
               </div>
             )}

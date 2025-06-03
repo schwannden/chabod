@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { TenantMember, TenantMemberWithProfile } from "./types";
+import { getTenantBySlug } from "./tenant-service";
 import { v4 as uuidv4 } from "uuid";
 
 /**
@@ -59,6 +60,25 @@ export async function deleteTenantMember(memberId: string): Promise<void> {
     console.error("Error deleting tenant member:", error);
     throw new Error(error.message);
   }
+}
+
+/**
+ * Invites a user to join a tenant by tenant slug
+ */
+export async function inviteMemberToTenant(
+  tenantSlug: string,
+  email: string,
+  role: string = "member",
+): Promise<void> {
+  // First get the tenant by slug
+  const tenant = await getTenantBySlug(tenantSlug);
+
+  if (!tenant) {
+    throw new Error(`Tenant "${tenantSlug}" not found`);
+  }
+
+  // Then use the existing function with tenantId
+  await inviteUserToTenant(tenant.id, email, role);
 }
 
 /**

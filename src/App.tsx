@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,6 +23,7 @@ import ServiceEventPage from "./pages/tenant/ServiceEventPage";
 
 // Import i18n configuration
 import { i18nPromise } from "./lib/i18n";
+import { useTranslation } from "react-i18next";
 
 const queryClient = new QueryClient();
 
@@ -66,11 +66,13 @@ function AppRoutes() {
 }
 
 function LoadingScreen() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-        <p>載入中...</p>
+        <p>{t("common.loading")}</p>
       </div>
     </div>
   );
