@@ -2,6 +2,8 @@
 
 Thank you for your interest in contributing to Chabod! This document provides guidelines and instructions to help you get started.
 
+For a comprehensive overview of the project, tech stack, and features, please see our [main README](../README.md).
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) (we recommend using Volta for version management)
@@ -77,7 +79,14 @@ see [Official Docs](https://supabase.com/docs/reference/cli/supabase-db) for mor
    ```bash
    npm run format
    npm run lint:fix
+   npm run test
    ```
+
+   **Testing Guidelines:**
+
+   - All RLS (Row Level Security) policies must be tested
+   - Run `npm run test:rls` to run only RLS-specific tests
+   - For detailed testing documentation, patterns, and best practices, see our [Test Documentation](../tests/README.md)
 
 4. Commit your changes using [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) messages.
 

@@ -6,6 +6,49 @@
 
 **URL**: https://chabod.fruitful-tools.com
 
+## Tech Stack
+
+**Frontend:**
+
+- React 19 with TypeScript
+- Vite for build tooling
+- Tailwind CSS for styling
+- shadcn/ui for UI components
+- React Hook Form + Zod for form validation
+- React i18next for internationalization (English/Chinese)
+- React Query for data fetching
+
+**Backend:**
+
+- Supabase (PostgreSQL + Auth + Storage)
+- Row Level Security (RLS) policies
+- Real-time subscriptions
+
+**Testing:**
+
+- Jest for unit/integration testing
+- Comprehensive RLS policy testing
+
+**Development:**
+
+- ESLint + Prettier for code quality
+- Husky for git hooks
+- Conventional commits
+- Volta for Node.js version management
+
+## About Chabod
+
+Chabod is an open-source, multi-tenant Church Management System (CMS) designed to provide churches with a comprehensive platform for managing their digital needs. Each church can register their own instance with independent data management, member administration, and customizable features.
+
+**Key Features:**
+
+- Multi-tenant architecture with isolated church data
+- Member and group management
+- Event scheduling and management
+- Resource sharing and organization
+- Role-based access control
+- Internationalization support
+
 ## How can I contribute this code?
 
 See [Contributing Guide](https://github.com/schwannden/chabod/blob/main/.github/CONTRIBUTING.md)
