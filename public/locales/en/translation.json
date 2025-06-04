@@ -166,7 +166,6 @@
     "createdSuccess": "{{name}} has been created successfully.",
     "errorCreating": "Error creating tenant",
     "members": "members",
-    "created": "Created",
     "subscriptionPlan": "Subscription Plan",
     "monthlyPrice": "/month",
     "membersLimit": "Members",

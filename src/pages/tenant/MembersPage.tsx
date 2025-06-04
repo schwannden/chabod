@@ -123,10 +123,10 @@ export default function MembersPage() {
       }
     >
       <MemberFilterBar
-        nameFilter={nameFilter}
-        setNameFilter={setNameFilter}
-        emailFilter={emailFilter}
-        setEmailFilter={setEmailFilter}
+        searchName={nameFilter}
+        setSearchName={setNameFilter}
+        searchEmail={emailFilter}
+        setSearchEmail={setEmailFilter}
         roleFilter={roleFilter}
         setRoleFilter={setRoleFilter}
       />
@@ -141,10 +141,10 @@ export default function MembersPage() {
 
       {tenant && (
         <MemberInviteDialog
-          tenantId={tenant.id}
+          tenantSlug={slug || ""}
           isOpen={isInviteDialogOpen}
           onClose={() => setIsInviteDialogOpen(false)}
-          onMemberInvited={handleMemberUpdated}
+          onInviteSuccess={handleMemberUpdated}
         />
       )}
     </TenantPageLayout>

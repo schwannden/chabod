@@ -9,13 +9,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { TenantMemberWithProfile } from "@/lib/types";
 import { deleteTenantMember, updateTenantMember } from "@/lib/member-service";
 import { updateUserProfile } from "@/lib/profile-service";
-import { MemberNameEditor } from "./MemberNameEditor";
 import { MemberRoleSelect } from "./MemberRoleSelect";
 import { MemberTableActions } from "./MemberTableActions";
 import { User } from "@supabase/supabase-js";
+import { useTranslation } from "react-i18next";
 
 interface MemberTableProps {
   user: User;
@@ -36,29 +37,23 @@ export function MemberTable({
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const { toast } = useToast();
+  const { t } = useTranslation();
 
-  const getRoleValue = (displayRole: string): string => {
-    if (displayRole === "管理者") return "owner";
-    if (displayRole === "一般會友") return "member";
-    return displayRole;
-  };
-
-  const handleRoleChange = async (memberId: string, displayRole: string) => {
+  const handleRoleChange = async (memberId: string, newRole: string) => {
     setLoadingMemberId(memberId);
 
     try {
-      const dbRole = getRoleValue(displayRole);
-      await updateTenantMember(memberId, dbRole);
+      await updateTenantMember(memberId, newRole);
 
       toast({
-        title: "會友角色已更新",
-        description: "會友的角色已成功更新。",
+        title: t("members.memberRoleUpdated"),
+        description: t("members.memberRoleUpdatedSuccess"),
       });
       onMemberUpdated();
     } catch (error) {
       toast({
-        title: "更新會友時出錯",
-        description: error?.message || "發生未知錯誤",
+        title: t("members.memberUpdateError"),
+        description: error?.message || t("members.unknownError"),
         variant: "destructive",
       });
     } finally {
@@ -72,14 +67,14 @@ export function MemberTable({
     try {
       await deleteTenantMember(memberId);
       toast({
-        title: "會友已移除",
-        description: "會友已從教會中移除。",
+        title: t("members.memberRemoved"),
+        description: t("members.memberRemovedSuccess"),
       });
       onMemberUpdated();
     } catch (error) {
       toast({
-        title: "移除會友時出錯",
-        description: error?.message || "發生未知錯誤",
+        title: t("members.memberRemoveError"),
+        description: error?.message || t("members.unknownError"),
         variant: "destructive",
       });
     } finally {
@@ -119,16 +114,16 @@ export function MemberTable({
       });
 
       toast({
-        title: "會友已更新",
-        description: "會友的資訊已成功更新。",
+        title: t("members.memberUpdated"),
+        description: t("members.memberUpdatedSuccess"),
       });
 
       setEditingMemberId(null);
       onMemberUpdated();
     } catch (error) {
       toast({
-        title: "更新會友時出錯",
-        description: error?.message || "發生未知錯誤",
+        title: t("members.memberUpdateError"),
+        description: error?.message || t("members.unknownError"),
         variant: "destructive",
       });
     } finally {
@@ -145,20 +140,20 @@ export function MemberTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>名稱</TableHead>
-            <TableHead>名字</TableHead>
-            <TableHead>姓氏</TableHead>
-            <TableHead>電子郵件</TableHead>
-            <TableHead>角色</TableHead>
-            <TableHead>加入時間</TableHead>
-            <TableHead className="text-right">操作</TableHead>
+            <TableHead>{t("members.name")}</TableHead>
+            <TableHead>{t("members.firstName")}</TableHead>
+            <TableHead>{t("members.lastName")}</TableHead>
+            <TableHead>{t("members.email")}</TableHead>
+            <TableHead>{t("members.role")}</TableHead>
+            <TableHead>{t("members.joinedAt")}</TableHead>
+            <TableHead className="text-right">{t("members.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sortedMembers.length === 0 && (
             <TableRow>
               <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
-                找不到會友。
+                {t("members.noMembersFound")}
               </TableCell>
             </TableRow>
           )}
@@ -172,7 +167,7 @@ export function MemberTable({
                   <Input
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="名字"
+                    placeholder={t("members.firstName")}
                     className="w-full max-w-[150px]"
                   />
                 ) : (
@@ -182,15 +177,30 @@ export function MemberTable({
 
               <TableCell>
                 {editingMemberId === member.id ? (
-                  <MemberNameEditor
-                    firstName={firstName}
-                    lastName={lastName}
-                    setFirstName={setFirstName}
-                    setLastName={setLastName}
-                    onSave={() => saveNameChanges(member)}
-                    onCancel={cancelEditing}
-                    isLoading={loadingMemberId === member.id}
-                  />
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      placeholder={t("members.lastName")}
+                      className="w-full max-w-[120px]"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => saveNameChanges(member)}
+                      disabled={loadingMemberId === member.id}
+                    >
+                      {t("common.save")}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={cancelEditing}
+                      disabled={loadingMemberId === member.id}
+                    >
+                      {t("common.cancel")}
+                    </Button>
+                  </div>
                 ) : (
                   member.profile?.last_name || "-"
                 )}
@@ -200,9 +210,9 @@ export function MemberTable({
 
               <TableCell>
                 <MemberRoleSelect
-                  role={member.role}
+                  currentRole={member.role}
                   onRoleChange={(role) => handleRoleChange(member.id, role)}
-                  isCurrentUserOwner={isCurrentUserOwner}
+                  disabled={!isCurrentUserOwner}
                 />
               </TableCell>
 
