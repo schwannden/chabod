@@ -308,6 +308,7 @@
     "notes": "Notes",
     "notesOptional": "Notes (Optional)",
     "serviceTypeCreated": "Service type created",
+    "serviceTypeCreatedSuccess": "Service type has been created successfully.",
     "createServiceTypeError": "Error creating service type",
     "addServiceType": "Add Service Type",
     "name": "Name",
@@ -321,6 +322,7 @@
     "serviceRoles": "Service Roles",
     "editServiceType": "Edit Service Type",
     "serviceTypeUpdated": "Service type updated",
+    "serviceTypeUpdatedSuccess": "Service type has been updated successfully.",
     "updateServiceTypeError": "Error updating service type",
     "updateServiceType": "Update Service Type",
     "confirmDeleteServiceType": "Confirm Delete Service Type",
@@ -333,6 +335,7 @@
     "relatedAdmins": "All service admin settings",
     "confirmDelete": "Confirm Delete",
     "serviceTypeDeleted": "Service type deleted",
+    "serviceDeletedSuccess": "Service type has been deleted successfully.",
     "deleteServiceTypeError": "Error deleting service type",
     "loadingError": "Loading failed",
     "noServiceGroups": "No service groups assigned yet",
@@ -342,7 +345,8 @@
     "noServiceAdmins": "No service admins assigned yet",
     "addAdmin": "Add Admin",
     "anonymousMember": "Anonymous member",
-    "noEmail": "No email"
+    "noEmail": "No email",
+    "noServiceTypesYet": "No service types created yet."
   },
   "serviceEvents": {
     "addSchedule": "Add Schedule",

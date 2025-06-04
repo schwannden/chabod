@@ -308,6 +308,7 @@
     "notes": "備註",
     "notesOptional": "備註 (選填)",
     "serviceTypeCreated": "服事類型已創建",
+    "serviceTypeCreatedSuccess": "服事類型已成功創建。",
     "createServiceTypeError": "創建服事類型時發生錯誤",
     "addServiceType": "新增服事類型",
     "name": "名稱",
@@ -321,6 +322,7 @@
     "serviceRoles": "服事角色",
     "editServiceType": "編輯服事類型",
     "serviceTypeUpdated": "服事類型已更新",
+    "serviceTypeUpdatedSuccess": "服事類型已成功更新。",
     "updateServiceTypeError": "更新服事類型時發生錯誤",
     "updateServiceType": "更新服事類型",
     "confirmDeleteServiceType": "確認刪除服事類型",
@@ -333,6 +335,7 @@
     "relatedAdmins": "所有服事管理員設定",
     "confirmDelete": "確認刪除",
     "serviceTypeDeleted": "服事類型已刪除",
+    "serviceDeletedSuccess": "服事類型已成功刪除。",
     "deleteServiceTypeError": "刪除服事類型時發生錯誤",
     "loadingError": "載入失敗",
     "noServiceGroups": "尚未指定服事小組",
@@ -342,7 +345,8 @@
     "noServiceAdmins": "尚未指定服事管理員",
     "addAdmin": "添加管理員",
     "anonymousMember": "匿名成員",
-    "noEmail": "無電子郵件"
+    "noEmail": "無電子郵件",
+    "noServiceTypesYet": "尚未創建任何服事類型。"
   },
   "serviceEvents": {
     "addSchedule": "新增服事排班",

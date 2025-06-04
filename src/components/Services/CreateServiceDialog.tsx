@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { useToast } from "@/components/ui/use-toast";
 import { useTranslation } from "react-i18next";
 
 import { useServiceForm } from "./hooks/useServiceForm";
@@ -22,6 +22,7 @@ interface CreateServiceDialogProps {
 
 export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialogProps) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
 
   const {
@@ -82,14 +83,14 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
 
       toast({
         title: t("services.serviceTypeCreated"),
-        description: "",
+        description: t("services.serviceTypeCreatedSuccess"),
       });
       handleDialogClose();
       onSuccess?.();
     } catch (error) {
       console.error("Error creating service:", error);
       toast({
-        title: "Error",
+        title: t("common.error"),
         description: t("services.createServiceTypeError"),
         variant: "destructive",
       });
@@ -108,7 +109,7 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
       <DialogTrigger asChild>
         <Button>
           <Plus className="size-4 mr-2" />
-          新增服事類型
+          {t("services.addServiceType")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-auto">

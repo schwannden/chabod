@@ -11,8 +11,10 @@ import { CreateServiceDialog } from "@/components/Services/CreateServiceDialog";
 import { ServiceCard } from "@/components/Services/ServiceCard";
 import { useState } from "react";
 import { EditServiceDialog } from "@/components/Services/EditServiceDialog";
+import { useTranslation } from "react-i18next";
 
 export default function ServicePage() {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const { user } = useSession();
   const { role } = useTenantRole(slug, user?.id);
@@ -43,11 +45,11 @@ export default function ServicePage() {
 
   return (
     <TenantPageLayout
-      title="服事管理"
-      description="創建和管理服事類型"
+      title={t("dashboard.serviceManagementTitle")}
+      description={t("dashboard.serviceManagementDesc")}
       tenantName={tenant?.name || ""}
       tenantSlug={slug || ""}
-      breadcrumbItems={[{ label: "服事管理" }]}
+      breadcrumbItems={[{ label: t("dashboard.serviceManagementTitle") }]}
       isLoading={isLoading}
       action={
         canManageServices &&
@@ -58,7 +60,7 @@ export default function ServicePage() {
         {isLoading ? (
           <Card>
             <CardContent className="pt-6">
-              <p className="text-muted-foreground">載入中...</p>
+              <p className="text-muted-foreground">{t("common.loading")}</p>
             </CardContent>
           </Card>
         ) : services && services.length > 0 ? (
@@ -75,7 +77,7 @@ export default function ServicePage() {
         ) : (
           <Card>
             <CardContent className="pt-6">
-              <p className="text-muted-foreground">尚未創建任何服事類型。</p>
+              <p className="text-muted-foreground">{t("services.noServiceTypesYet")}</p>
             </CardContent>
           </Card>
         )}

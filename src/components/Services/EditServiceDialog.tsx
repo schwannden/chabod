@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { toast } from "sonner";
+import { useToast } from "@/components/ui/use-toast";
 import { useTranslation } from "react-i18next";
 
 import { Service, updateService } from "@/lib/services";
@@ -21,6 +21,7 @@ export function EditServiceDialog({
   onSuccess,
 }: EditServiceDialogProps) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -62,7 +63,7 @@ export function EditServiceDialog({
 
       toast({
         title: t("services.serviceTypeUpdated"),
-        description: "",
+        description: t("services.serviceTypeUpdatedSuccess"),
       });
       onSuccess?.();
       handleDialogClose();

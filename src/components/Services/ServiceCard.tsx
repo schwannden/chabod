@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { deleteService } from "@/lib/services";
-import { toast } from "sonner";
+import { useToast } from "@/components/ui/use-toast";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   ServiceAdminView,
@@ -29,9 +29,11 @@ interface ServiceCardProps {
 
 export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [activeSheet, setActiveSheet] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleDelete = async () => {
     try {
@@ -39,13 +41,13 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
       await deleteService(service.id);
       toast({
         title: t("services.serviceTypeDeleted"),
-        description: "",
+        description: t("services.serviceDeletedSuccess"),
       });
       onDeleted();
     } catch (error) {
       console.error("Error deleting service:", error);
       toast({
-        title: "Error",
+        title: t("common.error"),
         description: t("services.deleteServiceTypeError"),
         variant: "destructive",
       });
@@ -53,6 +55,11 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
       setIsDeleting(false);
       setIsDeleteDialogOpen(false);
     }
+  };
+
+  const handleDeleteClick = () => {
+    setIsDropdownOpen(false); // Close dropdown first
+    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -66,7 +73,7 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
               : t("services.notSetDefaultTime")}
           </CardDescription>
         </div>
-        <DropdownMenu>
+        <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
               <MoreVertical className="h-4 w-4" />
@@ -75,14 +82,11 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => onEdit(service)}>
               <Pencil className="mr-2 h-4 w-4" />
-              編輯基本資料
+              {t("services.editBasicInfo")}
             </DropdownMenuItem>
-            <DropdownMenuItem
-              className="text-destructive"
-              onClick={() => setIsDeleteDialogOpen(true)}
-            >
+            <DropdownMenuItem className="text-destructive" onClick={handleDeleteClick}>
               <Trash className="mr-2 h-4 w-4" />
-              刪除
+              {t("common.delete")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -96,12 +100,14 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
             <SheetTrigger asChild>
               <Button variant="outline" className="w-full">
                 <UserPlus className="mr-2 h-4 w-4" />
-                服事管理員
+                {t("services.serviceAdmins")}
               </Button>
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
-                <SheetTitle>{service.name} - 服事管理員</SheetTitle>
+                <SheetTitle>
+                  {service.name} - {t("services.serviceAdmins")}
+                </SheetTitle>
               </SheetHeader>
               <div className="py-4">
                 <ServiceAdminView serviceId={service.id} />
@@ -116,12 +122,14 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
             <SheetTrigger asChild>
               <Button variant="outline" className="w-full">
                 <Users className="mr-2 h-4 w-4" />
-                服事小組
+                {t("services.serviceGroups")}
               </Button>
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
-                <SheetTitle>{service.name} - 服事小組</SheetTitle>
+                <SheetTitle>
+                  {service.name} - {t("services.serviceGroups")}
+                </SheetTitle>
               </SheetHeader>
               <div className="py-4">
                 <ServiceGroupView serviceId={service.id} />
@@ -136,12 +144,14 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
             <SheetTrigger asChild>
               <Button variant="outline" className="w-full">
                 <FilePlus className="mr-2 h-4 w-4" />
-                服事備註
+                {t("services.serviceNotes")}
               </Button>
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
-                <SheetTitle>{service.name} - 服事備註</SheetTitle>
+                <SheetTitle>
+                  {service.name} - {t("services.serviceNotes")}
+                </SheetTitle>
               </SheetHeader>
               <div className="py-4">
                 <ServiceNoteView serviceId={service.id} />
@@ -156,12 +166,14 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
             <SheetTrigger asChild>
               <Button variant="outline" className="w-full">
                 <ShieldPlus className="mr-2 h-4 w-4" />
-                服事角色
+                {t("services.serviceRoles")}
               </Button>
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
-                <SheetTitle>{service.name} - 服事角色</SheetTitle>
+                <SheetTitle>
+                  {service.name} - {t("services.serviceRoles")}
+                </SheetTitle>
               </SheetHeader>
               <div className="py-4">
                 <ServiceRoleView serviceId={service.id} />

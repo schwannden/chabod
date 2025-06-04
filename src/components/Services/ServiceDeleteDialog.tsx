@@ -38,29 +38,31 @@ export function ServiceDeleteDialog({
             <Trash2 className="h-5 w-5 text-destructive" />
             {t("services.confirmDeleteServiceType")}
           </AlertDialogTitle>
-          <AlertDialogDescription className="space-y-4">
-            <div
-              dangerouslySetInnerHTML={{
-                __html: t("services.deleteServiceTypeConfirm", { serviceName: service.name }),
-              }}
-            />
-            <div className="rounded-md bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-900/20 dark:text-amber-200">
-              <div className="flex items-start">
-                <AlertTriangle className="mr-2 h-4 w-4 mt-0.5" />
-                <div>
-                  <p className="font-medium">{t("services.deleteServiceTypeWarning")}</p>
-                  <ul className="list-disc pl-5 mt-1">
-                    <li>{t("services.relatedSchedules")}</li>
-                    <li>{t("services.relatedNotes")}</li>
-                    <li>{t("services.relatedRoles")}</li>
-                    <li>{t("services.relatedGroups")}</li>
-                    <li>{t("services.relatedAdmins")}</li>
-                  </ul>
-                </div>
+          <AlertDialogDescription
+            dangerouslySetInnerHTML={{
+              __html: t("services.deleteServiceTypeConfirm", { serviceName: service.name }),
+            }}
+          />
+        </AlertDialogHeader>
+
+        <div className="px-6 pb-4">
+          <div className="rounded-md bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-900/20 dark:text-amber-200">
+            <div className="flex items-start">
+              <AlertTriangle className="mr-2 h-4 w-4 mt-0.5" />
+              <div>
+                <div className="font-medium">{t("services.deleteServiceTypeWarning")}</div>
+                <ul className="list-disc pl-5 mt-1">
+                  <li>{t("services.relatedSchedules")}</li>
+                  <li>{t("services.relatedNotes")}</li>
+                  <li>{t("services.relatedRoles")}</li>
+                  <li>{t("services.relatedGroups")}</li>
+                  <li>{t("services.relatedAdmins")}</li>
+                </ul>
               </div>
             </div>
-          </AlertDialogDescription>
-        </AlertDialogHeader>
+          </div>
+        </div>
+
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isLoading}>{t("common.cancel")}</AlertDialogCancel>
           <AlertDialogAction
