@@ -10,7 +10,7 @@ import { useSession } from "@/hooks/useSession";
 import { useTranslation } from "react-i18next";
 
 // Temporary schema for type definition (will be recreated inside the hook with translations)
-const baseEventSchema = z.object({
+const _baseEventSchema = z.object({
   name: z.string().min(1, "Event name is required"),
   description: z.string().optional(),
   date: z.date({
@@ -24,7 +24,7 @@ const baseEventSchema = z.object({
   groups: z.array(z.string()).default([]),
 });
 
-export type EventFormValues = z.infer<typeof baseEventSchema>;
+export type EventFormValues = z.infer<typeof _baseEventSchema>;
 
 export function useEventForm(
   tenantSlug: string,

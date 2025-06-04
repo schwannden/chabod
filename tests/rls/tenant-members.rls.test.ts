@@ -1,5 +1,5 @@
 import { createRLSTest } from "../helpers/rls-test-base";
-import { getDefaultPriceTier, createTestUser, cleanupTestUser } from "../helpers/test-data-factory";
+import { createTestUser, cleanupTestUser } from "../helpers/test-data-factory";
 import { serviceRoleClient, TestUser } from "../setup";
 
 // Tenant members are a special relationship table that requires custom handling
