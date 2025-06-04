@@ -26,6 +26,7 @@ ALTER TYPE "public"."event_visibility" OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."check_tenant_user_limit"("tenant_uuid" "uuid") RETURNS boolean
     LANGUAGE "plpgsql" SECURITY DEFINER
+    SET search_path = ''
     AS $$
 DECLARE
   current_count INTEGER;
@@ -50,6 +51,7 @@ ALTER FUNCTION "public"."check_tenant_user_limit"("tenant_uuid" "uuid") OWNER TO
 
 CREATE OR REPLACE FUNCTION "public"."handle_new_user"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
+    SET search_path = ''
     AS $$
 BEGIN
   INSERT INTO public.profiles (id, email, full_name)
@@ -61,6 +63,7 @@ ALTER FUNCTION "public"."handle_new_user"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."handle_updated_at"() RETURNS "trigger"
     LANGUAGE "plpgsql"
+    SET search_path = ''
     AS $$
 BEGIN
     NEW.updated_at = NOW();
@@ -71,23 +74,14 @@ ALTER FUNCTION "public"."handle_updated_at"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."is_tenant_member"("tenant_uuid" "uuid") RETURNS boolean
     LANGUAGE "plpgsql" SECURITY DEFINER
+    SET search_path = ''
     AS $$
-DECLARE
-  current_user_id uuid;
 BEGIN
-  -- Get the current user ID
-  current_user_id := auth.uid();
-  
-  -- If no authenticated user, return false
-  IF current_user_id IS NULL THEN
-    RETURN FALSE;
-  END IF;
-  
   -- Check if user is a member of the tenant
   RETURN EXISTS (
     SELECT 1 FROM public.tenant_members
     WHERE tenant_id = tenant_uuid
-    AND user_id = current_user_id
+    AND user_id = (select auth.uid())
   );
 END;
 $$;
@@ -95,6 +89,7 @@ ALTER FUNCTION "public"."is_tenant_member"("tenant_uuid" "uuid") OWNER TO "postg
 
 CREATE OR REPLACE FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid") RETURNS boolean
     LANGUAGE "plpgsql" SECURITY DEFINER
+    SET search_path = ''
     AS $$
 BEGIN
     RETURN EXISTS (
@@ -110,6 +105,7 @@ ALTER FUNCTION "public"."is_tenant_owner"("tenant_uuid" "uuid") OWNER TO "postgr
 -- Function to automatically create tenant owner when tenant is created
 CREATE OR REPLACE FUNCTION "public"."create_tenant_owner"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
+    SET search_path = ''
     AS $$
 BEGIN
   -- Only create tenant owner if there's an authenticated user, this allows seeding to work
@@ -210,15 +206,15 @@ WITH CHECK (true);
 -- Invitations RLS
 CREATE POLICY "Tenant owners can create invitations" ON "public"."invitations" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
-  WHERE (("tenant_members"."tenant_id" = "invitations"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"()) AND ("tenant_members"."role" = 'owner'::"text")))));
+  WHERE (("tenant_members"."tenant_id" = "invitations"."tenant_id") AND ("tenant_members"."user_id" = (select auth.uid())) AND ("tenant_members"."role" = 'owner'::"text")))));
 
 CREATE POLICY "Tenant owners can delete invitations" ON "public"."invitations" FOR DELETE USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
-  WHERE (("tenant_members"."tenant_id" = "invitations"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"()) AND ("tenant_members"."role" = 'owner'::"text")))));
+  WHERE (("tenant_members"."tenant_id" = "invitations"."tenant_id") AND ("tenant_members"."user_id" = (select auth.uid())) AND ("tenant_members"."role" = 'owner'::"text")))));
 
 CREATE POLICY "Tenant owners can view invitations" ON "public"."invitations" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
-  WHERE (("tenant_members"."tenant_id" = "invitations"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"()) AND ("tenant_members"."role" = 'owner'::"text")))));
+  WHERE (("tenant_members"."tenant_id" = "invitations"."tenant_id") AND ("tenant_members"."user_id" = (select auth.uid())) AND ("tenant_members"."role" = 'owner'::"text")))));
 
 -- Tenant Members RLS
 CREATE POLICY "Tenant owners can delete tenant members" ON "public"."tenant_members" FOR DELETE USING ("public"."is_tenant_owner"("tenant_id"));
@@ -239,18 +235,17 @@ CREATE POLICY "Tenant owners can update tenant members" ON "public"."tenant_memb
 CREATE POLICY "Users can read tenant memberships" ON "public"."tenant_members" 
 FOR SELECT TO "authenticated" 
 USING (
-  "auth"."uid"() = "user_id" OR 
   "public"."is_tenant_member"("tenant_id")
 );
 
 -- Profiles RLS
-CREATE POLICY "Users can update their own profile" ON "public"."profiles" FOR UPDATE USING ("auth"."uid"() = "id");
+CREATE POLICY "Users can update their own profile" ON "public"."profiles" FOR UPDATE USING ((select auth.uid()) = "id");
 
 CREATE POLICY "Tenant owners can update user profiles" ON "public"."profiles" FOR UPDATE USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members" "tm"
   WHERE (("tm"."user_id" = "profiles"."id") AND "public"."is_tenant_owner"("tm"."tenant_id")))));
 
-CREATE POLICY "Users can view profiles of tenant members" ON "public"."profiles" FOR SELECT USING ((("id" = "auth"."uid"()) OR (EXISTS ( SELECT 1
+CREATE POLICY "Users can view profiles of tenant members" ON "public"."profiles" FOR SELECT USING ((("id" = (select auth.uid())) OR (EXISTS ( SELECT 1
    FROM "public"."tenant_members" "tm"
   WHERE (("tm"."user_id" = "profiles"."id") AND "public"."is_tenant_member"("tm"."tenant_id"))))));
 

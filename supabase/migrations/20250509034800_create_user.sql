@@ -1,13 +1,17 @@
 set check_function_bodies = off;
 
+CREATE EXTENSION IF NOT EXISTS "pgcrypto" WITH SCHEMA "extensions";
+
 CREATE OR REPLACE FUNCTION public.create_user(user_id uuid, email text, password text)
  RETURNS void
  LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path = ''
 AS $function$
   declare
   encrypted_pw text;
 BEGIN
-  encrypted_pw := crypt(password, gen_salt('bf'));
+  encrypted_pw := extensions.crypt(password, extensions.gen_salt('bf'));
   
   INSERT INTO auth.users
     (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at, confirmation_token, email_change, email_change_token_new, recovery_token)

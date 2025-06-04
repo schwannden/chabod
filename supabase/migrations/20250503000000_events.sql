@@ -1,6 +1,7 @@
 -- Function to check tenant event limits
 CREATE OR REPLACE FUNCTION "public"."check_tenant_event_limit"("tenant_uuid" "uuid") RETURNS boolean
     LANGUAGE "plpgsql" SECURITY DEFINER
+    SET search_path = ''
     AS $$
 DECLARE
   current_count INTEGER;
@@ -40,6 +41,7 @@ RETURNS TABLE(
 )
 LANGUAGE "plpgsql" 
 SECURITY DEFINER
+SET search_path = ''
 AS $$
 DECLARE
   member_check boolean;
@@ -102,13 +104,13 @@ CREATE POLICY "Tenant members can view all events" ON "public"."events" FOR SELE
 CREATE POLICY "Event creator can update and delete their own events" ON "public"."events" 
 FOR UPDATE 
 TO "public"
-USING ("created_by" = "auth"."uid"())
-WITH CHECK ("created_by" = "auth"."uid"());
+USING ("created_by" = (select auth.uid()))
+WITH CHECK ("created_by" = (select auth.uid()));
 
 CREATE POLICY "Event creator can delete their own events" ON "public"."events" 
 FOR DELETE 
 TO "public"
-USING ("created_by" = "auth"."uid"());
+USING ("created_by" = (select auth.uid()));
 
 CREATE POLICY "Tenant owners can update events within the tenant" ON "public"."events" 
 FOR UPDATE 
@@ -127,7 +129,7 @@ WITH CHECK (
   -- Must be a tenant member
   "public"."is_tenant_member"("tenant_id") 
   -- Must match the created_by field (ensures user can only create events for themselves)
-  AND "created_by" = "auth"."uid"()
+  AND "created_by" = (select auth.uid())
   -- Must not exceed tenant event limits (this combines the separate limit policy)
   AND "public"."check_tenant_event_limit"("tenant_id")
 );
@@ -150,7 +152,7 @@ CREATE POLICY "Event creator their own event groups" ON "public"."events_groups"
 FOR ALL
 USING ((EXISTS ( SELECT 1
    FROM "public"."events" "e"
-  WHERE (("e"."id" = "events_groups"."event_id") AND ("e"."created_by" = "auth"."uid"())))));
+  WHERE (("e"."id" = "events_groups"."event_id") AND ("e"."created_by" = (select auth.uid()))))));
 
 CREATE POLICY "Tenant owners can manage event groups within the tenant" ON "public"."events_groups" 
 FOR ALL

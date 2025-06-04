@@ -1,6 +1,7 @@
 -- Function to check tenant group limits
 CREATE OR REPLACE FUNCTION "public"."check_tenant_group_limit"("tenant_uuid" "uuid") RETURNS boolean
     LANGUAGE "plpgsql" SECURITY DEFINER
+    SET search_path = ''
     AS $$
 DECLARE
   current_count INTEGER;
@@ -27,6 +28,7 @@ ALTER FUNCTION "public"."check_tenant_group_limit"("tenant_uuid" "uuid") OWNER T
 -- we need this as a function, not as a cascade rule, because when a user is removed from a tenant, it might still exist in the system.
 CREATE OR REPLACE FUNCTION "public"."remove_user_from_groups"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
+    SET search_path = ''
     AS $$
 BEGIN
   DELETE FROM public.group_members gm

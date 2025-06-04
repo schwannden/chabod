@@ -30,6 +30,18 @@ describe("Tenants RLS Policies", () => {
         expect(data).toBeDefined();
         expect(data.name).toBe("Test Tenant Creation");
 
+        // Verify that the creator is automatically made the owner
+        const { data: membership, error: memberError } = await serviceRoleClient
+          .from("tenant_members")
+          .select("*")
+          .eq("tenant_id", data.id)
+          .eq("user_id", owner.id)
+          .single();
+
+        expect(memberError).toBeNull();
+        expect(membership).toBeDefined();
+        expect(membership.role).toBe("owner");
+
         // Cleanup the created tenant
         await serviceRoleClient.from("tenants").delete().eq("id", data.id);
       } finally {

@@ -128,76 +128,76 @@ CREATE OR REPLACE TRIGGER "handle_updated_at_services" BEFORE UPDATE ON "public"
 
 CREATE POLICY "Authenticated tenant user can view service event owners" ON "public"."service_event_owners" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
-  WHERE (("tenant_members"."tenant_id" = "service_event_owners"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"())))));
+  WHERE (("tenant_members"."tenant_id" = "service_event_owners"."tenant_id") AND ("tenant_members"."user_id" = (select auth.uid()))))));
 
 CREATE POLICY "Service groups can be managed by tenant owners" ON "public"."service_groups" USING ((EXISTS ( SELECT 1
    FROM ("public"."services" "s"
      JOIN "public"."tenant_members" "tm" ON (("tm"."tenant_id" = "s"."tenant_id")))
-  WHERE (("s"."id" = "service_groups"."service_id") AND ("tm"."user_id" = "auth"."uid"()) AND ("tm"."role" = 'owner'::"text")))));
+  WHERE (("s"."id" = "service_groups"."service_id") AND ("tm"."user_id" = (select auth.uid())) AND ("tm"."role" = 'owner'::"text")))));
 
 CREATE POLICY "Service groups can be viewed by tenant members" ON "public"."service_groups" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM ("public"."services" "s"
      JOIN "public"."tenant_members" "tm" ON (("tm"."tenant_id" = "s"."tenant_id")))
-  WHERE (("s"."id" = "service_groups"."service_id") AND ("tm"."user_id" = "auth"."uid"())))));
+  WHERE (("s"."id" = "service_groups"."service_id") AND ("tm"."user_id" = (select auth.uid()))))));
 
 CREATE POLICY "Service notes can be managed by tenant owners and service admin" ON "public"."service_notes" USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
-  WHERE (("tenant_members"."tenant_id" = "service_notes"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"()) AND (("tenant_members"."role" = 'owner'::"text") OR (EXISTS ( SELECT 1
+  WHERE (("tenant_members"."tenant_id" = "service_notes"."tenant_id") AND ("tenant_members"."user_id" = (select auth.uid())) AND (("tenant_members"."role" = 'owner'::"text") OR (EXISTS ( SELECT 1
            FROM "public"."service_admins"
-          WHERE (("service_admins"."service_id" = "service_notes"."service_id") AND ("service_admins"."user_id" = "auth"."uid"())))))))));
+          WHERE (("service_admins"."service_id" = "service_notes"."service_id") AND ("service_admins"."user_id" = (select auth.uid()))))))))));
 
 CREATE POLICY "Service notes can be viewed by tenant members" ON "public"."service_notes" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
-  WHERE (("tenant_members"."tenant_id" = "service_notes"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"())))));
+  WHERE (("tenant_members"."tenant_id" = "service_notes"."tenant_id") AND ("tenant_members"."user_id" = (select auth.uid()))))));
 
 CREATE POLICY "Service roles can be managed by tenant owners" ON "public"."service_roles" USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
-  WHERE (("tenant_members"."tenant_id" = "service_roles"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"()) AND ("tenant_members"."role" = 'owner'::"text")))));
+  WHERE (("tenant_members"."tenant_id" = "service_roles"."tenant_id") AND ("tenant_members"."user_id" = (select auth.uid())) AND ("tenant_members"."role" = 'owner'::"text")))));
 
 CREATE POLICY "Service roles can be viewed by tenant members" ON "public"."service_roles" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
-  WHERE (("tenant_members"."tenant_id" = "service_roles"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"())))));
+  WHERE (("tenant_members"."tenant_id" = "service_roles"."tenant_id") AND ("tenant_members"."user_id" = (select auth.uid()))))));
 
 CREATE POLICY "Tenant members can view services" ON "public"."services" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
-  WHERE (("tenant_members"."tenant_id" = "services"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"())))));
+  WHERE (("tenant_members"."tenant_id" = "services"."tenant_id") AND ("tenant_members"."user_id" = (select auth.uid()))))));
 
 CREATE POLICY "Tenant owners can manage services" ON "public"."services" USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
-  WHERE (("tenant_members"."tenant_id" = "services"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"()) AND ("tenant_members"."role" = 'owner'::"text")))));
+  WHERE (("tenant_members"."tenant_id" = "services"."tenant_id") AND ("tenant_members"."user_id" = (select auth.uid())) AND ("tenant_members"."role" = 'owner'::"text")))));
 
 CREATE POLICY "Service admins can be managed by tenant owners" ON "public"."service_admins" USING ((EXISTS ( SELECT 1
    FROM ("public"."services" "s"
      JOIN "public"."tenant_members" "tm" ON (("tm"."tenant_id" = "s"."tenant_id")))
-  WHERE (("s"."id" = "service_admins"."service_id") AND ("tm"."user_id" = "auth"."uid"()) AND ("tm"."role" = 'owner'::"text")))));
+  WHERE (("s"."id" = "service_admins"."service_id") AND ("tm"."user_id" = (select auth.uid())) AND ("tm"."role" = 'owner'::"text")))));
 
 CREATE POLICY "Service admins can be viewed by tenant members" ON "public"."service_admins" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM ("public"."services" "s"
      JOIN "public"."tenant_members" "tm" ON (("tm"."tenant_id" = "s"."tenant_id")))
-  WHERE (("s"."id" = "service_admins"."service_id") AND ("tm"."user_id" = "auth"."uid"())))));
+  WHERE (("s"."id" = "service_admins"."service_id") AND ("tm"."user_id" = (select auth.uid()))))));
 
 -- service events RLS
 
 CREATE POLICY "Authenticated tenant user can view service events" ON "public"."service_events" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members"
-  WHERE (("tenant_members"."tenant_id" = "service_events"."tenant_id") AND ("tenant_members"."user_id" = "auth"."uid"())))));
+  WHERE (("tenant_members"."tenant_id" = "service_events"."tenant_id") AND ("tenant_members"."user_id" = (select auth.uid()))))));
 
 CREATE POLICY "Service admins can manage service event owners" ON "public"."service_event_owners" TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM ("public"."service_events" "se"
      JOIN "public"."service_admins" "sa" ON (("sa"."service_id" = "se"."service_id")))
-  WHERE (("se"."id" = "service_event_owners"."service_event_id") AND ("sa"."user_id" = "auth"."uid"())))));
+  WHERE (("se"."id" = "service_event_owners"."service_event_id") AND ("sa"."user_id" = (select auth.uid()))))));
 
 CREATE POLICY "Service admins can manage service events" ON "public"."service_events" USING ((EXISTS ( SELECT 1
    FROM "public"."service_admins"
-  WHERE (("service_admins"."service_id" = "service_events"."service_id") AND ("service_admins"."user_id" = "auth"."uid"())))));
+  WHERE (("service_admins"."service_id" = "service_events"."service_id") AND ("service_admins"."user_id" = (select auth.uid()))))));
 
 CREATE POLICY "Tenant owners can manage service event owners" ON "public"."service_event_owners" TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members" "tm"
-  WHERE (("tm"."tenant_id" = "service_event_owners"."tenant_id") AND ("tm"."user_id" = "auth"."uid"()) AND ("tm"."role" = 'owner'::"text")))));
+  WHERE (("tm"."tenant_id" = "service_event_owners"."tenant_id") AND ("tm"."user_id" = (select auth.uid())) AND ("tm"."role" = 'owner'::"text")))));
 
 CREATE POLICY "Tenant owners can manage service events" ON "public"."service_events" TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM "public"."tenant_members" "tm"
-  WHERE (("tm"."tenant_id" = "service_events"."tenant_id") AND ("tm"."user_id" = "auth"."uid"()) AND ("tm"."role" = 'owner'::"text")))));
+  WHERE (("tm"."tenant_id" = "service_events"."tenant_id") AND ("tm"."user_id" = (select auth.uid())) AND ("tm"."role" = 'owner'::"text")))));
 
 
 ALTER TABLE "public"."service_admins" ENABLE ROW LEVEL SECURITY;

@@ -32,53 +32,6 @@ describe("Tenant Members RLS Policies", () => {
       }
     });
 
-    it("should allow initial owner creation when no owners exist", async () => {
-      await rlsTest.setupTestContext();
-
-      try {
-        const { outsider } = rlsTest.getContext();
-
-        // Create tenant via service role without auto-creating owner
-        const defaultPriceTier = await getDefaultPriceTier();
-        if (!defaultPriceTier) {
-          throw new Error("Failed to get default price tier");
-        }
-
-        const { data: tenant } = await serviceRoleClient
-          .from("tenants")
-          .insert({
-            name: "Owner Test Tenant",
-            slug: `owner-test-${Date.now()}`,
-            price_tier_id: defaultPriceTier.id,
-          })
-          .select()
-          .single();
-
-        if (!tenant) {
-          throw new Error("Failed to create test tenant");
-        }
-
-        // Should be able to add first owner
-        const { data, error } = await outsider.client
-          .from("tenant_members")
-          .insert({
-            tenant_id: tenant.id,
-            user_id: outsider.id,
-            role: "owner",
-          })
-          .select()
-          .single();
-
-        expect(error).toBeNull();
-        expect(data).toBeDefined();
-        expect(data.role).toBe("owner");
-
-        await serviceRoleClient.from("tenants").delete().eq("id", tenant.id);
-      } finally {
-        await rlsTest.cleanupTestContext();
-      }
-    });
-
     it("should prevent regular members from adding other members", async () => {
       await rlsTest.setupTestContext();
 
