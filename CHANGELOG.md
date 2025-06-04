@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.3.2](https://github.com/schwannden/chabod/compare/v0.3.1...v0.3.2) (2025-06-04)
+
+
+### Bug Fixes
+
+* db performance issue ([df27cbd](https://github.com/schwannden/chabod/commit/df27cbdaae4007f719531b0a63aef0c80f4303b3))
+* event create and delete issue ([49e9d0c](https://github.com/schwannden/chabod/commit/49e9d0c225d8c589ee155e43ef0b5853e2e11d16))
+* linter issue ([912700c](https://github.com/schwannden/chabod/commit/912700cb9776ea683e406d05fbcd2cbca5751294))
+* linter issue ([a1ec581](https://github.com/schwannden/chabod/commit/a1ec5815728390265c3142cc91f0c2c8372b5852))
+* service page deletion ([c746304](https://github.com/schwannden/chabod/commit/c746304b8d75e782040770724d09ec92deb56e83))
+* tenant member management ([dcf3fbe](https://github.com/schwannden/chabod/commit/dcf3fbea372db8576ce3dd5ab969b6d7a63d138d))
+
+
+### Refactors
+
+* breakdown migration files ([c34abdf](https://github.com/schwannden/chabod/commit/c34abdfe18f231dac01d1a950c055aa1de76371d))
+
+
+### Documentation
+
+* test related doc ([139d874](https://github.com/schwannden/chabod/commit/139d8748d6072640e030648d5ff2a7f43b47b2c1))
+
+
+### Tests
+
+* add groups test ([c13c516](https://github.com/schwannden/chabod/commit/c13c51628075584c8d7b4a2873f2fe127b27ba32))
+* add groups test ([a757c6c](https://github.com/schwannden/chabod/commit/a757c6cfcd9faa7eb88ba245474b622680761e8f))
+* adding ci ([#48](https://github.com/schwannden/chabod/issues/48)) ([608b1a2](https://github.com/schwannden/chabod/commit/608b1a28a0dacc045aa19c75b3a7f844c1da4292))
+* adding unit test for tenant and event RLS ([8cea915](https://github.com/schwannden/chabod/commit/8cea9157e552b387e27887fb067a24a4545a038e))
+* automation test script ([f00ebdf](https://github.com/schwannden/chabod/commit/f00ebdf13d4ae3c448301ec97020189364e244bc))
+* refactor tests ([b0963b8](https://github.com/schwannden/chabod/commit/b0963b82e4472adbc17590e91c991943eb5f7df4))
+* run test in parallel ([04ff3a2](https://github.com/schwannden/chabod/commit/04ff3a23cb1b4ad83c4384641cbd8cbd7b76325b))
+
 ## [0.3.1](https://github.com/schwannden/chabod/compare/v0.3.0...v0.3.1) (2025-06-03)
 
 
