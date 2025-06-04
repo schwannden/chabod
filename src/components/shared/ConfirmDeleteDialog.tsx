@@ -1,4 +1,3 @@
-import React from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,8 +13,8 @@ import { useTranslation } from "react-i18next";
 
 interface ConfirmDeleteDialogProps {
   isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void | Promise<void>;
   title?: string;
   description?: string;
   destructiveActionLabel?: string;
@@ -25,7 +24,7 @@ interface ConfirmDeleteDialogProps {
 
 export function ConfirmDeleteDialog({
   isOpen,
-  onClose,
+  onOpenChange,
   onConfirm,
   title,
   description,
@@ -40,8 +39,19 @@ export function ConfirmDeleteDialog({
   const defaultDestructiveLabel = destructiveActionLabel || t("shared.deleteButton");
   const defaultCancelLabel = cancelActionLabel || t("shared.cancelButton");
 
+  const handleConfirm = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isLoading) return; // Prevent multiple clicks during loading
+
+    try {
+      await onConfirm();
+    } catch (error) {
+      console.error("Error in confirm action:", error);
+    }
+  };
+
   return (
-    <AlertDialog open={isOpen} onOpenChange={onClose}>
+    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
@@ -53,10 +63,7 @@ export function ConfirmDeleteDialog({
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isLoading}>{defaultCancelLabel}</AlertDialogCancel>
           <AlertDialogAction
-            onClick={(e) => {
-              e.preventDefault();
-              onConfirm();
-            }}
+            onClick={handleConfirm}
             disabled={isLoading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >

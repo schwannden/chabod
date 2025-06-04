@@ -14,6 +14,7 @@ import { EventFormValues } from "@/hooks/useEventForm";
 import { Group } from "@/lib/types";
 import { useEffect } from "react";
 import { formatDateForInput, parseDateFromInput } from "@/lib/dateUtils";
+import { useTranslation } from "react-i18next";
 
 interface EventDetailsFieldsProps {
   form: UseFormReturn<EventFormValues>;
@@ -23,6 +24,7 @@ interface EventDetailsFieldsProps {
 export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProps) {
   const isFullDay = form.watch("isFullDay");
   const selectedGroups = form.watch("groups") || [];
+  const { t } = useTranslation();
 
   console.log("EventDetailsFields rendering with groups:", groups);
   console.log("Selected groups:", selectedGroups);
@@ -54,9 +56,9 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
         name="name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Event Name</FormLabel>
+            <FormLabel>{t("events.eventName")}</FormLabel>
             <FormControl>
-              <Input placeholder="Enter event name" {...field} />
+              <Input placeholder={t("events.eventNamePlaceholder")} {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -68,9 +70,9 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
         name="description"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Description (Optional)</FormLabel>
+            <FormLabel>{t("events.description")}</FormLabel>
             <FormControl>
-              <Input placeholder="Enter event description" {...field} />
+              <Input placeholder={t("events.descriptionPlaceholder")} {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -82,7 +84,7 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
         name="date"
         render={({ field }) => (
           <FormItem className="flex flex-col">
-            <FormLabel>Date</FormLabel>
+            <FormLabel>{t("events.date")}</FormLabel>
             <FormControl>
               <Input
                 type="date"
@@ -108,11 +110,11 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
 
           return (
             <FormItem>
-              <FormLabel>Groups</FormLabel>
+              <FormLabel>{t("events.groups")}</FormLabel>
               <FormControl>
                 {groups.length > 0 ? (
                   <div className="border rounded-md p-2">
-                    <p className="text-sm mb-2">Available Groups:</p>
+                    <p className="text-sm mb-2">{t("events.availableGroups")}</p>
                     {groups.map((group) => (
                       <div key={group.id} className="flex items-center gap-2 p-1">
                         <input
@@ -130,13 +132,11 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
                   </div>
                 ) : (
                   <div className="p-3 border rounded-md text-sm text-muted-foreground">
-                    No groups available
+                    {t("events.noGroupsAvailable")}
                   </div>
                 )}
               </FormControl>
-              <FormDescription>
-                Select groups that will be associated with this event
-              </FormDescription>
+              <FormDescription>{t("events.selectGroupsDescription")}</FormDescription>
               <FormMessage />
             </FormItem>
           );
@@ -151,7 +151,7 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
             <FormControl>
               <Switch checked={field.value} onCheckedChange={field.onChange} />
             </FormControl>
-            <FormLabel>Full day event</FormLabel>
+            <FormLabel>{t("events.fullDayEvent")}</FormLabel>
             <FormMessage />
           </FormItem>
         )}
@@ -164,7 +164,7 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
             name="start_time"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel>Start Time</FormLabel>
+                <FormLabel>{t("events.startTime")}</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -178,7 +178,7 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
             name="end_time"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel>End Time</FormLabel>
+                <FormLabel>{t("events.endTime")}</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -194,9 +194,9 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
         name="event_link"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Event Link (Optional)</FormLabel>
+            <FormLabel>{t("events.eventLink")}</FormLabel>
             <FormControl>
-              <Input type="url" placeholder="https://example.com" {...field} />
+              <Input type="url" placeholder={t("events.eventLinkPlaceholder")} {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -209,8 +209,8 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
         render={({ field }) => (
           <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
             <div className="space-y-0.5">
-              <FormLabel>Private Event</FormLabel>
-              <FormDescription>Make this event private (only visible to members)</FormDescription>
+              <FormLabel>{t("events.privateEvent")}</FormLabel>
+              <FormDescription>{t("events.privateEventDescription")}</FormDescription>
             </div>
             <FormControl>
               <Switch

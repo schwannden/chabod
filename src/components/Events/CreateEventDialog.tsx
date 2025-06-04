@@ -13,6 +13,7 @@ import { useEventForm } from "@/hooks/useEventForm";
 import { EventDetailsFields } from "./EventDetailsFields";
 import { Group, EventWithGroups } from "@/lib/types";
 import { parse } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 interface CreateEventDialogProps {
   tenantId: string;
@@ -30,6 +31,7 @@ export function CreateEventDialog({
   trigger,
 }: CreateEventDialogProps) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
 
   // Extract group IDs from the initial values if provided
   const initialGroupIds = useMemo(() => {
@@ -78,23 +80,29 @@ export function CreateEventDialog({
       <DialogTrigger asChild>
         {trigger || (
           <Button data-dialog-trigger={dialogId}>
-            {initialValues ? "Copy Event" : "Create Event"}
+            {initialValues ? t("events.copyEvent") : t("events.createEvent")}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader className="sticky top-0 z-10 bg-background pb-4">
-          <DialogTitle>{initialValues ? "Copy Event" : "Create New Event"}</DialogTitle>
+          <DialogTitle>
+            {initialValues ? t("events.copyEventTitle") : t("events.createNewEvent")}
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={onSubmit} className="space-y-4 pb-2">
             <EventDetailsFields form={form} groups={allGroups} />
             <div className="sticky bottom-0 pt-2 bg-background flex justify-end gap-2">
               <Button variant="outline" type="button" onClick={() => setOpen(false)}>
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Creating..." : initialValues ? "Create Copy" : "Create Event"}
+                {isLoading
+                  ? t("events.creating")
+                  : initialValues
+                    ? t("events.createCopy")
+                    : t("events.createEvent")}
               </Button>
             </div>
           </form>

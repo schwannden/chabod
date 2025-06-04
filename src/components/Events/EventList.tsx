@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { EventCard } from "./EventCard";
 import { getTenantBySlug } from "@/lib/tenant-utils";
+import { useTranslation } from "react-i18next";
 
 interface EventListProps {
   events: EventWithGroups[];
@@ -28,6 +29,7 @@ export function EventList({
   const { user } = useSession();
   const { toast } = useToast();
   const [editableEvents, setEditableEvents] = useState<Record<string, boolean>>({});
+  const { t } = useTranslation();
 
   const sortedEvents = [...events].sort((a, b) => {
     const dateComparison = new Date(a.date).getTime() - new Date(b.date).getTime();
@@ -103,15 +105,15 @@ export function EventList({
       if (error) throw error;
 
       toast({
-        title: "Event deleted",
-        description: "The event has been successfully deleted.",
+        title: t("events.eventDeleted"),
+        description: t("events.eventDeletedSuccess"),
       });
       onEventUpdated();
     } catch (error) {
       console.error("Error deleting event:", error);
       toast({
-        title: "Error",
-        description: "Failed to delete the event. Please try again.",
+        title: t("common.error"),
+        description: t("events.eventDeleteError"),
         variant: "destructive",
       });
     }
@@ -129,8 +131,8 @@ export function EventList({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>No events found</CardTitle>
-          <CardDescription>There are no events matching your filters.</CardDescription>
+          <CardTitle>{t("events.noEventsFound")}</CardTitle>
+          <CardDescription>{t("events.noEventsMatchingFilters")}</CardDescription>
         </CardHeader>
       </Card>
     );

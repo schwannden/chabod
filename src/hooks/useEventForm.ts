@@ -7,8 +7,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { getTenantBySlug } from "@/lib/tenant-utils";
 import { format } from "date-fns";
 import { useSession } from "@/hooks/useSession";
+import { useTranslation } from "react-i18next";
 
-const eventSchema = z.object({
+// Temporary schema for type definition (will be recreated inside the hook with translations)
+const baseEventSchema = z.object({
   name: z.string().min(1, "Event name is required"),
   description: z.string().optional(),
   date: z.date({
@@ -22,7 +24,7 @@ const eventSchema = z.object({
   groups: z.array(z.string()).default([]),
 });
 
-export type EventFormValues = z.infer<typeof eventSchema>;
+export type EventFormValues = z.infer<typeof baseEventSchema>;
 
 export function useEventForm(
   tenantSlug: string,
@@ -33,11 +35,27 @@ export function useEventForm(
   const [tenantUuid, setTenantUuid] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useSession();
+  const { t } = useTranslation();
+
+  // Create schema with translated validation messages
+  const eventSchema = z.object({
+    name: z.string().min(1, t("events.eventNameRequired")),
+    description: z.string().optional(),
+    date: z.date({
+      required_error: t("events.eventDateRequired"),
+    }),
+    isFullDay: z.boolean().default(false),
+    start_time: z.string().optional(),
+    end_time: z.string().optional(),
+    event_link: z.string().url(t("events.validUrlRequired")).optional().or(z.literal("")),
+    visibility: z.enum(["public", "private"]).default("public"),
+    groups: z.array(z.string()).default([]),
+  });
 
   // Ensure initialGroups is always an array
   const safeInitialGroups = Array.isArray(initialGroups) ? initialGroups : [];
 
-  const form = useForm<EventFormValues>({
+  const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
       name: "",
@@ -66,11 +84,11 @@ export function useEventForm(
     fetchTenantUuid();
   }, [tenantSlug]);
 
-  const onSubmit = async (data: EventFormValues) => {
+  const onSubmit = async (data: z.infer<typeof eventSchema>) => {
     if (!tenantUuid) {
       toast({
-        title: "Error",
-        description: "Unable to determine tenant ID. Please try again later.",
+        title: t("common.error"),
+        description: t("events.tenantIdError"),
         variant: "destructive",
       });
       return;
@@ -90,9 +108,8 @@ export function useEventForm(
 
       if (!checkData) {
         toast({
-          title: "Limit Reached",
-          description:
-            "You have reached the maximum number of events allowed by your plan. Please upgrade to create more events.",
+          title: t("events.limitReached"),
+          description: t("events.limitReachedDescription"),
           variant: "destructive",
         });
         setIsLoading(false);
@@ -118,7 +135,7 @@ export function useEventForm(
       if (eventError) {
         console.error("Event creation error details:", eventError);
         if (eventError.message.includes("new row violates row-level security policy")) {
-          throw new Error("Event limit reached. Please upgrade your plan to create more events.");
+          throw new Error(t("events.eventLimitError"));
         }
         throw eventError;
       }
@@ -136,17 +153,17 @@ export function useEventForm(
       }
 
       toast({
-        title: "Event created",
-        description: "The event has been created successfully.",
+        title: t("events.eventCreated"),
+        description: t("events.eventCreatedSuccess"),
       });
 
       form.reset();
       onSuccess();
     } catch (error) {
-      const errorMessage = error?.message || "未知錯誤";
+      const errorMessage = error?.message || t("common.unknownError");
       console.error("Error creating event:", error);
       toast({
-        title: "Error",
+        title: t("common.error"),
         description: errorMessage,
         variant: "destructive",
       });

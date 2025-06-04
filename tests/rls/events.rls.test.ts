@@ -130,6 +130,104 @@ describe("Events RLS Policies", () => {
       }
     });
 
+    it("should allow tenant members to view events they created themselves", async () => {
+      const owner = await createTestUser();
+      const member = await createTestUser();
+      const tenant = await createTestTenant(owner.id);
+
+      try {
+        await addUserToTenant(member.id, tenant.id, "member");
+
+        // Member creates an event using the client directly (simulating real usage)
+        const { data: createdEvent, error: createError } = await member.client
+          .from("events")
+          .insert({
+            name: "Member Self-Created Event",
+            description: "Event created by member themselves",
+            date: new Date().toISOString().split("T")[0],
+            start_time: "09:00:00",
+            end_time: "10:00:00",
+            visibility: "private",
+            tenant_id: tenant.id,
+            created_by: member.id,
+          })
+          .select()
+          .single();
+
+        expect(createError).toBeNull();
+        expect(createdEvent).toBeDefined();
+
+        // Member should be able to view their own created event
+        const { data, error } = await member.client
+          .from("events")
+          .select("*")
+          .eq("id", createdEvent.id)
+          .single();
+
+        expect(error).toBeNull();
+        expect(data).toBeDefined();
+        expect(data.name).toBe("Member Self-Created Event");
+        expect(data.created_by).toBe(member.id);
+      } finally {
+        await cleanupTestTenant(tenant.id);
+        await cleanupTestUser(owner.id);
+        await cleanupTestUser(member.id);
+      }
+    });
+
+    it("should allow members to view events without groups through fetch queries", async () => {
+      const owner = await createTestUser();
+      const member = await createTestUser();
+      const tenant = await createTestTenant(owner.id);
+
+      try {
+        await addUserToTenant(member.id, tenant.id, "member");
+
+        // Member creates an event without any group associations
+        const { data: createdEvent, error: createError } = await member.client
+          .from("events")
+          .insert({
+            name: "Event Without Groups",
+            description: "Event without any group associations",
+            date: new Date().toISOString().split("T")[0],
+            start_time: "10:00:00",
+            end_time: "11:00:00",
+            visibility: "private",
+            tenant_id: tenant.id,
+            created_by: member.id,
+          })
+          .select()
+          .single();
+
+        expect(createError).toBeNull();
+        expect(createdEvent).toBeDefined();
+
+        // Member should be able to fetch this event through tenant events query (with left join)
+        const { data: fetchedEvents, error: fetchError } = await member.client
+          .from("events")
+          .select(
+            `
+            *,
+            events_groups(
+              group:groups(*)
+            )
+          `,
+          )
+          .eq("tenant_id", tenant.id)
+          .eq("id", createdEvent.id);
+
+        expect(fetchError).toBeNull();
+        expect(fetchedEvents).toBeDefined();
+        expect(fetchedEvents?.length).toBe(1);
+        expect(fetchedEvents?.[0]?.name).toBe("Event Without Groups");
+        expect(fetchedEvents?.[0]?.events_groups).toEqual([]); // Should be empty array, not null
+      } finally {
+        await cleanupTestTenant(tenant.id);
+        await cleanupTestUser(owner.id);
+        await cleanupTestUser(member.id);
+      }
+    });
+
     it("should prevent non-members from viewing private events", async () => {
       const owner = await createTestUser();
       const outsider = await createTestUser();

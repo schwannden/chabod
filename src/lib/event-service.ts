@@ -12,13 +12,13 @@ export async function getTenantEvents(
 ): Promise<EventWithGroups[]> {
   try {
     // Build a query that joins events with events_groups and groups
-    // Filter by tenant_id first
+    // Use left join to include events without groups
     let query = supabase
       .from("events")
       .select(
         `
         *,
-        events_groups!inner(
+        events_groups(
           group:groups(*)
         )
       `,
@@ -42,7 +42,7 @@ export async function getTenantEvents(
     // Transform data to include groups properly
     let filteredData = data.map((event) => ({
       ...event,
-      groups: event.events_groups.map((eventGroup) => eventGroup.group),
+      groups: event.events_groups?.map((eventGroup) => eventGroup.group) || [],
     }));
 
     // Filter by group if needed
@@ -69,7 +69,7 @@ export async function getEventById(eventId: string): Promise<EventWithGroups | n
       .select(
         `
         *,
-        events_groups!inner(
+        events_groups(
           group:groups(*)
         )
       `,
@@ -86,7 +86,7 @@ export async function getEventById(eventId: string): Promise<EventWithGroups | n
 
     return {
       ...data,
-      groups: data.events_groups.map((eventGroup) => eventGroup.group),
+      groups: data.events_groups?.map((eventGroup) => eventGroup.group) || [],
     };
   } catch (error) {
     console.error("Error fetching event by ID:", error);
