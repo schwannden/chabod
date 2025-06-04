@@ -36,3 +36,96 @@ jobs:
         
       - name: Build project
         run: npm run build
+
+  test:
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+    runs-on: ubuntu-latest
+    services:
+      # Pre-start Docker for better performance
+      docker:
+        image: docker:latest
+        options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Detect and verify Supabase CLI
+        run: |
+          echo "🔍 Detecting Supabase CLI installation..."
+          if command -v supabase &> /dev/null; then
+            echo "SUPABASE_CMD=supabase" >> $GITHUB_ENV
+            echo "✅ Using globally installed Supabase CLI"
+            supabase --version
+          elif command -v npx &> /dev/null && npm list supabase &> /dev/null; then
+            echo "SUPABASE_CMD=npx supabase" >> $GITHUB_ENV
+            echo "✅ Using npm-installed Supabase CLI (via npx)"
+            npx supabase --version
+          else
+            echo "❌ Supabase CLI not found"
+            echo "Available in npm dependencies:"
+            npm list | grep supabase || echo "Not found in dependencies"
+            exit 1
+          fi
+
+      - name: Verify Docker is available
+        run: |
+          docker --version
+          docker info
+
+      - name: Create test environment file
+        run: |
+          cat > .env.test << EOF
+          # Test Environment Configuration for CI
+          VITE_SUPABASE_URL=http://localhost:54321
+          VITE_SUPABASE_ANON_KEY=ANON_KEY_PLACEHOLDER
+          SUPABASE_SERVICE_ROLE_KEY=SERVICE_KEY_PLACEHOLDER
+          TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:54322/postgres
+          EOF
+
+      - name: Start Supabase (with timeout)
+        timeout-minutes: 5
+        run: |
+          echo "🚀 Starting Supabase services..."
+          ${{ env.SUPABASE_CMD }} start
+          echo "✅ Supabase started successfully"
+          
+      - name: Update environment with actual keys
+        run: |
+          echo "🔑 Extracting API keys..."
+          ANON_KEY=$(${{ env.SUPABASE_CMD }} status | grep "anon key" | awk '{print $3}')
+          SERVICE_KEY=$(${{ env.SUPABASE_CMD }} status | grep "service_role key" | awk '{print $3}')
+          
+          echo "Anon key length: ${#ANON_KEY}"
+          echo "Service key length: ${#SERVICE_KEY}"
+          
+          sed -i "s/ANON_KEY_PLACEHOLDER/$ANON_KEY/g" .env.test
+          sed -i "s/SERVICE_KEY_PLACEHOLDER/$SERVICE_KEY/g" .env.test
+          
+          echo "✅ Environment updated with actual keys"
+
+      - name: Load test environment
+        run: |
+          source .env.test
+          export $(cat .env.test | grep -v '^#' | xargs)
+
+      - name: Run RLS tests
+        run: |
+          source .env.test
+          export $(cat .env.test | grep -v '^#' | xargs)
+          ./tests/run-rls-tests.sh
+
+      - name: Stop Supabase
+        if: always()
+        run: |
+          echo "🛑 Stopping Supabase services..."
+          ${{ env.SUPABASE_CMD }} stop || true
+          echo "✅ Cleanup completed"

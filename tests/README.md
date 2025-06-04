@@ -18,6 +18,88 @@ This document outlines the testing policies, standards, and patterns for the Cha
 3. **Error handling** must be tested for both success and failure scenarios
 4. **Performance constraints** (like tenant limits) must be verified
 
+## CI/CD Integration
+
+The project includes automated testing in GitHub Actions that runs RLS tests using Supabase in a containerized environment.
+
+### GitHub Actions Workflow
+
+The CI workflow (`.github/workflows/ci.yml`) includes two jobs:
+
+1. **Build Job**: Runs linting and builds the project across Node.js 20.x and 22.x
+2. **Test Job**: Runs RLS tests with Supabase services
+
+### How CI Tests Work
+
+The test job performs these steps:
+
+1. **Environment Setup**: Installs Node.js dependencies and Supabase CLI
+2. **Docker Verification**: Ensures Docker is available for Supabase services
+3. **Environment Configuration**: Creates `.env.test` with placeholder values
+4. **Supabase Startup**: Starts all Supabase services (PostgreSQL, Auth, Storage, etc.)
+5. **Key Extraction**: Extracts real API keys from running Supabase instance
+6. **Environment Update**: Updates `.env.test` with actual API keys
+7. **Test Execution**: Runs RLS tests using the CI-optimized script
+8. **Cleanup**: Stops Supabase services
+
+### CI Test Script
+
+The project includes a unified test runner script that automatically adapts to different environments:
+
+- `tests/run-rls-tests.sh` - Works in both local development and CI environments
+
+The script automatically detects whether it's running in a CI environment (GitHub Actions) or locally and adapts its behavior:
+
+**Local Development Features:**
+
+- Creates `.env.test` from example if missing
+- Starts Supabase automatically if not running
+- Shows full Supabase status
+- Extracts and updates API keys in `.env.test`
+- Supports interactive features like watch mode
+
+**CI Environment Features:**
+
+- Verifies environment variables are properly set
+- Expects Supabase to already be running
+- Shows abbreviated status for cleaner CI logs
+- Uses `--maxWorkers=1` for stability
+- Skips interactive features
+- Provides streamlined error messages
+
+### Supabase CLI Compatibility
+
+The script automatically detects and works with various Supabase CLI installation methods:
+
+- **Global Installation**: `supabase` command directly
+- **npm/yarn Installation**: `npx supabase` or `yarn supabase`
+- **Local Development**: Uses whatever method is available
+
+This follows the [official Supabase CLI installation guide](https://supabase.com/docs/guides/local-development/cli/getting-started) and supports all recommended installation methods.
+
+### Docker in GitHub Actions
+
+- GitHub Actions runners come with Docker pre-installed
+- Supabase CLI uses Docker containers for its services
+- The workflow includes Docker verification and privileged mode for container management
+- Services are automatically cleaned up after test completion
+
+### Performance Optimizations for CI
+
+- **Single Worker**: Tests run with `--maxWorkers=1` to prevent resource conflicts
+- **Timeout Protection**: Supabase startup has a 5-minute timeout
+- **Efficient Cleanup**: Uses `|| true` for cleanup commands to prevent CI failures
+- **Environment Caching**: Node.js dependencies are cached between runs
+
+### Running Tests in CI
+
+Tests automatically run on:
+
+- Pull requests (opened, synchronized, reopened)
+- Pushes to the main branch
+
+You can also trigger tests manually through the GitHub Actions interface.
+
 ## Test Structure
 
 ### Directory Organization
@@ -320,17 +402,22 @@ npm run test -- --watch
 
 ## Automated RLS Test Runner
 
-The project includes an automated test runner script (`run-rls-tests.sh`) that simplifies the process of running RLS tests by handling environment setup, Supabase management, and test execution.
+The project includes a unified automated test runner script (`run-rls-tests.sh`) that works in both local development and CI environments, automatically adapting its behavior based on the context.
 
 ### Features
 
-- **Automatic Supabase Management**: Checks if Supabase is running and starts it if needed
-- **Environment Configuration**: Creates and updates `.env.test` with proper configuration
-- **API Key Management**: Automatically extracts and updates API keys from running Supabase instance
+- **Environment Detection**: Automatically detects CI vs local environment
+- **Supabase CLI Compatibility**: Works with global, npm, or direct installations
+- **Automatic Supabase Management**: Checks if Supabase is running and starts it if needed (local only)
+- **Environment Configuration**: Creates and updates `.env.test` with proper configuration (local only)
+- **API Key Management**: Automatically extracts and updates API keys from running Supabase instance (local only)
 - **Flexible Test Execution**: Supports various test modes (coverage, watch, specific files)
+- **CI Optimization**: Uses `--maxWorkers=1` and streamlined output in CI environments
 - **Cross-Platform Support**: Works on both macOS and Linux
 
 ### Usage
+
+**Local Development:**
 
 ```bash
 # Basic usage - runs all RLS tests
@@ -346,22 +433,42 @@ The project includes an automated test runner script (`run-rls-tests.sh`) that s
 ./tests/run-rls-tests.sh groups.rls.test.ts
 ```
 
-### What the Script Does
+**CI Environment:**
 
-1. **Prerequisites Check**: Verifies Supabase CLI is installed
-2. **Environment Setup**:
-   - Creates `.env.test` if it doesn't exist
-   - Uses `.env.test.example` as template if available
-   - Creates basic template otherwise
-3. **Supabase Management**:
-   - Checks if Supabase is running
-   - Starts Supabase if needed
-   - Displays current status and connection info
-4. **API Key Management**:
-   - Extracts current API keys from running Supabase
-   - Updates `.env.test` with actual keys (replaces placeholders)
-   - Creates backup of previous `.env.test` before updates
-5. **Test Execution**: Runs tests with specified options
+```bash
+# Automatically detects CI and adapts behavior
+./tests/run-rls-tests.sh
+
+# Coverage in CI
+./tests/run-rls-tests.sh --coverage
+```
+
+### Adaptive Behavior
+
+**Local Development Mode:**
+
+1. **Environment Setup**: Creates `.env.test` if it doesn't exist, uses `.env.test.example` as template if available
+2. **Supabase Management**: Checks if Supabase is running, starts it if needed, displays full status
+3. **API Key Management**: Extracts current API keys from running Supabase, updates `.env.test` with actual keys, creates backup before updates
+4. **Interactive Features**: Supports watch mode, full status display, interactive prompts
+
+**CI Environment Mode:**
+
+1. **Environment Verification**: Validates required environment variables are set
+2. **Service Check**: Expects Supabase to already be running, fails if not available
+3. **Optimized Output**: Shows abbreviated status for cleaner CI logs
+4. **Performance**: Uses `--maxWorkers=1` for stability, disables interactive features
+5. **Error Handling**: Provides streamlined error messages suitable for CI logs
+
+### Supabase CLI Detection
+
+The script automatically detects and uses the appropriate Supabase CLI installation:
+
+- **Global Installation**: Uses `supabase` command directly
+- **npm Installation**: Uses `npx supabase` for npm-installed CLI
+- **Fallback**: Provides clear instructions if CLI is not found
+
+This follows the [official Supabase CLI installation guide](https://supabase.com/docs/guides/local-development/cli/getting-started) and supports all recommended installation methods.
 
 ## Best Practices Summary
 
