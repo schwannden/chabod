@@ -11,7 +11,7 @@ import { Loader2, Users, Calendar, Group, FileText, Handshake } from "lucide-rea
 export default function DashboardPage() {
   const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
-  const { user, profile, isLoading, signOut } = useSession();
+  const { user, profile, isLoading } = useSession();
   const navigate = useNavigate();
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [isTenantLoading, setIsTenantLoading] = useState(true);
@@ -55,12 +55,6 @@ export default function DashboardPage() {
 
     fetchTenant();
   }, [slug, user, navigate]);
-
-  const handleSignOut = async () => {
-    await signOut();
-    // navigate to tenant's auth page
-    navigate(`/tenant/${slug}/auth`);
-  };
 
   const organizationCards = [
     {

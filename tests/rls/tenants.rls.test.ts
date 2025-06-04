@@ -79,7 +79,7 @@ describe("Tenants RLS Policies", () => {
       try {
         const { member, tenant } = rlsTest.getContext();
 
-        const { data, error } = await member.client
+        const { data, error: _error } = await member.client
           .from("tenants")
           .update({ name: "Unauthorized Update" })
           .eq("id", tenant.id)
@@ -98,7 +98,7 @@ describe("Tenants RLS Policies", () => {
       try {
         const { outsider, tenant } = rlsTest.getContext();
 
-        const { data, error } = await outsider.client
+        const { data, error: _error } = await outsider.client
           .from("tenants")
           .update({ name: "Outsider Update" })
           .eq("id", tenant.id)
@@ -152,7 +152,7 @@ describe("Tenants RLS Policies", () => {
       try {
         const { member, tenant } = rlsTest.getContext();
 
-        const { data, error } = await member.client
+        const { data, error: _error } = await member.client
           .from("tenants")
           .delete()
           .eq("id", tenant.id)

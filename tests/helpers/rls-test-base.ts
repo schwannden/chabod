@@ -195,7 +195,7 @@ export class RLSTestBase {
         break;
     }
 
-    const { data, error } = await client
+    const { data, error: _error } = await client
       .from(tableName)
       .update(updateData)
       .eq("id", entityId)
@@ -249,7 +249,11 @@ export class RLSTestBase {
         break;
     }
 
-    const { data, error } = await client.from(tableName).delete().eq("id", entityId).select();
+    const { data, error: _error } = await client
+      .from(tableName)
+      .delete()
+      .eq("id", entityId)
+      .select();
 
     // Should return empty array (no rows deleted) due to RLS policy
     expect(data).toEqual([]);

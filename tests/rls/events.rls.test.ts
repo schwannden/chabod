@@ -228,7 +228,7 @@ describe("Events RLS Policies", () => {
         });
 
         // Other member should NOT be able to update event they didn't create
-        const { data, error } = await otherMember.client
+        const { data, error: _error } = await otherMember.client
           .from("events")
           .update({ name: "Unauthorized Update" })
           .eq("id", event.id)
@@ -333,7 +333,7 @@ describe("Events RLS Policies", () => {
         });
 
         // Owner2 should NOT be able to update events in tenant1
-        const { data, error } = await owner2.client
+        const { data, error: _error } = await owner2.client
           .from("events")
           .update({ name: "Cross-tenant Attack" })
           .eq("id", event.id)
