@@ -7,9 +7,13 @@ import unusedImports from "eslint-plugin-unused-imports";
 import eslintPluginPrettierRecommended from "eslint-config-prettier";
 
 export default tseslint.config(
-  { ignores: ["dist", "src/components/ui/**"] },
+  { ignores: ["dist", "src/components/ui/**", "coverage"] },
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended, eslintPluginPrettierRecommended],
+    extends: [
+      js.configs.recommended,
+      ...tseslint.configs.recommended,
+      eslintPluginPrettierRecommended,
+    ],
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2020,
@@ -22,21 +26,18 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
+      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unused-vars": "off",
       "unused-imports/no-unused-imports": "error",
       "unused-imports/no-unused-vars": [
         "warn",
-        { 
-          "vars": "all", 
-          "varsIgnorePattern": "^_", 
-          "args": "after-used", 
-          "argsIgnorePattern": "^_" 
-        }
+        {
+          vars: "all",
+          varsIgnorePattern: "^_",
+          args: "after-used",
+          argsIgnorePattern: "^_",
+        },
       ],
     },
-  }
+  },
 );

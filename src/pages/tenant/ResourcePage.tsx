@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useSession } from "@/hooks/useSession";
 import { ResourceList } from "@/components/Resources/ResourceList";
 import { CreateResourceDialog } from "@/components/Resources/CreateResourceDialog";
@@ -16,6 +17,7 @@ import { getTenantGroups } from "@/lib/group-service";
 
 export default function ResourcePage() {
   const { slug } = useParams<{ slug: string }>();
+  const { t } = useTranslation();
   const { user } = useSession();
   const [resources, setResources] = useState<Resource[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
@@ -28,88 +30,89 @@ export default function ResourcePage() {
   const { role } = useTenantRole(slug, user?.id);
   const { toast } = useToast();
 
-  useEffect(() => {
+  const fetchTenantName = useCallback(async () => {
     if (!slug) return;
 
-    const fetchTenantName = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("tenants")
-          .select("id, name")
-          .eq("slug", slug)
-          .single();
+    try {
+      const { data, error } = await supabase
+        .from("tenants")
+        .select("id, name")
+        .eq("slug", slug)
+        .single();
 
-        if (error) {
-          console.error("Error fetching tenant name:", error);
-        } else {
-          setTenantName(data?.name || "");
-
-          if (data?.id) {
-            try {
-              const groupsData = await getTenantGroups(data.id);
-              setGroups(groupsData);
-            } catch (groupError) {
-              console.error("Error fetching groups:", groupError);
-            }
-          }
-        }
-      } catch (error) {
+      if (error) {
         console.error("Error fetching tenant name:", error);
+        return;
       }
-    };
 
-    fetchTenantName();
+      setTenantName(data?.name || "");
+
+      if (data?.id) {
+        try {
+          const groupsData = await getTenantGroups(data.id);
+          setGroups(groupsData);
+        } catch (groupError) {
+          console.error("Error fetching groups:", groupError);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching tenant name:", error);
+    }
   }, [slug]);
 
-  useEffect(() => {
+  const fetchResources = useCallback(async () => {
     if (!slug) return;
 
-    const fetchResources = async () => {
-      try {
-        const data = await getResources(slug);
-        setResources(data);
+    try {
+      const data = await getResources(slug);
+      setResources(data);
 
-        // Fetch group associations for each resource
-        const groupMap: Record<string, string[]> = {};
-        for (const resource of data) {
-          try {
-            const resourceGroups = await getResourceGroups(resource.id);
-            groupMap[resource.id] = resourceGroups;
-          } catch (error) {
-            console.error(`Error fetching groups for resource ${resource.id}:`, error);
-            groupMap[resource.id] = [];
-          }
+      // Fetch group associations for each resource
+      const groupMap: Record<string, string[]> = {};
+      for (const resource of data) {
+        try {
+          const resourceGroups = await getResourceGroups(resource.id);
+          groupMap[resource.id] = resourceGroups;
+        } catch (error) {
+          console.error(`Error fetching groups for resource ${resource.id}:`, error);
+          groupMap[resource.id] = [];
         }
-
-        setResourceGroupMap(groupMap);
-      } catch (error) {
-        const errorMessage = error?.message || "未知錯誤";
-        toast({
-          title: "Error loading resources",
-          description: errorMessage,
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
       }
-    };
 
+      setResourceGroupMap(groupMap);
+    } catch (error) {
+      const errorMessage = error?.message || t("common.unknownError");
+      toast({
+        title: t("common.error"),
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [slug, toast, t]);
+
+  useEffect(() => {
+    fetchTenantName();
+  }, [fetchTenantName]);
+
+  useEffect(() => {
     fetchResources();
-  }, [slug, toast]);
+  }, [fetchResources]);
 
-  const handleResourceCreated = (newResource: Resource) => {
+  const handleResourceCreated = useCallback((newResource: Resource) => {
     setResources((prev) => [newResource, ...prev]);
-  };
+  }, []);
 
-  const handleResourceUpdated = (updatedResource: Resource) => {
+  const handleResourceUpdated = useCallback((updatedResource: Resource) => {
     setResources((prev) =>
       prev.map((resource) => (resource.id === updatedResource.id ? updatedResource : resource)),
     );
-  };
+  }, []);
 
-  const handleResourceDeleted = (id: string) => {
+  const handleResourceDeleted = useCallback((id: string) => {
     setResources((prev) => prev.filter((resource) => resource.id !== id));
-  };
+  }, []);
 
   const filteredResources = resources.filter((resource) => {
     // Text filter logic
@@ -129,15 +132,15 @@ export default function ResourcePage() {
 
   return (
     <TenantPageLayout
-      title="資源"
+      title={t("dashboard.resourcesTitle")}
       tenantName={tenantName}
       tenantSlug={slug || ""}
       isLoading={isLoading}
-      breadcrumbItems={[{ label: "資源" }]}
+      breadcrumbItems={[{ label: t("dashboard.resourcesTitle") }]}
       action={
         role === "owner" && (
           <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" /> 建立資源
+            <Plus className="mr-2 h-4 w-4" /> {t("resources.addResource")}
           </Button>
         )
       }
