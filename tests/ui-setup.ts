@@ -126,9 +126,13 @@ jest.mock("lucide-react", () => ({
   LogOut: () => React.createElement("svg", { "data-testid": "logout-icon" }),
   Copy: () => React.createElement("svg", { "data-testid": "copy-icon" }),
   Info: () => React.createElement("svg", { "data-testid": "info-icon" }),
-  Loader2: () => React.createElement("svg", { "data-testid": "loader-icon" }),
+  Loader2: () =>
+    React.createElement("svg", { "data-testid": "loader-icon", className: "animate-spin" }),
   Globe: () => React.createElement("svg", { "data-testid": "globe-icon" }),
   User: () => React.createElement("svg", { "data-testid": "user-icon" }),
+  Group: () => React.createElement("svg", { "data-testid": "group-icon" }),
+  FileText: () => React.createElement("svg", { "data-testid": "file-text-icon" }),
+  Handshake: () => React.createElement("svg", { "data-testid": "handshake-icon" }),
 }));
 
 // Mock next-themes
@@ -149,9 +153,17 @@ jest.mock("@/components/ui/use-toast", () => ({
 // Mock tenant utils
 jest.mock("@/lib/tenant-utils", () => ({
   getTenants: jest.fn(),
+  getTenantBySlug: jest.fn(),
   createTenant: jest.fn(),
   updateTenant: jest.fn(),
   deleteTenant: jest.fn(),
+}));
+
+// Mock member service
+jest.mock("@/lib/member-service", () => ({
+  checkUserTenantAccess: jest.fn(),
+  inviteMemberToTenant: jest.fn(),
+  inviteUserToTenant: jest.fn(),
 }));
 
 // Cleanup after each test
