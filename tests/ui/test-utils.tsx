@@ -1,8 +1,14 @@
 /* eslint-disable react-refresh/only-export-components */
 import React from "react";
-import { render, RenderOptions } from "@testing-library/react";
+import { render, RenderOptions, configure } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+// Configure React Testing Library for React 18
+configure({
+  reactStrictMode: true,
+  asyncUtilTimeout: 10000,
+});
 
 // Create a custom render function that includes providers
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {

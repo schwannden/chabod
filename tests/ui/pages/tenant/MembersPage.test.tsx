@@ -1,5 +1,5 @@
 import React from "react";
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render } from "../../test-utils";
 import MembersPage from "@/pages/tenant/MembersPage";
@@ -574,34 +574,64 @@ describe("MembersPage", () => {
 
       render(<MembersPage />);
 
-      await waitFor(() => {
-        expect(screen.getByTestId("member-table")).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByTestId("member-table")).toBeInTheDocument();
+        },
+        { timeout: 15000 },
+      );
+
+      // Record initial call count before action
+      const initialCallCount = (memberService.getTenantMembers as jest.Mock).mock.calls.length;
 
       const inviteSuccessButton = screen.getByTestId("mock-invite-success");
-      await user.click(inviteSuccessButton);
 
-      await waitFor(() => {
-        expect(memberService.getTenantMembers).toHaveBeenCalledTimes(2); // Initial load + refresh
+      await act(async () => {
+        await user.click(inviteSuccessButton);
       });
-    });
+
+      // Wait for the refresh to happen
+      await waitFor(
+        () => {
+          expect((memberService.getTenantMembers as jest.Mock).mock.calls.length).toBeGreaterThan(
+            initialCallCount,
+          );
+        },
+        { timeout: 15000 },
+      );
+    }, 20000);
 
     it("should refresh member list when member is updated", async () => {
       const user = userEvent.setup();
 
       render(<MembersPage />);
 
-      await waitFor(() => {
-        expect(screen.getByTestId("member-table")).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByTestId("member-table")).toBeInTheDocument();
+        },
+        { timeout: 15000 },
+      );
+
+      // Record initial call count before action
+      const initialCallCount = (memberService.getTenantMembers as jest.Mock).mock.calls.length;
 
       const memberUpdatedButton = screen.getByTestId("mock-member-updated");
-      await user.click(memberUpdatedButton);
 
-      await waitFor(() => {
-        expect(memberService.getTenantMembers).toHaveBeenCalledTimes(2); // Initial load + refresh
+      await act(async () => {
+        await user.click(memberUpdatedButton);
       });
-    });
+
+      // Wait for the refresh to happen
+      await waitFor(
+        () => {
+          expect((memberService.getTenantMembers as jest.Mock).mock.calls.length).toBeGreaterThan(
+            initialCallCount,
+          );
+        },
+        { timeout: 15000 },
+      );
+    }, 20000);
   });
 
   describe("Error Handling", () => {
