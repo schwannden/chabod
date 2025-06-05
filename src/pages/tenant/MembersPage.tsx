@@ -10,11 +10,13 @@ import { MemberFilterBar } from "@/components/Members/MemberFilterBar";
 import { Tenant, TenantMemberWithProfile } from "@/lib/types";
 import { UserPlus } from "lucide-react";
 import { TenantPageLayout } from "@/components/Layout/TenantPageLayout";
+import { useTranslation } from "react-i18next";
 
 export default function MembersPage() {
   const { slug } = useParams<{ slug: string }>();
   const { user, isLoading } = useSession();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [members, setMembers] = useState<TenantMemberWithProfile[]>([]);
   const [isOwner, setIsOwner] = useState(false);
@@ -87,7 +89,9 @@ export default function MembersPage() {
   });
 
   if (isLoading || isDataLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">{t("common.loading")}</div>
+    );
   }
 
   if (!tenant) {
@@ -95,10 +99,10 @@ export default function MembersPage() {
       <div className="min-h-screen bg-background flex flex-col">
         <main className="flex-1 container mx-auto px-4 py-8 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-3xl font-bold mb-4">Tenant Not Found</h1>
-            <p className="mb-6">The tenant "{slug}" does not exist or has been deleted.</p>
+            <h1 className="text-3xl font-bold mb-4">{t("common.tenantNotFound")}</h1>
+            <p className="mb-6">{t("common.tenantNotFoundDesc", { slug })}</p>
             <button onClick={() => navigate("/")} className="text-primary hover:underline">
-              Return to home
+              {t("common.returnHome")}
             </button>
           </div>
         </main>
@@ -108,16 +112,16 @@ export default function MembersPage() {
 
   return (
     <TenantPageLayout
-      title={`${tenant?.name || ""} 會友`}
-      description="管理此教會的會友"
+      title={t("members.membersTitle")}
+      description={t("members.membersDesc")}
       tenantName={tenant?.name || ""}
       tenantSlug={slug || ""}
       isLoading={isLoading || isDataLoading}
-      breadcrumbItems={[{ label: "會友" }]}
+      breadcrumbItems={[{ label: t("nav.members") }]}
       action={
         isOwner && (
           <Button onClick={() => setIsInviteDialogOpen(true)}>
-            <UserPlus className="mr-2 h-4 w-4" /> 邀請會友
+            <UserPlus className="mr-2 h-4 w-4" /> {t("members.inviteMember")}
           </Button>
         )
       }

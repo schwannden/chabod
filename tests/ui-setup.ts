@@ -133,6 +133,7 @@ jest.mock("lucide-react", () => ({
   Group: () => React.createElement("svg", { "data-testid": "group-icon" }),
   FileText: () => React.createElement("svg", { "data-testid": "file-text-icon" }),
   Handshake: () => React.createElement("svg", { "data-testid": "handshake-icon" }),
+  UserPlus: () => React.createElement("svg", { "data-testid": "user-plus-icon" }),
 }));
 
 // Mock next-themes
@@ -164,6 +165,12 @@ jest.mock("@/lib/member-service", () => ({
   checkUserTenantAccess: jest.fn(),
   inviteMemberToTenant: jest.fn(),
   inviteUserToTenant: jest.fn(),
+  getTenantMembers: jest.fn(),
+}));
+
+// Mock tenant service
+jest.mock("@/lib/tenant-service", () => ({
+  getTenantBySlug: jest.fn(),
 }));
 
 // Cleanup after each test
