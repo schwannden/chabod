@@ -7,11 +7,13 @@ import { getTenantGroups } from "@/lib/group-service";
 import { Tenant, GroupWithMemberCount } from "@/lib/types";
 import { TenantPageLayout } from "@/components/Layout/TenantPageLayout";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function GroupsPage() {
   const { slug } = useParams<{ slug: string }>();
   const { user, isLoading: isSessionLoading } = useSession();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [groups, setGroups] = useState<GroupWithMemberCount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -66,19 +68,19 @@ export default function GroupsPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">載入中...</span>
+        <span className="ml-2">{t("common.loading")}</span>
       </div>
     );
   }
 
   return (
     <TenantPageLayout
-      title="管理群組"
-      description={`建立和管理 ${tenant?.name || ""} 的群組`}
+      title={t("groups.manageGroups")}
+      description={t("groups.manageGroupsDescription", { tenantName: tenant?.name || "" })}
       tenantName={tenant?.name || ""}
       tenantSlug={slug || ""}
       isLoading={isLoading}
-      breadcrumbItems={[{ label: "群組" }]}
+      breadcrumbItems={[{ label: t("groups.groups") }]}
     >
       {tenant && (
         <GroupTable

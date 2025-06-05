@@ -21,7 +21,10 @@
     "yes": "是",
     "no": "否",
     "openMenu": "開啟選單",
-    "unknownError": "發生未知錯誤"
+    "unknownError": "發生未知錯誤",
+    "tenantNotFound": "找不到教會",
+    "tenantNotFoundDesc": "教會 \"{{slug}}\" 不存在或已被刪除。",
+    "returnHome": "返回首頁"
   },
   "shared": {
     "traditionalChinese": "繁體中文",
@@ -45,7 +48,8 @@
     "settings": "設定",
     "logout": "登出",
     "login": "登入",
-    "signup": "註冊"
+    "signup": "註冊",
+    "members": "會友"
   },
   "landing": {
     "hero": {

@@ -1,8 +1,36 @@
 import "@testing-library/jest-dom";
 import "./jest-dom.d.ts";
 import { cleanup } from "@testing-library/react";
-import { afterEach, jest } from "@jest/globals";
+import { afterEach, beforeEach, jest } from "@jest/globals";
 import React from "react";
+
+// Configure React 18 test environment
+global.IS_REACT_ACT_ENVIRONMENT = true;
+
+// Suppress React 18 act warnings in test environment
+const originalError = console.error;
+beforeEach(() => {
+  console.error = (...args: unknown[]) => {
+    if (
+      typeof args[0] === "string" &&
+      args[0].includes("Warning: An update to") &&
+      args[0].includes("was not wrapped in act")
+    ) {
+      return;
+    }
+    if (
+      typeof args[0] === "string" &&
+      args[0].includes("The current testing environment is not configured to support act")
+    ) {
+      return;
+    }
+    originalError.call(console, ...args);
+  };
+});
+
+afterEach(() => {
+  console.error = originalError;
+});
 
 // Mock react-router-dom
 jest.mock("react-router-dom", () => ({
@@ -126,9 +154,14 @@ jest.mock("lucide-react", () => ({
   LogOut: () => React.createElement("svg", { "data-testid": "logout-icon" }),
   Copy: () => React.createElement("svg", { "data-testid": "copy-icon" }),
   Info: () => React.createElement("svg", { "data-testid": "info-icon" }),
-  Loader2: () => React.createElement("svg", { "data-testid": "loader-icon" }),
+  Loader2: () =>
+    React.createElement("svg", { "data-testid": "loader-icon", className: "animate-spin" }),
   Globe: () => React.createElement("svg", { "data-testid": "globe-icon" }),
   User: () => React.createElement("svg", { "data-testid": "user-icon" }),
+  Group: () => React.createElement("svg", { "data-testid": "group-icon" }),
+  FileText: () => React.createElement("svg", { "data-testid": "file-text-icon" }),
+  Handshake: () => React.createElement("svg", { "data-testid": "handshake-icon" }),
+  UserPlus: () => React.createElement("svg", { "data-testid": "user-plus-icon" }),
 }));
 
 // Mock next-themes
@@ -149,9 +182,23 @@ jest.mock("@/components/ui/use-toast", () => ({
 // Mock tenant utils
 jest.mock("@/lib/tenant-utils", () => ({
   getTenants: jest.fn(),
+  getTenantBySlug: jest.fn(),
   createTenant: jest.fn(),
   updateTenant: jest.fn(),
   deleteTenant: jest.fn(),
+}));
+
+// Mock member service
+jest.mock("@/lib/member-service", () => ({
+  checkUserTenantAccess: jest.fn(),
+  inviteMemberToTenant: jest.fn(),
+  inviteUserToTenant: jest.fn(),
+  getTenantMembers: jest.fn(),
+}));
+
+// Mock tenant service
+jest.mock("@/lib/tenant-service", () => ({
+  getTenantBySlug: jest.fn(),
 }));
 
 // Cleanup after each test

@@ -32,4 +32,12 @@ export default {
       },
     ],
   },
+  // Configure jsdom to handle React 18 concurrent features
+  testEnvironmentOptions: {
+    customExportConditions: ["node", "node-addons"],
+  },
+  // Suppress React 18 act warnings in tests (they're expected in async components)
+  globals: {
+    IS_REACT_ACT_ENVIRONMENT: true,
+  },
 };

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthTabs } from "@/components/Auth/AuthTabs";
@@ -78,11 +77,17 @@ export default function AuthPage() {
     navigate(`/tenant/${slug}`);
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">{t("common.loading")}</div>
+    );
+  }
+
   if (isTenantLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">{t('common.loading')}</span>
+        <span className="ml-2">{t("common.loading")}</span>
       </div>
     );
   }

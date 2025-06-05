@@ -21,7 +21,10 @@
     "yes": "Yes",
     "no": "No",
     "openMenu": "Open menu",
-    "unknownError": "An unknown error occurred"
+    "unknownError": "An unknown error occurred",
+    "tenantNotFound": "Tenant Not Found",
+    "tenantNotFoundDesc": "The tenant \"{{slug}}\" does not exist or has been deleted.",
+    "returnHome": "Return to home"
   },
   "shared": {
     "traditionalChinese": "Traditional Chinese",
@@ -45,7 +48,8 @@
     "settings": "Settings",
     "logout": "Logout",
     "login": "Login",
-    "signup": "Sign Up"
+    "signup": "Sign Up",
+    "members": "Members"
   },
   "landing": {
     "hero": {

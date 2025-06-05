@@ -22,7 +22,9 @@
   "lint-staged": {
     "*.+(js|jsx|ts|tsx)": [],
     "*.+(js|jsx|ts|tsx|json|css|md|mdx)": [
-      "prettier --write"
+      "prettier --write",
+      "eslint --fix",
+      "eslint ."
     ]
   },
   "dependencies": {
