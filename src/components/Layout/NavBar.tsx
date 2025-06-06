@@ -30,12 +30,32 @@ export function NavBar() {
     }
   };
 
+  // Dynamic logo destination logic
+  const getLogoDestination = () => {
+    const currentPath = location.pathname;
+
+    // If on tenant paths, go to tenant dashboard
+    const tenantMatch = currentPath.match(/^\/tenant\/([^/]+)/);
+    if (tenantMatch) {
+      const slug = tenantMatch[1];
+      return `/tenant/${slug}`;
+    }
+
+    // If on profile page (but not tenant profile), go to dashboard
+    if (currentPath === "/profile") {
+      return "/dashboard";
+    }
+
+    // For all other paths (including "/" and "/dashboard"), go to "/"
+    return "/";
+  };
+
   return (
     <nav className="border-b bg-background">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-4">
-            <Link to="/" className="text-xl font-bold text-primary">
+            <Link to={getLogoDestination()} className="text-xl font-bold text-primary">
               Chabod
             </Link>
           </div>
