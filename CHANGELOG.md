@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/schwannden/chabod/compare/v0.3.3...v0.4.0) (2025-06-06)
+
+
+### Features
+
+* alpha warning ([#57](https://github.com/schwannden/chabod/issues/57)) ([1508b55](https://github.com/schwannden/chabod/commit/1508b5556d4eb1ab3951eec07b5c5355be1a6d14))
+
 ## [0.3.3](https://github.com/schwannden/chabod/compare/v0.3.2...v0.3.3) (2025-06-06)
 
 
