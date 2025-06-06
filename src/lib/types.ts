@@ -20,6 +20,7 @@ export type TenantWithUsage = Tenant & {
   memberCount: number;
   groupCount?: number;
   eventCount?: number;
+  userRole?: string | null;
   price_tier?: {
     name: string;
     price_monthly: number;

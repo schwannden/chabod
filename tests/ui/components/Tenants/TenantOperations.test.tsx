@@ -39,6 +39,7 @@ describe("Tenant Operations Integration Tests", () => {
     memberCount: 15,
     groupCount: 3,
     eventCount: 5,
+    userRole: "owner", // Add userRole so edit/delete buttons are visible
     price_tier: {
       name: "Basic",
       price_monthly: 29,

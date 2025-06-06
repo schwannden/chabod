@@ -36,7 +36,7 @@ export async function getTenants(): Promise<TenantWithUsage[]> {
       `
       *,
       price_tier:price_tiers(*),
-      tenant_members!inner(user_id)
+      tenant_members!inner(user_id, role)
     `,
     )
     .eq("tenant_members.user_id", user.id);
@@ -77,11 +77,15 @@ export async function getTenants(): Promise<TenantWithUsage[]> {
         console.error("Error counting events:", eventError);
       }
 
+      // Extract the user's role for this tenant
+      const userRole = tenant.tenant_members?.[0]?.role || null;
+
       return {
         ...tenant,
         memberCount: memberCount || 0,
         groupCount: groupCount || 0,
         eventCount: eventCount || 0,
+        userRole,
       };
     }),
   );
