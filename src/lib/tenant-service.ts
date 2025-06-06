@@ -45,27 +45,29 @@ export async function getTenants(): Promise<TenantWithUsage[]> {
     console.error("Error fetching tenants:", tenantError);
     return [];
   }
-  console.log("tenants", tenants);
 
+  // Batch all count queries to reduce round trips
   const tenantsWithCounts = await Promise.all(
     tenants.map(async (tenant) => {
-      // Get member count
-      const { count: memberCount, error: countError } = await supabase
-        .from("tenant_members")
-        .select("*", { count: "exact", head: true })
-        .eq("tenant_id", tenant.id);
+      // Execute all count queries in parallel for this tenant
+      const [memberResult, groupResult, eventResult] = await Promise.all([
+        supabase
+          .from("tenant_members")
+          .select("*", { count: "exact", head: true })
+          .eq("tenant_id", tenant.id),
+        supabase
+          .from("groups")
+          .select("*", { count: "exact", head: true })
+          .eq("tenant_id", tenant.id),
+        supabase
+          .from("events")
+          .select("*", { count: "exact", head: true })
+          .eq("tenant_id", tenant.id),
+      ]);
 
-      // Get group count
-      const { count: groupCount, error: groupError } = await supabase
-        .from("groups")
-        .select("*", { count: "exact", head: true })
-        .eq("tenant_id", tenant.id);
-
-      // Get event count
-      const { count: eventCount, error: eventError } = await supabase
-        .from("events")
-        .select("*", { count: "exact", head: true })
-        .eq("tenant_id", tenant.id);
+      const { count: memberCount, error: countError } = memberResult;
+      const { count: groupCount, error: groupError } = groupResult;
+      const { count: eventCount, error: eventError } = eventResult;
 
       if (countError) {
         console.error("Error counting members:", countError);

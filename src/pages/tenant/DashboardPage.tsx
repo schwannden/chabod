@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/hooks/useSession";
+import { useTenants } from "@/hooks/useTenants";
 import { NavBar } from "@/components/Layout/NavBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tenant } from "@/lib/types";
-import { getTenantBySlug, getTenants } from "@/lib/tenant-utils";
+import { getTenantBySlug } from "@/lib/tenant-utils";
 import { Loader2, Users, Calendar, Group, FileText, Handshake } from "lucide-react";
 
 export default function DashboardPage() {
@@ -16,6 +17,9 @@ export default function DashboardPage() {
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [isTenantLoading, setIsTenantLoading] = useState(true);
 
+  // Use cached tenant data
+  const { tenants, isLoading: isTenantsLoading } = useTenants();
+
   useEffect(() => {
     if (!isLoading && !user) {
       navigate(`/tenant/${slug}/auth`);
@@ -24,12 +28,11 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchTenant = async () => {
-      if (!slug || !user) return;
+      if (!slug || !user || isTenantsLoading) return;
 
       try {
-        // Check if user is a member of this tenant first
-        const userTenants = await getTenants();
-        const currentTenant = userTenants.find((t) => t.slug === slug);
+        // Check if user is a member of this tenant first using cached data
+        const currentTenant = tenants.find((t) => t.slug === slug);
 
         if (!currentTenant) {
           navigate(`/tenant/${slug}/auth`);
@@ -54,7 +57,7 @@ export default function DashboardPage() {
     };
 
     fetchTenant();
-  }, [slug, user, navigate]);
+  }, [slug, user, navigate, tenants, isTenantsLoading]);
 
   const organizationCards = [
     {

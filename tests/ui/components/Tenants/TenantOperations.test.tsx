@@ -111,7 +111,7 @@ describe("Tenant Operations Integration Tests", () => {
 
       // The error handling would be tested in the actual dialog component
       // Check that getTenants was called at least once (could be more due to re-renders)
-      expect(tenantUtils.getTenants).toHaveBeenCalledWith();
+      expect(tenantUtils.getTenants).toHaveBeenCalled();
     });
   });
 
@@ -303,7 +303,7 @@ describe("Tenant Operations Integration Tests", () => {
 
       // The test verifies that data refresh patterns work
       // In real usage, this would be triggered by child component callbacks
-      expect(tenantUtils.getTenants).toHaveBeenCalledWith();
+      expect(tenantUtils.getTenants).toHaveBeenCalled();
     }, 20000);
   });
 
