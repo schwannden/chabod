@@ -50,6 +50,21 @@ export function NavBar() {
     return "/";
   };
 
+  // Dynamic profile destination logic
+  const getProfileDestination = () => {
+    const currentPath = location.pathname;
+
+    // If on tenant paths, go to tenant profile
+    const tenantMatch = currentPath.match(/^\/tenant\/([^/]+)/);
+    if (tenantMatch) {
+      const slug = tenantMatch[1];
+      return `/tenant/${slug}/profile`;
+    }
+
+    // For all other paths, go to /profile
+    return "/profile";
+  };
+
   return (
     <nav className="border-b bg-background">
       <div className="container mx-auto px-4">
@@ -72,7 +87,7 @@ export function NavBar() {
                   </Link>
                 </Button>
                 <Button asChild variant="ghost" size="sm">
-                  <Link to="/profile">{t("nav.profile")}</Link>
+                  <Link to={getProfileDestination()}>{t("nav.profile")}</Link>
                 </Button>
                 <Button variant="ghost" size="sm" onClick={handleSignOut}>
                   <LogOut className="h-4 w-4 mr-2" />

@@ -234,7 +234,13 @@ describe("NavBar", () => {
   describe("Navigation Links", () => {
     it("should render correct login link with redirect when not on root", () => {
       mockLocation.pathname = "/some-page";
-      mockUseSession.mockReturnValue({ user: null, loading: false });
+      mockUseSession.mockReturnValue({
+        session: null,
+        user: null,
+        profile: null,
+        isLoading: false,
+        signOut: jest.fn(),
+      });
 
       render(<NavBar />);
 
@@ -244,7 +250,13 @@ describe("NavBar", () => {
 
     it("should render login link without redirect when on root", () => {
       mockLocation.pathname = "/";
-      mockUseSession.mockReturnValue({ user: null, loading: false });
+      mockUseSession.mockReturnValue({
+        session: null,
+        user: null,
+        profile: null,
+        isLoading: false,
+        signOut: jest.fn(),
+      });
 
       render(<NavBar />);
 
@@ -253,7 +265,13 @@ describe("NavBar", () => {
     });
 
     it("should render signup link", () => {
-      mockUseSession.mockReturnValue({ user: null, loading: false });
+      mockUseSession.mockReturnValue({
+        session: null,
+        user: null,
+        profile: null,
+        isLoading: false,
+        signOut: jest.fn(),
+      });
 
       render(<NavBar />);
 
@@ -263,8 +281,11 @@ describe("NavBar", () => {
 
     it("should render dashboard and profile links when authenticated", () => {
       mockUseSession.mockReturnValue({
-        user: { id: "user-1", email: "test@example.com" },
-        loading: false,
+        session: {} as any,
+        user: mockUser,
+        profile: null,
+        isLoading: false,
+        signOut: jest.fn(),
       });
 
       render(<NavBar />);
@@ -279,7 +300,13 @@ describe("NavBar", () => {
 
   describe("Accessibility", () => {
     it("should have proper navigation landmark", () => {
-      mockUseSession.mockReturnValue({ user: null, loading: false });
+      mockUseSession.mockReturnValue({
+        session: null,
+        user: null,
+        profile: null,
+        isLoading: false,
+        signOut: jest.fn(),
+      });
 
       render(<NavBar />);
 
@@ -288,7 +315,13 @@ describe("NavBar", () => {
     });
 
     it("should have clickable logo link", () => {
-      mockUseSession.mockReturnValue({ user: null, loading: false });
+      mockUseSession.mockReturnValue({
+        session: null,
+        user: null,
+        profile: null,
+        isLoading: false,
+        signOut: jest.fn(),
+      });
 
       render(<NavBar />);
 
@@ -298,8 +331,11 @@ describe("NavBar", () => {
 
     it("should have accessible buttons and links", () => {
       mockUseSession.mockReturnValue({
-        user: { id: "user-1", email: "test@example.com" },
-        loading: false,
+        session: {} as any,
+        user: mockUser,
+        profile: null,
+        isLoading: false,
+        signOut: jest.fn(),
       });
 
       render(<NavBar />);
@@ -310,9 +346,101 @@ describe("NavBar", () => {
     });
   });
 
+  describe("Profile Navigation Behavior", () => {
+    beforeEach(() => {
+      mockUseSession.mockReturnValue(mockAuthenticatedSession);
+    });
+
+    it("should link to '/profile' when on root path", () => {
+      mockLocation.pathname = "/";
+      render(<NavBar />);
+
+      const profileLink = screen.getByText("nav.profile").closest("a");
+      expect(profileLink).toHaveAttribute("href", "/profile");
+    });
+
+    it("should link to '/profile' when on dashboard path", () => {
+      mockLocation.pathname = "/dashboard";
+      render(<NavBar />);
+
+      const profileLink = screen.getByText("nav.profile").closest("a");
+      expect(profileLink).toHaveAttribute("href", "/profile");
+    });
+
+    it("should link to '/profile' when on profile path", () => {
+      mockLocation.pathname = "/profile";
+      render(<NavBar />);
+
+      const profileLink = screen.getByText("nav.profile").closest("a");
+      expect(profileLink).toHaveAttribute("href", "/profile");
+    });
+
+    it("should link to tenant profile when on tenant root path", () => {
+      mockLocation.pathname = "/tenant/my-church";
+      render(<NavBar />);
+
+      const profileLink = screen.getByText("nav.profile").closest("a");
+      expect(profileLink).toHaveAttribute("href", "/tenant/my-church/profile");
+    });
+
+    it("should link to tenant profile when on tenant members path", () => {
+      mockLocation.pathname = "/tenant/my-church/members";
+      render(<NavBar />);
+
+      const profileLink = screen.getByText("nav.profile").closest("a");
+      expect(profileLink).toHaveAttribute("href", "/tenant/my-church/profile");
+    });
+
+    it("should link to tenant profile when on tenant profile path", () => {
+      mockLocation.pathname = "/tenant/my-church/profile";
+      render(<NavBar />);
+
+      const profileLink = screen.getByText("nav.profile").closest("a");
+      expect(profileLink).toHaveAttribute("href", "/tenant/my-church/profile");
+    });
+
+    it("should link to tenant profile when on nested tenant path", () => {
+      mockLocation.pathname = "/tenant/my-church/groups/group-123";
+      render(<NavBar />);
+
+      const profileLink = screen.getByText("nav.profile").closest("a");
+      expect(profileLink).toHaveAttribute("href", "/tenant/my-church/profile");
+    });
+
+    it("should handle different tenant slugs", () => {
+      mockLocation.pathname = "/tenant/first-baptist-church/events";
+      render(<NavBar />);
+
+      const profileLink = screen.getByText("nav.profile").closest("a");
+      expect(profileLink).toHaveAttribute("href", "/tenant/first-baptist-church/profile");
+    });
+
+    it("should link to '/profile' for unknown paths", () => {
+      mockLocation.pathname = "/some-unknown-path";
+      render(<NavBar />);
+
+      const profileLink = screen.getByText("nav.profile").closest("a");
+      expect(profileLink).toHaveAttribute("href", "/profile");
+    });
+
+    it("should handle malformed tenant paths", () => {
+      mockLocation.pathname = "/tenant/";
+      render(<NavBar />);
+
+      const profileLink = screen.getByText("nav.profile").closest("a");
+      expect(profileLink).toHaveAttribute("href", "/profile");
+    });
+  });
+
   describe("Complete Route Navigation Specification", () => {
     beforeEach(() => {
-      mockUseSession.mockReturnValue({ user: null, loading: false });
+      mockUseSession.mockReturnValue({
+        session: null,
+        user: null,
+        profile: null,
+        isLoading: false,
+        signOut: jest.fn(),
+      });
     });
 
     it("should follow the complete navigation specification for all route scenarios", () => {
