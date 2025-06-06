@@ -206,6 +206,8 @@
     "profileUpdateErrorDesc": "發生未知錯誤"
   },
   "members": {
+    "membersTitle": "會友",
+    "membersDesc": "管理您的教會會友",
     "name": "名稱",
     "firstName": "名字",
     "lastName": "姓氏",
@@ -452,8 +454,6 @@
     "tenantDashboard": "{{name}} 首頁",
     "organizationManagement": "組織管理",
     "tools": "工具",
-    "membersTitle": "會友",
-    "membersDesc": "管理您的教會會友",
     "groupsTitle": "群組",
     "groupsDesc": "將您的教會組織成群組",
     "eventsTitle": "活動",

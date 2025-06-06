@@ -206,6 +206,8 @@
     "profileUpdateErrorDesc": "An unknown error occurred"
   },
   "members": {
+    "membersTitle": "Members",
+    "membersDesc": "Manage your church members",
     "name": "Name",
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -452,8 +454,6 @@
     "tenantDashboard": "{{name}} Dashboard",
     "organizationManagement": "Organization Management",
     "tools": "Tools",
-    "membersTitle": "Members",
-    "membersDesc": "Manage your church members",
     "groupsTitle": "Groups",
     "groupsDesc": "Organize your church into groups",
     "eventsTitle": "Events",
