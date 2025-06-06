@@ -2,17 +2,17 @@ import { useState, useEffect } from "react";
 import { Group, EventWithGroups } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { useSession } from "@/hooks/useSession";
+import { useTenantRole } from "@/hooks/useTenantRole";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { EventCard } from "./EventCard";
-import { getTenantBySlug } from "@/lib/tenant-utils";
 import { useTranslation } from "react-i18next";
 
 interface EventListProps {
   events: EventWithGroups[];
   isLoading: boolean;
-  tenantId: string;
+  tenantSlug: string;
   onEventUpdated: () => void;
   allGroups: Group[];
   onCopyEvent?: (event: EventWithGroups) => void;
@@ -21,13 +21,14 @@ interface EventListProps {
 export function EventList({
   events,
   isLoading,
-  tenantId,
+  tenantSlug,
   onEventUpdated,
   allGroups,
   onCopyEvent,
 }: EventListProps) {
   const { user } = useSession();
   const { toast } = useToast();
+  const { role } = useTenantRole(tenantSlug, user?.id);
   const [editableEvents, setEditableEvents] = useState<Record<string, boolean>>({});
   const { t } = useTranslation();
 
@@ -54,25 +55,8 @@ export function EventList({
       const permissions: Record<string, boolean> = {};
 
       try {
-        // Get the tenant UUID from the slug first
-        const tenant = await getTenantBySlug(tenantId);
-
-        if (!tenant) {
-          console.error("Tenant not found with slug:", tenantId);
-          return;
-        }
-
-        // Check if the user is a tenant owner
-        const { data: isOwner, error: ownerError } = await supabase.rpc("is_tenant_owner", {
-          tenant_uuid: tenant.id,
-        });
-
-        if (ownerError) {
-          console.error("Error checking tenant owner:", ownerError);
-        }
-
         // If user is a tenant owner, they can edit all events
-        if (isOwner) {
+        if (role === "owner") {
           events.forEach((event) => {
             permissions[event.id] = true;
           });
@@ -95,7 +79,7 @@ export function EventList({
     };
 
     checkPermissions();
-  }, [user, events, tenantId]);
+  }, [user, events, role]);
 
   const handleDeleteEvent = async (eventId: string) => {
     try {

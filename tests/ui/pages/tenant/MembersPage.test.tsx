@@ -19,6 +19,11 @@ jest.mock("react-router-dom", () => ({
 // Get the mocked useSession
 const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 
+// Import useTenantRole hook for mocking
+const { useTenantRole } = jest.requireMock("@/hooks/useTenantRole") as {
+  useTenantRole: jest.MockedFunction<typeof import("@/hooks/useTenantRole").useTenantRole>;
+};
+
 // Mock TenantPageLayout component
 jest.mock("@/components/Layout/TenantPageLayout", () => ({
   TenantPageLayout: ({
@@ -167,6 +172,11 @@ jest.mock("@/lib/member-service", () => ({
   getTenantMembers: jest.fn(),
 }));
 
+// Mock useTenantRole hook
+jest.mock("@/hooks/useTenantRole", () => ({
+  useTenantRole: jest.fn(),
+}));
+
 describe("MembersPage", () => {
   const mockUser = {
     id: "test-user-id",
@@ -229,6 +239,16 @@ describe("MembersPage", () => {
     // Set up default mocks
     (tenantService.getTenantBySlug as jest.Mock).mockResolvedValue(mockTenant);
     (memberService.getTenantMembers as jest.Mock).mockResolvedValue(mockMembers);
+    useTenantRole.mockReturnValue({ role: "owner", isLoading: false });
+
+    // Default authenticated user
+    mockUseSession.mockReturnValue({
+      session: null,
+      user: mockUser,
+      profile: null,
+      isLoading: false,
+      signOut: jest.fn(),
+    });
   });
 
   describe("Authentication and Navigation", () => {
@@ -418,6 +438,8 @@ describe("MembersPage", () => {
     });
 
     it("should not show invite button for non-owners", async () => {
+      useTenantRole.mockReturnValue({ role: "member", isLoading: false });
+
       const nonOwnerMembers = [
         {
           ...mockMembers[0],
@@ -433,6 +455,7 @@ describe("MembersPage", () => {
       await waitFor(() => {
         const actionContainer = screen.getByTestId("layout-action");
         expect(actionContainer).toBeEmptyDOMElement();
+        expect(screen.getByTestId("is-owner")).toHaveTextContent("false");
       });
     });
 
@@ -713,6 +736,8 @@ describe("MembersPage", () => {
     });
 
     it("should determine if current user is not owner correctly", async () => {
+      useTenantRole.mockReturnValue({ role: "member", isLoading: false });
+
       const nonOwnerMembers = [
         {
           ...mockMembers[0],

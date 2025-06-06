@@ -61,9 +61,9 @@ export default function DashboardPage() {
 
   const organizationCards = [
     {
-      title: t("dashboard.membersTitle"),
+      title: t("members.membersTitle"),
       icon: Users,
-      description: t("dashboard.membersDesc"),
+      description: t("members.membersDesc"),
       link: `/tenant/${tenant?.slug}/members`,
     },
     {

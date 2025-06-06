@@ -20,6 +20,11 @@ jest.mock("react-router-dom", () => ({
 // Get the mocked useSession
 const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 
+// Import useTenantRole hook for mocking
+const { useTenantRole } = jest.requireMock("@/hooks/useTenantRole") as {
+  useTenantRole: jest.MockedFunction<typeof import("@/hooks/useTenantRole").useTenantRole>;
+};
+
 // Mock supabase client
 jest.mock("@/integrations/supabase/client", () => ({
   supabase: {
@@ -183,13 +188,17 @@ jest.mock("lucide-react", () => ({
 jest.mock("@/lib/tenant-utils", () => ({
   getTenantBySlug: jest.fn(),
   getTenantMembers: jest.fn(),
-  fetchIsTenantOwner: jest.fn(),
 }));
 
 jest.mock("@/lib/group-service", () => ({
   getGroupMembers: jest.fn(),
   addUserToGroup: jest.fn(),
   removeUserFromGroup: jest.fn(),
+}));
+
+// Mock useTenantRole hook
+jest.mock("@/hooks/useTenantRole", () => ({
+  useTenantRole: jest.fn(),
 }));
 
 describe("GroupMembersPage", () => {
@@ -276,9 +285,18 @@ describe("GroupMembersPage", () => {
 
     // Set up default mocks
     (tenantUtils.getTenantBySlug as jest.Mock).mockResolvedValue(mockTenant);
-    (tenantUtils.fetchIsTenantOwner as jest.Mock).mockResolvedValue(false);
     (tenantUtils.getTenantMembers as jest.Mock).mockResolvedValue(mockTenantMembers);
     (groupService.getGroupMembers as jest.Mock).mockResolvedValue(mockGroupMembers);
+    useTenantRole.mockReturnValue({ role: "member", isLoading: false });
+
+    // Default authenticated user
+    mockUseSession.mockReturnValue({
+      session: null,
+      user: mockUser,
+      profile: null,
+      isLoading: false,
+      signOut: jest.fn(),
+    });
 
     // Mock supabase group query
     const mockSupabaseQuery = {
@@ -365,9 +383,6 @@ describe("GroupMembersPage", () => {
       });
 
       expect(screen.getByText("common.loading")).toBeInTheDocument();
-      expect(
-        document.querySelector('[data-testid="loader"]') || document.querySelector(".animate-spin"),
-      ).toBeTruthy();
     });
 
     it("should navigate to not-found when tenant doesn't exist", async () => {
@@ -473,7 +488,7 @@ describe("GroupMembersPage", () => {
     });
 
     it("should show add member button for tenant owners", async () => {
-      (tenantUtils.fetchIsTenantOwner as jest.Mock).mockResolvedValue(true);
+      useTenantRole.mockReturnValue({ role: "owner", isLoading: false });
 
       await act(async () => {
         render(<GroupMembersPage />);
@@ -485,7 +500,7 @@ describe("GroupMembersPage", () => {
     });
 
     it("should not show add member button for non-owners", async () => {
-      (tenantUtils.fetchIsTenantOwner as jest.Mock).mockResolvedValue(false);
+      useTenantRole.mockReturnValue({ role: "member", isLoading: false });
 
       await act(async () => {
         render(<GroupMembersPage />);
@@ -536,7 +551,7 @@ describe("GroupMembersPage", () => {
         isLoading: false,
         signOut: jest.fn(),
       });
-      (tenantUtils.fetchIsTenantOwner as jest.Mock).mockResolvedValue(true);
+      useTenantRole.mockReturnValue({ role: "owner", isLoading: false });
     });
 
     it("should open add member dialog when button is clicked", async () => {

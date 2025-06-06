@@ -189,32 +189,3 @@ export async function getTenantBySlug(slug: string): Promise<Tenant | null> {
     return null;
   }
 }
-
-export async function getUserRoleInTenant(tenantId: string, userId: string): Promise<string> {
-  const { data, error } = await supabase
-    .from("tenant_members")
-    .select("role")
-    .eq("tenant_id", tenantId)
-    .eq("user_id", userId)
-    .single();
-
-  if (error) {
-    console.error("Error fetching user role:", error);
-    return null;
-  }
-
-  return data?.role;
-}
-
-/**
- * Checks if a user is the owner of a tenant
- */
-export async function fetchIsTenantOwner(tenantId: string, userId: string): Promise<boolean> {
-  try {
-    const role = await getUserRoleInTenant(tenantId, userId);
-    return role === "owner";
-  } catch (error) {
-    console.error("Error in fetchIsTenantOwner:", error);
-    return false;
-  }
-}
