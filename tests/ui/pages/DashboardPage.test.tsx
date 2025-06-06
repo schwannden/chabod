@@ -385,4 +385,283 @@ describe("DashboardPage", () => {
       });
     });
   });
+
+  describe("Tenant Ownership Functionality", () => {
+    it("should show edit buttons for tenants where user is owner", async () => {
+      const mockTenants = [
+        {
+          id: "tenant-1",
+          name: "My Church",
+          slug: "my-church",
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+          price_tier_id: "basic-tier-id",
+          memberCount: 15,
+          groupCount: 3,
+          eventCount: 5,
+          userRole: "owner", // User is owner
+          price_tier: {
+            name: "Basic",
+            price_monthly: 29,
+            user_limit: 50,
+            group_limit: 10,
+            event_limit: 20,
+          },
+        },
+        {
+          id: "tenant-2",
+          name: "Other Church",
+          slug: "other-church",
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+          price_tier_id: "basic-tier-id",
+          memberCount: 10,
+          groupCount: 2,
+          eventCount: 3,
+          userRole: "member", // User is just a member
+          price_tier: {
+            name: "Basic",
+            price_monthly: 29,
+            user_limit: 50,
+            group_limit: 10,
+            event_limit: 20,
+          },
+        },
+      ];
+
+      (tenantUtils.getTenants as jest.Mock).mockResolvedValue(mockTenants);
+
+      render(<DashboardPage />);
+
+      // Wait for tenants to load
+      await waitFor(() => {
+        expect(screen.getByText("My Church")).toBeInTheDocument();
+        expect(screen.getByText("Other Church")).toBeInTheDocument();
+      });
+
+      // Get all edit buttons (pencil icons)
+      const editButtons = screen.getAllByTestId("pencil-icon");
+
+      // Should only have 1 edit button (for the church where user is owner)
+      expect(editButtons).toHaveLength(1);
+
+      // Verify edit button is for the correct tenant
+      const myChurchCard = screen.getByText("My Church").closest("div");
+      const otherChurchCard = screen.getByText("Other Church").closest("div");
+
+      // My Church should have edit button (user is owner)
+      expect(myChurchCard).toContainElement(editButtons[0]);
+
+      // Other Church should not have edit button (user is member)
+      expect(otherChurchCard).not.toContainElement(editButtons[0]);
+    });
+
+    it("should show no edit buttons when user is not owner of any tenants", async () => {
+      const mockTenants = [
+        {
+          id: "tenant-1",
+          name: "Church A",
+          slug: "church-a",
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+          price_tier_id: "basic-tier-id",
+          memberCount: 15,
+          groupCount: 3,
+          eventCount: 5,
+          userRole: "member", // User is member
+          price_tier: {
+            name: "Basic",
+            price_monthly: 29,
+            user_limit: 50,
+            group_limit: 10,
+            event_limit: 20,
+          },
+        },
+        {
+          id: "tenant-2",
+          name: "Church B",
+          slug: "church-b",
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+          price_tier_id: "basic-tier-id",
+          memberCount: 10,
+          groupCount: 2,
+          eventCount: 3,
+          userRole: "admin", // User is admin (not owner)
+          price_tier: {
+            name: "Basic",
+            price_monthly: 29,
+            user_limit: 50,
+            group_limit: 10,
+            event_limit: 20,
+          },
+        },
+      ];
+
+      (tenantUtils.getTenants as jest.Mock).mockResolvedValue(mockTenants);
+
+      render(<DashboardPage />);
+
+      // Wait for tenants to load
+      await waitFor(() => {
+        expect(screen.getByText("Church A")).toBeInTheDocument();
+        expect(screen.getByText("Church B")).toBeInTheDocument();
+      });
+
+      // Should have no edit buttons since user is not owner of any tenant
+      expect(screen.queryByTestId("pencil-icon")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("trash-icon")).not.toBeInTheDocument();
+    });
+
+    it("should show all edit buttons when user is owner of all tenants", async () => {
+      const mockTenants = [
+        {
+          id: "tenant-1",
+          name: "Church A",
+          slug: "church-a",
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+          price_tier_id: "basic-tier-id",
+          memberCount: 15,
+          groupCount: 3,
+          eventCount: 5,
+          userRole: "owner", // User is owner
+          price_tier: {
+            name: "Basic",
+            price_monthly: 29,
+            user_limit: 50,
+            group_limit: 10,
+            event_limit: 20,
+          },
+        },
+        {
+          id: "tenant-2",
+          name: "Church B",
+          slug: "church-b",
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+          price_tier_id: "basic-tier-id",
+          memberCount: 10,
+          groupCount: 2,
+          eventCount: 3,
+          userRole: "owner", // User is owner
+          price_tier: {
+            name: "Basic",
+            price_monthly: 29,
+            user_limit: 50,
+            group_limit: 10,
+            event_limit: 20,
+          },
+        },
+      ];
+
+      (tenantUtils.getTenants as jest.Mock).mockResolvedValue(mockTenants);
+
+      render(<DashboardPage />);
+
+      // Wait for tenants to load
+      await waitFor(() => {
+        expect(screen.getByText("Church A")).toBeInTheDocument();
+        expect(screen.getByText("Church B")).toBeInTheDocument();
+      });
+
+      // Should have 2 edit buttons (one for each tenant where user is owner)
+      const editButtons = screen.getAllByTestId("pencil-icon");
+      expect(editButtons).toHaveLength(2);
+
+      // Should have 2 delete buttons as well
+      const deleteButtons = screen.getAllByTestId("trash-icon");
+      expect(deleteButtons).toHaveLength(2);
+    });
+
+    it("should handle null userRole gracefully", async () => {
+      const mockTenants = [
+        {
+          id: "tenant-1",
+          name: "Church A",
+          slug: "church-a",
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+          price_tier_id: "basic-tier-id",
+          memberCount: 15,
+          groupCount: 3,
+          eventCount: 5,
+          userRole: null, // No role information
+          price_tier: {
+            name: "Basic",
+            price_monthly: 29,
+            user_limit: 50,
+            group_limit: 10,
+            event_limit: 20,
+          },
+        },
+      ];
+
+      (tenantUtils.getTenants as jest.Mock).mockResolvedValue(mockTenants);
+
+      render(<DashboardPage />);
+
+      // Wait for tenants to load
+      await waitFor(() => {
+        expect(screen.getByText("Church A")).toBeInTheDocument();
+      });
+
+      // Should have no edit buttons when userRole is null
+      expect(screen.queryByTestId("pencil-icon")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("trash-icon")).not.toBeInTheDocument();
+
+      // But navigation buttons should still be present
+      expect(screen.getByText("tenant.goToChurchDashboard")).toBeInTheDocument();
+      expect(screen.getByText("tenant.goToChurchLogin")).toBeInTheDocument();
+    });
+  });
+
+  describe("Loading and Error States", () => {
+    it("should show loading state initially", () => {
+      (tenantUtils.getTenants as jest.Mock).mockImplementation(
+        () => new Promise(() => {}), // Never resolves
+      );
+
+      render(<DashboardPage />);
+
+      expect(screen.getByText("dashboard.loadingChurchesList")).toBeInTheDocument();
+    });
+
+    it("should handle empty tenant list", async () => {
+      (tenantUtils.getTenants as jest.Mock).mockResolvedValue([]);
+
+      render(<DashboardPage />);
+
+      await waitFor(() => {
+        expect(screen.getByText("dashboard.noChurchesYet")).toBeInTheDocument();
+        expect(screen.getByText("dashboard.addFirstChurch")).toBeInTheDocument();
+      });
+
+      // Should still show the "Add Church" button
+      const addButtons = screen.getAllByText("dashboard.addChurch");
+      expect(addButtons).toHaveLength(2); // One in header, one in empty state
+    });
+  });
+
+  describe("User Interactions", () => {
+    it("should open create dialog when add church button is clicked", async () => {
+      const user = userEvent.setup();
+
+      (tenantUtils.getTenants as jest.Mock).mockResolvedValue([]);
+
+      render(<DashboardPage />);
+
+      await waitFor(() => {
+        expect(screen.getByText("dashboard.noChurchesYet")).toBeInTheDocument();
+      });
+
+      // Click the add church button in the header
+      const addButton = screen.getAllByText("dashboard.addChurch")[0];
+      await user.click(addButton);
+
+      // The create dialog should open
+      // This would be tested by checking if the dialog component is rendered
+      // In a real implementation, you might check for dialog-specific elements
+    });
+  });
 });

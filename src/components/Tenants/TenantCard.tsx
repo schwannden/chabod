@@ -77,19 +77,21 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
         <CardHeader>
           <CardTitle className="flex justify-between items-center">
             {tenant.name}
-            <div className="flex space-x-2">
-              <Button size="icon" variant="outline" onClick={() => setIsUpdateDialogOpen(true)}>
-                <Pencil className="h-4 w-4" />
-              </Button>
-              <Button
-                size="icon"
-                variant="destructive"
-                onClick={() => setIsDeleteDialogOpen(true)}
-                disabled={isDeleting}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
+            {tenant.userRole === "owner" && (
+              <div className="flex space-x-2">
+                <Button size="icon" variant="outline" onClick={() => setIsUpdateDialogOpen(true)}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                  disabled={isDeleting}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </CardTitle>
           <CardDescription>Slug: {tenant.slug}</CardDescription>
         </CardHeader>
@@ -175,7 +177,7 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
 
       <HighRiskDeleteDialog
         isOpen={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDelete}
         title={t("tenant.deleteChurch")}
         description={t("tenant.deleteChurchConfirm", { tenantName: tenant.name })}

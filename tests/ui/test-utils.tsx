@@ -41,6 +41,7 @@ export const mockTenant = {
   memberCount: 10,
   groupCount: 2,
   eventCount: 2,
+  userRole: "owner", // Default to owner for most tests
   price_tier: {
     name: "Basic",
     price_monthly: 29,

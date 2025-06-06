@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useSession } from "@/hooks/useSession";
 import { TenantPageLayout } from "@/components/Layout/TenantPageLayout";
 import { useQuery } from "@tanstack/react-query";
@@ -9,16 +9,24 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Service } from "@/lib/services";
 import { CreateServiceDialog } from "@/components/Services/CreateServiceDialog";
 import { ServiceCard } from "@/components/Services/ServiceCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { EditServiceDialog } from "@/components/Services/EditServiceDialog";
 import { useTranslation } from "react-i18next";
 
 export default function ServicePage() {
   const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
-  const { user } = useSession();
+  const { user, isLoading: isSessionLoading } = useSession();
+  const navigate = useNavigate();
   const { role } = useTenantRole(slug, user?.id);
   const [editingService, setEditingService] = useState<Service | null>(null);
+
+  // Redirect to auth page if user is not authenticated
+  useEffect(() => {
+    if (!isSessionLoading && !user) {
+      navigate(`/tenant/${slug}/auth`);
+    }
+  }, [user, isSessionLoading, navigate, slug]);
 
   const { data: tenant, isLoading: isTenantLoading } = useQuery({
     queryKey: ["tenant", slug],
@@ -37,7 +45,7 @@ export default function ServicePage() {
   });
 
   const canManageServices = role === "owner";
-  const isLoading = isTenantLoading || isServicesLoading;
+  const isLoading = isSessionLoading || isTenantLoading || isServicesLoading;
 
   const handleEditService = (service: Service) => {
     setEditingService(service);

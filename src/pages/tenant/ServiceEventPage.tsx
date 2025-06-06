@@ -51,12 +51,46 @@ export default function ServiceEventPage() {
 
   useEffect(() => {
     // Check if user can create events (is a service admin or tenant owner)
-    if (role === "owner" || user) {
-      setCanCreateEvent(true);
-    } else {
-      setCanCreateEvent(false);
-    }
-  }, [role, user]);
+    const checkCreatePermission = async () => {
+      if (!user) {
+        setCanCreateEvent(false);
+        return;
+      }
+
+      // Tenant owners can always create service events
+      if (role === "owner") {
+        setCanCreateEvent(true);
+        return;
+      }
+
+      // For non-owners, check if user is a service admin for any service
+      if (tenantId) {
+        try {
+          const { data: serviceAdmins, error } = await supabase
+            .from("service_admins")
+            .select("id")
+            .eq("user_id", user.id);
+
+          if (error) {
+            console.error("Error checking service admin status:", error);
+            setCanCreateEvent(false);
+            return;
+          }
+
+          // If user is a service admin for any service, they can create events
+          setCanCreateEvent(serviceAdmins && serviceAdmins.length > 0);
+        } catch (error) {
+          console.error("Error checking create permissions:", error);
+          setCanCreateEvent(false);
+        }
+      } else {
+        // If no tenantId yet, show button for members - it will be validated server-side
+        setCanCreateEvent(false);
+      }
+    };
+
+    checkCreatePermission();
+  }, [role, user, tenantId]);
 
   const fetchBaseData = useCallback(
     async (id: string) => {

@@ -233,7 +233,7 @@ export function GroupTable({
                         onClick={() => navigateToGroupMembers(group.id)}
                       >
                         <Users className="h-4 w-4 mr-1" />
-                        Members
+                        {t("groups.viewMembers")}
                       </Button>
 
                       {isTenantOwner && (
