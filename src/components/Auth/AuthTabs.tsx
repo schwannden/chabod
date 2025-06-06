@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SignInForm } from "./SignInForm";
 import { SignUpForm } from "./SignUpForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,6 +22,11 @@ export function AuthTabs({
   const [activeTab, setActiveTab] = useState<"signin" | "signup">(initialTab);
   const { t } = useTranslation();
 
+  // Update active tab when initialTab prop changes
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
+
   const handleSignInClick = () => setActiveTab("signin");
   const handleSignUpClick = () => setActiveTab("signup");
 
@@ -33,8 +37,8 @@ export function AuthTabs({
       className="w-full max-w-md mx-auto"
     >
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="signin">{t('auth.signIn')}</TabsTrigger>
-        <TabsTrigger value="signup">{t('auth.signUp')}</TabsTrigger>
+        <TabsTrigger value="signin">{t("auth.signIn")}</TabsTrigger>
+        <TabsTrigger value="signup">{t("auth.signUp")}</TabsTrigger>
       </TabsList>
       <TabsContent value="signin">
         <SignInForm

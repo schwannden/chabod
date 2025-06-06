@@ -270,6 +270,16 @@ describe("AuthPage (Main)", () => {
   });
 
   describe("URL Parameter Handling", () => {
+    beforeEach(() => {
+      mockUseSession.mockReturnValue({
+        session: null,
+        user: null,
+        profile: null,
+        isLoading: false,
+        signOut: jest.fn(),
+      });
+    });
+
     it("should properly handle empty search params", () => {
       mockUseSearchParams.mockReturnValue([new URLSearchParams("")]);
 
@@ -318,6 +328,29 @@ describe("AuthPage (Main)", () => {
       render(<AuthPage />);
 
       // Should default to signin for case-sensitive mismatch
+      expect(screen.getByTestId("initial-tab")).toHaveTextContent("signin");
+    });
+
+    it("should update tab when URL parameters change (simulating navbar navigation)", () => {
+      // Start with signin (no tab parameter)
+      mockUseSearchParams.mockReturnValue([new URLSearchParams("")]);
+
+      const { rerender } = render(<AuthPage />);
+
+      expect(screen.getByTestId("initial-tab")).toHaveTextContent("signin");
+
+      // Simulate clicking navbar signup link (changing URL to include tab=signup)
+      mockUseSearchParams.mockReturnValue([new URLSearchParams("tab=signup")]);
+
+      rerender(<AuthPage />);
+
+      expect(screen.getByTestId("initial-tab")).toHaveTextContent("signup");
+
+      // Simulate clicking navbar login link (changing URL to remove tab parameter)
+      mockUseSearchParams.mockReturnValue([new URLSearchParams("")]);
+
+      rerender(<AuthPage />);
+
       expect(screen.getByTestId("initial-tab")).toHaveTextContent("signin");
     });
   });

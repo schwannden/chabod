@@ -264,7 +264,55 @@ describe("NavBar", () => {
       expect(loginLink).toHaveAttribute("href", "/auth");
     });
 
+    it("should render login link without redirect when already on auth page", () => {
+      mockLocation.pathname = "/auth";
+      mockUseSession.mockReturnValue({
+        session: null,
+        user: null,
+        profile: null,
+        isLoading: false,
+        signOut: jest.fn(),
+      });
+
+      render(<NavBar />);
+
+      const loginLink = screen.getByText("nav.login").closest("a");
+      expect(loginLink).toHaveAttribute("href", "/auth");
+    });
+
+    it("should render login link without redirect when on auth page with query params", () => {
+      mockLocation.pathname = "/auth";
+      mockUseSession.mockReturnValue({
+        session: null,
+        user: null,
+        profile: null,
+        isLoading: false,
+        signOut: jest.fn(),
+      });
+
+      render(<NavBar />);
+
+      const loginLink = screen.getByText("nav.login").closest("a");
+      expect(loginLink).toHaveAttribute("href", "/auth");
+    });
+
     it("should render signup link", () => {
+      mockUseSession.mockReturnValue({
+        session: null,
+        user: null,
+        profile: null,
+        isLoading: false,
+        signOut: jest.fn(),
+      });
+
+      render(<NavBar />);
+
+      const signupLink = screen.getByText("nav.signup").closest("a");
+      expect(signupLink).toHaveAttribute("href", "/auth?tab=signup");
+    });
+
+    it("should render signup link when already on auth page", () => {
+      mockLocation.pathname = "/auth";
       mockUseSession.mockReturnValue({
         session: null,
         user: null,

@@ -141,6 +141,11 @@ jest.mock("@/components/shared/HighRiskDeleteDialog", () => ({
     isOpen ? React.createElement("div", { "data-testid": "delete-dialog" }, children) : null,
 }));
 
+jest.mock("@/components/shared/AlphaWarningDialog", () => ({
+  AlphaWarningDialog: ({ isOpen }: { isOpen: boolean }) =>
+    isOpen ? React.createElement("div", { "data-testid": "alpha-warning-dialog" }) : null,
+}));
+
 // Mock Lucide React icons
 jest.mock("lucide-react", () => ({
   Plus: () => React.createElement("svg", { "data-testid": "plus-icon" }),
@@ -162,6 +167,8 @@ jest.mock("lucide-react", () => ({
   FileText: () => React.createElement("svg", { "data-testid": "file-text-icon" }),
   Handshake: () => React.createElement("svg", { "data-testid": "handshake-icon" }),
   UserPlus: () => React.createElement("svg", { "data-testid": "user-plus-icon" }),
+  AlertTriangle: () => React.createElement("svg", { "data-testid": "alert-triangle-icon" }),
+  Check: () => React.createElement("svg", { "data-testid": "check-icon" }),
 }));
 
 // Mock next-themes
