@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.3.3](https://github.com/schwannden/chabod/compare/v0.3.2...v0.3.3) (2025-06-06)
+
+
+### Refactors
+
+* optimize query ([#55](https://github.com/schwannden/chabod/issues/55)) ([0230031](https://github.com/schwannden/chabod/commit/023003192eb37aaab7ce6512f7a56ad7e6009dd9))
+
+
+### Tests
+
+* add test for service rls ([#50](https://github.com/schwannden/chabod/issues/50)) ([d61cdc5](https://github.com/schwannden/chabod/commit/d61cdc5f8a896e74497d804b1f9b03dc0b7f0ed2))
+* adding ui component testing ([#51](https://github.com/schwannden/chabod/issues/51)) ([dd53fa0](https://github.com/schwannden/chabod/commit/dd53fa050e38d6e997b25a2cddd711d00f5fe8ee))
+* extend coverage ([#53](https://github.com/schwannden/chabod/issues/53)) ([4261d93](https://github.com/schwannden/chabod/commit/4261d93ea918e45f21da41478225b7051536384c))
+* extend coverage ([#54](https://github.com/schwannden/chabod/issues/54)) ([9dcbdc0](https://github.com/schwannden/chabod/commit/9dcbdc00100eb8a9309cb64318be9a9c9cb49b9c))
+
 ## [0.3.2](https://github.com/schwannden/chabod/compare/v0.3.1...v0.3.2) (2025-06-04)
 
 
