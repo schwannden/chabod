@@ -5,8 +5,13 @@ import { ValueProposition } from "@/components/Landing/ValueProposition";
 import { PricingPlans } from "@/components/Landing/PricingPlans";
 import { CallToAction } from "@/components/Landing/CallToAction";
 import { Footer } from "@/components/Landing/Footer";
+import { useAlphaWarning } from "@/hooks/useAlphaWarning";
+import { AlphaWarningDialog } from "@/components/shared/AlphaWarningDialog";
 
 export default function LandingPage() {
+  // Use the alpha warning hook
+  const { isOpen: isAlphaWarningOpen, dismissWarning } = useAlphaWarning();
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <NavBar />
@@ -18,6 +23,8 @@ export default function LandingPage() {
         <CallToAction />
       </main>
       <Footer />
+
+      <AlphaWarningDialog isOpen={isAlphaWarningOpen} onDismiss={dismissWarning} />
     </div>
   );
 }

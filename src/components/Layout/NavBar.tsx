@@ -98,7 +98,7 @@ export function NavBar() {
               <div className="flex items-center space-x-2">
                 <Button asChild variant="ghost" size="sm">
                   <Link
-                    to={`/auth${location.pathname !== "/" ? `?redirect=${encodeURIComponent(location.pathname)}` : ""}`}
+                    to={`/auth${location.pathname !== "/" && !location.pathname.startsWith("/auth") ? `?redirect=${encodeURIComponent(location.pathname)}` : ""}`}
                   >
                     {t("nav.login")}
                   </Link>

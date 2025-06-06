@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/hooks/useSession";
 import { useTenants } from "@/hooks/useTenants";
+import { useAlphaWarning } from "@/hooks/useAlphaWarning";
 import { NavBar } from "@/components/Layout/NavBar";
 import { TenantCard } from "@/components/Tenants/TenantCard";
 import { TenantCreateDialog } from "@/components/Tenants/TenantCreateDialog";
+import { AlphaWarningDialog } from "@/components/shared/AlphaWarningDialog";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
@@ -22,6 +24,9 @@ export default function DashboardPage() {
     error: tenantsError,
     invalidateTenants,
   } = useTenants();
+
+  // Use the alpha warning hook
+  const { isOpen: isAlphaWarningOpen, dismissWarning } = useAlphaWarning();
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -85,6 +90,8 @@ export default function DashboardPage() {
           onTenantCreated={invalidateTenants}
         />
       )}
+
+      <AlphaWarningDialog isOpen={isAlphaWarningOpen} onDismiss={dismissWarning} />
     </div>
   );
 }
