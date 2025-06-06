@@ -2,21 +2,26 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/hooks/useSession";
+import { useTenants } from "@/hooks/useTenants";
 import { NavBar } from "@/components/Layout/NavBar";
 import { TenantCard } from "@/components/Tenants/TenantCard";
 import { TenantCreateDialog } from "@/components/Tenants/TenantCreateDialog";
 import { Button } from "@/components/ui/button";
-import { TenantWithUsage } from "@/lib/types";
-import { getTenants } from "@/lib/tenant-utils";
 import { Plus } from "lucide-react";
 
 export default function DashboardPage() {
   const { t } = useTranslation();
   const { user, isLoading } = useSession();
   const navigate = useNavigate();
-  const [tenants, setTenants] = useState<TenantWithUsage[]>([]);
-  const [isTenantsLoading, setIsTenantsLoading] = useState(true);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+  // Use the custom hook for tenant data management
+  const {
+    tenants,
+    isLoading: isTenantsLoading,
+    error: tenantsError,
+    invalidateTenants,
+  } = useTenants();
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -25,37 +30,14 @@ export default function DashboardPage() {
     }
   }, [user, isLoading, navigate]);
 
-  useEffect(() => {
-    const fetchTenants = async () => {
-      if (!user) return;
-
-      try {
-        const tenantsData = await getTenants();
-        setTenants(tenantsData);
-      } catch (error) {
-        console.error("Error fetching tenants:", error);
-      } finally {
-        setIsTenantsLoading(false);
-      }
-    };
-
-    if (user) {
-      fetchTenants();
-    }
-  }, [user]);
-
-  const handleTenantChange = async () => {
-    if (!user) return;
-    setIsTenantsLoading(true);
-    const tenantsData = await getTenants();
-    setTenants(tenantsData);
-    setIsTenantsLoading(false);
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">{t("common.loading")}</div>
     );
+  }
+
+  if (tenantsError) {
+    console.error("Error fetching tenants:", tenantsError);
   }
 
   return (
@@ -87,8 +69,8 @@ export default function DashboardPage() {
               <TenantCard
                 key={tenant.id}
                 tenant={tenant}
-                onTenantUpdated={handleTenantChange}
-                onTenantDeleted={handleTenantChange}
+                onTenantUpdated={invalidateTenants}
+                onTenantDeleted={invalidateTenants}
               />
             ))}
           </div>
@@ -100,7 +82,7 @@ export default function DashboardPage() {
           isOpen={isCreateDialogOpen}
           onClose={() => setIsCreateDialogOpen(false)}
           userId={user.id}
-          onTenantCreated={handleTenantChange}
+          onTenantCreated={invalidateTenants}
         />
       )}
     </div>

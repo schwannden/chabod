@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSession } from "@/hooks/useSession";
+import { useTenantRole } from "@/hooks/useTenantRole";
 import { Button } from "@/components/ui/button";
 import { getTenantBySlug } from "@/lib/tenant-service";
 import { getTenantMembers } from "@/lib/member-service";
@@ -17,14 +18,16 @@ export default function MembersPage() {
   const { user, isLoading } = useSession();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { role, isLoading: isRoleLoading } = useTenantRole(slug, user?.id);
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [members, setMembers] = useState<TenantMemberWithProfile[]>([]);
-  const [isOwner, setIsOwner] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [nameFilter, setNameFilter] = useState("");
   const [emailFilter, setEmailFilter] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
+
+  const isOwner = role === "owner";
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -53,9 +56,12 @@ export default function MembersPage() {
           return;
         }
 
-        const isUserOwner = currentUserMember.role === "owner";
-        setIsOwner(isUserOwner);
-        console.log("Current user role:", currentUserMember.role, "Is owner:", isUserOwner);
+        console.log(
+          "Current user role:",
+          currentUserMember.role,
+          "Is owner:",
+          currentUserMember.role === "owner",
+        );
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -88,7 +94,7 @@ export default function MembersPage() {
     return nameMatch && emailMatch && roleMatch;
   });
 
-  if (isLoading || isDataLoading) {
+  if (isLoading || isDataLoading || isRoleLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">{t("common.loading")}</div>
     );
@@ -116,7 +122,7 @@ export default function MembersPage() {
       description={t("members.membersDesc")}
       tenantName={tenant?.name || ""}
       tenantSlug={slug || ""}
-      isLoading={isLoading || isDataLoading}
+      isLoading={isLoading || isDataLoading || isRoleLoading}
       breadcrumbItems={[{ label: t("nav.members") }]}
       action={
         isOwner && (

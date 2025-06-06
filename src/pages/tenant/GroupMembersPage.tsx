@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSession } from "@/hooks/useSession";
-import { NavBar } from "@/components/Layout/NavBar";
+import { useTenantRole } from "@/hooks/useTenantRole";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Tenant, Profile, GroupMemberWithProfile } from "@/lib/types";
-import { getTenantBySlug, getTenantMembers, fetchIsTenantOwner } from "@/lib/tenant-utils";
+import { getTenantBySlug, getTenantMembers } from "@/lib/tenant-utils";
 import { addUserToGroup, getGroupMembers, removeUserFromGroup } from "@/lib/group-service";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, UserMinus } from "lucide-react";
+import { UserMinus } from "lucide-react";
 import { TenantBreadcrumb } from "@/components/Layout/TenantBreadcrumb";
+import { NavBar } from "@/components/Layout/NavBar";
 import {
   Table,
   TableBody,
@@ -41,6 +42,7 @@ export default function GroupMembersPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { role, isLoading: isRoleLoading } = useTenantRole(slug, user?.id);
 
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [groupName, setGroupName] = useState<string>("");
@@ -50,7 +52,8 @@ export default function GroupMembersPage() {
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isTenantOwner, setIsTenantOwner] = useState(false);
+
+  const isTenantOwner = role === "owner";
 
   useEffect(() => {
     if (!isSessionLoading && !user) {
@@ -69,9 +72,6 @@ export default function GroupMembersPage() {
           return;
         }
         setTenant(tenantData);
-
-        const isOwner = await fetchIsTenantOwner(tenantData.id, user.id);
-        setIsTenantOwner(isOwner);
 
         const { data: groupData, error: groupError } = await supabase
           .from("groups")
@@ -178,12 +178,9 @@ export default function GroupMembersPage() {
     }
   };
 
-  if (isSessionLoading || isLoading) {
+  if (isSessionLoading || isLoading || isRoleLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">{t("common.loading")}</span>
-      </div>
+      <div className="flex items-center justify-center min-h-screen">{t("common.loading")}</div>
     );
   }
 

@@ -19,6 +19,11 @@ jest.mock("react-router-dom", () => ({
 // Get the mocked useSession
 const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 
+// Import useTenantRole hook for mocking
+const { useTenantRole } = jest.requireMock("@/hooks/useTenantRole") as {
+  useTenantRole: jest.MockedFunction<typeof import("@/hooks/useTenantRole").useTenantRole>;
+};
+
 // Mock TenantPageLayout component
 jest.mock("@/components/Layout/TenantPageLayout", () => ({
   TenantPageLayout: ({
@@ -101,11 +106,15 @@ jest.mock("@/components/Groups/GroupTable", () => ({
 // Mock the service functions
 jest.mock("@/lib/tenant-utils", () => ({
   getTenantBySlug: jest.fn(),
-  fetchIsTenantOwner: jest.fn(),
 }));
 
 jest.mock("@/lib/group-service", () => ({
   getTenantGroups: jest.fn(),
+}));
+
+// Mock useTenantRole hook
+jest.mock("@/hooks/useTenantRole", () => ({
+  useTenantRole: jest.fn(),
 }));
 
 describe("GroupsPage", () => {
@@ -157,8 +166,17 @@ describe("GroupsPage", () => {
 
     // Set up default mocks
     (tenantUtils.getTenantBySlug as jest.Mock).mockResolvedValue(mockTenant);
-    (tenantUtils.fetchIsTenantOwner as jest.Mock).mockResolvedValue(false);
     (groupService.getTenantGroups as jest.Mock).mockResolvedValue(mockGroups);
+    useTenantRole.mockReturnValue({ role: "member", isLoading: false });
+
+    // Default authenticated user
+    mockUseSession.mockReturnValue({
+      session: null,
+      user: mockUser,
+      profile: null,
+      isLoading: false,
+      signOut: jest.fn(),
+    });
   });
 
   describe("Authentication and Navigation", () => {
@@ -297,7 +315,7 @@ describe("GroupsPage", () => {
     });
 
     it("should pass correct owner status to GroupTable", async () => {
-      (tenantUtils.fetchIsTenantOwner as jest.Mock).mockResolvedValue(true);
+      useTenantRole.mockReturnValue({ role: "owner", isLoading: false });
 
       await act(async () => {
         render(<GroupsPage />);
@@ -309,7 +327,7 @@ describe("GroupsPage", () => {
     });
 
     it("should pass non-owner status to GroupTable", async () => {
-      (tenantUtils.fetchIsTenantOwner as jest.Mock).mockResolvedValue(false);
+      useTenantRole.mockReturnValue({ role: "member", isLoading: false });
 
       await act(async () => {
         render(<GroupsPage />);
@@ -508,24 +526,16 @@ describe("GroupsPage", () => {
       consoleSpy.mockRestore();
     });
 
-    it("should handle owner check errors", async () => {
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-      (tenantUtils.fetchIsTenantOwner as jest.Mock).mockRejectedValue(
-        new Error("Owner check failed"),
-      );
+    it("should handle role loading state", async () => {
+      useTenantRole.mockReturnValue({ role: null, isLoading: true });
 
       await act(async () => {
         render(<GroupsPage />);
       });
 
       await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalledWith(
-          "Error fetching tenant or groups:",
-          expect.any(Error),
-        );
+        expect(screen.getByText("common.loading")).toBeInTheDocument();
       });
-
-      consoleSpy.mockRestore();
     });
 
     it("should not fetch data when user is null", async () => {

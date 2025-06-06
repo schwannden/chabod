@@ -167,7 +167,7 @@ export default function ServiceEventPage() {
         <ServiceEventList
           serviceEvents={serviceEvents}
           isLoading={isEventsLoading}
-          tenantId={tenantId || ""}
+          tenantSlug={slug}
           onEventUpdated={handleEventUpdated}
           services={services}
         />

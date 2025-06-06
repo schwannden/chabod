@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ServiceEventWithService } from "@/lib/services/types";
 import { Loader2 } from "lucide-react";
 import { useSession } from "@/hooks/useSession";
+import { useTenantRole } from "@/hooks/useTenantRole";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -12,7 +13,7 @@ import { deleteServiceEvent } from "@/lib/services/service-event-crud";
 interface ServiceEventListProps {
   serviceEvents: ServiceEventWithService[];
   isLoading: boolean;
-  tenantId: string;
+  tenantSlug: string;
   onEventUpdated: () => void;
   services: { id: string; name: string }[];
 }
@@ -20,12 +21,13 @@ interface ServiceEventListProps {
 export function ServiceEventList({
   serviceEvents,
   isLoading,
-  tenantId,
+  tenantSlug,
   onEventUpdated,
   services,
 }: ServiceEventListProps) {
   const { user } = useSession();
   const { toast } = useToast();
+  const { role } = useTenantRole(tenantSlug, user?.id);
   const [editableEvents, setEditableEvents] = useState<Record<string, boolean>>({});
 
   const sortedEvents = [...serviceEvents].sort((a, b) => {
@@ -47,17 +49,8 @@ export function ServiceEventList({
       const permissions: Record<string, boolean> = {};
 
       try {
-        // For simplicity, check if the user is a tenant owner
-        const { data: isOwner, error: ownerError } = await supabase.rpc("is_tenant_owner", {
-          tenant_uuid: tenantId,
-        });
-
-        if (ownerError) {
-          console.error("Error checking tenant owner:", ownerError);
-        }
-
         // If user is a tenant owner, they can edit all events
-        if (isOwner) {
+        if (role === "owner") {
           serviceEvents.forEach((event) => {
             permissions[event.id] = true;
           });
@@ -90,7 +83,7 @@ export function ServiceEventList({
     };
 
     checkPermissions();
-  }, [user, serviceEvents, tenantId]);
+  }, [user, serviceEvents, role]);
 
   const handleDeleteEvent = async (eventId: string) => {
     try {

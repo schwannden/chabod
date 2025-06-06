@@ -453,7 +453,7 @@ describe("ServiceEventPage", () => {
         expect.objectContaining({
           serviceEvents: mockEvents,
           isLoading: false,
-          tenantId: "",
+          tenantSlug: "test-church",
           services: [],
         }),
       );
@@ -591,10 +591,10 @@ describe("ServiceEventPage", () => {
       // Component should still render
       expect(screen.getByTestId("generic-event-page")).toBeInTheDocument();
 
-      // Should pass empty tenantId to components
+      // Should pass tenantSlug to components
       expect(mockServiceEventList).toHaveBeenCalledWith(
         expect.objectContaining({
-          tenantId: "",
+          tenantSlug: "test-church",
         }),
       );
     });
@@ -943,7 +943,7 @@ describe("ServiceEventPage", () => {
         () => {
           expect(mockServiceEventList).toHaveBeenCalledWith(
             expect.objectContaining({
-              tenantId: "test-tenant-id",
+              tenantSlug: "test-church",
             }),
           );
         },

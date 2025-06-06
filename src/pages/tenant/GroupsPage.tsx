@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSession } from "@/hooks/useSession";
+import { useTenantRole } from "@/hooks/useTenantRole";
 import { GroupTable } from "@/components/Groups/GroupTable";
-import { getTenantBySlug, fetchIsTenantOwner } from "@/lib/tenant-utils";
+import { getTenantBySlug } from "@/lib/tenant-utils";
 import { getTenantGroups } from "@/lib/group-service";
 import { Tenant, GroupWithMemberCount } from "@/lib/types";
 import { TenantPageLayout } from "@/components/Layout/TenantPageLayout";
@@ -14,10 +15,12 @@ export default function GroupsPage() {
   const { user, isLoading: isSessionLoading } = useSession();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { role, isLoading: isRoleLoading } = useTenantRole(slug, user?.id);
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [groups, setGroups] = useState<GroupWithMemberCount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isTenantOwner, setIsTenantOwner] = useState(false);
+
+  const isTenantOwner = role === "owner";
 
   useEffect(() => {
     if (!isSessionLoading && !user) {
@@ -36,9 +39,6 @@ export default function GroupsPage() {
           return;
         }
         setTenant(tenantData);
-
-        const isOwner = await fetchIsTenantOwner(tenantData.id, user.id);
-        setIsTenantOwner(isOwner);
 
         const groupsData = await getTenantGroups(tenantData.id);
         setGroups(groupsData);
@@ -64,7 +64,7 @@ export default function GroupsPage() {
   const handleGroupUpdated = handleGroupCreated;
   const handleGroupDeleted = handleGroupCreated;
 
-  if (isSessionLoading || isLoading) {
+  if (isSessionLoading || isLoading || isRoleLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -79,7 +79,7 @@ export default function GroupsPage() {
       description={t("groups.manageGroupsDescription", { tenantName: tenant?.name || "" })}
       tenantName={tenant?.name || ""}
       tenantSlug={slug || ""}
-      isLoading={isLoading}
+      isLoading={isLoading || isRoleLoading}
       breadcrumbItems={[{ label: t("groups.groups") }]}
     >
       {tenant && (

@@ -117,7 +117,7 @@ export default function EventPage() {
         <EventList
           events={events}
           isLoading={isEventsLoading}
-          tenantId={slug}
+          tenantSlug={slug}
           onEventUpdated={handleEventUpdated}
           allGroups={allGroups || []}
           onCopyEvent={user ? handleCopyEvent : undefined}
