@@ -143,9 +143,18 @@ jest.mock("@/components/shared/HighRiskDeleteDialog", () => ({
     isOpen ? React.createElement("div", { "data-testid": "delete-dialog" }, children) : null,
 }));
 
-jest.mock("@/components/shared/AlphaWarningDialog", () => ({
-  AlphaWarningDialog: ({ isOpen }: { isOpen: boolean }) =>
-    isOpen ? React.createElement("div", { "data-testid": "alpha-warning-dialog" }) : null,
+jest.mock("@/components/shared/AnnouncementDialog", () => ({
+  AnnouncementDialog: ({ isOpen }: { isOpen: boolean }) =>
+    isOpen ? React.createElement("div", { "data-testid": "announcement-dialog" }) : null,
+}));
+
+jest.mock("@/hooks/useAnnouncement", () => ({
+  useAnnouncement: () => ({
+    isOpen: false,
+    currentAnnouncement: null,
+    dismissAnnouncement: jest.fn(),
+    resetAnnouncements: jest.fn(),
+  }),
 }));
 
 // Mock Lucide React icons
@@ -170,6 +179,8 @@ jest.mock("lucide-react", () => ({
   Handshake: () => React.createElement("svg", { "data-testid": "handshake-icon" }),
   UserPlus: () => React.createElement("svg", { "data-testid": "user-plus-icon" }),
   AlertTriangle: () => React.createElement("svg", { "data-testid": "alert-triangle-icon" }),
+  AlertCircle: () => React.createElement("svg", { "data-testid": "alert-circle-icon" }),
+  CheckCircle: () => React.createElement("svg", { "data-testid": "check-circle-icon" }),
   Check: () => React.createElement("svg", { "data-testid": "check-icon" }),
 }));
 

@@ -3,10 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/hooks/useSession";
 import { useTenants } from "@/hooks/useTenants";
-import { useAlphaWarning } from "@/hooks/useAlphaWarning";
 import { NavBar } from "@/components/Layout/NavBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlphaWarningDialog } from "@/components/shared/AlphaWarningDialog";
 import { Tenant } from "@/lib/types";
 import { getTenantBySlug } from "@/lib/tenant-utils";
 import { Loader2, Users, Calendar, Group, FileText, Handshake } from "lucide-react";
@@ -21,9 +19,6 @@ export default function DashboardPage() {
 
   // Use cached tenant data
   const { tenants, isLoading: isTenantsLoading } = useTenants();
-
-  // Use the alpha warning hook
-  const { isOpen: isAlphaWarningOpen, dismissWarning } = useAlphaWarning();
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -189,8 +184,6 @@ export default function DashboardPage() {
           </section>
         </div>
       </main>
-
-      <AlphaWarningDialog isOpen={isAlphaWarningOpen} onDismiss={dismissWarning} />
     </div>
   );
 }
