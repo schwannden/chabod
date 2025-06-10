@@ -4,7 +4,7 @@ import { TenantBreadcrumb } from "@/components/Layout/TenantBreadcrumb";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-interface TenantPageLayoutProps {
+export interface TenantPageLayoutProps {
   children: ReactNode;
   title: string;
   description?: string;

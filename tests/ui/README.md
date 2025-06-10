@@ -55,6 +55,136 @@ tests/ui/
 
 **Finding Tests:** `src/components/Tenants/TenantCard.tsx` → `tests/ui/components/Tenants/TenantCard.test.tsx`
 
+## Authentication Testing
+
+The test utilities provide helper functions for common authentication scenarios:
+
+### Using Helper Functions (Recommended)
+
+```tsx
+// User is loading (most common initial state)
+mockUseSessionHelpers.loading();
+
+// User is not authenticated
+mockUseSessionHelpers.unauthenticated();
+
+// User is authenticated with default profile
+mockUseSessionHelpers.authenticated();
+
+// User is authenticated but no profile loaded
+mockUseSessionHelpers.authenticatedNoProfile();
+
+// User with custom data
+mockUseSessionHelpers.withUser({ email: "custom@example.com" });
+
+// User with custom profile
+mockUseSessionHelpers.withProfile({ full_name: "Custom Name" });
+
+// Authenticated user with custom user and profile data
+mockUseSessionHelpers.authenticated(
+  { email: "override@example.com" },
+  { full_name: "Override Name" },
+);
+```
+
+### Using Direct Mock (For Complex Cases)
+
+```tsx
+// Direct mock session state for complex scenarios
+mockUseSession({
+  session: mockSession,
+  user: mockUser,
+  profile: mockProfile,
+  isLoading: false,
+  signOut: jest.fn().mockResolvedValue(undefined),
+  refetchProfile: jest.fn().mockResolvedValue(undefined),
+});
+```
+
+### Testing Authentication Flows
+
+```tsx
+// Test loading state
+mockUseSessionHelpers.loading();
+render(<Component />);
+expect(screen.getByText("Loading...")).toBeInTheDocument();
+
+// Test unauthenticated redirect
+mockUseSessionHelpers.unauthenticated();
+render(<Component />);
+expect(mockNavigate).toHaveBeenCalledWith("/auth");
+
+// Test authenticated state
+mockUseSessionHelpers.authenticated();
+render(<Component />);
+expect(screen.getByText("Welcome")).toBeInTheDocument();
+```
+
+### Session Helper Benefits
+
+The `mockUseSessionHelpers` functions provide several advantages:
+
+1. **Consistent Defaults**: All helpers use sensible default values
+2. **Type Safety**: Full TypeScript support with proper types
+3. **Readability**: Clear, semantic function names
+4. **Maintainability**: Centralized session state management
+5. **Flexibility**: Override defaults when needed
+6. **Performance**: Optimized for common test scenarios
+
+### Available Mock Data
+
+The test utilities export several pre-configured mock objects:
+
+```tsx
+// Default mock user
+export const mockUser = {
+  id: "test-user-id",
+  email: "test@example.com",
+  // ... other user properties
+};
+
+// Default mock profile
+export const mockProfile = {
+  id: "profile-id-456",
+  full_name: "Test User",
+  first_name: "Test",
+  last_name: "User",
+  email: "test@example.com",
+  // ... other profile properties
+};
+
+// Default mock session
+export const mockSession = {
+  access_token: "mock_access_token",
+  user: mockUser,
+  // ... other session properties
+};
+
+// Default mock tenant
+export const mockTenant = {
+  id: "test-tenant-id",
+  name: "Test Church",
+  slug: "test-church",
+  // ... other tenant properties
+};
+```
+
+### Custom Data Override Examples
+
+```tsx
+// Custom profile with specific data
+mockUseSessionHelpers.withProfile({
+  full_name: "John Doe",
+  first_name: "John",
+  last_name: "Doe",
+});
+
+// Custom user email
+mockUseSessionHelpers.withUser({
+  email: "specific@example.com",
+});
+```
+
 ## Writing Tests
 
 ### Basic Test Structure

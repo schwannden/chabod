@@ -1,14 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
 import { screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { render } from "../test-utils";
+import { render, mockUseSessionHelpers, mockProfile } from "../test-utils";
 import ProfilePage from "@/pages/ProfilePage";
 
-// Mock the useSession hook
-jest.mock("@/hooks/useSession", () => ({
-  useSession: jest.fn(),
-}));
+// useSession is already mocked in test-utils.tsx
 
 // Mock the getTenantBySlug function
 jest.mock("@/lib/tenant-utils", () => ({
@@ -55,32 +51,17 @@ jest.mock("react-router-dom", () => ({
   useParams: () => mockParams,
 }));
 
-import { useSession } from "@/hooks/useSession";
 import { getTenantBySlug } from "@/lib/tenant-utils";
 import { supabase } from "@/integrations/supabase/client";
 
-const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 const mockGetTenantBySlug = getTenantBySlug as jest.MockedFunction<typeof getTenantBySlug>;
 
-// Mock user and profile objects
-const mockUser = {
-  id: "user-1",
-  email: "test@example.com",
-  app_metadata: {},
-  user_metadata: {},
-  aud: "authenticated",
-  created_at: "2024-01-01T00:00:00Z",
-} as any;
-
-const mockProfile = {
-  id: "user-1",
+// Test-specific profile with custom data
+const testProfile = {
+  ...mockProfile,
   full_name: "John Doe",
   first_name: "John",
   last_name: "Doe",
-  email: "test@example.com",
-  avatar_url: null,
-  created_at: "2024-01-01T00:00:00Z",
-  updated_at: "2024-01-01T00:00:00Z",
 };
 
 const mockTenant = {
@@ -100,13 +81,7 @@ describe("ProfilePage", () => {
 
   describe("Regular Profile Page (non-tenant)", () => {
     it("should render profile page when user is authenticated", async () => {
-      mockUseSession.mockReturnValue({
-        session: {} as any,
-        user: mockUser,
-        profile: mockProfile,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.withProfile(testProfile);
 
       await act(async () => {
         render(<ProfilePage />);
@@ -123,13 +98,7 @@ describe("ProfilePage", () => {
     });
 
     it("should redirect to auth when user is not authenticated", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       await act(async () => {
         render(<ProfilePage />);
@@ -139,13 +108,7 @@ describe("ProfilePage", () => {
     });
 
     it("should show loading state while session is loading", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: true,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.loading();
 
       await act(async () => {
         render(<ProfilePage />);
@@ -155,13 +118,7 @@ describe("ProfilePage", () => {
     });
 
     it("should show error when profile is not found", async () => {
-      mockUseSession.mockReturnValue({
-        session: {} as any,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       await act(async () => {
         render(<ProfilePage />);
@@ -186,13 +143,7 @@ describe("ProfilePage", () => {
       }));
       (supabase.from as jest.Mock).mockImplementation(mockFrom);
 
-      mockUseSession.mockReturnValue({
-        session: {} as any,
-        user: mockUser,
-        profile: mockProfile,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.withProfile(testProfile);
 
       await act(async () => {
         render(<ProfilePage />);
@@ -215,13 +166,7 @@ describe("ProfilePage", () => {
     });
 
     it("should render tenant profile page when user is authenticated and tenant exists", async () => {
-      mockUseSession.mockReturnValue({
-        session: {} as any,
-        user: mockUser,
-        profile: mockProfile,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.withProfile(testProfile);
 
       mockGetTenantBySlug.mockResolvedValue(mockTenant);
 
@@ -239,13 +184,7 @@ describe("ProfilePage", () => {
     });
 
     it("should redirect to tenant auth when user is not authenticated", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       await act(async () => {
         render(<ProfilePage />);
@@ -255,13 +194,7 @@ describe("ProfilePage", () => {
     });
 
     it("should show tenant not found when tenant doesn't exist", async () => {
-      mockUseSession.mockReturnValue({
-        session: {} as any,
-        user: mockUser,
-        profile: mockProfile,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticated();
 
       mockGetTenantBySlug.mockResolvedValue(null);
 
@@ -279,13 +212,7 @@ describe("ProfilePage", () => {
     });
 
     it("should handle tenant fetch error", async () => {
-      mockUseSession.mockReturnValue({
-        session: {} as any,
-        user: mockUser,
-        profile: mockProfile,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticated();
 
       mockGetTenantBySlug.mockRejectedValue(new Error("Network error"));
 
@@ -299,13 +226,7 @@ describe("ProfilePage", () => {
     });
 
     it("should show loading state while tenant is loading", async () => {
-      mockUseSession.mockReturnValue({
-        session: {} as any,
-        user: mockUser,
-        profile: mockProfile,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.loading();
 
       // Don't resolve the promise immediately
       mockGetTenantBySlug.mockImplementation(() => new Promise(() => {}));
@@ -320,13 +241,7 @@ describe("ProfilePage", () => {
     it("should navigate to home when clicking return home button", async () => {
       const user = userEvent.setup();
 
-      mockUseSession.mockReturnValue({
-        session: {} as any,
-        user: mockUser,
-        profile: mockProfile,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticated();
 
       mockGetTenantBySlug.mockResolvedValue(null);
 
@@ -349,13 +264,7 @@ describe("ProfilePage", () => {
 
   describe("Profile Data Management", () => {
     it("should use session profile when available", async () => {
-      mockUseSession.mockReturnValue({
-        session: {} as any,
-        user: mockUser,
-        profile: mockProfile,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.withProfile(testProfile);
 
       await act(async () => {
         render(<ProfilePage />);
@@ -377,13 +286,7 @@ describe("ProfilePage", () => {
       }));
       (supabase.from as jest.Mock).mockImplementation(mockFrom);
 
-      mockUseSession.mockReturnValue({
-        session: {} as any,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       await act(async () => {
         render(<ProfilePage />);
@@ -406,13 +309,7 @@ describe("ProfilePage", () => {
       }));
       (supabase.from as jest.Mock).mockImplementation(mockFrom);
 
-      mockUseSession.mockReturnValue({
-        session: {} as any,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       await act(async () => {
         render(<ProfilePage />);
@@ -421,6 +318,72 @@ describe("ProfilePage", () => {
       await waitFor(() => {
         expect(screen.getByText("找不到個人資料")).toBeInTheDocument();
       });
+    });
+  });
+
+  describe("Profile Display", () => {
+    it("should display profile information correctly", async () => {
+      mockUseSessionHelpers.withProfile(testProfile);
+
+      await act(async () => {
+        render(<ProfilePage />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("profile-form")).toBeInTheDocument();
+        expect(screen.getByTestId("profile-name")).toHaveTextContent("John Doe");
+      });
+    });
+
+    it("should handle profile updates correctly", async () => {
+      const user = userEvent.setup();
+
+      mockUseSessionHelpers.withProfile(testProfile);
+
+      // Mock updated profile fetch
+      const mockFrom = jest.fn(() => ({
+        select: jest.fn(() => ({
+          eq: jest.fn(() => ({
+            single: jest.fn().mockResolvedValue({
+              data: { ...mockProfile, full_name: "Updated Name" },
+              error: null,
+            }),
+          })),
+        })),
+      }));
+      (supabase.from as jest.Mock).mockImplementation(mockFrom);
+
+      await act(async () => {
+        render(<ProfilePage />);
+      });
+
+      const updateButton = screen.getByTestId("update-profile-btn");
+      await act(async () => {
+        await user.click(updateButton);
+      });
+
+      await waitFor(() => {
+        expect(supabase.from).toHaveBeenCalledWith("profiles");
+      });
+    });
+
+    it("should render correctly in tenant context", async () => {
+      mockParams.slug = "test-church";
+      mockGetTenantBySlug.mockResolvedValue(mockTenant);
+
+      mockUseSessionHelpers.withProfile(testProfile);
+
+      await act(async () => {
+        render(<ProfilePage />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("profile-form")).toBeInTheDocument();
+        expect(screen.getByTestId("profile-name")).toHaveTextContent("John Doe");
+      });
+
+      // Should not navigate anywhere when rendering in tenant context
+      expect(mockNavigate).not.toHaveBeenCalledWith("/");
     });
   });
 });

@@ -1,11 +1,14 @@
 import React from "react";
 import { screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { render } from "../../test-utils";
+import { render, mockUseSessionHelpers, mockTenant } from "../../test-utils";
 import MembersPage from "@/pages/tenant/MembersPage";
-import { useSession } from "@/hooks/useSession";
 import * as tenantService from "@/lib/tenant-service";
 import * as memberService from "@/lib/member-service";
+import type { TenantPageLayoutProps } from "@/components/Layout/TenantPageLayout";
+import type { MemberTableProps } from "@/components/Members/MemberTable";
+import type { MemberInviteDialogProps } from "@/components/Members/MemberInviteDialog";
+import type { MemberFilterBarProps } from "@/components/Members/MemberFilterBar";
 
 // Mock navigation
 const mockNavigate = jest.fn();
@@ -15,9 +18,6 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
   useParams: () => mockUseParams(),
 }));
-
-// Get the mocked useSession
-const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 
 // Import useTenantRole hook for mocking
 const { useTenantRole } = jest.requireMock("@/hooks/useTenantRole") as {
@@ -35,16 +35,7 @@ jest.mock("@/components/Layout/TenantPageLayout", () => ({
     isLoading,
     breadcrumbItems,
     action,
-  }: {
-    children: React.ReactNode;
-    title: string;
-    description?: string;
-    tenantName: string;
-    tenantSlug: string;
-    isLoading?: boolean;
-    breadcrumbItems: Array<{ label: string; path?: string }>;
-    action?: React.ReactNode;
-  }) => (
+  }: TenantPageLayoutProps) => (
     <div data-testid="tenant-page-layout">
       <div data-testid="layout-title">{title}</div>
       <div data-testid="layout-description">{description}</div>
@@ -71,13 +62,7 @@ jest.mock("@/components/Members/MemberTable", () => ({
     currentUserId,
     isCurrentUserOwner,
     onMemberUpdated,
-  }: {
-    user: unknown;
-    members: Array<unknown>;
-    currentUserId: string;
-    isCurrentUserOwner: boolean;
-    onMemberUpdated: () => void;
-  }) => (
+  }: MemberTableProps) => (
     <div data-testid="member-table">
       <div data-testid="members-count">{members.length}</div>
       <div data-testid="current-user-id">{currentUserId}</div>
@@ -101,12 +86,7 @@ jest.mock("@/components/Members/MemberInviteDialog", () => ({
     isOpen,
     onClose,
     onInviteSuccess,
-  }: {
-    tenantSlug: string;
-    isOpen: boolean;
-    onClose: () => void;
-    onInviteSuccess: () => void;
-  }) => (
+  }: MemberInviteDialogProps) => (
     <div data-testid="member-invite-dialog">
       <div data-testid="dialog-tenant-slug">{tenantSlug}</div>
       <div data-testid="dialog-open">{isOpen ? "open" : "closed"}</div>
@@ -129,14 +109,7 @@ jest.mock("@/components/Members/MemberFilterBar", () => ({
     setSearchEmail,
     roleFilter,
     setRoleFilter,
-  }: {
-    searchName: string;
-    setSearchName: (value: string) => void;
-    searchEmail: string;
-    setSearchEmail: (value: string) => void;
-    roleFilter: string;
-    setRoleFilter: (value: string) => void;
-  }) => (
+  }: MemberFilterBarProps) => (
     <div data-testid="member-filter-bar">
       <input
         data-testid="name-filter"
@@ -178,26 +151,6 @@ jest.mock("@/hooks/useTenantRole", () => ({
 }));
 
 describe("MembersPage", () => {
-  const mockUser = {
-    id: "test-user-id",
-    email: "test@example.com",
-    aud: "authenticated",
-    created_at: "2024-01-01T00:00:00Z",
-    app_metadata: {},
-    user_metadata: {},
-    role: "authenticated",
-    updated_at: "2024-01-01T00:00:00Z",
-  };
-
-  const mockTenant = {
-    id: "tenant-1",
-    name: "Test Church",
-    slug: "test-church",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-    price_tier_id: "basic",
-  };
-
   const mockMembers = [
     {
       id: "member-1",
@@ -242,64 +195,34 @@ describe("MembersPage", () => {
     useTenantRole.mockReturnValue({ role: "owner", isLoading: false });
 
     // Default authenticated user
-    mockUseSession.mockReturnValue({
-      session: null,
-      user: mockUser,
-      profile: null,
-      isLoading: false,
-      signOut: jest.fn(),
-    });
+    mockUseSessionHelpers.authenticatedNoProfile();
   });
 
   describe("Authentication and Navigation", () => {
-    it("should redirect to auth page when user is not authenticated", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+    it("should redirect to auth page when user is not authenticated", () => {
+      mockUseSessionHelpers.unauthenticated();
 
-      await act(async () => {
-        render(<MembersPage />);
-      });
+      render(<MembersPage />);
 
       expect(mockNavigate).toHaveBeenCalledWith("/tenant/test-church/auth");
     });
 
-    it("should not redirect when session is loading", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: true,
-        signOut: jest.fn(),
-      });
+    it("should not redirect when session is loading", () => {
+      mockUseSessionHelpers.loading();
 
-      await act(async () => {
-        render(<MembersPage />);
-      });
+      render(<MembersPage />);
 
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 
     it("should not redirect when user is authenticated", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       await act(async () => {
         render(<MembersPage />);
       });
 
-      await waitFor(() => {
-        expect(mockNavigate).not.toHaveBeenCalledWith("/tenant/test-church/auth");
-      });
+      expect(mockNavigate).not.toHaveBeenCalledWith("/tenant/test-church/auth");
     });
 
     it("should redirect to tenant page when current user is not a member", async () => {
@@ -321,13 +244,7 @@ describe("MembersPage", () => {
 
       (memberService.getTenantMembers as jest.Mock).mockResolvedValue(membersWithoutCurrentUser);
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       await act(async () => {
         render(<MembersPage />);
@@ -341,13 +258,7 @@ describe("MembersPage", () => {
     it("should redirect to not-found when tenant does not exist", async () => {
       (tenantService.getTenantBySlug as jest.Mock).mockResolvedValue(null);
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       await act(async () => {
         render(<MembersPage />);
@@ -361,23 +272,11 @@ describe("MembersPage", () => {
 
   describe("Rendering", () => {
     beforeEach(() => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
     });
 
     it("should show loading state while session is loading", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: true,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.loading();
 
       await act(async () => {
         render(<MembersPage />);
@@ -387,13 +286,7 @@ describe("MembersPage", () => {
     });
 
     it("should show loading state while data is loading", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       // Mock delayed response
       (memberService.getTenantMembers as jest.Mock).mockImplementation(
@@ -443,7 +336,7 @@ describe("MembersPage", () => {
       await waitFor(() => {
         expect(screen.getByTestId("member-table")).toBeInTheDocument();
         expect(screen.getByTestId("members-count")).toHaveTextContent("2");
-        expect(screen.getByTestId("current-user-id")).toHaveTextContent(mockUser.id);
+        expect(screen.getByTestId("current-user-id")).toHaveTextContent("test-user-id");
         expect(screen.getByTestId("is-owner")).toHaveTextContent("true");
       });
     });
@@ -500,13 +393,7 @@ describe("MembersPage", () => {
 
   describe("Member Filtering", () => {
     beforeEach(() => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
     });
 
     it("should filter members by name", async () => {
@@ -578,13 +465,7 @@ describe("MembersPage", () => {
 
   describe("Member Management", () => {
     beforeEach(() => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
     });
 
     it("should open invite dialog when invite button is clicked", async () => {
@@ -711,13 +592,7 @@ describe("MembersPage", () => {
 
   describe("Error Handling", () => {
     beforeEach(() => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
     });
 
     it("should handle tenant fetch error gracefully", async () => {
@@ -767,13 +642,7 @@ describe("MembersPage", () => {
 
   describe("Data Loading", () => {
     beforeEach(() => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
     });
 
     it("should fetch tenant and members data on mount", async () => {
@@ -820,13 +689,7 @@ describe("MembersPage", () => {
     });
 
     it("should not fetch data when user is not available", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       await act(async () => {
         render(<MembersPage />);
@@ -842,13 +705,7 @@ describe("MembersPage", () => {
       const user = userEvent.setup();
       (tenantService.getTenantBySlug as jest.Mock).mockResolvedValue(null);
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       await act(async () => {
         render(<MembersPage />);
@@ -869,13 +726,7 @@ describe("MembersPage", () => {
 
   describe("Accessibility", () => {
     beforeEach(() => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
     });
 
     it("should render proper heading structure", async () => {

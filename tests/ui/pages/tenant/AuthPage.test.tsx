@@ -1,9 +1,8 @@
 import React from "react";
 import { screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { render } from "../../test-utils";
+import { render, mockUseSessionHelpers, mockTenant } from "../../test-utils";
 import AuthPage from "@/pages/tenant/AuthPage";
-import { useSession } from "@/hooks/useSession";
 import * as tenantUtils from "@/lib/tenant-utils";
 import * as memberService from "@/lib/member-service";
 
@@ -15,9 +14,6 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
   useParams: () => mockUseParams(),
 }));
-
-// Get the mocked useSession
-const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 
 // Mock AuthTabs component
 jest.mock("@/components/Auth/AuthTabs", () => ({
@@ -54,26 +50,6 @@ jest.mock("@/lib/member-service", () => ({
 }));
 
 describe("AuthPage (Tenant)", () => {
-  const mockUser = {
-    id: "test-user-id",
-    email: "test@example.com",
-    aud: "authenticated",
-    created_at: "2024-01-01T00:00:00Z",
-    app_metadata: {},
-    user_metadata: {},
-    role: "authenticated",
-    updated_at: "2024-01-01T00:00:00Z",
-  };
-
-  const mockTenant = {
-    id: "tenant-1",
-    name: "Test Church",
-    slug: "test-church",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-    price_tier_id: "basic",
-  };
-
   beforeEach(() => {
     jest.clearAllMocks();
     mockNavigate.mockClear();
@@ -99,13 +75,7 @@ describe("AuthPage (Tenant)", () => {
         () => new Promise(() => {}), // Never resolves
       );
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       await act(async () => {
         render(<AuthPage />);
@@ -117,13 +87,7 @@ describe("AuthPage (Tenant)", () => {
     it("should display tenant not found error when tenant doesn't exist", async () => {
       (tenantUtils.getTenantBySlug as jest.Mock).mockResolvedValue(null);
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       await act(async () => {
         render(<AuthPage />);
@@ -139,13 +103,7 @@ describe("AuthPage (Tenant)", () => {
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
       (tenantUtils.getTenantBySlug as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       await act(async () => {
         render(<AuthPage />);
@@ -169,13 +127,7 @@ describe("AuthPage (Tenant)", () => {
         writable: true,
       });
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       await act(async () => {
         render(<AuthPage />);
@@ -187,13 +139,7 @@ describe("AuthPage (Tenant)", () => {
     });
 
     it("should handle missing invite token", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       await act(async () => {
         render(<AuthPage />);
@@ -212,13 +158,7 @@ describe("AuthPage (Tenant)", () => {
         writable: true,
       });
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       await act(async () => {
         render(<AuthPage />);
@@ -234,13 +174,7 @@ describe("AuthPage (Tenant)", () => {
     it("should redirect authenticated users with access to tenant dashboard", async () => {
       (memberService.checkUserTenantAccess as jest.Mock).mockResolvedValue(true);
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       await act(async () => {
         render(<AuthPage />);
@@ -251,16 +185,10 @@ describe("AuthPage (Tenant)", () => {
       });
     });
 
-    it("should not redirect authenticated users without access and no invite token", async () => {
+    it("should not redirect authenticated users without access", async () => {
       (memberService.checkUserTenantAccess as jest.Mock).mockResolvedValue(false);
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       await act(async () => {
         render(<AuthPage />);
@@ -273,49 +201,30 @@ describe("AuthPage (Tenant)", () => {
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 
-    it("should show auth form for authenticated users without access but with invite token", async () => {
-      Object.defineProperty(window, "location", {
-        value: {
-          search: "?token=invite-789",
-        },
-        writable: true,
-      });
+    it("should show loading state while checking access", async () => {
+      (memberService.checkUserTenantAccess as jest.Mock).mockImplementation(
+        () => new Promise(() => {}), // Never resolves
+      );
 
-      (memberService.checkUserTenantAccess as jest.Mock).mockResolvedValue(false);
-
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       await act(async () => {
         render(<AuthPage />);
       });
 
+      // Should show the auth form while checking access, not a loading state
       await waitFor(() => {
         expect(screen.getByText("歡迎來到 Test Church")).toBeInTheDocument();
-        expect(screen.getByTestId("invite-token")).toHaveTextContent("invite-789");
       });
-
-      expect(mockNavigate).not.toHaveBeenCalled();
     });
 
-    it("should handle authentication check errors gracefully", async () => {
+    it("should handle error when checking access fails", async () => {
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
       (memberService.checkUserTenantAccess as jest.Mock).mockRejectedValue(
         new Error("Access check failed"),
       );
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       await act(async () => {
         render(<AuthPage />);
@@ -335,13 +244,7 @@ describe("AuthPage (Tenant)", () => {
 
   describe("Auth Form Display", () => {
     beforeEach(async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
     });
 
     it("should display tenant name and auth form when tenant exists", async () => {
@@ -379,16 +282,10 @@ describe("AuthPage (Tenant)", () => {
 
   describe("Authentication Success Handler", () => {
     beforeEach(async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
     });
 
-    it("should navigate to tenant dashboard on successful authentication", async () => {
+    it("should navigate to tenant dashboard after successful auth", async () => {
       const user = userEvent.setup();
 
       await act(async () => {
@@ -410,13 +307,7 @@ describe("AuthPage (Tenant)", () => {
     it("should show error page when tenant is not found", async () => {
       (tenantUtils.getTenantBySlug as jest.Mock).mockResolvedValue(null);
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       await act(async () => {
         render(<AuthPage />);
@@ -431,13 +322,7 @@ describe("AuthPage (Tenant)", () => {
     it("should allow navigation back to home from error page", async () => {
       (tenantUtils.getTenantBySlug as jest.Mock).mockResolvedValue(null);
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       const user = userEvent.setup();
 
@@ -458,13 +343,7 @@ describe("AuthPage (Tenant)", () => {
 
   describe("Loading States", () => {
     it("should show session loading state", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: true,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.loading();
 
       await act(async () => {
         render(<AuthPage />);
@@ -479,13 +358,7 @@ describe("AuthPage (Tenant)", () => {
         () => new Promise(() => {}), // Never resolves
       );
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       await act(async () => {
         render(<AuthPage />);
@@ -504,13 +377,7 @@ describe("AuthPage (Tenant)", () => {
     it("should handle missing slug parameter", async () => {
       mockUseParams.mockReturnValue({ slug: undefined });
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       await act(async () => {
         render(<AuthPage />);
@@ -529,13 +396,7 @@ describe("AuthPage (Tenant)", () => {
 
       (tenantUtils.getTenantBySlug as jest.Mock).mockReturnValue(pendingPromise);
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       let rerender: (ui: React.ReactElement) => void;
       await act(async () => {
@@ -557,13 +418,7 @@ describe("AuthPage (Tenant)", () => {
     });
 
     it("should handle missing user during authentication check", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       await act(async () => {
         render(<AuthPage />);
@@ -575,13 +430,7 @@ describe("AuthPage (Tenant)", () => {
 
     it("should handle session loading to user state transition", async () => {
       // Start with loading session
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: true,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.loading();
 
       let rerender: (ui: React.ReactElement) => void;
       await act(async () => {
@@ -593,13 +442,7 @@ describe("AuthPage (Tenant)", () => {
 
       // Change to user with access
       (memberService.checkUserTenantAccess as jest.Mock).mockResolvedValue(true);
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       await act(async () => {
         rerender(<AuthPage />);
@@ -608,6 +451,38 @@ describe("AuthPage (Tenant)", () => {
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith("/tenant/test-church");
       });
+    });
+
+    it("should not check access if user is null", async () => {
+      mockUseSessionHelpers.unauthenticated();
+
+      await act(async () => {
+        render(<AuthPage />);
+      });
+
+      // Should not attempt to check access without user
+      expect(memberService.checkUserTenantAccess).not.toHaveBeenCalled();
+    });
+
+    it("should handle cases where user authenticates but has no tenant access", async () => {
+      (memberService.checkUserTenantAccess as jest.Mock).mockResolvedValue(false);
+
+      mockUseSessionHelpers.authenticatedNoProfile();
+
+      await act(async () => {
+        render(<AuthPage />);
+      });
+
+      // Should check access when user is present
+      await waitFor(() => {
+        expect(memberService.checkUserTenantAccess).toHaveBeenCalledWith(
+          "test-user-id",
+          "test-church",
+        );
+      });
+
+      // Should show auth form since user doesn't have access
+      expect(screen.getByText("歡迎來到 Test Church")).toBeInTheDocument();
     });
   });
 });

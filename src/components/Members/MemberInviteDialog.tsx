@@ -15,7 +15,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { inviteMemberToTenant } from "@/lib/member-service";
 import { useTranslation } from "react-i18next";
 
-interface MemberInviteDialogProps {
+export interface MemberInviteDialogProps {
   isOpen: boolean;
   onClose: () => void;
   tenantSlug: string;

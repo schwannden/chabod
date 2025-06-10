@@ -1,9 +1,8 @@
 import React from "react";
 import { screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { render } from "../../test-utils";
+import { render, mockUseSessionHelpers } from "../../test-utils";
 import EventPage from "@/pages/tenant/EventPage";
-import { useSession } from "@/hooks/useSession";
 import * as eventService from "@/lib/event-service";
 import * as groupService from "@/lib/group-service";
 
@@ -15,9 +14,6 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
   useParams: () => mockUseParams(),
 }));
-
-// Get the mocked useSession
-const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 
 // Mock useEventFilters hook
 const mockFilters = {
@@ -234,16 +230,7 @@ jest.mock("@/lib/group-service", () => ({
 }));
 
 describe("EventPage", () => {
-  const mockUser = {
-    id: "test-user-id",
-    email: "test@example.com",
-    aud: "authenticated",
-    created_at: "2024-01-01T00:00:00Z",
-    app_metadata: {},
-    user_metadata: {},
-    role: "authenticated",
-    updated_at: "2024-01-01T00:00:00Z",
-  };
+  // Using mock data from test-utils.tsx
 
   const mockEvents = [
     {
@@ -254,7 +241,7 @@ describe("EventPage", () => {
       start_time: "10:00",
       end_time: "12:00",
       tenant_id: "test-tenant-id",
-      visibility: "public",
+      visibility: "public" as const,
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
       groups: [
@@ -272,7 +259,7 @@ describe("EventPage", () => {
       start_time: "19:00",
       end_time: "21:00",
       tenant_id: "test-tenant-id",
-      visibility: "public",
+      visibility: "public" as const,
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
       groups: [],
@@ -323,13 +310,7 @@ describe("EventPage", () => {
 
   describe("Rendering", () => {
     it("should render correctly when slug is provided", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -343,26 +324,14 @@ describe("EventPage", () => {
 
     it("should return null when no slug is provided", () => {
       mockUseParams.mockReturnValue({ slug: undefined });
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       const { container } = render(<EventPage />);
       expect(container.firstChild).toBeNull();
     });
 
     it("should render all main sections", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -377,13 +346,7 @@ describe("EventPage", () => {
 
   describe("Data Fetching", () => {
     it("should fetch groups and events on mount", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -399,13 +362,7 @@ describe("EventPage", () => {
     });
 
     it("should display fetched groups and events", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -421,13 +378,7 @@ describe("EventPage", () => {
     });
 
     it("should refetch events when filters change", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       // Create a new component instance with different filters
       const TestComponent = () => {
@@ -499,19 +450,16 @@ describe("EventPage", () => {
         new Error("Failed to fetch groups"),
       );
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
       await waitFor(() => {
-        expect(screen.getByTestId("filter-groups-count")).toHaveTextContent("0");
+        expect(screen.getByTestId("generic-event-page")).toBeInTheDocument();
       });
+
+      // Should still render with empty groups
+      expect(screen.getByTestId("filter-groups-count")).toHaveTextContent("0");
     });
 
     it("should handle event fetching errors gracefully", async () => {
@@ -519,32 +467,23 @@ describe("EventPage", () => {
         new Error("Failed to fetch events"),
       );
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
       await waitFor(() => {
-        expect(screen.getByTestId("calendar-events-count")).toHaveTextContent("0");
-        expect(screen.getByTestId("list-events-count")).toHaveTextContent("0");
+        expect(screen.getByTestId("generic-event-page")).toBeInTheDocument();
       });
+
+      // Should still render with empty events
+      expect(screen.getByTestId("calendar-events-count")).toHaveTextContent("0");
+      expect(screen.getByTestId("list-events-count")).toHaveTextContent("0");
     });
   });
 
   describe("Authentication-dependent Features", () => {
     it("should show action buttons when user is authenticated", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -555,13 +494,7 @@ describe("EventPage", () => {
     });
 
     it("should hide action buttons when user is not authenticated", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       render(<EventPage />);
 
@@ -574,13 +507,7 @@ describe("EventPage", () => {
 
   describe("Event Management", () => {
     it("should handle event creation", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -609,13 +536,7 @@ describe("EventPage", () => {
         () => new Promise((resolve) => setTimeout(() => resolve(mockEvents), 50)),
       );
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -651,13 +572,7 @@ describe("EventPage", () => {
     }, 15000);
 
     it("should handle event copying", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -695,13 +610,7 @@ describe("EventPage", () => {
     });
 
     it("should close copy dialog when cancelled", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -734,13 +643,7 @@ describe("EventPage", () => {
         () => new Promise((resolve) => setTimeout(() => resolve(mockEvents), 100)),
       );
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -758,13 +661,7 @@ describe("EventPage", () => {
 
   describe("Filter Integration", () => {
     it("should pass correct props to EventFilterBar", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -778,13 +675,7 @@ describe("EventPage", () => {
     });
 
     it("should update filters when filter controls are used", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -810,13 +701,7 @@ describe("EventPage", () => {
 
   describe("Accessibility", () => {
     it("should have proper structure for screen readers", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -835,13 +720,7 @@ describe("EventPage", () => {
     it("should handle empty events list", async () => {
       (eventService.getTenantEvents as jest.Mock).mockResolvedValue([]);
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -854,13 +733,7 @@ describe("EventPage", () => {
     it("should handle empty groups list", async () => {
       (groupService.getTenantGroups as jest.Mock).mockResolvedValue([]);
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -873,13 +746,7 @@ describe("EventPage", () => {
     it("should handle null groups response", async () => {
       (groupService.getTenantGroups as jest.Mock).mockResolvedValue(null);
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -896,13 +763,7 @@ describe("EventPage", () => {
         endDate: undefined,
       });
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -921,13 +782,7 @@ describe("EventPage", () => {
     it("should show error toast when event fetching fails", async () => {
       (eventService.getTenantEvents as jest.Mock).mockRejectedValue(new Error("Network error"));
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 
@@ -941,13 +796,7 @@ describe("EventPage", () => {
     it("should show error toast when group fetching fails", async () => {
       (groupService.getTenantGroups as jest.Mock).mockRejectedValue(new Error("Network error"));
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       render(<EventPage />);
 

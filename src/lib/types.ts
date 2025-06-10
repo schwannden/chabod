@@ -79,6 +79,7 @@ export type SessionContextType = {
   profile: Profile | null;
   isLoading: boolean;
   signOut: () => Promise<void>;
+  refetchProfile: () => Promise<void>;
 };
 
 export type ServiceWithGroups = Service & {

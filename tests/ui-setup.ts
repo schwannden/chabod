@@ -44,6 +44,7 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
   useParams: () => ({}),
   useLocation: () => ({ pathname: "/" }),
+  useSearchParams: () => [new URLSearchParams()],
 }));
 
 // Mock react-i18next with proper i18n object
@@ -113,6 +114,7 @@ jest.mock("@/hooks/useSession", () => ({
     profile: null,
     isLoading: false,
     signOut: jest.fn(),
+    refetchProfile: jest.fn(),
   })),
 }));
 

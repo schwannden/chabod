@@ -1,10 +1,8 @@
-import React from "react";
 import { screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { render } from "../test-utils";
+import { render, mockUseSessionHelpers } from "../test-utils";
 import DashboardPage from "@/pages/DashboardPage";
 import * as tenantUtils from "@/lib/tenant-utils";
-import { useSession } from "@/hooks/useSession";
 
 // Mock navigation
 const mockNavigate = jest.fn();
@@ -12,9 +10,6 @@ jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
   useNavigate: () => mockNavigate,
 }));
-
-// Get the mocked useSession
-const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 
 describe("DashboardPage", () => {
   const mockTenantsData = [
@@ -63,33 +58,12 @@ describe("DashboardPage", () => {
     (tenantUtils.getTenants as jest.Mock).mockResolvedValue(mockTenantsData);
 
     // Default mock setup for useSession
-    mockUseSession.mockReturnValue({
-      session: null,
-      user: {
-        id: "test-user-id",
-        email: "test@example.com",
-        aud: "authenticated",
-        created_at: "2024-01-01T00:00:00Z",
-        app_metadata: {},
-        user_metadata: {},
-        role: "authenticated",
-        updated_at: "2024-01-01T00:00:00Z",
-      },
-      profile: null,
-      isLoading: false,
-      signOut: jest.fn(),
-    });
+    mockUseSessionHelpers.authenticatedNoProfile();
   });
 
   describe("Authentication and Loading", () => {
     it("should show loading state when session is loading", () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: true,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.loading();
 
       render(<DashboardPage />);
 
@@ -97,13 +71,7 @@ describe("DashboardPage", () => {
     });
 
     it("should redirect to auth when user is not logged in", () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       render(<DashboardPage />);
 
@@ -326,13 +294,7 @@ describe("DashboardPage", () => {
 
   describe("Edge Cases", () => {
     it("should handle missing user gracefully", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       render(<DashboardPage />);
 
@@ -340,13 +302,7 @@ describe("DashboardPage", () => {
     });
 
     it("should not fetch tenants when user is not available", () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       render(<DashboardPage />);
 
@@ -356,25 +312,11 @@ describe("DashboardPage", () => {
 
     it("should handle rapid user state changes", async () => {
       // Start with no user
+      mockUseSessionHelpers.unauthenticated();
       const { rerender } = render(<DashboardPage />);
 
       // Then set a user
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: {
-          id: "test-user-id",
-          email: "test@example.com",
-          aud: "authenticated",
-          created_at: "2024-01-01T00:00:00Z",
-          app_metadata: {},
-          user_metadata: {},
-          role: "authenticated",
-          updated_at: "2024-01-01T00:00:00Z",
-        },
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       await act(async () => {
         rerender(<DashboardPage />);

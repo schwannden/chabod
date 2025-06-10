@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/hooks/useSession";
 import { ResourceList } from "@/components/Resources/ResourceList";
@@ -18,7 +18,8 @@ import { getTenantGroups } from "@/lib/group-service";
 export default function ResourcePage() {
   const { slug } = useParams<{ slug: string }>();
   const { t } = useTranslation();
-  const { user } = useSession();
+  const { user, isLoading: isSessionLoading } = useSession();
+  const navigate = useNavigate();
   const [resources, setResources] = useState<Resource[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [resourceGroupMap, setResourceGroupMap] = useState<Record<string, string[]>>({});
@@ -29,6 +30,13 @@ export default function ResourcePage() {
   const [selectedGroup, setSelectedGroup] = useState("all");
   const { role } = useTenantRole(slug, user?.id);
   const { toast } = useToast();
+
+  // Redirect to auth page if user is not authenticated
+  useEffect(() => {
+    if (!isSessionLoading && !user) {
+      navigate(`/tenant/${slug}/auth`);
+    }
+  }, [user, isSessionLoading, navigate, slug]);
 
   const fetchTenantName = useCallback(async () => {
     if (!slug) return;

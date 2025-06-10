@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Profile } from "@/lib/types";
@@ -11,6 +11,21 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+
+  const fetchUserProfile = useCallback(async (userId: string) => {
+    try {
+      const { data, error } = await supabase.from("profiles").select("*").eq("id", userId).single();
+
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return;
+      }
+
+      setProfile(data);
+    } catch (error) {
+      console.error("Failed to fetch user profile:", error);
+    }
+  }, []);
 
   useEffect(() => {
     // Set up auth state listener
@@ -45,24 +60,9 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchUserProfile]);
 
-  const fetchUserProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase.from("profiles").select("*").eq("id", userId).single();
-
-      if (error) {
-        console.error("Error fetching profile:", error);
-        return;
-      }
-
-      setProfile(data);
-    } catch (error) {
-      console.error("Failed to fetch user profile:", error);
-    }
-  };
-
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     try {
       await supabase.auth.signOut();
       toast({
@@ -77,11 +77,25 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         variant: "destructive",
       });
     }
-  };
+  }, [toast]);
 
-  return (
-    <SessionContext.Provider value={{ session, user, profile, isLoading, signOut }}>
-      {children}
-    </SessionContext.Provider>
+  const refetchProfile = useCallback(async () => {
+    if (user) {
+      await fetchUserProfile(user.id);
+    }
+  }, [user, fetchUserProfile]);
+
+  const value = useMemo(
+    () => ({
+      session,
+      user,
+      profile,
+      isLoading,
+      signOut,
+      refetchProfile,
+    }),
+    [session, user, profile, isLoading, signOut, refetchProfile],
   );
+
+  return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 };
