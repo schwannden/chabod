@@ -55,13 +55,6 @@ export default function MembersPage() {
           navigate(`/tenant/${slug}`);
           return;
         }
-
-        console.log(
-          "Current user role:",
-          currentUserMember.role,
-          "Is owner:",
-          currentUserMember.role === "owner",
-        );
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {

@@ -402,7 +402,12 @@
     "unnamedMember": "未命名成員",
     "selectRole": "選擇角色",
     "selectedMembers": "已選擇的成員",
-    "noRolesConfigured": "此服事類型尚未設定任何角色，請先在服事類型頁面設定角色。"
+    "noRolesConfigured": "此服事類型尚未設定任何角色，請先在服事類型頁面設定角色。",
+    "createServiceEvent": "新增服事排班",
+    "createServiceEventTitle": "新增服事排班",
+    "eventCreated": "服事排班已建立",
+    "createEventError": "建立服事排班時出錯",
+    "memberAssignment": "服事人員分配"
   },
   "events": {
     "deleteEvent": "刪除活動",
