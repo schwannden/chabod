@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render } from "../test-utils";
 import ProfilePage from "@/pages/ProfilePage";
@@ -108,7 +108,9 @@ describe("ProfilePage", () => {
         signOut: jest.fn(),
       });
 
-      render(<ProfilePage />);
+      await act(async () => {
+        render(<ProfilePage />);
+      });
 
       expect(screen.getByTestId("navbar")).toBeInTheDocument();
       expect(screen.getByText("你的個人資料")).toBeInTheDocument();
@@ -120,7 +122,7 @@ describe("ProfilePage", () => {
       });
     });
 
-    it("should redirect to auth when user is not authenticated", () => {
+    it("should redirect to auth when user is not authenticated", async () => {
       mockUseSession.mockReturnValue({
         session: null,
         user: null,
@@ -129,12 +131,14 @@ describe("ProfilePage", () => {
         signOut: jest.fn(),
       });
 
-      render(<ProfilePage />);
+      await act(async () => {
+        render(<ProfilePage />);
+      });
 
       expect(mockNavigate).toHaveBeenCalledWith("/auth");
     });
 
-    it("should show loading state while session is loading", () => {
+    it("should show loading state while session is loading", async () => {
       mockUseSession.mockReturnValue({
         session: null,
         user: null,
@@ -143,12 +147,14 @@ describe("ProfilePage", () => {
         signOut: jest.fn(),
       });
 
-      render(<ProfilePage />);
+      await act(async () => {
+        render(<ProfilePage />);
+      });
 
       expect(screen.getByText("載入中...")).toBeInTheDocument();
     });
 
-    it("should show error when profile is not found", () => {
+    it("should show error when profile is not found", async () => {
       mockUseSession.mockReturnValue({
         session: {} as any,
         user: mockUser,
@@ -157,7 +163,9 @@ describe("ProfilePage", () => {
         signOut: jest.fn(),
       });
 
-      render(<ProfilePage />);
+      await act(async () => {
+        render(<ProfilePage />);
+      });
 
       expect(screen.getByText("找不到個人資料")).toBeInTheDocument();
     });
@@ -186,10 +194,14 @@ describe("ProfilePage", () => {
         signOut: jest.fn(),
       });
 
-      render(<ProfilePage />);
+      await act(async () => {
+        render(<ProfilePage />);
+      });
 
       const updateButton = screen.getByTestId("update-profile-btn");
-      await user.click(updateButton);
+      await act(async () => {
+        await user.click(updateButton);
+      });
 
       await waitFor(() => {
         expect(supabase.from).toHaveBeenCalledWith("profiles");
@@ -213,7 +225,9 @@ describe("ProfilePage", () => {
 
       mockGetTenantBySlug.mockResolvedValue(mockTenant);
 
-      render(<ProfilePage />);
+      await act(async () => {
+        render(<ProfilePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("navbar")).toBeInTheDocument();
@@ -224,7 +238,7 @@ describe("ProfilePage", () => {
       expect(mockGetTenantBySlug).toHaveBeenCalledWith("test-church");
     });
 
-    it("should redirect to tenant auth when user is not authenticated", () => {
+    it("should redirect to tenant auth when user is not authenticated", async () => {
       mockUseSession.mockReturnValue({
         session: null,
         user: null,
@@ -233,7 +247,9 @@ describe("ProfilePage", () => {
         signOut: jest.fn(),
       });
 
-      render(<ProfilePage />);
+      await act(async () => {
+        render(<ProfilePage />);
+      });
 
       expect(mockNavigate).toHaveBeenCalledWith("/tenant/test-church/auth");
     });
@@ -249,7 +265,9 @@ describe("ProfilePage", () => {
 
       mockGetTenantBySlug.mockResolvedValue(null);
 
-      render(<ProfilePage />);
+      await act(async () => {
+        render(<ProfilePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByText("找不到租戶")).toBeInTheDocument();
@@ -271,14 +289,16 @@ describe("ProfilePage", () => {
 
       mockGetTenantBySlug.mockRejectedValue(new Error("Network error"));
 
-      render(<ProfilePage />);
+      await act(async () => {
+        render(<ProfilePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByText("找不到租戶")).toBeInTheDocument();
       });
     });
 
-    it("should show loading state while tenant is loading", () => {
+    it("should show loading state while tenant is loading", async () => {
       mockUseSession.mockReturnValue({
         session: {} as any,
         user: mockUser,
@@ -290,7 +310,9 @@ describe("ProfilePage", () => {
       // Don't resolve the promise immediately
       mockGetTenantBySlug.mockImplementation(() => new Promise(() => {}));
 
-      render(<ProfilePage />);
+      await act(async () => {
+        render(<ProfilePage />);
+      });
 
       expect(screen.getByText("載入中...")).toBeInTheDocument();
     });
@@ -308,21 +330,25 @@ describe("ProfilePage", () => {
 
       mockGetTenantBySlug.mockResolvedValue(null);
 
-      render(<ProfilePage />);
+      await act(async () => {
+        render(<ProfilePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByText("返回首頁")).toBeInTheDocument();
       });
 
       const homeButton = screen.getByText("返回首頁");
-      await user.click(homeButton);
+      await act(async () => {
+        await user.click(homeButton);
+      });
 
       expect(mockNavigate).toHaveBeenCalledWith("/");
     });
   });
 
   describe("Profile Data Management", () => {
-    it("should use session profile when available", () => {
+    it("should use session profile when available", async () => {
       mockUseSession.mockReturnValue({
         session: {} as any,
         user: mockUser,
@@ -331,7 +357,9 @@ describe("ProfilePage", () => {
         signOut: jest.fn(),
       });
 
-      render(<ProfilePage />);
+      await act(async () => {
+        render(<ProfilePage />);
+      });
 
       expect(screen.getByTestId("profile-name")).toHaveTextContent("John Doe");
     });
@@ -357,7 +385,9 @@ describe("ProfilePage", () => {
         signOut: jest.fn(),
       });
 
-      render(<ProfilePage />);
+      await act(async () => {
+        render(<ProfilePage />);
+      });
 
       // Since profile is null, it should show "找不到個人資料"
       expect(screen.getByText("找不到個人資料")).toBeInTheDocument();
@@ -384,7 +414,9 @@ describe("ProfilePage", () => {
         signOut: jest.fn(),
       });
 
-      render(<ProfilePage />);
+      await act(async () => {
+        render(<ProfilePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByText("找不到個人資料")).toBeInTheDocument();
