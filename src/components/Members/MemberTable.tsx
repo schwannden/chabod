@@ -18,7 +18,7 @@ import { MemberTableActions } from "./MemberTableActions";
 import { User } from "@supabase/supabase-js";
 import { useTranslation } from "react-i18next";
 
-interface MemberTableProps {
+export interface MemberTableProps {
   user: User;
   members: TenantMemberWithProfile[];
   currentUserId: string;

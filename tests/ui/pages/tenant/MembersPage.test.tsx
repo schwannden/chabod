@@ -6,6 +6,10 @@ import MembersPage from "@/pages/tenant/MembersPage";
 import { useSession } from "@/hooks/useSession";
 import * as tenantService from "@/lib/tenant-service";
 import * as memberService from "@/lib/member-service";
+import type { TenantPageLayoutProps } from "@/components/Layout/TenantPageLayout";
+import type { MemberTableProps } from "@/components/Members/MemberTable";
+import type { MemberInviteDialogProps } from "@/components/Members/MemberInviteDialog";
+import type { MemberFilterBarProps } from "@/components/Members/MemberFilterBar";
 
 // Mock navigation
 const mockNavigate = jest.fn();
@@ -35,16 +39,7 @@ jest.mock("@/components/Layout/TenantPageLayout", () => ({
     isLoading,
     breadcrumbItems,
     action,
-  }: {
-    children: React.ReactNode;
-    title: string;
-    description?: string;
-    tenantName: string;
-    tenantSlug: string;
-    isLoading?: boolean;
-    breadcrumbItems: Array<{ label: string; path?: string }>;
-    action?: React.ReactNode;
-  }) => (
+  }: TenantPageLayoutProps) => (
     <div data-testid="tenant-page-layout">
       <div data-testid="layout-title">{title}</div>
       <div data-testid="layout-description">{description}</div>
@@ -71,13 +66,7 @@ jest.mock("@/components/Members/MemberTable", () => ({
     currentUserId,
     isCurrentUserOwner,
     onMemberUpdated,
-  }: {
-    user: unknown;
-    members: Array<unknown>;
-    currentUserId: string;
-    isCurrentUserOwner: boolean;
-    onMemberUpdated: () => void;
-  }) => (
+  }: MemberTableProps) => (
     <div data-testid="member-table">
       <div data-testid="members-count">{members.length}</div>
       <div data-testid="current-user-id">{currentUserId}</div>
@@ -101,12 +90,7 @@ jest.mock("@/components/Members/MemberInviteDialog", () => ({
     isOpen,
     onClose,
     onInviteSuccess,
-  }: {
-    tenantSlug: string;
-    isOpen: boolean;
-    onClose: () => void;
-    onInviteSuccess: () => void;
-  }) => (
+  }: MemberInviteDialogProps) => (
     <div data-testid="member-invite-dialog">
       <div data-testid="dialog-tenant-slug">{tenantSlug}</div>
       <div data-testid="dialog-open">{isOpen ? "open" : "closed"}</div>
@@ -129,14 +113,7 @@ jest.mock("@/components/Members/MemberFilterBar", () => ({
     setSearchEmail,
     roleFilter,
     setRoleFilter,
-  }: {
-    searchName: string;
-    setSearchName: (value: string) => void;
-    searchEmail: string;
-    setSearchEmail: (value: string) => void;
-    roleFilter: string;
-    setRoleFilter: (value: string) => void;
-  }) => (
+  }: MemberFilterBarProps) => (
     <div data-testid="member-filter-bar">
       <input
         data-testid="name-filter"

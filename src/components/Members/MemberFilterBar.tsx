@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
 
-interface MemberFilterBarProps {
+export interface MemberFilterBarProps {
   searchName: string;
   setSearchName: (value: string) => void;
   searchEmail: string;
