@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.4.1](https://github.com/schwannden/chabod/compare/v0.4.0...v0.4.1) (2025-06-10)
+
+
+### Bug Fixes
+
+* create service event button ([#70](https://github.com/schwannden/chabod/issues/70)) ([bbdb236](https://github.com/schwannden/chabod/commit/bbdb236e7302cb8899997139a3346fdbfd012885))
+
+
+### Build Related
+
+* **deps-dev:** bump @types/react-dom from 18.3.1 to 19.1.6 ([#61](https://github.com/schwannden/chabod/issues/61)) ([2d99445](https://github.com/schwannden/chabod/commit/2d994450489f17fd10498de490c61afe2aac76a1))
+* **deps-dev:** bump pg and @types/pg ([#66](https://github.com/schwannden/chabod/issues/66)) ([d1ab773](https://github.com/schwannden/chabod/commit/d1ab7732f6b96f49042e1183e82d55f49d43a074))
+* **deps-dev:** bump postcss from 8.5.3 to 8.5.4 ([#63](https://github.com/schwannden/chabod/issues/63)) ([dbe3840](https://github.com/schwannden/chabod/commit/dbe3840685de0e5104ced52cfa69188d05560eb2))
+* **deps-dev:** bump supabase from 2.23.4 to 2.24.3 ([#67](https://github.com/schwannden/chabod/issues/67)) ([c18de58](https://github.com/schwannden/chabod/commit/c18de5867e1407361e2ffdf6212f7c7bbc16569d))
+* **deps:** bump @radix-ui/react-checkbox from 1.1.2 to 1.3.2 ([#68](https://github.com/schwannden/chabod/issues/68)) ([facc346](https://github.com/schwannden/chabod/commit/facc3469dae736cc71012d035518016b3f0a2a81))
+* **deps:** bump @radix-ui/react-radio-group from 1.2.1 to 1.3.7 ([#64](https://github.com/schwannden/chabod/issues/64)) ([2507d03](https://github.com/schwannden/chabod/commit/2507d03116813341dd9acd9baf8049e070cf48b7))
+* **deps:** bump @radix-ui/react-tabs from 1.1.1 to 1.1.12 ([#62](https://github.com/schwannden/chabod/issues/62)) ([cb27e48](https://github.com/schwannden/chabod/commit/cb27e48630a42bb97de9e9d88cd1f7c193a1253b))
+* **deps:** bump @supabase/supabase-js from 2.49.8 to 2.50.0 ([#69](https://github.com/schwannden/chabod/issues/69)) ([b8018e8](https://github.com/schwannden/chabod/commit/b8018e8fa8848edfc1b66db0d44134b0f3d9ce0f))
+* **deps:** bump react-i18next from 13.5.0 to 15.5.2 ([#60](https://github.com/schwannden/chabod/issues/60)) ([fd92c9e](https://github.com/schwannden/chabod/commit/fd92c9e9aa86cef650a071c3e1c7725e98536a2a))
+* **deps:** bump react-router-dom from 6.27.0 to 7.6.2 ([#65](https://github.com/schwannden/chabod/issues/65)) ([39a99e7](https://github.com/schwannden/chabod/commit/39a99e7dff5dada82f4843c753467d46c10176bf))
+
+
+### Refactors
+
+* useAnnouncement ([#71](https://github.com/schwannden/chabod/issues/71)) ([11fab88](https://github.com/schwannden/chabod/commit/11fab880876ea598839fa8aaca2f889c27808b5e))
+
 ## [0.4.0](https://github.com/schwannden/chabod/compare/v0.3.3...v0.4.0) (2025-06-06)
 
 
