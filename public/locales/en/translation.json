@@ -24,13 +24,18 @@
     "unknownError": "An unknown error occurred",
     "tenantNotFound": "Tenant Not Found",
     "tenantNotFoundDesc": "The tenant \"{{slug}}\" does not exist or has been deleted.",
-    "returnHome": "Return to home"
-  },
-  "alphaWarning": {
-    "title": "Alpha Version Notice",
-    "message": "Chabod is currently in alpha version, database could be reset at any moment. We recommend contributors to use local development environment.",
+    "returnHome": "Return to home",
     "dontShowAgain": "Don't show this again",
     "understood": "Understood"
+  },
+  "announcements": {
+    "alphaVersion": {
+      "title": "Alpha Version Notice",
+      "message": "Chabod is currently in alpha version, database could be reset at any moment. We recommend contributors to use local development environment.",
+      "icon": "warning",
+      "dontShowAgain": "Don't show this again",
+      "understood": "Understood"
+    }
   },
   "shared": {
     "traditionalChinese": "Traditional Chinese",

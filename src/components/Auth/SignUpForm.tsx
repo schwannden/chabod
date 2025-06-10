@@ -17,8 +17,6 @@ import { AuthEmailInput } from "./AuthEmailInput";
 import { AuthPasswordInput } from "./AuthPasswordInput";
 import { TermsOfService } from "./TermsOfService";
 import { useTranslation } from "react-i18next";
-import { useAlphaWarning } from "@/hooks/useAlphaWarning";
-import { AlphaWarningDialog } from "@/components/shared/AlphaWarningDialog";
 
 interface SignUpFormProps {
   tenantSlug?: string;
@@ -42,9 +40,6 @@ export function SignUpForm({
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-
-  // Use the alpha warning hook
-  const { isOpen: isAlphaWarningOpen, dismissWarning } = useAlphaWarning();
 
   const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFullName(e.target.value);
@@ -164,47 +159,38 @@ export function SignUpForm({
   };
 
   return (
-    <>
-      <Card className="w-full max-w-md mx-auto">
-        <CardHeader>
-          <CardTitle>{t("auth.signUpTitle")}</CardTitle>
-          <CardDescription>
-            {tenantName ? t("auth.signUpToJoin", { tenantName }) : t("auth.signUpToChabod")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSignUp} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="full-name">{t("auth.fullName")}</Label>
-              <Input
-                id="full-name"
-                placeholder={t("auth.enterYourName")}
-                value={fullName}
-                onChange={handleFullNameChange}
-                required
-              />
-            </div>
-            <AuthEmailInput value={email} onChange={setEmail} disabled={loading} />
-            <AuthPasswordInput
-              value={password}
-              onChange={setPassword}
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle>{t("auth.signUpTitle")}</CardTitle>
+        <CardDescription>
+          {tenantName ? t("auth.signUpToJoin", { tenantName }) : t("auth.signUpToChabod")}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSignUp} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="full-name">{t("auth.fullName")}</Label>
+            <Input
+              id="full-name"
+              placeholder={t("auth.enterYourName")}
+              value={fullName}
+              onChange={handleFullNameChange}
               required
-              disabled={loading}
             />
-            <TermsOfService accepted={termsAccepted} onChange={setTermsAccepted} />
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? t("auth.creatingAccount") : t("auth.createAccount")}
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-center">
-          <Button variant="link" onClick={onSignInClick}>
-            {t("auth.alreadyHaveAccount")}
+          </div>
+          <AuthEmailInput value={email} onChange={setEmail} disabled={loading} />
+          <AuthPasswordInput value={password} onChange={setPassword} required disabled={loading} />
+          <TermsOfService accepted={termsAccepted} onChange={setTermsAccepted} />
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? t("auth.creatingAccount") : t("auth.createAccount")}
           </Button>
-        </CardFooter>
-      </Card>
-
-      <AlphaWarningDialog isOpen={isAlphaWarningOpen} onDismiss={dismissWarning} />
-    </>
+        </form>
+      </CardContent>
+      <CardFooter className="flex justify-center">
+        <Button variant="link" onClick={onSignInClick}>
+          {t("auth.alreadyHaveAccount")}
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }

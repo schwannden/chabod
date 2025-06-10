@@ -20,6 +20,8 @@ import EventPage from "./pages/tenant/EventPage";
 import ResourcePage from "./pages/tenant/ResourcePage";
 import ServicePage from "./pages/tenant/ServicePage";
 import ServiceEventPage from "./pages/tenant/ServiceEventPage";
+import { useAnnouncement } from "@/hooks/useAnnouncement";
+import { AnnouncementDialog } from "@/components/shared/AnnouncementDialog";
 
 // Import i18n configuration
 import { i18nPromise } from "./lib/i18n";
@@ -28,6 +30,7 @@ const queryClient = new QueryClient();
 
 function AppRoutes() {
   const navigate = useNavigate();
+  const { isOpen, currentAnnouncement, dismissAnnouncement } = useAnnouncement();
 
   useEffect(() => {
     // Handle redirect from 404.html
@@ -39,28 +42,36 @@ function AppRoutes() {
   }, [navigate]);
 
   return (
-    <Routes>
-      {/* Root routes */}
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/auth" element={<AuthPage />} />
-      <Route path="/profile" element={<ProfilePage />} />
+    <>
+      <Routes>
+        {/* Root routes */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
 
-      {/* Tenant routes */}
-      <Route path="/tenant/:slug" element={<TenantDashboard />} />
-      <Route path="/tenant/:slug/auth" element={<TenantAuth />} />
-      <Route path="/tenant/:slug/members" element={<MembersPage />} />
-      <Route path="/tenant/:slug/groups" element={<GroupsPage />} />
-      <Route path="/tenant/:slug/events" element={<EventPage />} />
-      <Route path="/tenant/:slug/groups/:groupId" element={<GroupMembersPage />} />
-      <Route path="/tenant/:slug/profile" element={<ProfilePage />} />
-      <Route path="/tenant/:slug/resources" element={<ResourcePage />} />
-      <Route path="/tenant/:slug/services" element={<ServicePage />} />
-      <Route path="/tenant/:slug/service_events" element={<ServiceEventPage />} />
+        {/* Tenant routes */}
+        <Route path="/tenant/:slug" element={<TenantDashboard />} />
+        <Route path="/tenant/:slug/auth" element={<TenantAuth />} />
+        <Route path="/tenant/:slug/members" element={<MembersPage />} />
+        <Route path="/tenant/:slug/groups" element={<GroupsPage />} />
+        <Route path="/tenant/:slug/events" element={<EventPage />} />
+        <Route path="/tenant/:slug/groups/:groupId" element={<GroupMembersPage />} />
+        <Route path="/tenant/:slug/profile" element={<ProfilePage />} />
+        <Route path="/tenant/:slug/resources" element={<ResourcePage />} />
+        <Route path="/tenant/:slug/services" element={<ServicePage />} />
+        <Route path="/tenant/:slug/service_events" element={<ServiceEventPage />} />
 
-      {/* Catch-all route */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        {/* Catch-all route */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+
+      <AnnouncementDialog
+        isOpen={isOpen}
+        announcement={currentAnnouncement}
+        onDismiss={dismissAnnouncement}
+      />
+    </>
   );
 }
 

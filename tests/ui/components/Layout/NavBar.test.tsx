@@ -530,7 +530,7 @@ describe("NavBar", () => {
         },
       ];
 
-      scenarios.forEach(({ currentPath, expectedDestination }, index) => {
+      scenarios.forEach(({ currentPath, expectedDestination }) => {
         // Set the current path
         mockLocation.pathname = currentPath;
 
