@@ -3,6 +3,11 @@ import "./jest-dom.d.ts";
 import { cleanup } from "@testing-library/react";
 import { afterEach, beforeEach, jest } from "@jest/globals";
 import React from "react";
+import { TextEncoder, TextDecoder } from "util";
+
+// Polyfill for TextEncoder/TextDecoder (required for React Router DOM 7)
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
 
 // Configure React 18 test environment
 global.IS_REACT_ACT_ENVIRONMENT = true;
@@ -33,15 +38,12 @@ afterEach(() => {
 });
 
 // Mock react-router-dom
+const mockNavigate = jest.fn();
 jest.mock("react-router-dom", () => ({
-  useNavigate: () => jest.fn(),
+  ...jest.requireActual<typeof import("react-router-dom")>("react-router-dom"),
+  useNavigate: () => mockNavigate,
   useParams: () => ({}),
   useLocation: () => ({ pathname: "/" }),
-  BrowserRouter: ({ children }: { children: React.ReactNode }) => children,
-  Routes: ({ children }: { children: React.ReactNode }) => children,
-  Route: ({ children }: { children: React.ReactNode }) => children,
-  Link: ({ children, to }: { children: React.ReactNode; to: string }) =>
-    React.createElement("a", { href: to }, children),
 }));
 
 // Mock react-i18next with proper i18n object

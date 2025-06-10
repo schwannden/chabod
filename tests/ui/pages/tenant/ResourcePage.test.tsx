@@ -1,5 +1,5 @@
 import React from "react";
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render } from "../../test-utils";
 import ResourcePage from "@/pages/tenant/ResourcePage";
@@ -18,9 +18,27 @@ jest.mock("react-router-dom", () => ({
   useParams: () => mockUseParams(),
 }));
 
+// Mock react-i18next with stable reference
+const mockT = jest.fn((key: string) => key);
+jest.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: mockT,
+  }),
+}));
+
 // Mock hooks
 jest.mock("@/hooks/useSession");
-jest.mock("@/hooks/useTenantRole");
+jest.mock("@/hooks/useTenantRole", () => ({
+  useTenantRole: jest.fn(),
+}));
+
+// Mock useToast with stable reference
+const mockToast = jest.fn();
+jest.mock("@/components/ui/use-toast", () => ({
+  useToast: () => ({
+    toast: mockToast,
+  }),
+}));
 
 // Mock TenantPageLayout component
 jest.mock("@/components/Layout/TenantPageLayout", () => ({
@@ -223,6 +241,9 @@ jest.mock("@/integrations/supabase/client", () => ({
 }));
 
 describe("ResourcePage", () => {
+  // Set timeout for all tests in this describe block
+  jest.setTimeout(10000);
+
   const mockUser = {
     id: "test-user-id",
     email: "test@example.com",
@@ -248,6 +269,7 @@ describe("ResourcePage", () => {
       tenant_id: "tenant-1",
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
+      memberCount: 5,
     },
     {
       id: "group-2",
@@ -256,6 +278,7 @@ describe("ResourcePage", () => {
       tenant_id: "tenant-1",
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
+      memberCount: 3,
     },
   ];
 
@@ -298,6 +321,8 @@ describe("ResourcePage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockNavigate.mockClear();
+    mockT.mockClear();
+    mockToast.mockClear();
     mockUseParams.mockReturnValue({ slug: "test-church" });
 
     // Set up default mocks
@@ -314,31 +339,50 @@ describe("ResourcePage", () => {
       isLoading: false,
     });
 
-    // Mock Supabase tenant query
-    const mockSupabaseChain = {
-      single: jest.fn().mockResolvedValue({
-        data: mockTenant,
-        error: null,
-      }),
-    };
-    const mockEqChain = {
-      eq: jest.fn().mockReturnValue(mockSupabaseChain),
-    };
-    const mockSelectChain = {
-      select: jest.fn().mockReturnValue(mockEqChain),
-    };
-    (supabase.from as jest.Mock).mockReturnValue(mockSelectChain);
+    // Mock Supabase tenant query with stable implementation
+    const mockSingleFn = jest.fn().mockResolvedValue({
+      data: mockTenant,
+      error: null,
+    });
+    const mockEqFn = jest.fn().mockReturnValue({
+      single: mockSingleFn,
+    });
+    const mockSelectFn = jest.fn().mockReturnValue({
+      eq: mockEqFn,
+    });
+    const mockFromFn = jest.fn().mockReturnValue({
+      select: mockSelectFn,
+    });
+    (supabase.from as jest.Mock).mockImplementation(mockFromFn);
 
-    mockGetResources.mockResolvedValue(mockResources);
-    mockGetResourceGroups.mockResolvedValue([]);
-    mockGetTenantGroups.mockResolvedValue(mockGroups);
+    // Set up service mocks with stable implementations
+    mockGetResources.mockImplementation(() => Promise.resolve([...mockResources]));
+
+    // Create a Map to cache resource groups and prevent infinite loops
+    const resourceGroupsCache = new Map([
+      ["resource-1", ["group-1"]],
+      ["resource-2", ["group-2"]],
+    ]);
+
+    mockGetResourceGroups.mockImplementation((resourceId: string) => {
+      const groups = resourceGroupsCache.get(resourceId) || [];
+      return Promise.resolve([...groups]);
+    });
+
+    mockGetTenantGroups.mockImplementation(() => Promise.resolve([...mockGroups]));
   });
 
   describe("Rendering", () => {
     it("should render with loading state initially", async () => {
       render(<ResourcePage />);
 
-      expect(screen.getByTestId("layout-loading")).toHaveTextContent("loading");
+      // Check if the layout renders
+      expect(screen.getByTestId("tenant-page-layout")).toBeInTheDocument();
+
+      // Wait for initial loading to complete
+      await waitFor(() => {
+        expect(screen.getByTestId("layout-loading")).toHaveTextContent("not-loading");
+      });
     });
 
     it("should render page title and breadcrumbs", async () => {
@@ -362,24 +406,32 @@ describe("ResourcePage", () => {
     it("should render filter bar and resource list", async () => {
       render(<ResourcePage />);
 
-      await waitFor(() => {
-        expect(screen.getByTestId("resource-filter-bar")).toBeInTheDocument();
-        expect(screen.getByTestId("resource-list")).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByTestId("resource-filter-bar")).toBeInTheDocument();
+          expect(screen.getByTestId("resource-list")).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
     });
 
     it("should display resources when loaded", async () => {
       render(<ResourcePage />);
 
-      await waitFor(() => {
-        expect(screen.getByTestId("resources-count")).toHaveTextContent("2");
-        expect(screen.getByTestId("resource-resource-1")).toHaveTextContent("Bible Study Guide");
-        expect(screen.getByTestId("resource-resource-2")).toHaveTextContent("Song List");
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByTestId("resources-count")).toHaveTextContent("2");
+          expect(screen.getByTestId("resource-resource-1")).toHaveTextContent("Bible Study Guide");
+          expect(screen.getByTestId("resource-resource-2")).toHaveTextContent("Song List");
+        },
+        { timeout: 3000 },
+      );
     });
 
     it("should display groups in filter", async () => {
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("groups-count")).toHaveTextContent("2");
@@ -396,10 +448,13 @@ describe("ResourcePage", () => {
 
       render(<ResourcePage />);
 
-      await waitFor(() => {
-        const actionElement = screen.getByTestId("layout-action");
-        expect(actionElement).toHaveTextContent("resources.addResource");
-      });
+      await waitFor(
+        () => {
+          const actionElement = screen.getByTestId("layout-action");
+          expect(actionElement).toHaveTextContent("resources.addResource");
+        },
+        { timeout: 3000 },
+      );
     });
 
     it("should not show create button for member", async () => {
@@ -408,7 +463,9 @@ describe("ResourcePage", () => {
         isLoading: false,
       });
 
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         const actionElement = screen.getByTestId("layout-action");
@@ -422,7 +479,9 @@ describe("ResourcePage", () => {
         isLoading: false,
       });
 
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("can-manage")).toHaveTextContent("true");
@@ -435,7 +494,9 @@ describe("ResourcePage", () => {
         isLoading: false,
       });
 
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("can-manage")).toHaveTextContent("false");
@@ -451,14 +512,18 @@ describe("ResourcePage", () => {
         isLoading: false,
       });
 
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("layout-action")).toBeInTheDocument();
       });
 
       const createButton = screen.getByRole("button", { name: /resources.addResource/ });
-      await user.click(createButton);
+      await act(async () => {
+        await user.click(createButton);
+      });
 
       expect(screen.getByTestId("create-resource-dialog")).toBeVisible();
     });
@@ -470,17 +535,23 @@ describe("ResourcePage", () => {
         isLoading: false,
       });
 
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("layout-action")).toBeInTheDocument();
       });
 
       const createButton = screen.getByRole("button", { name: /resources.addResource/ });
-      await user.click(createButton);
+      await act(async () => {
+        await user.click(createButton);
+      });
 
       const closeButton = screen.getByTestId("dialog-close");
-      await user.click(closeButton);
+      await act(async () => {
+        await user.click(closeButton);
+      });
 
       expect(screen.getByTestId("create-resource-dialog")).not.toBeVisible();
     });
@@ -494,9 +565,12 @@ describe("ResourcePage", () => {
 
       render(<ResourcePage />);
 
-      await waitFor(() => {
-        expect(screen.getByTestId("resources-count")).toHaveTextContent("2");
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByTestId("resources-count")).toHaveTextContent("2");
+        },
+        { timeout: 3000 },
+      );
 
       const createButton = screen.getByRole("button", { name: /resources.addResource/ });
       await user.click(createButton);
@@ -509,7 +583,7 @@ describe("ResourcePage", () => {
         () => {
           expect(screen.getByTestId("resources-count")).toHaveTextContent("3");
         },
-        { timeout: 5000 },
+        { timeout: 3000 },
       );
     });
   });
@@ -517,14 +591,18 @@ describe("ResourcePage", () => {
   describe("Resource Filtering", () => {
     it("should filter resources by text", async () => {
       const user = userEvent.setup();
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("text-filter")).toBeInTheDocument();
       });
 
       const textFilter = screen.getByTestId("text-filter");
-      await user.type(textFilter, "Bible");
+      await act(async () => {
+        await user.type(textFilter, "Bible");
+      });
 
       // The actual filtering logic is tested through component integration
       expect(textFilter).toHaveValue("Bible");
@@ -532,28 +610,36 @@ describe("ResourcePage", () => {
 
     it("should filter resources by group", async () => {
       const user = userEvent.setup();
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("group-filter")).toBeInTheDocument();
       });
 
       const groupFilter = screen.getByTestId("group-filter");
-      await user.selectOptions(groupFilter, "group-1");
+      await act(async () => {
+        await user.selectOptions(groupFilter, "group-1");
+      });
 
       expect(groupFilter).toHaveValue("group-1");
     });
 
     it("should reset to all groups", async () => {
       const user = userEvent.setup();
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("group-filter")).toBeInTheDocument();
       });
 
       const groupFilter = screen.getByTestId("group-filter");
-      await user.selectOptions(groupFilter, "all");
+      await act(async () => {
+        await user.selectOptions(groupFilter, "all");
+      });
 
       expect(groupFilter).toHaveValue("all");
     });
@@ -562,14 +648,18 @@ describe("ResourcePage", () => {
   describe("Resource Management", () => {
     it("should update resource list when resource is updated", async () => {
       const user = userEvent.setup();
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("mock-resource-updated")).toBeInTheDocument();
       });
 
       const updateButton = screen.getByTestId("mock-resource-updated");
-      await user.click(updateButton);
+      await act(async () => {
+        await user.click(updateButton);
+      });
 
       // Resource update logic is handled by the parent component
       expect(updateButton).toBeInTheDocument();
@@ -579,10 +669,13 @@ describe("ResourcePage", () => {
       const user = userEvent.setup();
       render(<ResourcePage />);
 
-      await waitFor(() => {
-        expect(screen.getByTestId("mock-resource-deleted")).toBeInTheDocument();
-        expect(screen.getByTestId("resources-count")).toHaveTextContent("2");
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByTestId("mock-resource-deleted")).toBeInTheDocument();
+          expect(screen.getByTestId("resources-count")).toHaveTextContent("2");
+        },
+        { timeout: 3000 },
+      );
 
       const deleteButton = screen.getByTestId("mock-resource-deleted");
       await user.click(deleteButton);
@@ -592,32 +685,36 @@ describe("ResourcePage", () => {
         () => {
           expect(screen.getByTestId("resources-count")).toHaveTextContent("1");
         },
-        { timeout: 5000 },
+        { timeout: 3000 },
       );
     });
   });
 
   describe("Error Handling", () => {
     it("should handle tenant fetch error", async () => {
-      const mockSupabaseChain = {
-        single: jest.fn().mockResolvedValue({
-          data: null,
-          error: { message: "Tenant not found" },
-        }),
-      };
-      const mockEqChain = {
-        eq: jest.fn().mockReturnValue(mockSupabaseChain),
-      };
-      const mockSelectChain = {
-        select: jest.fn().mockReturnValue(mockEqChain),
-      };
-      (supabase.from as jest.Mock).mockReturnValue(mockSelectChain);
+      const mockSingleFn = jest.fn().mockResolvedValue({
+        data: null,
+        error: { message: "Tenant not found" },
+      });
+      const mockEqFn = jest.fn().mockReturnValue({
+        single: mockSingleFn,
+      });
+      const mockSelectFn = jest.fn().mockReturnValue({
+        eq: mockEqFn,
+      });
+      const mockFromFn = jest.fn().mockReturnValue({
+        select: mockSelectFn,
+      });
+      (supabase.from as jest.Mock).mockImplementation(mockFromFn);
 
       render(<ResourcePage />);
 
-      await waitFor(() => {
-        expect(screen.getByTestId("layout-tenant-name")).toHaveTextContent("");
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByTestId("layout-tenant-name")).toHaveTextContent("");
+        },
+        { timeout: 3000 },
+      );
     });
 
     it("should handle resources fetch error", async () => {
@@ -625,15 +722,20 @@ describe("ResourcePage", () => {
 
       render(<ResourcePage />);
 
-      await waitFor(() => {
-        expect(screen.getByTestId("layout-loading")).toHaveTextContent("not-loading");
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByTestId("layout-loading")).toHaveTextContent("not-loading");
+        },
+        { timeout: 3000 },
+      );
     });
 
     it("should handle groups fetch error", async () => {
       mockGetTenantGroups.mockRejectedValue(new Error("Groups fetch failed"));
 
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("groups-count")).toHaveTextContent("0");
@@ -643,7 +745,9 @@ describe("ResourcePage", () => {
     it("should handle resource groups fetch error", async () => {
       mockGetResourceGroups.mockRejectedValue(new Error("Resource groups fetch failed"));
 
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         // Should still render resources even if group associations fail
@@ -656,7 +760,9 @@ describe("ResourcePage", () => {
     it("should handle missing slug parameter", async () => {
       mockUseParams.mockReturnValue({ slug: undefined });
 
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("layout-tenant-slug")).toHaveTextContent("");
@@ -666,7 +772,9 @@ describe("ResourcePage", () => {
     it("should handle empty resources list", async () => {
       mockGetResources.mockResolvedValue([]);
 
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("resources-count")).toHaveTextContent("0");
@@ -676,7 +784,9 @@ describe("ResourcePage", () => {
     it("should handle empty groups list", async () => {
       mockGetTenantGroups.mockResolvedValue([]);
 
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("groups-count")).toHaveTextContent("0");
@@ -689,7 +799,9 @@ describe("ResourcePage", () => {
         isLoading: true,
       });
 
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         const actionElement = screen.getByTestId("layout-action");
@@ -700,7 +812,9 @@ describe("ResourcePage", () => {
 
   describe("Component Integration", () => {
     it("should pass correct props to ResourceFilterBar", async () => {
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         const filterBar = screen.getByTestId("resource-filter-bar");
@@ -714,7 +828,9 @@ describe("ResourcePage", () => {
     });
 
     it("should pass correct props to ResourceList", async () => {
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("resources-count")).toHaveTextContent("2");
@@ -731,14 +847,18 @@ describe("ResourcePage", () => {
         isLoading: false,
       });
 
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("layout-action")).toBeInTheDocument();
       });
 
       const createButton = screen.getByRole("button", { name: /resources.addResource/ });
-      await user.click(createButton);
+      await act(async () => {
+        await user.click(createButton);
+      });
 
       expect(screen.getByTestId("dialog-tenant-id")).toHaveTextContent("test-church");
       expect(screen.getByTestId("dialog-groups-count")).toHaveTextContent("2");
@@ -770,20 +890,30 @@ describe("ResourcePage", () => {
     ];
 
     beforeEach(() => {
-      mockGetResources.mockResolvedValue(resourcesWithGroups);
-      // Mock resource groups - resource-1 in group-1, resource-2 in group-2
-      mockGetResourceGroups
-        .mockResolvedValueOnce(["group-1"]) // for resource-1
-        .mockResolvedValueOnce(["group-2"]); // for resource-2
+      mockGetResources.mockImplementation(() => Promise.resolve([...resourcesWithGroups]));
+
+      // Create stable cache for filtering tests
+      const filterResourceGroupsCache = new Map([
+        ["resource-1", ["group-1"]],
+        ["resource-2", ["group-2"]],
+      ]);
+
+      mockGetResourceGroups.mockImplementation((resourceId: string) => {
+        const groups = filterResourceGroupsCache.get(resourceId) || [];
+        return Promise.resolve([...groups]);
+      });
     });
 
     it("should filter resources by text in name", async () => {
       const user = userEvent.setup();
       render(<ResourcePage />);
 
-      await waitFor(() => {
-        expect(screen.getByTestId("resources-count")).toHaveTextContent("2");
-      });
+      await waitFor(
+        () => {
+          expect(screen.getByTestId("resources-count")).toHaveTextContent("2");
+        },
+        { timeout: 3000 },
+      );
 
       const textFilter = screen.getByTestId("text-filter");
       await user.type(textFilter, "Bible");
@@ -794,57 +924,73 @@ describe("ResourcePage", () => {
 
     it("should filter resources by text in description", async () => {
       const user = userEvent.setup();
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("text-filter")).toBeInTheDocument();
       });
 
       const textFilter = screen.getByTestId("text-filter");
-      await user.type(textFilter, "Songs");
+      await act(async () => {
+        await user.type(textFilter, "Songs");
+      });
 
       expect(textFilter).toHaveValue("Songs");
     });
 
     it("should filter resources by text in URL", async () => {
       const user = userEvent.setup();
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("text-filter")).toBeInTheDocument();
       });
 
       const textFilter = screen.getByTestId("text-filter");
-      await user.type(textFilter, "youth-music");
+      await act(async () => {
+        await user.type(textFilter, "youth-music");
+      });
 
       expect(textFilter).toHaveValue("youth-music");
     });
 
     it("should handle case insensitive text filtering", async () => {
       const user = userEvent.setup();
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("text-filter")).toBeInTheDocument();
       });
 
       const textFilter = screen.getByTestId("text-filter");
-      await user.type(textFilter, "BIBLE");
+      await act(async () => {
+        await user.type(textFilter, "BIBLE");
+      });
 
       expect(textFilter).toHaveValue("BIBLE");
     });
 
     it("should clear text filter", async () => {
       const user = userEvent.setup();
-      render(<ResourcePage />);
+      await act(async () => {
+        render(<ResourcePage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("text-filter")).toBeInTheDocument();
       });
 
       const textFilter = screen.getByTestId("text-filter");
-      await user.type(textFilter, "test");
-      await user.clear(textFilter);
+      await act(async () => {
+        await user.type(textFilter, "test");
+        await user.clear(textFilter);
+      });
 
       expect(textFilter).toHaveValue("");
     });

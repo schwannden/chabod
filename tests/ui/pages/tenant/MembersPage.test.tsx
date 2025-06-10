@@ -252,7 +252,7 @@ describe("MembersPage", () => {
   });
 
   describe("Authentication and Navigation", () => {
-    it("should redirect to auth page when user is not authenticated", () => {
+    it("should redirect to auth page when user is not authenticated", async () => {
       mockUseSession.mockReturnValue({
         session: null,
         user: null,
@@ -261,12 +261,14 @@ describe("MembersPage", () => {
         signOut: jest.fn(),
       });
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       expect(mockNavigate).toHaveBeenCalledWith("/tenant/test-church/auth");
     });
 
-    it("should not redirect when session is loading", () => {
+    it("should not redirect when session is loading", async () => {
       mockUseSession.mockReturnValue({
         session: null,
         user: null,
@@ -275,7 +277,9 @@ describe("MembersPage", () => {
         signOut: jest.fn(),
       });
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       expect(mockNavigate).not.toHaveBeenCalled();
     });
@@ -289,7 +293,9 @@ describe("MembersPage", () => {
         signOut: jest.fn(),
       });
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(mockNavigate).not.toHaveBeenCalledWith("/tenant/test-church/auth");
@@ -323,7 +329,9 @@ describe("MembersPage", () => {
         signOut: jest.fn(),
       });
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith("/tenant/test-church");
@@ -341,7 +349,9 @@ describe("MembersPage", () => {
         signOut: jest.fn(),
       });
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith("/not-found");
@@ -360,7 +370,7 @@ describe("MembersPage", () => {
       });
     });
 
-    it("should show loading state while session is loading", () => {
+    it("should show loading state while session is loading", async () => {
       mockUseSession.mockReturnValue({
         session: null,
         user: null,
@@ -369,12 +379,14 @@ describe("MembersPage", () => {
         signOut: jest.fn(),
       });
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       expect(screen.getByText("common.loading")).toBeInTheDocument();
     });
 
-    it("should show loading state while data is loading", () => {
+    it("should show loading state while data is loading", async () => {
       mockUseSession.mockReturnValue({
         session: null,
         user: mockUser,
@@ -391,13 +403,17 @@ describe("MembersPage", () => {
           }),
       );
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       expect(screen.getByText("common.loading")).toBeInTheDocument();
     });
 
     it("should render the page layout with correct props", async () => {
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("tenant-page-layout")).toBeInTheDocument();
@@ -410,7 +426,9 @@ describe("MembersPage", () => {
     });
 
     it("should render member filter bar", async () => {
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("member-filter-bar")).toBeInTheDocument();
@@ -418,7 +436,9 @@ describe("MembersPage", () => {
     });
 
     it("should render member table with correct props", async () => {
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("member-table")).toBeInTheDocument();
@@ -429,7 +449,9 @@ describe("MembersPage", () => {
     });
 
     it("should show invite button for owners", async () => {
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         const actionContainer = screen.getByTestId("layout-action");
@@ -450,7 +472,9 @@ describe("MembersPage", () => {
 
       (memberService.getTenantMembers as jest.Mock).mockResolvedValue(nonOwnerMembers);
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         const actionContainer = screen.getByTestId("layout-action");
@@ -462,7 +486,9 @@ describe("MembersPage", () => {
     it("should show tenant not found when tenant is null after loading", async () => {
       (tenantService.getTenantBySlug as jest.Mock).mockResolvedValue(null);
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByText("common.tenantNotFound")).toBeInTheDocument();
@@ -486,14 +512,18 @@ describe("MembersPage", () => {
     it("should filter members by name", async () => {
       const user = userEvent.setup();
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("member-table")).toBeInTheDocument();
       });
 
       const nameFilter = screen.getByTestId("name-filter");
-      await user.type(nameFilter, "Owner");
+      await act(async () => {
+        await user.type(nameFilter, "Owner");
+      });
 
       // The filtering is done in the component, so we need to check if the filtered data is passed
       await waitFor(() => {
@@ -506,14 +536,18 @@ describe("MembersPage", () => {
     it("should filter members by email", async () => {
       const user = userEvent.setup();
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("member-table")).toBeInTheDocument();
       });
 
       const emailFilter = screen.getByTestId("email-filter");
-      await user.type(emailFilter, "test@");
+      await act(async () => {
+        await user.type(emailFilter, "test@");
+      });
 
       await waitFor(() => {
         expect(emailFilter).toHaveValue("test@");
@@ -523,14 +557,18 @@ describe("MembersPage", () => {
     it("should filter members by role", async () => {
       const user = userEvent.setup();
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("member-table")).toBeInTheDocument();
       });
 
       const roleFilter = screen.getByTestId("role-filter");
-      await user.selectOptions(roleFilter, "owner");
+      await act(async () => {
+        await user.selectOptions(roleFilter, "owner");
+      });
 
       await waitFor(() => {
         expect(roleFilter).toHaveValue("owner");
@@ -552,14 +590,18 @@ describe("MembersPage", () => {
     it("should open invite dialog when invite button is clicked", async () => {
       const user = userEvent.setup();
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("layout-action")).toBeInTheDocument();
       });
 
       const inviteButton = screen.getByText("members.inviteMember");
-      await user.click(inviteButton);
+      await act(async () => {
+        await user.click(inviteButton);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("dialog-open")).toHaveTextContent("open");
@@ -569,7 +611,9 @@ describe("MembersPage", () => {
     it("should close invite dialog when close is triggered", async () => {
       const user = userEvent.setup();
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("layout-action")).toBeInTheDocument();
@@ -577,7 +621,9 @@ describe("MembersPage", () => {
 
       // Open dialog first
       const inviteButton = screen.getByText("members.inviteMember");
-      await user.click(inviteButton);
+      await act(async () => {
+        await user.click(inviteButton);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("dialog-open")).toHaveTextContent("open");
@@ -585,7 +631,9 @@ describe("MembersPage", () => {
 
       // Close dialog
       const closeButton = screen.getByTestId("mock-dialog-close");
-      await user.click(closeButton);
+      await act(async () => {
+        await user.click(closeButton);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("dialog-open")).toHaveTextContent("closed");
@@ -595,7 +643,9 @@ describe("MembersPage", () => {
     it("should refresh member list when invite is successful", async () => {
       const user = userEvent.setup();
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(
         () => {
@@ -627,7 +677,9 @@ describe("MembersPage", () => {
     it("should refresh member list when member is updated", async () => {
       const user = userEvent.setup();
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(
         () => {
@@ -672,7 +724,9 @@ describe("MembersPage", () => {
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
       (tenantService.getTenantBySlug as jest.Mock).mockRejectedValue(new Error("Fetch error"));
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(consoleSpy).toHaveBeenCalledWith("Error fetching data:", expect.any(Error));
@@ -685,7 +739,9 @@ describe("MembersPage", () => {
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
       (memberService.getTenantMembers as jest.Mock).mockRejectedValue(new Error("Fetch error"));
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(consoleSpy).toHaveBeenCalledWith("Error fetching data:", expect.any(Error));
@@ -697,7 +753,9 @@ describe("MembersPage", () => {
     it("should handle missing slug parameter", async () => {
       mockUseParams.mockReturnValue({ slug: undefined });
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       // Should not make any API calls with undefined slug
       await waitFor(() => {
@@ -719,7 +777,9 @@ describe("MembersPage", () => {
     });
 
     it("should fetch tenant and members data on mount", async () => {
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(tenantService.getTenantBySlug).toHaveBeenCalledWith("test-church");
@@ -728,7 +788,9 @@ describe("MembersPage", () => {
     });
 
     it("should determine if current user is owner correctly", async () => {
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("is-owner")).toHaveTextContent("true");
@@ -748,14 +810,16 @@ describe("MembersPage", () => {
 
       (memberService.getTenantMembers as jest.Mock).mockResolvedValue(nonOwnerMembers);
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId("is-owner")).toHaveTextContent("false");
       });
     });
 
-    it("should not fetch data when user is not available", () => {
+    it("should not fetch data when user is not available", async () => {
       mockUseSession.mockReturnValue({
         session: null,
         user: null,
@@ -764,7 +828,9 @@ describe("MembersPage", () => {
         signOut: jest.fn(),
       });
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       expect(tenantService.getTenantBySlug).not.toHaveBeenCalled();
       expect(memberService.getTenantMembers).not.toHaveBeenCalled();
@@ -784,14 +850,18 @@ describe("MembersPage", () => {
         signOut: jest.fn(),
       });
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByText("common.returnHome")).toBeInTheDocument();
       });
 
       const returnButton = screen.getByText("common.returnHome");
-      await user.click(returnButton);
+      await act(async () => {
+        await user.click(returnButton);
+      });
 
       expect(mockNavigate).toHaveBeenCalledWith("/");
     });
@@ -811,7 +881,9 @@ describe("MembersPage", () => {
     it("should render proper heading structure", async () => {
       (tenantService.getTenantBySlug as jest.Mock).mockResolvedValue(null);
 
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
@@ -819,7 +891,9 @@ describe("MembersPage", () => {
     });
 
     it("should render button with proper accessibility", async () => {
-      render(<MembersPage />);
+      await act(async () => {
+        render(<MembersPage />);
+      });
 
       await waitFor(() => {
         const inviteButton = screen.getByRole("button", { name: /members.inviteMember/i });
