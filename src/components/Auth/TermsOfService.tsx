@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
@@ -49,5 +50,17 @@ export function TermsOfService({ accepted, onChange }: TermsOfServiceProps) {
         </Label>
       </div>
     </div>
+  );
+}
+
+// For backwards compatibility, create a simplified version without props
+export function SimpleTermsOfService() {
+  const [accepted, setAccepted] = useState(false);
+  
+  return (
+    <TermsOfService 
+      accepted={accepted} 
+      onChange={setAccepted} 
+    />
   );
 }

@@ -1,6 +1,7 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { AuthTabs } from "@/components/Auth/AuthTabs";
+import { TenantAuthFlow } from "@/components/Auth/TenantAuthFlow";
 import { NavBar } from "@/components/Layout/NavBar";
 import { useSession } from "@/hooks/useSession";
 import { getTenantBySlug } from "@/lib/tenant-utils";
@@ -37,18 +38,18 @@ export default function AuthPage() {
           setTenant(tenantData);
           setError(null);
         } else {
-          setError(`The tenant "${slug}" does not exist or has been deleted.`);
+          setError(t("common.tenantNotFoundDesc", { slug }));
         }
       } catch (error) {
         console.error("Error fetching tenant:", error);
-        setError(`Failed to load tenant information. Please try again later.`);
+        setError(t("common.unknownError"));
       } finally {
         setIsTenantLoading(false);
       }
     };
 
     fetchTenant();
-  }, [slug]);
+  }, [slug, t]);
 
   useEffect(() => {
     const checkUserMembership = async () => {
@@ -95,10 +96,10 @@ export default function AuthPage() {
         <NavBar />
         <main className="flex-1 container mx-auto px-4 py-8 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-3xl font-bold mb-4">Tenant Not Found</h1>
+            <h1 className="text-3xl font-bold mb-4">{t("common.tenantNotFound")}</h1>
             <p className="mb-6">{error}</p>
             <button onClick={() => navigate("/")} className="text-primary hover:underline">
-              Return to home
+              {t("common.returnHome")}
             </button>
           </div>
         </main>
@@ -113,8 +114,8 @@ export default function AuthPage() {
         <div className="max-w-md mx-auto mt-8">
           {tenant && (
             <>
-              <h1 className="text-3xl font-bold text-center mb-8">歡迎來到 {tenant.name}</h1>
-              <AuthTabs
+              <h1 className="text-3xl font-bold text-center mb-8">{t("auth.welcomeToChurch", { tenantName: tenant.name })}</h1>
+              <TenantAuthFlow
                 tenantSlug={tenant.slug}
                 tenantName={tenant.name}
                 inviteToken={inviteToken || undefined}

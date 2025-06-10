@@ -7,9 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { useTranslation } from "react-i18next";
+import { Profile } from "@/lib/types";
 
-export function ProfileForm() {
-  const { user, profile, refetchProfile } = useSession();
+interface ProfileFormProps {
+  profile: Profile;
+  onProfileUpdated?: () => void;
+}
+
+export function ProfileForm({ profile, onProfileUpdated }: ProfileFormProps) {
+  const { user, refetchProfile } = useSession();
   const { toast } = useToast();
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,15 +45,18 @@ export function ProfileForm() {
     try {
       await updateUserProfile(user.id, formData);
       await refetchProfile();
+      if (onProfileUpdated) {
+        onProfileUpdated();
+      }
       toast({
         title: t("profile.profileUpdated"),
         description: t("profile.profileUpdatedSuccess"),
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Profile update error:", error);
       toast({
         title: t("profile.profileUpdateError"),
-        description: error?.message || t("profile.profileUpdateErrorDesc"),
+        description: error instanceof Error ? error.message : t("profile.profileUpdateErrorDesc"),
         variant: "destructive",
       });
     } finally {

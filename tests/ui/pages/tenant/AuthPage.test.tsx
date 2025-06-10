@@ -15,9 +15,9 @@ jest.mock("react-router-dom", () => ({
   useParams: () => mockUseParams(),
 }));
 
-// Mock AuthTabs component
-jest.mock("@/components/Auth/AuthTabs", () => ({
-  AuthTabs: ({
+// Mock TenantAuthFlow component
+jest.mock("@/components/Auth/TenantAuthFlow", () => ({
+  TenantAuthFlow: ({
     onSuccess,
     tenantSlug,
     tenantName,
@@ -28,7 +28,7 @@ jest.mock("@/components/Auth/AuthTabs", () => ({
     tenantName?: string;
     inviteToken?: string;
   }) => (
-    <div data-testid="auth-tabs">
+    <div data-testid="tenant-auth-flow">
       <div data-testid="tenant-slug">{tenantSlug || "no-slug"}</div>
       <div data-testid="tenant-name">{tenantName || "no-name"}</div>
       <div data-testid="invite-token">{inviteToken || "no-token"}</div>
@@ -94,8 +94,8 @@ describe("AuthPage (Tenant)", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("Tenant Not Found")).toBeInTheDocument();
-        expect(screen.getByText(/does not exist or has been deleted/)).toBeInTheDocument();
+        expect(screen.getByText("common.tenantNotFound")).toBeInTheDocument();
+        expect(screen.getByText("common.tenantNotFoundDesc")).toBeInTheDocument();
       });
     });
 
@@ -110,7 +110,7 @@ describe("AuthPage (Tenant)", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText(/Failed to load tenant information/)).toBeInTheDocument();
+        expect(screen.getByText("common.unknownError")).toBeInTheDocument();
       });
 
       expect(consoleSpy).toHaveBeenCalledWith("Error fetching tenant:", expect.any(Error));
@@ -195,7 +195,7 @@ describe("AuthPage (Tenant)", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("歡迎來到 Test Church")).toBeInTheDocument();
+        expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
       });
 
       expect(mockNavigate).not.toHaveBeenCalled();
@@ -214,7 +214,7 @@ describe("AuthPage (Tenant)", () => {
 
       // Should show the auth form while checking access, not a loading state
       await waitFor(() => {
-        expect(screen.getByText("歡迎來到 Test Church")).toBeInTheDocument();
+        expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
       });
     });
 
@@ -231,7 +231,7 @@ describe("AuthPage (Tenant)", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("歡迎來到 Test Church")).toBeInTheDocument();
+        expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
       });
 
       expect(consoleSpy).toHaveBeenCalledWith(
@@ -242,25 +242,25 @@ describe("AuthPage (Tenant)", () => {
     });
   });
 
-  describe("Auth Form Display", () => {
+  describe("Auth Flow Display", () => {
     beforeEach(async () => {
       mockUseSessionHelpers.unauthenticated();
     });
 
-    it("should display tenant name and auth form when tenant exists", async () => {
+    it("should display tenant name and auth flow when tenant exists", async () => {
       await act(async () => {
         render(<AuthPage />);
       });
 
       await waitFor(() => {
-        expect(screen.getByText("歡迎來到 Test Church")).toBeInTheDocument();
-        expect(screen.getByTestId("auth-tabs")).toBeInTheDocument();
+        expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
+        expect(screen.getByTestId("tenant-auth-flow")).toBeInTheDocument();
         expect(screen.getByTestId("tenant-slug")).toHaveTextContent("test-church");
         expect(screen.getByTestId("tenant-name")).toHaveTextContent("Test Church");
       });
     });
 
-    it("should pass correct props to AuthTabs component", async () => {
+    it("should pass correct props to TenantAuthFlow component", async () => {
       Object.defineProperty(window, "location", {
         value: {
           search: "?token=test-invite",
@@ -293,7 +293,7 @@ describe("AuthPage (Tenant)", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByTestId("auth-tabs")).toBeInTheDocument();
+        expect(screen.getByTestId("tenant-auth-flow")).toBeInTheDocument();
       });
 
       const successButton = screen.getByTestId("mock-auth-success");
@@ -314,8 +314,8 @@ describe("AuthPage (Tenant)", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("Tenant Not Found")).toBeInTheDocument();
-        expect(screen.getByText("Return to home")).toBeInTheDocument();
+        expect(screen.getByText("common.tenantNotFound")).toBeInTheDocument();
+        expect(screen.getByText("common.returnHome")).toBeInTheDocument();
       });
     });
 
@@ -331,10 +331,10 @@ describe("AuthPage (Tenant)", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("Return to home")).toBeInTheDocument();
+        expect(screen.getByText("common.returnHome")).toBeInTheDocument();
       });
 
-      const homeLink = screen.getByText("Return to home");
+      const homeLink = screen.getByText("common.returnHome");
       await user.click(homeLink);
 
       expect(mockNavigate).toHaveBeenCalledWith("/");
@@ -413,7 +413,7 @@ describe("AuthPage (Tenant)", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("歡迎來到 Test Church")).toBeInTheDocument();
+        expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
       });
     });
 
@@ -482,7 +482,7 @@ describe("AuthPage (Tenant)", () => {
       });
 
       // Should show auth form since user doesn't have access
-      expect(screen.getByText("歡迎來到 Test Church")).toBeInTheDocument();
+      expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
     });
   });
 });

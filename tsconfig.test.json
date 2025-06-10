@@ -1,3 +1,4 @@
+
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
@@ -19,7 +20,8 @@
     "typeRoots": ["node_modules/@types", "tests"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@testing-library/jest-dom": ["./node_modules/@testing-library/jest-dom"]
     }
   },
   "include": ["tests/**/*", "src/**/*"],

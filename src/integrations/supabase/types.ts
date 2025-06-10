@@ -765,6 +765,10 @@ export type Database = {
         Args: { tenant_uuid: string }
         Returns: boolean
       }
+      create_user: {
+        Args: { user_id: string; email: string; password: string }
+        Returns: undefined
+      }
       is_tenant_member: {
         Args: { tenant_uuid: string }
         Returns: boolean
@@ -772,6 +776,14 @@ export type Database = {
       is_tenant_owner: {
         Args: { tenant_uuid: string }
         Returns: boolean
+      }
+      validate_event_creation: {
+        Args: { tenant_uuid: string; user_uuid: string }
+        Returns: {
+          is_member: boolean
+          under_limit: boolean
+          can_create: boolean
+        }[]
       }
     }
     Enums: {
