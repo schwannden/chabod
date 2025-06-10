@@ -1,9 +1,8 @@
 import React from "react";
 import { screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { render } from "../../test-utils";
+import { render, mockUseSessionHelpers, mockTenant } from "../../test-utils";
 import ResourcePage from "@/pages/tenant/ResourcePage";
-import { useSession } from "@/hooks/useSession";
 import { useTenantRole } from "@/hooks/useTenantRole";
 import * as resourceService from "@/lib/resource-service";
 import * as groupService from "@/lib/group-service";
@@ -27,7 +26,6 @@ jest.mock("react-i18next", () => ({
 }));
 
 // Mock hooks
-jest.mock("@/hooks/useSession");
 jest.mock("@/hooks/useTenantRole", () => ({
   useTenantRole: jest.fn(),
 }));
@@ -244,42 +242,11 @@ describe("ResourcePage", () => {
   // Set timeout for all tests in this describe block
   jest.setTimeout(10000);
 
-  const mockUser = {
-    id: "test-user-id",
-    email: "test@example.com",
-    aud: "authenticated",
-    created_at: "2024-01-01T00:00:00Z",
-    app_metadata: {},
-    user_metadata: {},
-    role: "authenticated",
-    updated_at: "2024-01-01T00:00:00Z",
-  };
-
-  const mockTenant = {
-    id: "tenant-1",
-    name: "Test Church",
-    slug: "test-church",
-  };
+  // Using mock data from test-utils.tsx
 
   const mockGroups = [
-    {
-      id: "group-1",
-      name: "Youth Group",
-      description: "For young people",
-      tenant_id: "tenant-1",
-      created_at: "2024-01-01T00:00:00Z",
-      updated_at: "2024-01-01T00:00:00Z",
-      memberCount: 5,
-    },
-    {
-      id: "group-2",
-      name: "Seniors Group",
-      description: "For older members",
-      tenant_id: "tenant-1",
-      created_at: "2024-01-01T00:00:00Z",
-      updated_at: "2024-01-01T00:00:00Z",
-      memberCount: 3,
-    },
+    { id: "group-1", name: "Bible Study" },
+    { id: "group-2", name: "Prayer Group" },
   ];
 
   const mockResources = [
@@ -306,7 +273,6 @@ describe("ResourcePage", () => {
   ];
 
   // Get mocked functions with proper typing
-  const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
   const mockUseTenantRole = useTenantRole as jest.MockedFunction<typeof useTenantRole>;
   const mockGetResources = resourceService.getResources as jest.MockedFunction<
     typeof resourceService.getResources
@@ -326,13 +292,7 @@ describe("ResourcePage", () => {
     mockUseParams.mockReturnValue({ slug: "test-church" });
 
     // Set up default mocks
-    mockUseSession.mockReturnValue({
-      session: null,
-      user: mockUser,
-      profile: null,
-      isLoading: false,
-      signOut: jest.fn(),
-    });
+    mockUseSessionHelpers.authenticatedNoProfile();
 
     mockUseTenantRole.mockReturnValue({
       role: "member",
@@ -372,7 +332,33 @@ describe("ResourcePage", () => {
     mockGetTenantGroups.mockImplementation(() => Promise.resolve([...mockGroups]));
   });
 
-  describe("Rendering", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe("Authentication and Loading", () => {
+    it("should redirect to auth page when user is not authenticated", async () => {
+      mockUseSessionHelpers.unauthenticated();
+
+      await act(async () => {
+        render(<ResourcePage />);
+      });
+
+      expect(mockNavigate).toHaveBeenCalledWith("/tenant/test-church/auth");
+    });
+
+    it("should show loading state when session is loading", async () => {
+      mockUseSessionHelpers.loading();
+
+      await act(async () => {
+        render(<ResourcePage />);
+      });
+
+      expect(screen.getByTestId("layout-loading")).toHaveTextContent("loading");
+    });
+  });
+
+  describe("Tenant and Data Loading", () => {
     it("should render with loading state initially", async () => {
       render(<ResourcePage />);
 
@@ -441,7 +427,7 @@ describe("ResourcePage", () => {
 
   describe("User Role and Permissions", () => {
     it("should show create button for owner", async () => {
-      mockUseTenantRole.mockReturnValue({
+      (useTenantRole as jest.Mock).mockReturnValue({
         role: "owner",
         isLoading: false,
       });
@@ -458,7 +444,7 @@ describe("ResourcePage", () => {
     });
 
     it("should not show create button for member", async () => {
-      mockUseTenantRole.mockReturnValue({
+      (useTenantRole as jest.Mock).mockReturnValue({
         role: "member",
         isLoading: false,
       });
@@ -474,7 +460,7 @@ describe("ResourcePage", () => {
     });
 
     it("should pass correct manage permissions to ResourceList", async () => {
-      mockUseTenantRole.mockReturnValue({
+      (useTenantRole as jest.Mock).mockReturnValue({
         role: "owner",
         isLoading: false,
       });
@@ -489,7 +475,7 @@ describe("ResourcePage", () => {
     });
 
     it("should not allow management for non-owner", async () => {
-      mockUseTenantRole.mockReturnValue({
+      (useTenantRole as jest.Mock).mockReturnValue({
         role: "member",
         isLoading: false,
       });
@@ -507,7 +493,7 @@ describe("ResourcePage", () => {
   describe("Create Resource Dialog", () => {
     it("should open create dialog when create button is clicked", async () => {
       const user = userEvent.setup();
-      mockUseTenantRole.mockReturnValue({
+      (useTenantRole as jest.Mock).mockReturnValue({
         role: "owner",
         isLoading: false,
       });
@@ -530,7 +516,7 @@ describe("ResourcePage", () => {
 
     it("should close create dialog", async () => {
       const user = userEvent.setup();
-      mockUseTenantRole.mockReturnValue({
+      (useTenantRole as jest.Mock).mockReturnValue({
         role: "owner",
         isLoading: false,
       });
@@ -558,7 +544,7 @@ describe("ResourcePage", () => {
 
     it("should add new resource when created", async () => {
       const user = userEvent.setup();
-      mockUseTenantRole.mockReturnValue({
+      (useTenantRole as jest.Mock).mockReturnValue({
         role: "owner",
         isLoading: false,
       });
@@ -718,7 +704,9 @@ describe("ResourcePage", () => {
     });
 
     it("should handle resources fetch error", async () => {
-      mockGetResources.mockRejectedValue(new Error("Resources fetch failed"));
+      (resourceService.getResources as jest.Mock).mockRejectedValue(
+        new Error("Resources fetch failed"),
+      );
 
       render(<ResourcePage />);
 
@@ -731,7 +719,9 @@ describe("ResourcePage", () => {
     });
 
     it("should handle groups fetch error", async () => {
-      mockGetTenantGroups.mockRejectedValue(new Error("Groups fetch failed"));
+      (groupService.getTenantGroups as jest.Mock).mockRejectedValue(
+        new Error("Groups fetch failed"),
+      );
 
       await act(async () => {
         render(<ResourcePage />);
@@ -743,7 +733,9 @@ describe("ResourcePage", () => {
     });
 
     it("should handle resource groups fetch error", async () => {
-      mockGetResourceGroups.mockRejectedValue(new Error("Resource groups fetch failed"));
+      (resourceService.getResourceGroups as jest.Mock).mockRejectedValue(
+        new Error("Resource groups fetch failed"),
+      );
 
       await act(async () => {
         render(<ResourcePage />);
@@ -770,7 +762,7 @@ describe("ResourcePage", () => {
     });
 
     it("should handle empty resources list", async () => {
-      mockGetResources.mockResolvedValue([]);
+      (resourceService.getResources as jest.Mock).mockResolvedValue([]);
 
       await act(async () => {
         render(<ResourcePage />);
@@ -782,7 +774,7 @@ describe("ResourcePage", () => {
     });
 
     it("should handle empty groups list", async () => {
-      mockGetTenantGroups.mockResolvedValue([]);
+      (groupService.getTenantGroups as jest.Mock).mockResolvedValue([]);
 
       await act(async () => {
         render(<ResourcePage />);
@@ -794,7 +786,7 @@ describe("ResourcePage", () => {
     });
 
     it("should handle loading role state", async () => {
-      mockUseTenantRole.mockReturnValue({
+      (useTenantRole as jest.Mock).mockReturnValue({
         role: null,
         isLoading: true,
       });
@@ -842,7 +834,7 @@ describe("ResourcePage", () => {
 
     it("should pass correct props to CreateResourceDialog", async () => {
       const user = userEvent.setup();
-      mockUseTenantRole.mockReturnValue({
+      (useTenantRole as jest.Mock).mockReturnValue({
         role: "owner",
         isLoading: false,
       });
@@ -890,7 +882,9 @@ describe("ResourcePage", () => {
     ];
 
     beforeEach(() => {
-      mockGetResources.mockImplementation(() => Promise.resolve([...resourcesWithGroups]));
+      (resourceService.getResources as jest.Mock).mockImplementation(() =>
+        Promise.resolve([...resourcesWithGroups]),
+      );
 
       // Create stable cache for filtering tests
       const filterResourceGroupsCache = new Map([
@@ -898,7 +892,7 @@ describe("ResourcePage", () => {
         ["resource-2", ["group-2"]],
       ]);
 
-      mockGetResourceGroups.mockImplementation((resourceId: string) => {
+      (resourceService.getResourceGroups as jest.Mock).mockImplementation((resourceId: string) => {
         const groups = filterResourceGroupsCache.get(resourceId) || [];
         return Promise.resolve([...groups]);
       });

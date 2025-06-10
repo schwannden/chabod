@@ -8,22 +8,6 @@ Page tests focus on complete user workflows, navigation behavior, and integratio
 
 ## Testing Patterns
 
-### Authentication Testing
-
-```tsx
-// Mock session state
-mockUseSession.mockReturnValue({
-  session: null,
-  user: mockUser,
-  profile: null,
-  isLoading: false,
-  signOut: jest.fn(),
-});
-
-// Test authentication redirects
-expect(mockNavigate).toHaveBeenCalledWith("/dashboard");
-```
-
 ### URL Parameter Testing
 
 ```tsx
@@ -61,6 +45,7 @@ All page tests use the shared test utilities from `../test-utils.tsx` which prov
 
 - Consistent mocking for routing and authentication
 - Mock data factories for common entities
+- Helper functions for session state management
 - Proper React Query and context provider setup
 - Standardized rendering with all necessary providers
 
@@ -83,6 +68,8 @@ Page tests rely on global mocks defined in `tests/ui-setup.ts`:
 5. **Test Error States**: Network failures, missing data, invalid states
 6. **Test Loading States**: Ensure proper loading indicators and transitions
 7. **Test Edge Cases**: Missing parameters, rapid state changes, error conditions
+8. **Use Helper Functions**: Prefer `mockUseSessionHelpers` over direct `mockUseSession` calls
+9. **Override Only What You Need**: Use default mock data and override specific properties
 
 ## Running Page Tests
 

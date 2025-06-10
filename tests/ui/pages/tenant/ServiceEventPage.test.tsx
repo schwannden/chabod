@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { screen } from "@testing-library/react";
-import { render } from "../../test-utils";
+import { render, mockUseSessionHelpers } from "../../test-utils";
 import ServiceEventPage from "@/pages/tenant/ServiceEventPage";
 
 // Mock navigation
@@ -13,16 +13,6 @@ jest.mock("react-router-dom", () => ({
 }));
 
 // Mock hooks with proper return types
-jest.mock("@/hooks/useSession", () => ({
-  useSession: jest.fn(() => ({
-    session: {} as any,
-    user: { id: "test-user", email: "test@example.com" } as any,
-    profile: null,
-    isLoading: false,
-    signOut: jest.fn(),
-  })),
-}));
-
 jest.mock("@/hooks/useTenantRole", () => ({
   useTenantRole: jest.fn(() => ({ role: "member", isLoading: false })),
 }));
@@ -96,10 +86,8 @@ jest.mock("@/components/ServiceEvents/ServiceEventCreateDialog", () => ({
 
 // Import mocked functions
 import { useTenantRole } from "@/hooks/useTenantRole";
-import { useSession } from "@/hooks/useSession";
 
 const mockUseTenantRole = useTenantRole as jest.MockedFunction<typeof useTenantRole>;
-const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 
 describe("ServiceEventPage", () => {
   beforeEach(() => {
@@ -107,13 +95,7 @@ describe("ServiceEventPage", () => {
 
     // Reset mocks to defaults
     mockUseTenantRole.mockReturnValue({ role: "member", isLoading: false });
-    mockUseSession.mockReturnValue({
-      session: {} as any,
-      user: { id: "test-user", email: "test@example.com" } as any,
-      profile: null,
-      isLoading: false,
-      signOut: jest.fn(),
-    });
+    mockUseSessionHelpers.authenticated();
   });
 
   it("should render all main components", () => {
@@ -141,13 +123,7 @@ describe("ServiceEventPage", () => {
   });
 
   it("should not show create button when user is not logged in", () => {
-    mockUseSession.mockReturnValue({
-      session: null,
-      user: null,
-      profile: null,
-      isLoading: false,
-      signOut: jest.fn(),
-    });
+    mockUseSessionHelpers.unauthenticated();
 
     render(<ServiceEventPage />);
 

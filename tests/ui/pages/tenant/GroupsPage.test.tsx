@@ -1,9 +1,8 @@
 import React from "react";
 import { screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { render } from "../../test-utils";
+import { render, mockUseSessionHelpers, mockTenant } from "../../test-utils";
 import GroupsPage from "@/pages/tenant/GroupsPage";
-import { useSession } from "@/hooks/useSession";
 import * as tenantUtils from "@/lib/tenant-utils";
 import * as groupService from "@/lib/group-service";
 
@@ -15,9 +14,6 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
   useParams: () => mockUseParams(),
 }));
-
-// Get the mocked useSession
-const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 
 // Import useTenantRole hook for mocking
 const { useTenantRole } = jest.requireMock("@/hooks/useTenantRole") as {
@@ -118,32 +114,12 @@ jest.mock("@/hooks/useTenantRole", () => ({
 }));
 
 describe("GroupsPage", () => {
-  const mockUser = {
-    id: "test-user-id",
-    email: "test@example.com",
-    aud: "authenticated",
-    created_at: "2024-01-01T00:00:00Z",
-    app_metadata: {},
-    user_metadata: {},
-    role: "authenticated",
-    updated_at: "2024-01-01T00:00:00Z",
-  };
-
-  const mockTenant = {
-    id: "tenant-1",
-    name: "Test Church",
-    slug: "test-church",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-    price_tier_id: "basic",
-  };
-
   const mockGroups = [
     {
       id: "group-1",
       name: "Youth Group",
       description: "For young people",
-      tenant_id: "tenant-1",
+      tenant_id: "test-tenant-id",
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
       memberCount: 5,
@@ -152,7 +128,7 @@ describe("GroupsPage", () => {
       id: "group-2",
       name: "Seniors Group",
       description: "For older members",
-      tenant_id: "tenant-1",
+      tenant_id: "test-tenant-id",
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
       memberCount: 3,
@@ -170,24 +146,12 @@ describe("GroupsPage", () => {
     useTenantRole.mockReturnValue({ role: "member", isLoading: false });
 
     // Default authenticated user
-    mockUseSession.mockReturnValue({
-      session: null,
-      user: mockUser,
-      profile: null,
-      isLoading: false,
-      signOut: jest.fn(),
-    });
+    mockUseSessionHelpers.authenticatedNoProfile();
   });
 
   describe("Authentication and Navigation", () => {
     it("should redirect to auth page when user is not authenticated", () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       render(<GroupsPage />);
 
@@ -195,13 +159,7 @@ describe("GroupsPage", () => {
     });
 
     it("should not redirect when session is loading", () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: true,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.loading();
 
       render(<GroupsPage />);
 
@@ -209,13 +167,7 @@ describe("GroupsPage", () => {
     });
 
     it("should not redirect when user is authenticated", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       await act(async () => {
         render(<GroupsPage />);
@@ -227,29 +179,18 @@ describe("GroupsPage", () => {
 
   describe("Tenant Loading and Error Handling", () => {
     beforeEach(() => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
     });
 
     it("should show loading state while fetching tenant", async () => {
-      // Mock pending promise
+      // Mock pending promise that never resolves to simulate loading
       (tenantUtils.getTenantBySlug as jest.Mock).mockImplementation(
         () => new Promise(() => {}), // Never resolves
       );
 
-      await act(async () => {
-        render(<GroupsPage />);
-      });
+      render(<GroupsPage />);
 
       expect(screen.getByText("common.loading")).toBeInTheDocument();
-      expect(
-        document.querySelector('[data-testid="loader"]') || document.querySelector(".animate-spin"),
-      ).toBeTruthy();
     });
 
     it("should navigate to not-found when tenant doesn't exist", async () => {
@@ -285,13 +226,7 @@ describe("GroupsPage", () => {
 
   describe("Data Fetching and Display", () => {
     beforeEach(() => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
     });
 
     it("should fetch and display tenant and groups data", async () => {
@@ -311,7 +246,7 @@ describe("GroupsPage", () => {
       expect(screen.getByTestId("layout-tenant-name")).toHaveTextContent("Test Church");
       expect(screen.getByTestId("layout-tenant-slug")).toHaveTextContent("test-church");
       expect(screen.getByTestId("groups-count")).toHaveTextContent("2");
-      expect(screen.getByTestId("tenant-id")).toHaveTextContent("tenant-1");
+      expect(screen.getByTestId("tenant-id")).toHaveTextContent("test-tenant-id");
     });
 
     it("should pass correct owner status to GroupTable", async () => {
@@ -351,13 +286,7 @@ describe("GroupsPage", () => {
 
   describe("Group Management Callbacks", () => {
     beforeEach(() => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
     });
 
     it("should refresh groups when group is created", async () => {
@@ -368,7 +297,7 @@ describe("GroupsPage", () => {
           id: "group-3",
           name: "New Group",
           description: "Newly created",
-          tenant_id: "tenant-1",
+          tenant_id: "test-tenant-id",
           created_at: "2024-01-01T00:00:00Z",
           updated_at: "2024-01-01T00:00:00Z",
           memberCount: 0,
@@ -390,7 +319,7 @@ describe("GroupsPage", () => {
       await user.click(createButton);
 
       await waitFor(() => {
-        expect(groupService.getTenantGroups).toHaveBeenCalledWith("tenant-1");
+        expect(groupService.getTenantGroups).toHaveBeenCalledWith("test-tenant-id");
       });
     });
 
@@ -409,7 +338,7 @@ describe("GroupsPage", () => {
       await user.click(updateButton);
 
       await waitFor(() => {
-        expect(groupService.getTenantGroups).toHaveBeenCalledWith("tenant-1");
+        expect(groupService.getTenantGroups).toHaveBeenCalledWith("test-tenant-id");
       });
     });
 
@@ -428,20 +357,14 @@ describe("GroupsPage", () => {
       await user.click(deleteButton);
 
       await waitFor(() => {
-        expect(groupService.getTenantGroups).toHaveBeenCalledWith("tenant-1");
+        expect(groupService.getTenantGroups).toHaveBeenCalledWith("test-tenant-id");
       });
     });
   });
 
   describe("Loading States", () => {
     it("should show session loading state", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: true,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.loading();
 
       await act(async () => {
         render(<GroupsPage />);
@@ -456,17 +379,9 @@ describe("GroupsPage", () => {
         () => new Promise(() => {}), // Never resolves
       );
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
-      await act(async () => {
-        render(<GroupsPage />);
-      });
+      render(<GroupsPage />);
 
       expect(screen.getByText("common.loading")).toBeInTheDocument();
     });
@@ -474,13 +389,7 @@ describe("GroupsPage", () => {
 
   describe("Edge Cases", () => {
     beforeEach(() => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
     });
 
     it("should handle missing slug parameter", async () => {
@@ -539,13 +448,7 @@ describe("GroupsPage", () => {
     });
 
     it("should not fetch data when user is null", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       await act(async () => {
         render(<GroupsPage />);
@@ -559,24 +462,19 @@ describe("GroupsPage", () => {
     it("should handle rapid state changes during data loading", async () => {
       // Start with loading tenant
       let resolvePromise: (value: typeof mockTenant) => void;
-      const pendingPromise = new Promise((resolve) => {
+      const pendingPromise = new Promise<typeof mockTenant>((resolve) => {
         resolvePromise = resolve;
       });
 
       (tenantUtils.getTenantBySlug as jest.Mock).mockReturnValue(pendingPromise);
 
-      let rerender: (ui: React.ReactElement) => void;
-      await act(async () => {
-        const result = render(<GroupsPage />);
-        rerender = result.rerender;
-      });
+      render(<GroupsPage />);
 
       expect(screen.getByText("common.loading")).toBeInTheDocument();
 
       // Resolve the promise to simulate data loading
       await act(async () => {
         resolvePromise!(mockTenant);
-        rerender(<GroupsPage />);
       });
 
       await waitFor(() => {

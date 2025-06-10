@@ -1,9 +1,8 @@
 import React from "react";
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { render } from "../../test-utils";
+import { render, mockUseSessionHelpers, mockTenant } from "../../test-utils";
 import ServicePage from "@/pages/tenant/ServicePage";
-import { useSession } from "@/hooks/useSession";
 import * as tenantUtils from "@/lib/tenant-utils";
 import * as serviceCore from "@/lib/services/service-core";
 
@@ -15,9 +14,6 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
   useParams: () => mockUseParams(),
 }));
-
-// Get the mocked useSession
-const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 
 // Mock TenantPageLayout component
 jest.mock("@/components/Layout/TenantPageLayout", () => ({
@@ -162,25 +158,7 @@ jest.mock("@/hooks/useTenantRole", () => ({
 }));
 
 describe("ServicePage", () => {
-  const mockUser = {
-    id: "test-user-id",
-    email: "test@example.com",
-    aud: "authenticated",
-    created_at: "2024-01-01T00:00:00Z",
-    app_metadata: {},
-    user_metadata: {},
-    role: "authenticated",
-    updated_at: "2024-01-01T00:00:00Z",
-  };
-
-  const mockTenant = {
-    id: "tenant-1",
-    name: "Test Church",
-    slug: "test-church",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-    price_tier_id: "basic",
-  };
+  // Using mock data from test-utils.tsx
 
   const mockServices = [
     {
@@ -188,7 +166,7 @@ describe("ServicePage", () => {
       name: "Sunday Morning Service",
       default_start_time: "09:00:00",
       default_end_time: "11:00:00",
-      tenant_id: "tenant-1",
+      tenant_id: "test-tenant-id",
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
     },
@@ -197,7 +175,7 @@ describe("ServicePage", () => {
       name: "Wednesday Prayer",
       default_start_time: null,
       default_end_time: null,
-      tenant_id: "tenant-1",
+      tenant_id: "test-tenant-id",
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
     },
@@ -219,24 +197,12 @@ describe("ServicePage", () => {
     useTenantRole.mockReturnValue({ role: "member", isLoading: false });
 
     // Default authenticated user
-    mockUseSession.mockReturnValue({
-      session: null,
-      user: mockUser,
-      profile: null,
-      isLoading: false,
-      signOut: jest.fn(),
-    });
+    mockUseSessionHelpers.authenticatedNoProfile();
   });
 
   describe("Authentication and Navigation", () => {
     it("should redirect to auth page when user is not authenticated", () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       render(<ServicePage />);
 
@@ -244,13 +210,7 @@ describe("ServicePage", () => {
     });
 
     it("should not redirect when session is loading", () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: true,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.loading();
 
       render(<ServicePage />);
 
@@ -308,7 +268,7 @@ describe("ServicePage", () => {
 
       await waitFor(() => {
         expect(screen.getByTestId("create-service-dialog")).toBeInTheDocument();
-        expect(screen.getByTestId("tenant-id")).toHaveTextContent("tenant-1");
+        expect(screen.getByTestId("tenant-id")).toHaveTextContent("test-tenant-id");
       });
     });
 
@@ -564,7 +524,7 @@ describe("ServicePage", () => {
       render(<ServicePage />);
 
       await waitFor(() => {
-        expect(serviceCore.getServices).toHaveBeenCalledWith("tenant-1");
+        expect(serviceCore.getServices).toHaveBeenCalledWith("test-tenant-id");
       });
     });
   });
@@ -577,13 +537,7 @@ describe("ServicePage", () => {
     });
 
     it("should handle missing user ID", () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       render(<ServicePage />);
 
@@ -593,13 +547,7 @@ describe("ServicePage", () => {
 
   describe("Loading States", () => {
     it("should show loading when session is loading", () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: true,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.loading();
 
       render(<ServicePage />);
 

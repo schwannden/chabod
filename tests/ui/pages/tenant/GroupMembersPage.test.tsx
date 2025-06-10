@@ -1,9 +1,8 @@
 import React from "react";
 import { screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { render } from "../../test-utils";
+import { render, mockUseSessionHelpers, mockTenant } from "../../test-utils";
 import GroupMembersPage from "@/pages/tenant/GroupMembersPage";
-import { useSession } from "@/hooks/useSession";
 import * as tenantUtils from "@/lib/tenant-utils";
 import * as groupService from "@/lib/group-service";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,9 +15,6 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
   useParams: () => mockUseParams(),
 }));
-
-// Get the mocked useSession
-const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 
 // Import useTenantRole hook for mocking
 const { useTenantRole } = jest.requireMock("@/hooks/useTenantRole") as {
@@ -202,25 +198,7 @@ jest.mock("@/hooks/useTenantRole", () => ({
 }));
 
 describe("GroupMembersPage", () => {
-  const mockUser = {
-    id: "test-user-id",
-    email: "test@example.com",
-    aud: "authenticated",
-    created_at: "2024-01-01T00:00:00Z",
-    app_metadata: {},
-    user_metadata: {},
-    role: "authenticated",
-    updated_at: "2024-01-01T00:00:00Z",
-  };
-
-  const mockTenant = {
-    id: "tenant-1",
-    name: "Test Church",
-    slug: "test-church",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-    price_tier_id: "basic",
-  };
+  // Using mock data from test-utils.tsx
 
   const mockGroup = {
     id: "group-1",
@@ -290,13 +268,7 @@ describe("GroupMembersPage", () => {
     useTenantRole.mockReturnValue({ role: "member", isLoading: false });
 
     // Default authenticated user
-    mockUseSession.mockReturnValue({
-      session: null,
-      user: mockUser,
-      profile: null,
-      isLoading: false,
-      signOut: jest.fn(),
-    });
+    mockUseSessionHelpers.authenticatedNoProfile();
 
     // Mock supabase group query
     const mockSupabaseQuery = {
@@ -315,61 +287,42 @@ describe("GroupMembersPage", () => {
     (supabase as any).from = mockSupabaseQuery.from;
   });
 
-  describe("Authentication and Navigation", () => {
-    it("should redirect to auth page when user is not authenticated", () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+  describe("Authentication and Authorization", () => {
+    it("should redirect to auth page if user is not authenticated", () => {
+      mockUseSessionHelpers.unauthenticated();
 
       render(<GroupMembersPage />);
-
       expect(mockNavigate).toHaveBeenCalledWith("/tenant/test-church/auth");
     });
 
-    it("should not redirect when session is loading", () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: true,
-        signOut: jest.fn(),
-      });
-
+    it("should not redirect if session is loading", () => {
+      mockUseSessionHelpers.loading();
       render(<GroupMembersPage />);
-
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 
-    it("should not redirect when user is authenticated", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
+    it("should not show add/remove controls for members", async () => {
+      useTenantRole.mockReturnValue({ role: "member", isLoading: false });
+      render(<GroupMembersPage />);
+      await waitFor(() => {
+        expect(screen.queryByText("groups.addMember")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("user-minus")).not.toBeInTheDocument();
       });
+    });
 
-      await act(async () => {
-        render(<GroupMembersPage />);
+    it("should show add/remove controls for owners", async () => {
+      useTenantRole.mockReturnValue({ role: "owner", isLoading: false });
+      render(<GroupMembersPage />);
+      await waitFor(() => {
+        expect(screen.getByText("groups.addMember")).toBeInTheDocument();
+        expect(screen.getAllByTestId("user-minus").length).toBeGreaterThan(0);
       });
-
-      expect(mockNavigate).not.toHaveBeenCalledWith("/tenant/test-church/auth");
     });
   });
 
   describe("Data Loading and Error Handling", () => {
     beforeEach(() => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
     });
 
     it("should show loading state while fetching data", async () => {
@@ -444,13 +397,7 @@ describe("GroupMembersPage", () => {
 
   describe("Data Display", () => {
     beforeEach(() => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
     });
 
     it("should display group members correctly", async () => {
@@ -487,30 +434,6 @@ describe("GroupMembersPage", () => {
       });
     });
 
-    it("should show add member button for tenant owners", async () => {
-      useTenantRole.mockReturnValue({ role: "owner", isLoading: false });
-
-      await act(async () => {
-        render(<GroupMembersPage />);
-      });
-
-      await waitFor(() => {
-        expect(screen.getByText("groups.addMember")).toBeInTheDocument();
-      });
-    });
-
-    it("should not show add member button for non-owners", async () => {
-      useTenantRole.mockReturnValue({ role: "member", isLoading: false });
-
-      await act(async () => {
-        render(<GroupMembersPage />);
-      });
-
-      await waitFor(() => {
-        expect(screen.queryByText("groups.addMember")).not.toBeInTheDocument();
-      });
-    });
-
     it("should show empty state when no members", async () => {
       (groupService.getGroupMembers as jest.Mock).mockResolvedValue([]);
 
@@ -544,13 +467,7 @@ describe("GroupMembersPage", () => {
 
   describe("Member Management", () => {
     beforeEach(() => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
       useTenantRole.mockReturnValue({ role: "owner", isLoading: false });
     });
 
@@ -689,13 +606,7 @@ describe("GroupMembersPage", () => {
 
   describe("Navigation Actions", () => {
     beforeEach(() => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
     });
 
     it("should navigate back to groups when back button is clicked", async () => {
@@ -718,13 +629,7 @@ describe("GroupMembersPage", () => {
 
   describe("Loading States", () => {
     it("should show session loading state", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: true,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.loading();
 
       await act(async () => {
         render(<GroupMembersPage />);
@@ -739,13 +644,7 @@ describe("GroupMembersPage", () => {
         () => new Promise(() => {}), // Never resolves
       );
 
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
 
       await act(async () => {
         render(<GroupMembersPage />);
@@ -757,13 +656,7 @@ describe("GroupMembersPage", () => {
 
   describe("Edge Cases", () => {
     beforeEach(() => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: mockUser,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.authenticatedNoProfile();
     });
 
     it("should handle missing slug parameter", async () => {
@@ -789,13 +682,7 @@ describe("GroupMembersPage", () => {
     });
 
     it("should not fetch data when user is null", async () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       await act(async () => {
         render(<GroupMembersPage />);

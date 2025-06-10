@@ -1,11 +1,10 @@
 import React from "react";
 import { screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { render } from "../../test-utils";
+import { render, mockUseSessionHelpers, mockTenant } from "../../test-utils";
 import DashboardPage from "@/pages/DashboardPage";
 import { TenantCard } from "@/components/Tenants/TenantCard";
 import * as tenantUtils from "@/lib/tenant-utils";
-import { useSession } from "@/hooks/useSession";
 
 // Mock navigation
 const mockNavigate = jest.fn();
@@ -14,28 +13,12 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
 }));
 
-// Get the mocked useSession
-const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
-
 describe("Tenant Operations Integration Tests", () => {
-  const mockUser = {
-    id: "test-user-id",
-    email: "test@example.com",
-    aud: "authenticated",
-    created_at: "2024-01-01T00:00:00Z",
-    app_metadata: {},
-    user_metadata: {},
-    role: "authenticated",
-    updated_at: "2024-01-01T00:00:00Z",
-  };
-
-  const mockTenant = {
+  const mockTenantWithUsage = {
+    ...mockTenant,
     id: "tenant-1",
     name: "Test Church",
     slug: "test-church",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-    price_tier_id: "basic",
     memberCount: 15,
     groupCount: 3,
     eventCount: 5,
@@ -53,22 +36,16 @@ describe("Tenant Operations Integration Tests", () => {
     jest.clearAllMocks();
 
     // Setup default session
-    mockUseSession.mockReturnValue({
-      session: null,
-      user: mockUser,
-      profile: null,
-      isLoading: false,
-      signOut: jest.fn(),
-    });
+    mockUseSessionHelpers.authenticatedNoProfile();
 
     // Setup default tenant data
-    (tenantUtils.getTenants as jest.Mock).mockResolvedValue([mockTenant]);
+    (tenantUtils.getTenants as jest.Mock).mockResolvedValue([mockTenantWithUsage]);
   });
 
   describe("Tenant Creation Flow", () => {
     it("should handle successful tenant creation", async () => {
       const newTenant = {
-        ...mockTenant,
+        ...mockTenantWithUsage,
         id: "tenant-2",
         name: "New Church",
         slug: "new-church",
@@ -77,8 +54,8 @@ describe("Tenant Operations Integration Tests", () => {
       // Mock successful creation
       (tenantUtils.createTenant as jest.Mock).mockResolvedValue(newTenant);
       (tenantUtils.getTenants as jest.Mock)
-        .mockResolvedValueOnce([mockTenant]) // Initial load
-        .mockResolvedValueOnce([mockTenant, newTenant]); // After creation
+        .mockResolvedValueOnce([mockTenantWithUsage]) // Initial load
+        .mockResolvedValueOnce([mockTenantWithUsage, newTenant]); // After creation
 
       await act(async () => {
         render(<DashboardPage />);
@@ -118,7 +95,7 @@ describe("Tenant Operations Integration Tests", () => {
   describe("Tenant Update Flow", () => {
     it("should handle successful tenant update", async () => {
       const updatedTenant = {
-        ...mockTenant,
+        ...mockTenantWithUsage,
         name: "Updated Church Name",
       };
 
@@ -131,7 +108,7 @@ describe("Tenant Operations Integration Tests", () => {
 
       render(
         <TenantCard
-          tenant={mockTenant}
+          tenant={mockTenantWithUsage}
           onTenantUpdated={mockCallbacks.onTenantUpdated}
           onTenantDeleted={mockCallbacks.onTenantDeleted}
         />,
@@ -154,15 +131,19 @@ describe("Tenant Operations Integration Tests", () => {
 
       // Test error handling logic
       try {
-        await tenantUtils.updateTenant(mockTenant.id, "New Name", mockTenant.slug);
+        await tenantUtils.updateTenant(
+          mockTenantWithUsage.id,
+          "New Name",
+          mockTenantWithUsage.slug,
+        );
       } catch (error) {
         expect(error.message).toBe("Update failed");
       }
 
       expect(tenantUtils.updateTenant).toHaveBeenCalledWith(
-        mockTenant.id,
+        mockTenantWithUsage.id,
         "New Name",
-        mockTenant.slug,
+        mockTenantWithUsage.slug,
       );
     });
   });
@@ -178,7 +159,7 @@ describe("Tenant Operations Integration Tests", () => {
 
       render(
         <TenantCard
-          tenant={mockTenant}
+          tenant={mockTenantWithUsage}
           onTenantUpdated={mockCallbacks.onTenantUpdated}
           onTenantDeleted={mockCallbacks.onTenantDeleted}
         />,
@@ -201,12 +182,12 @@ describe("Tenant Operations Integration Tests", () => {
 
       // Test error handling logic
       try {
-        await tenantUtils.deleteTenant(mockTenant.id);
+        await tenantUtils.deleteTenant(mockTenantWithUsage.id);
       } catch (error) {
         expect(error.message).toBe("Delete failed");
       }
 
-      expect(tenantUtils.deleteTenant).toHaveBeenCalledWith(mockTenant.id);
+      expect(tenantUtils.deleteTenant).toHaveBeenCalledWith(mockTenantWithUsage.id);
     });
 
     it("should call onTenantDeleted callback after successful deletion", async () => {
@@ -220,7 +201,7 @@ describe("Tenant Operations Integration Tests", () => {
       // Simulate the delete flow
       const handleDelete = async () => {
         try {
-          await tenantUtils.deleteTenant(mockTenant.id);
+          await tenantUtils.deleteTenant(mockTenantWithUsage.id);
           mockCallbacks.onTenantDeleted();
         } catch {
           // Error handling would be done here
@@ -229,7 +210,7 @@ describe("Tenant Operations Integration Tests", () => {
 
       await handleDelete();
 
-      expect(tenantUtils.deleteTenant).toHaveBeenCalledWith(mockTenant.id);
+      expect(tenantUtils.deleteTenant).toHaveBeenCalledWith(mockTenantWithUsage.id);
       expect(mockCallbacks.onTenantDeleted).toHaveBeenCalled();
     });
   });
@@ -243,7 +224,7 @@ describe("Tenant Operations Integration Tests", () => {
 
       render(
         <TenantCard
-          tenant={mockTenant}
+          tenant={mockTenantWithUsage}
           onTenantUpdated={mockCallbacks.onTenantUpdated}
           onTenantDeleted={mockCallbacks.onTenantDeleted}
         />,
@@ -263,7 +244,7 @@ describe("Tenant Operations Integration Tests", () => {
 
       render(
         <TenantCard
-          tenant={mockTenant}
+          tenant={mockTenantWithUsage}
           onTenantUpdated={mockCallbacks.onTenantUpdated}
           onTenantDeleted={mockCallbacks.onTenantDeleted}
         />,
@@ -279,7 +260,7 @@ describe("Tenant Operations Integration Tests", () => {
   describe("Data Refresh Patterns", () => {
     it("should refresh tenant list after operations", async () => {
       // Use a consistent mock for both calls to avoid race conditions
-      (tenantUtils.getTenants as jest.Mock).mockResolvedValue([mockTenant]);
+      (tenantUtils.getTenants as jest.Mock).mockResolvedValue([mockTenantWithUsage]);
 
       await act(async () => {
         render(<DashboardPage />);
@@ -341,13 +322,7 @@ describe("Tenant Operations Integration Tests", () => {
     });
 
     it("should handle authentication errors", () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: false,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.unauthenticated();
 
       render(<DashboardPage />);
 
@@ -367,13 +342,7 @@ describe("Tenant Operations Integration Tests", () => {
     });
 
     it("should show session loading state", () => {
-      mockUseSession.mockReturnValue({
-        session: null,
-        user: null,
-        profile: null,
-        isLoading: true,
-        signOut: jest.fn(),
-      });
+      mockUseSessionHelpers.loading();
 
       render(<DashboardPage />);
 
@@ -417,7 +386,7 @@ describe("Tenant Operations Integration Tests", () => {
 
       render(
         <TenantCard
-          tenant={mockTenant}
+          tenant={mockTenantWithUsage}
           onTenantUpdated={mockCallbacks.onTenantUpdated}
           onTenantDeleted={mockCallbacks.onTenantDeleted}
         />,
@@ -435,7 +404,7 @@ describe("Tenant Operations Integration Tests", () => {
 
       render(
         <TenantCard
-          tenant={mockTenant}
+          tenant={mockTenantWithUsage}
           onTenantUpdated={mockCallbacks.onTenantUpdated}
           onTenantDeleted={mockCallbacks.onTenantDeleted}
         />,
