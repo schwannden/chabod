@@ -1,4 +1,4 @@
-import { screen, waitFor } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render, mockUseSessionHelpers } from "../test-utils";
 import AuthPage from "@/pages/AuthPage";
@@ -25,81 +25,84 @@ jest.mock("@/components/Auth/AuthTabs", () => ({
 }));
 
 describe("AuthPage (Main)", () => {
+  const setupUrlParams = (params: string) => {
+    mockUseSearchParams.mockReturnValue([new URLSearchParams(params)]);
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockNavigate.mockClear();
-    mockUseSearchParams.mockReturnValue([new URLSearchParams()]);
+    setupUrlParams("");
   });
 
   describe("Authentication State Management", () => {
-    it("should show loading state when session is loading", () => {
+    it("should show loading state and redirect when authenticated", () => {
+      // Test loading state
       mockUseSessionHelpers.loading();
-
-      render(<AuthPage />);
-
+      const { rerender } = render(<AuthPage />);
       expect(screen.getByText("common.loading")).toBeInTheDocument();
-    });
+      expect(mockNavigate).not.toHaveBeenCalled();
 
-    it("should redirect to dashboard when user is already logged in", () => {
+      // Test redirect on authentication
       mockUseSessionHelpers.authenticated();
-
-      render(<AuthPage />);
-
+      rerender(<AuthPage />);
       expect(mockNavigate).toHaveBeenCalledWith("/dashboard");
     });
 
-    it("should not redirect during loading state", () => {
-      mockUseSessionHelpers.loading();
-
-      render(<AuthPage />);
-
-      expect(mockNavigate).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("Auth Form Display", () => {
-    beforeEach(() => {
+    it("should display auth form when not authenticated", () => {
       mockUseSessionHelpers.unauthenticated();
-    });
-
-    it("should display welcome title and auth form when not authenticated", () => {
       render(<AuthPage />);
 
       expect(screen.getByText("auth.welcome")).toBeInTheDocument();
       expect(screen.getByTestId("auth-tabs")).toBeInTheDocument();
-    });
-
-    it("should default to signin tab when no tab parameter is provided", () => {
-      render(<AuthPage />);
-
-      expect(screen.getByTestId("initial-tab")).toHaveTextContent("signin");
-    });
-
-    it("should use signup tab when tab parameter is set to signup", () => {
-      // Mock useSearchParams to return signup tab
-      mockUseSearchParams.mockReturnValue([new URLSearchParams("tab=signup")]);
-
-      render(<AuthPage />);
-
-      expect(screen.getByTestId("initial-tab")).toHaveTextContent("signup");
-    });
-
-    it("should default to signin for invalid tab parameters", () => {
-      // Mock useSearchParams to return invalid tab
-      mockUseSearchParams.mockReturnValue([new URLSearchParams("tab=invalid")]);
-
-      render(<AuthPage />);
-
-      expect(screen.getByTestId("initial-tab")).toHaveTextContent("signin");
+      expect(screen.getByRole("main")).toBeInTheDocument();
     });
   });
 
-  describe("Authentication Success Handler", () => {
+  describe("URL Parameter Handling and Tab Selection", () => {
     beforeEach(() => {
       mockUseSessionHelpers.unauthenticated();
     });
 
-    it("should navigate to dashboard on successful authentication", async () => {
+    const urlParamTestCases = [
+      { urlParams: "", expectedTab: "signin", description: "default case" },
+      { urlParams: "tab=signin", expectedTab: "signin", description: "explicit signin" },
+      { urlParams: "tab=signup", expectedTab: "signup", description: "explicit signup" },
+      {
+        urlParams: "tab=invalid",
+        expectedTab: "signin",
+        description: "invalid defaults to signin",
+      },
+      { urlParams: "tab=SIGNUP", expectedTab: "signin", description: "case sensitive" },
+      {
+        urlParams: "tab=signup&redirect=/dashboard",
+        expectedTab: "signup",
+        description: "multiple params",
+      },
+    ];
+
+    urlParamTestCases.forEach(({ urlParams, expectedTab, description }) => {
+      it(`should handle URL parameters: ${description}`, () => {
+        setupUrlParams(urlParams);
+        render(<AuthPage />);
+        expect(screen.getByTestId("initial-tab")).toHaveTextContent(expectedTab);
+      });
+    });
+
+    it("should update tab when URL parameters change", () => {
+      setupUrlParams("tab=signin");
+      const { rerender } = render(<AuthPage />);
+      expect(screen.getByTestId("initial-tab")).toHaveTextContent("signin");
+
+      setupUrlParams("tab=signup");
+      rerender(<AuthPage />);
+      expect(screen.getByTestId("initial-tab")).toHaveTextContent("signup");
+    });
+  });
+
+  describe("Authentication Success", () => {
+    it("should navigate to dashboard after successful authentication", async () => {
+      mockUseSessionHelpers.unauthenticated();
       const user = userEvent.setup();
 
       render(<AuthPage />);
@@ -111,116 +114,20 @@ describe("AuthPage (Main)", () => {
     });
   });
 
-  describe("Layout and UI Elements", () => {
-    beforeEach(() => {
+  describe("Layout and Error Handling", () => {
+    it("should render proper page structure and handle state transitions", async () => {
       mockUseSessionHelpers.unauthenticated();
-    });
-
-    it("should render navbar component", () => {
       render(<AuthPage />);
 
-      // NavBar is rendered (we can check for its container or typical elements)
-      expect(document.querySelector("nav") || document.querySelector("header")).toBeTruthy();
-    });
-
-    it("should render main content area with proper structure", () => {
-      render(<AuthPage />);
-
-      expect(screen.getByRole("main")).toBeInTheDocument();
-      expect(screen.getByText("auth.welcome")).toBeInTheDocument();
-      expect(screen.getByTestId("auth-tabs")).toBeInTheDocument();
-    });
-
-    it("should apply proper styling classes", () => {
-      render(<AuthPage />);
-
+      // Check layout structure
       const mainElement = screen.getByRole("main");
-      expect(mainElement).toHaveClass("container");
-      expect(mainElement).toHaveClass("mx-auto");
-    });
-  });
+      expect(mainElement).toHaveClass("container", "mx-auto");
+      expect(document.querySelector("nav") || document.querySelector("header")).toBeTruthy();
 
-  describe("Edge Cases and Error Handling", () => {
-    it("should handle rapid auth state changes", async () => {
-      // Start with loading state
-      mockUseSessionHelpers.loading();
-
-      const { rerender } = render(<AuthPage />);
-
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
-
-      // Switch to authenticated state
-      mockUseSessionHelpers.authenticated();
-
-      rerender(<AuthPage />);
-
-      await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith("/dashboard");
-      });
-    });
-
-    it("should handle missing user with completed loading", () => {
-      mockUseSessionHelpers.unauthenticated();
-
-      render(<AuthPage />);
-
-      expect(screen.getByText("auth.welcome")).toBeInTheDocument();
-      expect(mockNavigate).not.toHaveBeenCalled();
-    });
-
-    it("should handle session data without throwing errors", () => {
-      mockUseSessionHelpers.authenticated();
-
-      expect(() => render(<AuthPage />)).not.toThrow();
-      expect(mockNavigate).toHaveBeenCalledWith("/dashboard");
-    });
-  });
-
-  describe("URL Parameter Handling", () => {
-    beforeEach(() => {
-      mockUseSessionHelpers.unauthenticated();
-    });
-
-    it("should properly handle empty search params", () => {
-      mockUseSearchParams.mockReturnValue([new URLSearchParams()]);
-
-      render(<AuthPage />);
-
-      expect(screen.getByTestId("initial-tab")).toHaveTextContent("signin");
-    });
-
-    it("should handle multiple URL parameters", () => {
-      mockUseSearchParams.mockReturnValue([new URLSearchParams("tab=signup&redirect=/dashboard")]);
-
-      render(<AuthPage />);
-
-      expect(screen.getByTestId("initial-tab")).toHaveTextContent("signup");
-    });
-
-    it("should handle case sensitivity in tab parameter", () => {
-      mockUseSearchParams.mockReturnValue([new URLSearchParams("tab=SIGNUP")]);
-
-      render(<AuthPage />);
-
-      // Should default to signin for invalid case
-      expect(screen.getByTestId("initial-tab")).toHaveTextContent("signin");
-    });
-
-    it("should update tab when URL parameters change (simulating navbar navigation)", async () => {
-      const searchParams = new URLSearchParams("tab=signin");
-      mockUseSearchParams.mockReturnValue([searchParams]);
-
-      const { rerender } = render(<AuthPage />);
-
-      expect(screen.getByTestId("initial-tab")).toHaveTextContent("signin");
-
-      // Simulate URL change to signup
-      searchParams.set("tab", "signup");
-      mockUseSearchParams.mockReturnValue([searchParams]);
-
-      rerender(<AuthPage />);
-
-      expect(screen.getByTestId("initial-tab")).toHaveTextContent("signup");
+      // Should not throw on session data
+      expect(() => {
+        mockUseSessionHelpers.authenticated();
+      }).not.toThrow();
     });
   });
 });

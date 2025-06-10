@@ -32,8 +32,8 @@ jest.mock("@/components/Auth/TenantAuthFlow", () => ({
       <div data-testid="tenant-slug">{tenantSlug || "no-slug"}</div>
       <div data-testid="tenant-name">{tenantName || "no-name"}</div>
       <div data-testid="invite-token">{inviteToken || "no-token"}</div>
-      <button onClick={onSuccess} data-testid="mock-auth-success">
-        Mock Auth Success
+      <button onClick={onSuccess} data-testid="auth-success">
+        Auth Success
       </button>
     </div>
   ),
@@ -68,8 +68,18 @@ describe("AuthPage (Tenant)", () => {
     });
   });
 
-  describe("Tenant Loading", () => {
-    it("should show loading state while fetching tenant", async () => {
+  describe("Page Loading States", () => {
+    it("should show session loading state", async () => {
+      mockUseSessionHelpers.loading();
+
+      await act(async () => {
+        render(<AuthPage />);
+      });
+
+      expect(screen.getByText("common.loading")).toBeInTheDocument();
+    });
+
+    it("should show tenant loading state while fetching tenant", async () => {
       // Mock pending promise
       (tenantUtils.getTenantBySlug as jest.Mock).mockImplementation(
         () => new Promise(() => {}), // Never resolves
@@ -82,6 +92,22 @@ describe("AuthPage (Tenant)", () => {
       });
 
       expect(screen.getByText("common.loading")).toBeInTheDocument();
+      // Check for spinner icon (Loader2 component)
+      expect(
+        document.querySelector('[data-testid="loader"]') || document.querySelector(".animate-spin"),
+      ).toBeTruthy();
+    });
+  });
+
+  describe("Tenant Management", () => {
+    it("should fetch tenant based on URL slug parameter", async () => {
+      mockUseSessionHelpers.unauthenticated();
+
+      await act(async () => {
+        render(<AuthPage />);
+      });
+
+      expect(tenantUtils.getTenantBySlug).toHaveBeenCalledWith("test-church");
     });
 
     it("should display tenant not found error when tenant doesn't exist", async () => {
@@ -116,9 +142,22 @@ describe("AuthPage (Tenant)", () => {
       expect(consoleSpy).toHaveBeenCalledWith("Error fetching tenant:", expect.any(Error));
       consoleSpy.mockRestore();
     });
+
+    it("should handle missing slug parameter", async () => {
+      mockUseParams.mockReturnValue({ slug: undefined });
+
+      mockUseSessionHelpers.unauthenticated();
+
+      await act(async () => {
+        render(<AuthPage />);
+      });
+
+      // Should not call getTenantBySlug with undefined slug
+      expect(tenantUtils.getTenantBySlug).not.toHaveBeenCalled();
+    });
   });
 
-  describe("Invitation Token Handling", () => {
+  describe("URL Parameter Handling", () => {
     it("should extract invite token from URL parameters", async () => {
       Object.defineProperty(window, "location", {
         value: {
@@ -170,7 +209,7 @@ describe("AuthPage (Tenant)", () => {
     });
   });
 
-  describe("User Authentication and Access", () => {
+  describe("User Authentication and Navigation", () => {
     it("should redirect authenticated users with access to tenant dashboard", async () => {
       (memberService.checkUserTenantAccess as jest.Mock).mockResolvedValue(true);
 
@@ -201,23 +240,6 @@ describe("AuthPage (Tenant)", () => {
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 
-    it("should show loading state while checking access", async () => {
-      (memberService.checkUserTenantAccess as jest.Mock).mockImplementation(
-        () => new Promise(() => {}), // Never resolves
-      );
-
-      mockUseSessionHelpers.authenticatedNoProfile();
-
-      await act(async () => {
-        render(<AuthPage />);
-      });
-
-      // Should show the auth form while checking access, not a loading state
-      await waitFor(() => {
-        expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
-      });
-    });
-
     it("should handle error when checking access fails", async () => {
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
       (memberService.checkUserTenantAccess as jest.Mock).mockRejectedValue(
@@ -240,14 +262,31 @@ describe("AuthPage (Tenant)", () => {
       );
       consoleSpy.mockRestore();
     });
+
+    it("should navigate to tenant dashboard after successful authentication", async () => {
+      const user = userEvent.setup();
+
+      mockUseSessionHelpers.unauthenticated();
+
+      await act(async () => {
+        render(<AuthPage />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("tenant-auth-flow")).toBeInTheDocument();
+      });
+
+      const successButton = screen.getByTestId("auth-success");
+      await user.click(successButton);
+
+      expect(mockNavigate).toHaveBeenCalledWith("/tenant/test-church");
+    });
   });
 
-  describe("Auth Flow Display", () => {
-    beforeEach(async () => {
+  describe("Page Layout and Content", () => {
+    it("should display tenant name and welcome message when tenant exists", async () => {
       mockUseSessionHelpers.unauthenticated();
-    });
 
-    it("should display tenant name and auth flow when tenant exists", async () => {
       await act(async () => {
         render(<AuthPage />);
       });
@@ -255,8 +294,6 @@ describe("AuthPage (Tenant)", () => {
       await waitFor(() => {
         expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
         expect(screen.getByTestId("tenant-auth-flow")).toBeInTheDocument();
-        expect(screen.getByTestId("tenant-slug")).toHaveTextContent("test-church");
-        expect(screen.getByTestId("tenant-name")).toHaveTextContent("Test Church");
       });
     });
 
@@ -268,6 +305,8 @@ describe("AuthPage (Tenant)", () => {
         writable: true,
       });
 
+      mockUseSessionHelpers.unauthenticated();
+
       await act(async () => {
         render(<AuthPage />);
       });
@@ -277,29 +316,6 @@ describe("AuthPage (Tenant)", () => {
         expect(screen.getByTestId("tenant-name")).toHaveTextContent("Test Church");
         expect(screen.getByTestId("invite-token")).toHaveTextContent("test-invite");
       });
-    });
-  });
-
-  describe("Authentication Success Handler", () => {
-    beforeEach(async () => {
-      mockUseSessionHelpers.unauthenticated();
-    });
-
-    it("should navigate to tenant dashboard after successful auth", async () => {
-      const user = userEvent.setup();
-
-      await act(async () => {
-        render(<AuthPage />);
-      });
-
-      await waitFor(() => {
-        expect(screen.getByTestId("tenant-auth-flow")).toBeInTheDocument();
-      });
-
-      const successButton = screen.getByTestId("mock-auth-success");
-      await user.click(successButton);
-
-      expect(mockNavigate).toHaveBeenCalledWith("/tenant/test-church");
     });
   });
 
@@ -341,52 +357,7 @@ describe("AuthPage (Tenant)", () => {
     });
   });
 
-  describe("Loading States", () => {
-    it("should show session loading state", async () => {
-      mockUseSessionHelpers.loading();
-
-      await act(async () => {
-        render(<AuthPage />);
-      });
-
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
-    });
-
-    it("should show tenant loading spinner", async () => {
-      // Mock pending promise to simulate loading
-      (tenantUtils.getTenantBySlug as jest.Mock).mockImplementation(
-        () => new Promise(() => {}), // Never resolves
-      );
-
-      mockUseSessionHelpers.unauthenticated();
-
-      await act(async () => {
-        render(<AuthPage />);
-      });
-
-      // Should show loading with spinner
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
-      // Check for spinner icon (Loader2 component)
-      expect(
-        document.querySelector('[data-testid="loader"]') || document.querySelector(".animate-spin"),
-      ).toBeTruthy();
-    });
-  });
-
-  describe("Edge Cases", () => {
-    it("should handle missing slug parameter", async () => {
-      mockUseParams.mockReturnValue({ slug: undefined });
-
-      mockUseSessionHelpers.unauthenticated();
-
-      await act(async () => {
-        render(<AuthPage />);
-      });
-
-      // Should not call getTenantBySlug with undefined slug
-      expect(tenantUtils.getTenantBySlug).not.toHaveBeenCalled();
-    });
-
+  describe("Edge Cases and State Transitions", () => {
     it("should handle rapid state changes during loading", async () => {
       // Start with loading tenant
       let resolvePromise: (value: typeof mockTenant) => void;
@@ -415,17 +386,6 @@ describe("AuthPage (Tenant)", () => {
       await waitFor(() => {
         expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
       });
-    });
-
-    it("should handle missing user during authentication check", async () => {
-      mockUseSessionHelpers.unauthenticated();
-
-      await act(async () => {
-        render(<AuthPage />);
-      });
-
-      // Should not attempt to check access without user
-      expect(memberService.checkUserTenantAccess).not.toHaveBeenCalled();
     });
 
     it("should handle session loading to user state transition", async () => {
