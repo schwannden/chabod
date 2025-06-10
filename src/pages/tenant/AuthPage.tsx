@@ -32,10 +32,7 @@ export default function AuthPage() {
       if (!slug) return;
 
       try {
-        console.log("Fetching tenant with slug:", slug);
         const tenantData = await getTenantBySlug(slug);
-        console.log("Tenant data received:", tenantData);
-
         if (tenantData) {
           setTenant(tenantData);
           setError(null);

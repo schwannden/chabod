@@ -541,8 +541,6 @@ describe("NavBar", () => {
         const logoLink = screen.getByText("Chabod").closest("a");
         expect(logoLink).toHaveAttribute("href", expectedDestination);
 
-        console.log(`✓ Scenario ${index + 1}: ${currentPath} → ${expectedDestination}`);
-
         // Clean up for next iteration
         unmount();
       });

@@ -5,16 +5,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { createServiceEventWithOwners } from "@/lib/services/service-event-crud";
 import { ServiceEventForm, ServiceEventFormValues } from "./ServiceEventForm";
 import { ServiceEventOwner, ServiceEventOwnerSelect } from "./ServiceEventOwnerSelect";
+import { useTranslation } from "react-i18next";
 
 interface ServiceEventCreateDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
   onEventCreated: () => void;
   tenantId: string;
   services: {
@@ -23,6 +25,7 @@ interface ServiceEventCreateDialogProps {
     default_start_time?: string | null;
     default_end_time?: string | null;
   }[];
+  trigger?: React.ReactNode;
 }
 
 export function ServiceEventCreateDialog({
@@ -31,7 +34,10 @@ export function ServiceEventCreateDialog({
   onEventCreated,
   tenantId,
   services,
+  trigger,
 }: ServiceEventCreateDialogProps) {
+  const { t } = useTranslation();
+  const [internalOpen, setInternalOpen] = useState(false);
   const [selectedServiceId, setSelectedServiceId] = useState<string>(
     services.length > 0 ? services[0].id : "",
   );
@@ -41,6 +47,14 @@ export function ServiceEventCreateDialog({
   const [selectedOwners, setSelectedOwners] = useState<ServiceEventOwner[]>([]);
 
   const { toast } = useToast();
+
+  // Use external state if provided, otherwise use internal state
+  const open = isOpen !== undefined ? isOpen : internalOpen;
+  const setOpen = onClose
+    ? (open: boolean) => {
+        if (!open) onClose();
+      }
+    : setInternalOpen;
 
   // Update default times when selected service changes
   useEffect(() => {
@@ -73,17 +87,17 @@ export function ServiceEventCreateDialog({
       await createServiceEventWithOwners(eventData, owners);
 
       toast({
-        title: "成功",
-        description: "服事排班已建立",
+        title: t("common.success"),
+        description: t("serviceEvents.eventCreated"),
       });
 
       onEventCreated();
-      onClose();
+      setOpen(false);
     } catch (error) {
       console.error("Error creating service event:", error);
       toast({
-        title: "錯誤",
-        description: "建立服事排班時出錯",
+        title: t("common.error"),
+        description: t("serviceEvents.createEventError"),
         variant: "destructive",
       });
     } finally {
@@ -91,11 +105,23 @@ export function ServiceEventCreateDialog({
     }
   };
 
+  const handleCancel = () => {
+    setOpen(false);
+  };
+
+  // If no trigger is provided and we're not in controlled mode, provide default trigger
+  const shouldShowTrigger = trigger !== undefined || isOpen === undefined;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={setOpen}>
+      {shouldShowTrigger && (
+        <DialogTrigger asChild>
+          {trigger || <Button>{t("serviceEvents.createServiceEvent")}</Button>}
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>新增服事排班</DialogTitle>
+          <DialogTitle>{t("serviceEvents.createServiceEventTitle")}</DialogTitle>
         </DialogHeader>
 
         <ServiceEventForm
@@ -105,14 +131,14 @@ export function ServiceEventCreateDialog({
           setSelectedServiceId={setSelectedServiceId}
           tenantId={tenantId}
           isSubmitting={isSubmitting}
-          onCancel={onClose}
+          onCancel={handleCancel}
           defaultStartTime={defaultStartTime}
           defaultEndTime={defaultEndTime}
           selectedOwners={selectedOwners}
           setSelectedOwners={setSelectedOwners}
         >
           <div className="space-y-4 mb-4">
-            <div className="text-sm font-medium mb-1">服事人員分配</div>
+            <div className="text-sm font-medium mb-1">{t("serviceEvents.memberAssignment")}</div>
             {selectedServiceId && (
               <ServiceEventOwnerSelect
                 serviceId={selectedServiceId}
@@ -124,11 +150,11 @@ export function ServiceEventCreateDialog({
           </div>
 
           <DialogFooter className="mt-6">
-            <Button type="button" variant="outline" onClick={onClose}>
-              取消
+            <Button type="button" variant="outline" onClick={handleCancel}>
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "提交中..." : "建立"}
+              {isSubmitting ? t("common.submitting") : t("common.create")}
             </Button>
           </DialogFooter>
         </ServiceEventForm>

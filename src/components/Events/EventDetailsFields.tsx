@@ -39,13 +39,10 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
   }, [groups]);
 
   const toggleGroup = (groupId: string) => {
-    console.log("toggleGroup called with groupId:", groupId);
     const currentGroups = form.getValues("groups") || [];
-    console.log("Current groups before toggle:", currentGroups);
     const newGroups = currentGroups.includes(groupId)
       ? currentGroups.filter((id) => id !== groupId)
       : [...currentGroups, groupId];
-    console.log("New groups after toggle:", newGroups);
     form.setValue("groups", newGroups);
   };
 

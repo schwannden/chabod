@@ -10,7 +10,6 @@ import { ServiceEventCreateDialog } from "@/components/ServiceEvents/ServiceEven
 import { useTenantRole } from "@/hooks/useTenantRole";
 import { useEventFilters } from "@/hooks/useEventFilters";
 import { useServiceEvents } from "@/hooks/useServiceEvents";
-import { ServiceEventAddButton } from "@/components/ServiceEvents/ServiceEventAddButton";
 import { ServiceEventList } from "@/components/ServiceEvents/ServiceEventList";
 import { GenericEventPage } from "@/components/shared/GenericEventPage";
 import { getTenantGroups } from "@/lib/group-service";
@@ -21,7 +20,6 @@ export default function ServiceEventPage() {
   const { role } = useTenantRole(slug, user?.id);
   const [allGroups, setAllGroups] = useState<Group[]>([]);
   const [services, setServices] = useState<Service[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [canCreateEvent, setCanCreateEvent] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [tenantId, setTenantId] = useState<string | null>(null);
@@ -57,13 +55,20 @@ export default function ServiceEventPage() {
         return;
       }
 
-      // Tenant owners can always create service events
+      // Tenant owners can always create service events (no need to wait for tenantId)
       if (role === "owner") {
         setCanCreateEvent(true);
         return;
       }
 
+      // For members/non-owners, we need to be more careful about timing
+      // If role is still loading (undefined), don't hide the button yet
+      if (role === undefined) {
+        return; // Don't update state while role is loading
+      }
+
       // For non-owners, check if user is a service admin for any service
+      // Only check if tenantId is available, otherwise set to false
       if (tenantId) {
         try {
           const { data: serviceAdmins, error } = await supabase
@@ -84,7 +89,7 @@ export default function ServiceEventPage() {
           setCanCreateEvent(false);
         }
       } else {
-        // If no tenantId yet, show button for members - it will be validated server-side
+        // For non-owners without tenantId, set to false
         setCanCreateEvent(false);
       }
     };
@@ -173,18 +178,13 @@ export default function ServiceEventPage() {
         />
       }
       actionButton={
-        canCreateEvent ? <ServiceEventAddButton onClick={() => setIsDialogOpen(true)} /> : null
-      }
-      dialog={
-        isDialogOpen && (
+        user && canCreateEvent ? (
           <ServiceEventCreateDialog
-            isOpen={isDialogOpen}
-            onClose={() => setIsDialogOpen(false)}
             onEventCreated={handleEventUpdated}
             tenantId={tenantId || ""}
             services={services}
           />
-        )
+        ) : null
       }
       fetchBaseData={fetchBaseData}
     />
