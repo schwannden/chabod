@@ -34,13 +34,7 @@ const MockAnnouncementDialog = ({
       <div data-testid="announcement-message">{announcement.message}</div>
       <div data-testid="announcement-icon">{announcement.icon || "warning"}</div>
       <label>
-        <input
-          type="checkbox"
-          data-testid="dont-show-again-checkbox"
-          onChange={(e) => {
-            // Mock checkbox behavior
-          }}
-        />
+        <input type="checkbox" data-testid="dont-show-again-checkbox" />
         {dontShowAgainText}
       </label>
       <button onClick={() => onDismiss(false)} data-testid="understood-button">
