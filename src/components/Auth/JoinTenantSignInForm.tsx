@@ -57,12 +57,12 @@ export function JoinTenantSignInForm({
           setError(
             associationError instanceof Error
               ? associationError.message
-              : t("auth.cannotJoinChurch", { errorMessage: "Unknown error" }),
+              : t("auth:cannotJoinChurch", { errorMessage: "Unknown error" }),
           );
         }
       }
     } catch {
-      setError(t("auth.unknownError"));
+      setError(t("auth:unknownError"));
     } finally {
       setIsLoading(false);
     }
@@ -75,17 +75,17 @@ export function JoinTenantSignInForm({
           <Button variant="ghost" size="sm" onClick={onBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <CardTitle className="text-xl">{t("auth.signInToJoin")}</CardTitle>
+          <CardTitle className="text-xl">{t("auth:signInToJoin")}</CardTitle>
         </div>
         <p className="text-sm text-muted-foreground">
-          {t("auth.signInExistingDesc", { tenantName })}
-          {inviteToken && ` ${t("auth.invitedSpecialPermissions")}`}
+          {t("auth:signInExistingDesc", { tenantName })}
+          {inviteToken && ` ${t("auth:invitedSpecialPermissions")}`}
         </p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">{t("auth.email")}</Label>
+            <Label htmlFor="email">{t("auth:email")}</Label>
             <Input
               id="email"
               type="email"
@@ -97,7 +97,7 @@ export function JoinTenantSignInForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">{t("auth.password")}</Label>
+            <Label htmlFor="password">{t("auth:password")}</Label>
             <Input
               id="password"
               type="password"
@@ -111,7 +111,7 @@ export function JoinTenantSignInForm({
           {error && <div className="text-sm text-destructive">{error}</div>}
 
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? t("auth.signingIn") : t("auth.joinChurch", { tenantName })}
+            {isLoading ? t("auth:signingIn") : t("auth:joinChurch", { tenantName })}
           </Button>
         </form>
       </CardContent>

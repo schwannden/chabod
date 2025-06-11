@@ -49,14 +49,14 @@ export function ProfileForm({ profile, onProfileUpdated }: ProfileFormProps) {
         onProfileUpdated();
       }
       toast({
-        title: t("profile.profileUpdated"),
-        description: t("profile.profileUpdatedSuccess"),
+        title: t("profile:profileUpdated"),
+        description: t("profile:profileUpdatedSuccess"),
       });
     } catch (error: unknown) {
       console.error("Profile update error:", error);
       toast({
-        title: t("profile.profileUpdateError"),
-        description: error instanceof Error ? error.message : t("profile.profileUpdateErrorDesc"),
+        title: t("profile:profileUpdateError"),
+        description: error instanceof Error ? error.message : t("profile:profileUpdateErrorDesc"),
         variant: "destructive",
       });
     } finally {
@@ -67,50 +67,50 @@ export function ProfileForm({ profile, onProfileUpdated }: ProfileFormProps) {
   return (
     <Card className="max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>{t("profile.title")}</CardTitle>
-        <CardDescription>{t("profile.description")}</CardDescription>
+        <CardTitle>{t("profile:title")}</CardTitle>
+        <CardDescription>{t("profile:description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="full-name">{t("profile.fullName")}</Label>
+            <Label htmlFor="full-name">{t("profile:fullName")}</Label>
             <Input
               id="full-name"
               type="text"
               value={formData.full_name}
               onChange={(e) => setFormData((prev) => ({ ...prev, full_name: e.target.value }))}
-              placeholder={t("profile.yourName")}
+              placeholder={t("profile:yourName")}
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="first-name">{t("profile.firstName")}</Label>
+              <Label htmlFor="first-name">{t("profile:firstName")}</Label>
               <Input
                 id="first-name"
                 type="text"
                 value={formData.first_name}
                 onChange={(e) => setFormData((prev) => ({ ...prev, first_name: e.target.value }))}
-                placeholder={t("profile.firstName_")}
+                placeholder={t("profile:firstName_")}
               />
             </div>
             <div>
-              <Label htmlFor="last-name">{t("profile.lastName")}</Label>
+              <Label htmlFor="last-name">{t("profile:lastName")}</Label>
               <Input
                 id="last-name"
                 type="text"
                 value={formData.last_name}
                 onChange={(e) => setFormData((prev) => ({ ...prev, last_name: e.target.value }))}
-                placeholder={t("profile.lastName_")}
+                placeholder={t("profile:lastName_")}
               />
             </div>
           </div>
           <div>
-            <Label htmlFor="email">{t("profile.email")}</Label>
+            <Label htmlFor="email">{t("profile:email")}</Label>
             <Input id="email" type="email" value={user?.email || ""} disabled />
-            <p className="text-xs text-muted-foreground">{t("profile.emailNote")}</p>
+            <p className="text-xs text-muted-foreground">{t("profile:emailNote")}</p>
           </div>
           <div>
-            <Label htmlFor="avatar-url">{t("profile.avatarUrl")}</Label>
+            <Label htmlFor="avatar-url">{t("profile:avatarUrl")}</Label>
             <Input
               id="avatar-url"
               type="url"
@@ -119,7 +119,7 @@ export function ProfileForm({ profile, onProfileUpdated }: ProfileFormProps) {
             />
           </div>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? t("common.saving") : t("profile.saveChanges")}
+            {isSubmitting ? t("common:saving") : t("profile:saveChanges")}
           </Button>
         </form>
       </CardContent>

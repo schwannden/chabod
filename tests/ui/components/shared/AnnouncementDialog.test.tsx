@@ -25,8 +25,8 @@ const MockAnnouncementDialog = ({
 }: MockAnnouncementDialogProps) => {
   if (!isOpen || !announcement) return null;
 
-  const dontShowAgainText = announcement.dontShowAgain || "common.dontShowAgain";
-  const understoodText = announcement.understood || "common.understood";
+  const dontShowAgainText = announcement.dontShowAgain || "common:dontShowAgain";
+  const understoodText = announcement.understood || "common:understood";
 
   return (
     <div role="dialog" data-testid="announcement-dialog" aria-modal="true">
@@ -122,8 +122,8 @@ describe("AnnouncementDialog", () => {
       />,
     );
 
-    expect(screen.getByText("common.dontShowAgain")).toBeInTheDocument();
-    expect(screen.getByText("common.understood")).toBeInTheDocument();
+    expect(screen.getByText("common:dontShowAgain")).toBeInTheDocument();
+    expect(screen.getByText("common:understood")).toBeInTheDocument();
   });
 
   it("should render HTML content in message", () => {

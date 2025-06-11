@@ -1,5 +1,6 @@
 import { Group, Service } from "@/lib/types";
 import { GenericFilterBar, FilterConfig } from "@/components/shared/GenericFilterBar";
+import { useTranslation } from "react-i18next";
 
 interface ServiceEventFilterBarProps {
   allGroups: Group[];
@@ -26,14 +27,16 @@ export function ServiceEventFilterBar({
   endDate,
   setEndDate,
 }: ServiceEventFilterBarProps) {
+  const { t } = useTranslation("services");
+
   // Create a configuration array for our filters
   const filters: FilterConfig<Group | Service>[] = [
     // Group filter
     {
       type: "select",
       id: "group-filter",
-      label: "組別",
-      placeholder: "選擇組別",
+      label: t("group"),
+      placeholder: t("selectGroup"),
       options: allGroups,
       value: selectedGroup,
       onChange: setSelectedGroup,
@@ -42,8 +45,8 @@ export function ServiceEventFilterBar({
     {
       type: "select",
       id: "service-filter",
-      label: "服事類型",
-      placeholder: "選擇服事",
+      label: t("serviceType"),
+      placeholder: t("selectService"),
       options: services,
       value: selectedService,
       onChange: setSelectedService,
@@ -52,7 +55,7 @@ export function ServiceEventFilterBar({
     {
       type: "date",
       id: "start-date-filter",
-      label: "開始日期",
+      label: t("startDate"),
       value: startDate,
       onChange: setStartDate,
     },
@@ -60,7 +63,7 @@ export function ServiceEventFilterBar({
     {
       type: "date",
       id: "end-date-filter",
-      label: "結束日期",
+      label: t("endDate"),
       value: endDate,
       onChange: setEndDate,
     },

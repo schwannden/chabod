@@ -1,4 +1,3 @@
-import React from "react";
 import { screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render, mockUseSessionHelpers, mockTenant } from "../../test-utils";
@@ -63,11 +62,11 @@ describe("Tenant Operations Integration Tests", () => {
 
       // Wait for initial load
       await waitFor(() => {
-        expect(screen.getByText("dashboard.churchesYouManage")).toBeInTheDocument();
+        expect(screen.getByText("churchesYouManage")).toBeInTheDocument();
       });
 
       // Click add button to open dialog
-      const addButton = screen.getByRole("button", { name: /dashboard.addChurch/i });
+      const addButton = screen.getByRole("button", { name: /addChurch/i });
       await userEvent.setup().click(addButton);
 
       // Verify the create dialog would be opened
@@ -83,7 +82,7 @@ describe("Tenant Operations Integration Tests", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("dashboard.churchesYouManage")).toBeInTheDocument();
+        expect(screen.getByText("churchesYouManage")).toBeInTheDocument();
       });
 
       // The error handling would be tested in the actual dialog component
@@ -230,7 +229,7 @@ describe("Tenant Operations Integration Tests", () => {
         />,
       );
 
-      const manageButton = screen.getByText("tenant.goToChurchDashboard");
+      const manageButton = screen.getByText("tenant:goToChurchDashboard");
       await userEvent.setup().click(manageButton);
 
       expect(mockNavigate).toHaveBeenCalledWith("/tenant/test-church");
@@ -250,7 +249,7 @@ describe("Tenant Operations Integration Tests", () => {
         />,
       );
 
-      const loginButton = screen.getByText("tenant.goToChurchLogin");
+      const loginButton = screen.getByText("tenant:goToChurchLogin");
       await userEvent.setup().click(loginButton);
 
       expect(mockNavigate).toHaveBeenCalledWith("/tenant/test-church/auth");
@@ -302,13 +301,13 @@ describe("Tenant Operations Integration Tests", () => {
 
       // When there's an error, the component shows the main dashboard structure
       await waitFor(() => {
-        expect(screen.getByText("dashboard.churchesYouManage")).toBeInTheDocument();
+        expect(screen.getByText("churchesYouManage")).toBeInTheDocument();
       });
 
       // After error, the loading should complete and show empty state
       // The error case should show empty state with the "no churches yet" message
       await waitFor(() => {
-        expect(screen.getByText("dashboard.noChurchesYet")).toBeInTheDocument();
+        expect(screen.getByText("noChurchesYet")).toBeInTheDocument();
       });
 
       // The error should be logged - wait for the async operation to complete
@@ -338,7 +337,7 @@ describe("Tenant Operations Integration Tests", () => {
 
       render(<DashboardPage />);
 
-      expect(screen.getByText("dashboard.loadingChurchesList")).toBeInTheDocument();
+      expect(screen.getByText("loadingChurchesList")).toBeInTheDocument();
     });
 
     it("should show session loading state", () => {
@@ -346,7 +345,7 @@ describe("Tenant Operations Integration Tests", () => {
 
       render(<DashboardPage />);
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
     });
   });
 
@@ -359,12 +358,12 @@ describe("Tenant Operations Integration Tests", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("dashboard.noChurchesYet")).toBeInTheDocument();
-        expect(screen.getByText("dashboard.addFirstChurch")).toBeInTheDocument();
+        expect(screen.getByText("noChurchesYet")).toBeInTheDocument();
+        expect(screen.getByText("addFirstChurch")).toBeInTheDocument();
       });
 
       // Should have add buttons available
-      const addButtons = screen.getAllByText("dashboard.addChurch");
+      const addButtons = screen.getAllByText("addChurch");
       expect(addButtons).toHaveLength(2);
     });
   });
@@ -410,7 +409,7 @@ describe("Tenant Operations Integration Tests", () => {
         />,
       );
 
-      const copyButton = screen.getByText("tenant.copy");
+      const copyButton = screen.getByText("tenant:copy");
       expect(copyButton).toBeInTheDocument();
     });
   });

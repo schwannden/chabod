@@ -1,11 +1,14 @@
 import { EventWithGroups } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 
 type EventCellTooltipProps = {
   event: EventWithGroups;
 };
 
 export function EventCellTooltip({ event }: EventCellTooltipProps) {
+  const { t } = useTranslation();
+
   return (
     <div>
       <div className="flex items-center gap-2 mb-1">
@@ -27,7 +30,7 @@ export function EventCellTooltip({ event }: EventCellTooltipProps) {
           ? event.end_time
             ? `${event.start_time} - ${event.end_time}`
             : event.start_time
-          : "Full Day"}
+          : t("events:fullDay")}
       </div>
     </div>
   );

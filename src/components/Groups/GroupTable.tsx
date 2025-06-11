@@ -185,7 +185,7 @@ export function GroupTable({
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">{t("groups.name")}</h1>
+          <h1 className="text-2xl font-bold">{t("groups:name")}</h1>
         </div>
         {isTenantOwner && (
           <Button
@@ -195,7 +195,7 @@ export function GroupTable({
               setIsCreateOpen(true);
             }}
           >
-            {t("groups.createGroup")}
+            {t("groups:createGroup")}
           </Button>
         )}
       </div>
@@ -204,18 +204,18 @@ export function GroupTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t("groups.name")}</TableHead>
-              <TableHead>{t("groups.description")}</TableHead>
-              <TableHead>{t("groups.members")}</TableHead>
-              <TableHead>{t("groups.createdAt")}</TableHead>
-              <TableHead className="text-right">{t("groups.actions")}</TableHead>
+              <TableHead>{t("groups:name")}</TableHead>
+              <TableHead>{t("groups:description")}</TableHead>
+              <TableHead>{t("groups:members")}</TableHead>
+              <TableHead>{t("groups:createdAt")}</TableHead>
+              <TableHead className="text-right">{t("groups:actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {groups.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-8">
-                  {t("groups.noGroupsFound")} {isTenantOwner && t("groups.createFirstGroup")}
+                  {t("groups:noGroupsFound")} {isTenantOwner && t("groups:createFirstGroup")}
                 </TableCell>
               </TableRow>
             ) : (
@@ -233,7 +233,7 @@ export function GroupTable({
                         onClick={() => navigateToGroupMembers(group.id)}
                       >
                         <Users className="h-4 w-4 mr-1" />
-                        {t("groups.viewMembers")}
+                        {t("groups:viewMembers")}
                       </Button>
 
                       {isTenantOwner && (
@@ -265,37 +265,37 @@ export function GroupTable({
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("groups.createNewGroup")}</DialogTitle>
+            <DialogTitle>{t("groups:createNewGroup")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">{t("groups.groupName")}</Label>
+              <Label htmlFor="name">{t("groups:groupName")}</Label>
               <Input
                 id="name"
                 value={newGroupName}
                 onChange={handleNameChange}
                 onBlur={handleNameBlur}
-                placeholder={t("groups.enterGroupName")}
+                placeholder={t("groups:enterGroupName")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">{t("groups.descriptionOptional")}</Label>
+              <Label htmlFor="description">{t("groups:descriptionOptional")}</Label>
               <Textarea
                 id="description"
                 value={newGroupDescription}
                 onChange={handleDescriptionChange}
                 onBlur={handleDescriptionBlur}
-                placeholder={t("groups.enterGroupDescription")}
+                placeholder={t("groups:enterGroupDescription")}
                 rows={3}
               />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
-              {t("common.cancel")}
+              {t("common:cancel")}
             </Button>
             <Button onClick={handleCreateGroup} disabled={isSubmitting}>
-              {isSubmitting ? t("common.creating") : t("groups.createGroup_")}
+              {isSubmitting ? t("common:creating") : t("groups:createGroup_")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -305,11 +305,11 @@ export function GroupTable({
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("groups.editGroup")}</DialogTitle>
+            <DialogTitle>{t("groups:editGroup")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-name">{t("groups.groupName")}</Label>
+              <Label htmlFor="edit-name">{t("groups:groupName")}</Label>
               <Input
                 id="edit-name"
                 value={newGroupName}
@@ -318,7 +318,7 @@ export function GroupTable({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-description">{t("groups.descriptionOptional")}</Label>
+              <Label htmlFor="edit-description">{t("groups:descriptionOptional")}</Label>
               <Textarea
                 id="edit-description"
                 value={newGroupDescription}
@@ -330,10 +330,10 @@ export function GroupTable({
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditOpen(false)}>
-              {t("common.cancel")}
+              {t("common:cancel")}
             </Button>
             <Button onClick={handleUpdateGroup} disabled={isSubmitting}>
-              {isSubmitting ? t("common.saving") : t("groups.saveChanges")}
+              {isSubmitting ? t("common:saving") : t("groups:saveChanges")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -343,17 +343,17 @@ export function GroupTable({
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("groups.deleteGroup")}</DialogTitle>
+            <DialogTitle>{t("groups:deleteGroup")}</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <p>{t("groups.deleteGroupConfirm", { groupName: selectedGroup?.name })}</p>
+            <p>{t("groups:deleteGroupConfirm", { groupName: selectedGroup?.name })}</p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
-              {t("common.cancel")}
+              {t("common:cancel")}
             </Button>
             <Button variant="destructive" onClick={handleDeleteGroup} disabled={isSubmitting}>
-              {isSubmitting ? t("common.deleting") : t("groups.deleteGroup")}
+              {isSubmitting ? t("common:deleting") : t("groups:deleteGroup")}
             </Button>
           </DialogFooter>
         </DialogContent>

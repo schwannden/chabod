@@ -14,7 +14,7 @@ import { EditServiceDialog } from "@/components/Services/EditServiceDialog";
 import { useTranslation } from "react-i18next";
 
 export default function ServicePage() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["services", "dashboard", "common"]);
   const { slug } = useParams<{ slug: string }>();
   const { user, isLoading: isSessionLoading } = useSession();
   const navigate = useNavigate();
@@ -53,11 +53,11 @@ export default function ServicePage() {
 
   return (
     <TenantPageLayout
-      title={t("dashboard.serviceManagementTitle")}
-      description={t("dashboard.serviceManagementDesc")}
+      title={t("dashboard:serviceManagementTitle")}
+      description={t("dashboard:serviceManagementDesc")}
       tenantName={tenant?.name || ""}
       tenantSlug={slug || ""}
-      breadcrumbItems={[{ label: t("dashboard.serviceManagementTitle") }]}
+      breadcrumbItems={[{ label: t("dashboard:serviceManagementTitle") }]}
       isLoading={isLoading}
       action={
         canManageServices &&
@@ -68,7 +68,7 @@ export default function ServicePage() {
         {isLoading ? (
           <Card>
             <CardContent className="pt-6">
-              <p className="text-muted-foreground">{t("common.loading")}</p>
+              <p className="text-muted-foreground">{t("common:loading")}</p>
             </CardContent>
           </Card>
         ) : services && services.length > 0 ? (
@@ -85,7 +85,7 @@ export default function ServicePage() {
         ) : (
           <Card>
             <CardContent className="pt-6">
-              <p className="text-muted-foreground">{t("services.noServiceTypesYet")}</p>
+              <p className="text-muted-foreground">{t("services:noServiceTypesYet")}</p>
             </CardContent>
           </Card>
         )}

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
 export default function DashboardPage() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["dashboard", "common"]);
   const { user, isLoading } = useSession();
   const navigate = useNavigate();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -32,7 +32,7 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">{t("common.loading")}</div>
+      <div className="flex items-center justify-center min-h-screen">{t("common:loading")}</div>
     );
   }
 
@@ -45,22 +45,20 @@ export default function DashboardPage() {
       <NavBar />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">{t("dashboard.churchesYouManage")}</h1>
+          <h1 className="text-3xl font-bold">{t("churchesYouManage")}</h1>
           <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" /> {t("dashboard.addChurch")}
+            <Plus className="mr-2 h-4 w-4" /> {t("addChurch")}
           </Button>
         </div>
 
         {isTenantsLoading ? (
-          <div className="flex items-center justify-center py-12">
-            {t("dashboard.loadingChurchesList")}
-          </div>
+          <div className="flex items-center justify-center py-12">{t("loadingChurchesList")}</div>
         ) : tenants.length === 0 ? (
           <div className="bg-muted rounded-lg p-6 text-center">
-            <h3 className="text-lg font-medium mb-2">{t("dashboard.noChurchesYet")}</h3>
-            <p className="text-muted-foreground mb-4">{t("dashboard.addFirstChurch")}</p>
+            <h3 className="text-lg font-medium mb-2">{t("noChurchesYet")}</h3>
+            <p className="text-muted-foreground mb-4">{t("addFirstChurch")}</p>
             <Button onClick={() => setIsCreateDialogOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" /> {t("dashboard.addChurch")}
+              <Plus className="mr-2 h-4 w-4" /> {t("addChurch")}
             </Button>
           </div>
         ) : (

@@ -21,11 +21,11 @@ export function MemberRoleSelect({ currentRole, onRoleChange, disabled }: Member
   const getRoleDisplayName = (role: string) => {
     switch (role) {
       case "owner":
-        return t("members.admin");
+        return t("members:admin");
       case "member":
-        return t("members.member");
+        return t("members:member");
       default:
-        return t("members.member");
+        return t("members:member");
     }
   };
 
@@ -44,10 +44,10 @@ export function MemberRoleSelect({ currentRole, onRoleChange, disabled }: Member
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => onRoleChange("owner")}>
-          {t("members.admin")}
+          {t("members:admin")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onRoleChange("member")}>
-          {t("members.member")}
+          {t("members:member")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -42,9 +42,9 @@ export function HighRiskDeleteDialog({
   const [inputValue, setInputValue] = useState("");
 
   const defaultConfirmationPlaceholder =
-    confirmationPlaceholder || t("shared.enterConfirmationPlaceholder");
-  const defaultDestructiveLabel = destructiveActionLabel || t("shared.permanentDelete");
-  const defaultCancelLabel = cancelActionLabel || t("shared.cancelButton");
+    confirmationPlaceholder || t("shared:enterConfirmationPlaceholder");
+  const defaultDestructiveLabel = destructiveActionLabel || t("shared:permanentDelete");
+  const defaultCancelLabel = cancelActionLabel || t("shared:cancelButton");
 
   const isConfirmationValid = inputValue === confirmationText;
 
@@ -66,16 +66,16 @@ export function HighRiskDeleteDialog({
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2 text-destructive">
             <AlertTriangle className="h-6 w-6" />
-            {title || t("shared.highRiskDelete")}
+            {title || t("shared:highRiskDelete")}
           </AlertDialogTitle>
           <AlertDialogDescription className="space-y-3">
             <div className="bg-destructive/10 p-3 rounded-lg border border-destructive/20">
-              <p className="font-medium">{t("shared.warningCannotUndo")}</p>
-              <p>{description || t("shared.deleteWarningDesc")}</p>
+              <p className="font-medium">{t("shared:warningCannotUndo")}</p>
+              <p>{description || t("shared:deleteWarningDesc")}</p>
             </div>
             <div>
-              {t("shared.enterConfirmationText")}{" "}
-              <span className="font-bold">{confirmationText}</span> {t("shared.toConfirmDelete")}
+              {t("shared:enterConfirmationText")}{" "}
+              <span className="font-bold">{confirmationText}</span> {t("shared:toConfirmDelete")}
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
@@ -95,7 +95,7 @@ export function HighRiskDeleteDialog({
             disabled={!isConfirmationValid || isLoading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isLoading ? t("common.processing") : defaultDestructiveLabel}
+            {isLoading ? t("common:processing") : defaultDestructiveLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

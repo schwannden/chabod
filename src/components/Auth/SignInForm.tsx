@@ -46,8 +46,8 @@ export function SignInForm({
 
     if (!trimmedEmail) {
       toast({
-        title: t("auth.loginFailed"),
-        description: t("auth.emailEmpty"),
+        title: t("auth:loginFailed"),
+        description: t("auth:emailEmpty"),
         variant: "destructive",
       });
       return;
@@ -62,16 +62,16 @@ export function SignInForm({
       });
 
       if (error) {
-        let errorMessage = t("auth.emailOrPasswordIncorrect");
+        let errorMessage = t("auth:emailOrPasswordIncorrect");
         if (error.message?.includes("invalid email")) {
-          errorMessage = t("auth.emailFormatIncorrect");
+          errorMessage = t("auth:emailFormatIncorrect");
         } else if (
           error.message?.toLowerCase().includes("invalid login credentials") ||
           error.message?.toLowerCase().includes("invalid email or password")
         ) {
-          errorMessage = t("auth.emailOrPasswordIncorrect");
+          errorMessage = t("auth:emailOrPasswordIncorrect");
         } else if (error.message?.includes("User not confirmed")) {
-          errorMessage = t("auth.pleaseVerifyEmail");
+          errorMessage = t("auth:pleaseVerifyEmail");
         } else if (error.message) {
           errorMessage = error.message;
         }
@@ -86,14 +86,14 @@ export function SignInForm({
 
           if (!hasAccess) {
             await supabase.auth.signOut();
-            throw new Error(t("auth.noPermissionToEnterChurch"));
+            throw new Error(t("auth:noPermissionToEnterChurch"));
           }
         }
       }
 
       toast({
-        title: t("auth.loginSuccess"),
-        description: tenantName ? t("auth.welcomeBack", { tenantName }) : t("auth.welcomeToChabod"),
+        title: t("auth:loginSuccess"),
+        description: tenantName ? t("auth:welcomeBack", { tenantName }) : t("auth:welcomeToChabod"),
       });
 
       if (onSuccess) {
@@ -101,8 +101,8 @@ export function SignInForm({
       }
     } catch (error) {
       toast({
-        title: t("auth.loginFailed"),
-        description: error?.message || t("auth.emailOrPasswordIncorrect"),
+        title: t("auth:loginFailed"),
+        description: error?.message || t("auth:emailOrPasswordIncorrect"),
         variant: "destructive",
       });
     } finally {
@@ -118,8 +118,8 @@ export function SignInForm({
 
     if (!trimmedEmail) {
       toast({
-        title: t("auth.resetPasswordFailed"),
-        description: t("auth.emailEmpty"),
+        title: t("auth:resetPasswordFailed"),
+        description: t("auth:emailEmpty"),
         variant: "destructive",
       });
       return;
@@ -133,11 +133,11 @@ export function SignInForm({
       });
 
       if (error) {
-        let errorMessage = t("auth.resetPasswordError");
+        let errorMessage = t("auth:resetPasswordError");
         if (error.message?.includes("user not found")) {
-          errorMessage = t("auth.userNotFound");
+          errorMessage = t("auth:userNotFound");
         } else if (error.message?.includes("invalid email")) {
-          errorMessage = t("auth.emailFormatIncorrect");
+          errorMessage = t("auth:emailFormatIncorrect");
         } else if (error.message) {
           errorMessage = error.message;
         }
@@ -145,16 +145,16 @@ export function SignInForm({
       }
 
       toast({
-        title: t("auth.resetPasswordEmailSent"),
-        description: t("auth.checkEmailForReset"),
+        title: t("auth:resetPasswordEmailSent"),
+        description: t("auth:checkEmailForReset"),
       });
 
       setResetPasswordMode(false);
     } catch (error) {
-      const errorMessage = error?.message || t("auth.unknownError");
+      const errorMessage = error?.message || t("auth:unknownError");
       toast({
-        title: t("auth.resetPasswordFailed"),
-        description: errorMessage || t("auth.resetPasswordError"),
+        title: t("auth:resetPasswordFailed"),
+        description: errorMessage || t("auth:resetPasswordError"),
         variant: "destructive",
       });
     } finally {
@@ -166,20 +166,20 @@ export function SignInForm({
     return (
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
-          <CardTitle>{t("auth.resetPassword")}</CardTitle>
-          <CardDescription>{t("auth.resetPasswordDesc")}</CardDescription>
+          <CardTitle>{t("auth:resetPassword")}</CardTitle>
+          <CardDescription>{t("auth:resetPasswordDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleResetPassword} className="space-y-4">
             <AuthEmailInput id="reset-email" value={email} onChange={setEmail} disabled={loading} />
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? t("auth.sending") : t("auth.sendResetPasswordLink")}
+              {loading ? t("auth:sending") : t("auth:sendResetPasswordLink")}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
           <Button variant="link" onClick={() => setResetPasswordMode(false)}>
-            {t("auth.backToLogin")}
+            {t("auth:backToLogin")}
           </Button>
         </CardFooter>
       </Card>
@@ -189,9 +189,9 @@ export function SignInForm({
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>{t("auth.signIn")}</CardTitle>
+        <CardTitle>{t("auth:signIn")}</CardTitle>
         <CardDescription>
-          {tenantName ? t("auth.signInTo", { tenantName }) : t("auth.signInToChabod")}
+          {tenantName ? t("auth:signInTo", { tenantName }) : t("auth:signInToChabod")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -204,13 +204,13 @@ export function SignInForm({
             onForgotPassword={() => setResetPasswordMode(true)}
           />
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? t("common.loading") : t("auth.signIn")}
+            {loading ? t("common:loading") : t("auth:signIn")}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="flex justify-center">
         <Button variant="link" onClick={onSignUpClick}>
-          {t("nav.signup")}
+          {t("nav:signup")}
         </Button>
       </CardFooter>
     </Card>

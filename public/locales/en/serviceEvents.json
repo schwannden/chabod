@@ -1,0 +1,23 @@
+{
+  "addSchedule": "Add Schedule",
+  "copySchedule": "Copy Schedule",
+  "copyScheduleButton": "Copy Schedule",
+  "serviceStaffAssignment": "Service Staff Assignment",
+  "loadingServiceStaff": "Loading service staff...",
+  "copy": "Copy",
+  "errorTitle": "Error",
+  "cannotLoadServiceStaffData": "Cannot load service staff data",
+  "successTitle": "Success",
+  "scheduleCreated": "Schedule created",
+  "scheduleCreateError": "Error creating schedule",
+  "selectMember": "Select member",
+  "unnamedMember": "Unnamed member",
+  "selectRole": "Select role",
+  "selectedMembers": "Selected Members",
+  "noRolesConfigured": "This service type has not configured any roles yet. Please configure roles on the service type page first.",
+  "createServiceEvent": "Create Service Event",
+  "createServiceEventTitle": "Create Service Event",
+  "eventCreated": "Service event created",
+  "createEventError": "Error creating service event",
+  "memberAssignment": "Member Assignment"
+}

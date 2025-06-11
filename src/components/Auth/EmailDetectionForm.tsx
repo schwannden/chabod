@@ -37,7 +37,7 @@ export function EmailDetectionForm({
 
     switch (errorCode) {
       case "EMAIL_CHECK_FAILED":
-        return t("auth.emailCheckFailed");
+        return t("auth:emailCheckFailed");
       default:
         return errorCode; // Return original error if not recognized
     }
@@ -50,20 +50,20 @@ export function EmailDetectionForm({
           <Button variant="ghost" size="sm" onClick={onBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <CardTitle className="text-xl">{t("auth.whatsYourEmail")}</CardTitle>
+          <CardTitle className="text-xl">{t("auth:whatsYourEmail")}</CardTitle>
         </div>
-        <p className="text-sm text-muted-foreground">{t("auth.emailCheckDesc", { tenantName })}</p>
+        <p className="text-sm text-muted-foreground">{t("auth:emailCheckDesc", { tenantName })}</p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">{t("auth.email")}</Label>
+            <Label htmlFor="email">{t("auth:email")}</Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={t("auth.enterEmailAddress")}
+              placeholder={t("auth:enterEmailAddress")}
               required
               disabled={isLoading}
             />
@@ -72,7 +72,7 @@ export function EmailDetectionForm({
           {error && <div className="text-sm text-destructive">{getErrorMessage(error)}</div>}
 
           <Button type="submit" className="w-full" disabled={isLoading || !email.trim()}>
-            {isLoading ? t("auth.checking") : t("auth.continue")}
+            {isLoading ? t("auth:checking") : t("auth:continue")}
           </Button>
         </form>
       </CardContent>

@@ -66,8 +66,8 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
     const authUrl = `${window.location.origin}/tenant/${tenant.slug}/auth`;
     navigator.clipboard.writeText(authUrl);
     toast({
-      title: t("tenant.urlCopied"),
-      description: t("tenant.churchLoginUrlCopied"),
+      title: t("tenant:urlCopied"),
+      description: t("tenant:churchLoginUrlCopied"),
     });
   };
 
@@ -99,16 +99,16 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
           <div className="flex items-center space-x-2">
             <Users className="h-4 w-4" />
             <span>
-              {tenant.memberCount} {t("tenant.members")}
+              {tenant.memberCount} {t("tenant:members")}
             </span>
           </div>
           <p className="text-sm text-muted-foreground mt-2">
-            {t("tenant.created")}: {new Date(tenant.created_at).toLocaleDateString()}
+            {t("tenant:created")}: {new Date(tenant.created_at).toLocaleDateString()}
           </p>
 
           <div className="mt-4 pt-4 border-t">
             <div className="flex items-center justify-between">
-              <h4 className="font-medium mb-2">{t("tenant.subscriptionPlan")}</h4>
+              <h4 className="font-medium mb-2">{t("tenant:subscriptionPlan")}</h4>
               <Button
                 variant="ghost"
                 size="icon"
@@ -122,19 +122,19 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
               <p className="text-sm font-semibold">{tenant.price_tier?.name || "Free"}</p>
               <p className="text-sm text-muted-foreground">
                 ${tenant.price_tier?.price_monthly || 0}
-                {t("tenant.monthlyPrice")}
+                {t("tenant:monthlyPrice")}
               </p>
               <div className="space-y-1">
                 <p className="text-xs">
-                  {t("tenant.membersLimit")}: {tenant.memberCount} /{" "}
+                  {t("tenant:membersLimit")}: {tenant.memberCount} /{" "}
                   {tenant.price_tier?.user_limit || 0}
                 </p>
                 <p className="text-xs">
-                  {t("tenant.groupsLimit")}: {tenant.groupCount || 0} /{" "}
+                  {t("tenant:groupsLimit")}: {tenant.groupCount || 0} /{" "}
                   {tenant.price_tier?.group_limit || 0}
                 </p>
                 <p className="text-xs">
-                  {t("tenant.eventsLimit")}: {tenant.eventCount || 0} /{" "}
+                  {t("tenant:eventsLimit")}: {tenant.eventCount || 0} /{" "}
                   {tenant.price_tier?.event_limit || 0}
                 </p>
               </div>
@@ -142,23 +142,23 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
           </div>
 
           <div className="mt-4 pt-2 border-t">
-            <p className="text-sm font-medium mb-1">{t("tenant.churchLoginPageUrl")}:</p>
+            <p className="text-sm font-medium mb-1">{t("tenant:churchLoginPageUrl")}:</p>
             <div className="flex items-center justify-between">
               <code className="text-xs bg-muted p-1 rounded break-all">
                 {window.location.origin}/tenant/{tenant.slug}/auth
               </code>
               <Button size="sm" variant="ghost" onClick={handleCopyAuthUrl}>
                 <Copy className="h-4 w-4 mr-1" />
-                {t("tenant.copy")}
+                {t("tenant:copy")}
               </Button>
             </div>
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={handleManageTenant}>
-            {t("tenant.goToChurchDashboard")}
+            {t("tenant:goToChurchDashboard")}
           </Button>
-          <Button onClick={handleOpenTenantAuth}>{t("tenant.goToChurchLogin")}</Button>
+          <Button onClick={handleOpenTenantAuth}>{t("tenant:goToChurchLogin")}</Button>
         </CardFooter>
       </Card>
 
@@ -179,10 +179,10 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDelete}
-        title={t("tenant.deleteChurch")}
-        description={t("tenant.deleteChurchConfirm", { tenantName: tenant.name })}
+        title={t("tenant:deleteChurch")}
+        description={t("tenant:deleteChurchConfirm", { tenantName: tenant.name })}
         confirmationText={tenant.slug}
-        confirmationPlaceholder={t("tenant.enterChurchSlug")}
+        confirmationPlaceholder={t("tenant:enterChurchSlug")}
         isLoading={isDeleting}
       />
     </>

@@ -1,0 +1,18 @@
+{
+  "title": "你的個人資料",
+  "description": "更新你的個人資訊",
+  "fullName": "全名",
+  "firstName": "名字",
+  "lastName": "姓氏",
+  "email": "電子郵件地址",
+  "emailNote": "電子郵件無法更改。",
+  "avatarUrl": "頭像 URL",
+  "yourName": "你的名字",
+  "firstName_": "名字",
+  "lastName_": "姓氏",
+  "saveChanges": "儲存變更",
+  "profileUpdated": "個人資料已更新",
+  "profileUpdatedSuccess": "你的個人資料已成功更新。",
+  "profileUpdateError": "更新個人資料時出錯",
+  "profileUpdateErrorDesc": "發生未知錯誤"
+}

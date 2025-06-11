@@ -34,10 +34,10 @@ export function ConfirmDeleteDialog({
 }: ConfirmDeleteDialogProps) {
   const { t } = useTranslation();
 
-  const defaultTitle = title || t("shared.confirmDelete");
-  const defaultDescription = description || t("shared.confirmDeleteDesc");
-  const defaultDestructiveLabel = destructiveActionLabel || t("shared.deleteButton");
-  const defaultCancelLabel = cancelActionLabel || t("shared.cancelButton");
+  const defaultTitle = title || t("shared:confirmDelete");
+  const defaultDescription = description || t("shared:confirmDeleteDesc");
+  const defaultDestructiveLabel = destructiveActionLabel || t("shared:deleteButton");
+  const defaultCancelLabel = cancelActionLabel || t("shared:cancelButton");
 
   const handleConfirm = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -67,7 +67,7 @@ export function ConfirmDeleteDialog({
             disabled={isLoading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isLoading ? t("common.processing") : defaultDestructiveLabel}
+            {isLoading ? t("common:processing") : defaultDestructiveLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

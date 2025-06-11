@@ -62,8 +62,8 @@ export function EditServiceDialog({
       });
 
       toast({
-        title: t("services.serviceTypeUpdated"),
-        description: t("services.serviceTypeUpdatedSuccess"),
+        title: t("services:serviceTypeUpdated"),
+        description: t("services:serviceTypeUpdatedSuccess"),
       });
       onSuccess?.();
       handleDialogClose();
@@ -71,7 +71,7 @@ export function EditServiceDialog({
       console.error("Error updating service:", error);
       toast({
         title: "Error",
-        description: t("services.updateServiceTypeError"),
+        description: t("services:updateServiceTypeError"),
         variant: "destructive",
       });
     } finally {
@@ -94,7 +94,7 @@ export function EditServiceDialog({
     >
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-auto">
         <DialogHeader>
-          <DialogTitle>{t("services.editServiceType")}</DialogTitle>
+          <DialogTitle>{t("services:editServiceType")}</DialogTitle>
         </DialogHeader>
 
         <div className="mt-6">
@@ -115,7 +115,7 @@ export function EditServiceDialog({
             onSubmit={handleSubmit}
             onCancel={handleDialogClose}
             isSubmitting={isSubmitting}
-            submitLabel={t("services.updateServiceType")}
+            submitLabel={t("services:updateServiceType")}
             serviceId={service.id}
             isEditing={true}
           />

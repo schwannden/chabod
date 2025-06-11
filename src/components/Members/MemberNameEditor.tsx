@@ -48,14 +48,14 @@ export function MemberNameEditor({
       <Input
         value={localFirstName}
         onChange={(e) => handleFirstNameChange(e.target.value)}
-        placeholder={t("members.firstName")}
+        placeholder={t("members:firstName")}
         disabled={disabled}
         className="w-full max-w-[150px] text-sm"
       />
       <Input
         value={localLastName}
         onChange={(e) => handleLastNameChange(e.target.value)}
-        placeholder={t("members.lastName")}
+        placeholder={t("members:lastName")}
         disabled={disabled}
         className="w-full max-w-[150px] text-sm"
       />

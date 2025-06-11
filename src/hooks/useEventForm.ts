@@ -39,15 +39,15 @@ export function useEventForm(
 
   // Create schema with translated validation messages
   const eventSchema = z.object({
-    name: z.string().min(1, t("events.eventNameRequired")),
+    name: z.string().min(1, t("events:eventNameRequired")),
     description: z.string().optional(),
     date: z.date({
-      required_error: t("events.eventDateRequired"),
+      required_error: t("events:eventDateRequired"),
     }),
     isFullDay: z.boolean().default(false),
     start_time: z.string().optional(),
     end_time: z.string().optional(),
-    event_link: z.string().url(t("events.validUrlRequired")).optional().or(z.literal("")),
+    event_link: z.string().url(t("events:validUrlRequired")).optional().or(z.literal("")),
     visibility: z.enum(["public", "private"]).default("public"),
     groups: z.array(z.string()).default([]),
   });
@@ -87,8 +87,8 @@ export function useEventForm(
   const onSubmit = async (data: z.infer<typeof eventSchema>) => {
     if (!tenantUuid) {
       toast({
-        title: t("common.error"),
-        description: t("events.tenantIdError"),
+        title: t("common:error"),
+        description: t("events:tenantIdError"),
         variant: "destructive",
       });
       return;
@@ -108,8 +108,8 @@ export function useEventForm(
 
       if (!checkData) {
         toast({
-          title: t("events.limitReached"),
-          description: t("events.limitReachedDescription"),
+          title: t("events:limitReached"),
+          description: t("events:limitReachedDescription"),
           variant: "destructive",
         });
         setIsLoading(false);
@@ -135,7 +135,7 @@ export function useEventForm(
       if (eventError) {
         console.error("Event creation error details:", eventError);
         if (eventError.message.includes("new row violates row-level security policy")) {
-          throw new Error(t("events.eventLimitError"));
+          throw new Error(t("events:eventLimitError"));
         }
         throw eventError;
       }
@@ -153,17 +153,17 @@ export function useEventForm(
       }
 
       toast({
-        title: t("events.eventCreated"),
-        description: t("events.eventCreatedSuccess"),
+        title: t("events:eventCreated"),
+        description: t("events:eventCreatedSuccess"),
       });
 
       form.reset();
       onSuccess();
     } catch (error) {
-      const errorMessage = error?.message || t("common.unknownError");
+      const errorMessage = error?.message || t("common:unknownError");
       console.error("Error creating event:", error);
       toast({
-        title: t("common.error"),
+        title: t("common:error"),
         description: errorMessage,
         variant: "destructive",
       });

@@ -43,7 +43,7 @@ export function JoinTenantSignUpForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!termsAccepted) {
-      setError(t("auth.mustAcceptTerms"));
+      setError(t("auth:mustAcceptTerms"));
       return;
     }
 
@@ -71,7 +71,7 @@ export function JoinTenantSignUpForm({
           signUpError.message.includes("User already registered") ||
           signUpError.message.includes("already been registered")
         ) {
-          setError(t("auth.emailAlreadyRegistered"));
+          setError(t("auth:emailAlreadyRegistered"));
           setShowSignInOption(true);
         } else {
           setError(signUpError.message);
@@ -87,12 +87,12 @@ export function JoinTenantSignUpForm({
           setError(
             associationError instanceof Error
               ? associationError.message
-              : t("auth.cannotJoinChurch", { errorMessage: t("auth.unknownError") }),
+              : t("auth:cannotJoinChurch", { errorMessage: t("auth:unknownError") }),
           );
         }
       }
     } catch {
-      setError(t("auth.unknownError"));
+      setError(t("auth:unknownError"));
     } finally {
       setIsLoading(false);
     }
@@ -111,18 +111,18 @@ export function JoinTenantSignUpForm({
           <Button variant="ghost" size="sm" onClick={onBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <CardTitle className="text-xl">{t("auth.createYourAccount")}</CardTitle>
+          <CardTitle className="text-xl">{t("auth:createYourAccount")}</CardTitle>
         </div>
         <p className="text-sm text-muted-foreground">
-          {t("auth.joinChurchDesc", { tenantName })}
-          {inviteToken && ` ${t("auth.invitedSpecialPermissions")}`}
+          {t("auth:joinChurchDesc", { tenantName })}
+          {inviteToken && ` ${t("auth:invitedSpecialPermissions")}`}
         </p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="firstName">{t("auth.firstName")}</Label>
+              <Label htmlFor="firstName">{t("auth:firstName")}</Label>
               <Input
                 id="firstName"
                 value={formData.firstName}
@@ -132,7 +132,7 @@ export function JoinTenantSignUpForm({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lastName">{t("auth.lastName")}</Label>
+              <Label htmlFor="lastName">{t("auth:lastName")}</Label>
               <Input
                 id="lastName"
                 value={formData.lastName}
@@ -144,7 +144,7 @@ export function JoinTenantSignUpForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">{t("auth.email")}</Label>
+            <Label htmlFor="email">{t("auth:email")}</Label>
             <Input
               id="email"
               type="email"
@@ -156,7 +156,7 @@ export function JoinTenantSignUpForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">{t("auth.password")}</Label>
+            <Label htmlFor="password">{t("auth:password")}</Label>
             <Input
               id="password"
               type="password"
@@ -172,13 +172,13 @@ export function JoinTenantSignUpForm({
               <div className="text-sm text-destructive">{error}</div>
               {showSignInOption && onSwitchToSignIn && (
                 <div className="text-sm text-muted-foreground">
-                  {t("auth.alreadyHaveAccount")}{" "}
+                  {t("auth:alreadyHaveAccount")}{" "}
                   <button
                     type="button"
                     onClick={handleSwitchToSignIn}
                     className="text-primary hover:underline"
                   >
-                    {t("auth.signInToJoin")}
+                    {t("auth:signInToJoin")}
                   </button>
                 </div>
               )}
@@ -188,7 +188,7 @@ export function JoinTenantSignUpForm({
           <TermsOfService accepted={termsAccepted} onChange={setTermsAccepted} />
 
           <Button type="submit" className="w-full" disabled={isLoading || !termsAccepted}>
-            {isLoading ? t("auth.creatingAccount") : t("auth.joinChurch", { tenantName })}
+            {isLoading ? t("auth:creatingAccount") : t("auth:joinChurch", { tenantName })}
           </Button>
         </form>
       </CardContent>

@@ -89,7 +89,7 @@ export default function MembersPage() {
 
   if (isLoading || isDataLoading || isRoleLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">{t("common.loading")}</div>
+      <div className="flex items-center justify-center min-h-screen">{t("common:loading")}</div>
     );
   }
 
@@ -98,10 +98,10 @@ export default function MembersPage() {
       <div className="min-h-screen bg-background flex flex-col">
         <main className="flex-1 container mx-auto px-4 py-8 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-3xl font-bold mb-4">{t("common.tenantNotFound")}</h1>
-            <p className="mb-6">{t("common.tenantNotFoundDesc", { slug })}</p>
+            <h1 className="text-3xl font-bold mb-4">{t("common:tenantNotFound")}</h1>
+            <p className="mb-6">{t("common:tenantNotFoundDesc", { slug })}</p>
             <button onClick={() => navigate("/")} className="text-primary hover:underline">
-              {t("common.returnHome")}
+              {t("common:returnHome")}
             </button>
           </div>
         </main>
@@ -111,16 +111,16 @@ export default function MembersPage() {
 
   return (
     <TenantPageLayout
-      title={t("members.membersTitle")}
-      description={t("members.membersDesc")}
+      title={t("members:membersTitle")}
+      description={t("members:membersDesc")}
       tenantName={tenant?.name || ""}
       tenantSlug={slug || ""}
       isLoading={isLoading || isDataLoading || isRoleLoading}
-      breadcrumbItems={[{ label: t("nav.members") }]}
+      breadcrumbItems={[{ label: t("nav:members") }]}
       action={
         isOwner && (
           <Button onClick={() => setIsInviteDialogOpen(true)}>
-            <UserPlus className="mr-2 h-4 w-4" /> {t("members.inviteMember")}
+            <UserPlus className="mr-2 h-4 w-4" /> {t("members:inviteMember")}
           </Button>
         )
       }

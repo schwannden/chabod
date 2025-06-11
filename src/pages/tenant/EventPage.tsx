@@ -13,8 +13,10 @@ import { useEventFilters } from "@/hooks/useEventFilters";
 import { getTenantGroups } from "@/lib/group-service";
 import { getTenantEvents } from "@/lib/event-service";
 import { CopyEventDialog } from "@/components/Events/CopyEventDialog";
+import { useTranslation } from "react-i18next";
 
 export default function EventPage() {
+  const { t } = useTranslation(["dashboard"]);
   const { slug } = useParams<{ slug: string }>();
   const { user } = useSession();
   const [events, setEvents] = useState<EventWithGroups[]>([]);
@@ -100,7 +102,8 @@ export default function EventPage() {
   return slug ? (
     <GenericEventPage
       slug={slug}
-      title="活動"
+      title={t("dashboard:eventsTitle")}
+      description={t("dashboard:eventsDesc")}
       calendar={<EventCalendar events={events} isLoading={isEventsLoading} />}
       filterBar={
         <EventFilterBar

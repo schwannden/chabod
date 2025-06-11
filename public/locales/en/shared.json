@@ -1,0 +1,16 @@
+{
+  "traditionalChinese": "Traditional Chinese",
+  "monthFormat": "{{year}} {{month}}",
+  "monthsTotal": " Total {{monthsToShow}} months",
+  "confirmDelete": "Confirm Delete",
+  "confirmDeleteDesc": "Are you sure you want to delete this item? This action cannot be undone.",
+  "deleteButton": "Delete",
+  "cancelButton": "Cancel",
+  "highRiskDelete": "High Risk Deletion",
+  "warningCannotUndo": "Warning: This action cannot be undone!",
+  "deleteWarningDesc": "After deletion, all related data will be permanently lost and cannot be recovered.",
+  "enterConfirmationText": "Please enter",
+  "toConfirmDelete": "to confirm deletion:",
+  "enterConfirmationPlaceholder": "Please enter confirmation text",
+  "permanentDelete": "Permanently Delete"
+}

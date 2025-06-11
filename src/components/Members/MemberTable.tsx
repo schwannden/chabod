@@ -46,14 +46,14 @@ export function MemberTable({
       await updateTenantMember(memberId, newRole);
 
       toast({
-        title: t("members.memberRoleUpdated"),
-        description: t("members.memberRoleUpdatedSuccess"),
+        title: t("members:memberRoleUpdated"),
+        description: t("members:memberRoleUpdatedSuccess"),
       });
       onMemberUpdated();
     } catch (error) {
       toast({
-        title: t("members.memberUpdateError"),
-        description: error?.message || t("members.unknownError"),
+        title: t("members:memberUpdateError"),
+        description: error?.message || t("members:unknownError"),
         variant: "destructive",
       });
     } finally {
@@ -67,14 +67,14 @@ export function MemberTable({
     try {
       await deleteTenantMember(memberId);
       toast({
-        title: t("members.memberRemoved"),
-        description: t("members.memberRemovedSuccess"),
+        title: t("members:memberRemoved"),
+        description: t("members:memberRemovedSuccess"),
       });
       onMemberUpdated();
     } catch (error) {
       toast({
-        title: t("members.memberRemoveError"),
-        description: error?.message || t("members.unknownError"),
+        title: t("members:memberRemoveError"),
+        description: error?.message || t("members:unknownError"),
         variant: "destructive",
       });
     } finally {
@@ -114,16 +114,16 @@ export function MemberTable({
       });
 
       toast({
-        title: t("members.memberUpdated"),
-        description: t("members.memberUpdatedSuccess"),
+        title: t("members:memberUpdated"),
+        description: t("members:memberUpdatedSuccess"),
       });
 
       setEditingMemberId(null);
       onMemberUpdated();
     } catch (error) {
       toast({
-        title: t("members.memberUpdateError"),
-        description: error?.message || t("members.unknownError"),
+        title: t("members:memberUpdateError"),
+        description: error?.message || t("members:unknownError"),
         variant: "destructive",
       });
     } finally {
@@ -140,20 +140,20 @@ export function MemberTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t("members.name")}</TableHead>
-            <TableHead>{t("members.firstName")}</TableHead>
-            <TableHead>{t("members.lastName")}</TableHead>
-            <TableHead>{t("members.email")}</TableHead>
-            <TableHead>{t("members.role")}</TableHead>
-            <TableHead>{t("members.joinedAt")}</TableHead>
-            <TableHead className="text-right">{t("members.actions")}</TableHead>
+            <TableHead>{t("members:name")}</TableHead>
+            <TableHead>{t("members:firstName")}</TableHead>
+            <TableHead>{t("members:lastName")}</TableHead>
+            <TableHead>{t("members:email")}</TableHead>
+            <TableHead>{t("members:role")}</TableHead>
+            <TableHead>{t("members:joinedAt")}</TableHead>
+            <TableHead className="text-right">{t("members:actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sortedMembers.length === 0 && (
             <TableRow>
               <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
-                {t("members.noMembersFound")}
+                {t("members:noMembersFound")}
               </TableCell>
             </TableRow>
           )}
@@ -167,7 +167,7 @@ export function MemberTable({
                   <Input
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    placeholder={t("members.firstName")}
+                    placeholder={t("members:firstName")}
                     className="w-full max-w-[150px]"
                   />
                 ) : (
@@ -181,7 +181,7 @@ export function MemberTable({
                     <Input
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      placeholder={t("members.lastName")}
+                      placeholder={t("members:lastName")}
                       className="w-full max-w-[120px]"
                     />
                     <Button
@@ -190,7 +190,7 @@ export function MemberTable({
                       onClick={() => saveNameChanges(member)}
                       disabled={loadingMemberId === member.id}
                     >
-                      {t("common.save")}
+                      {t("common:save")}
                     </Button>
                     <Button
                       variant="ghost"
@@ -198,7 +198,7 @@ export function MemberTable({
                       onClick={cancelEditing}
                       disabled={loadingMemberId === member.id}
                     >
-                      {t("common.cancel")}
+                      {t("common:cancel")}
                     </Button>
                   </div>
                 ) : (

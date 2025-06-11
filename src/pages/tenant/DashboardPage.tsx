@@ -10,7 +10,7 @@ import { getTenantBySlug } from "@/lib/tenant-utils";
 import { Loader2, Users, Calendar, Group, FileText, Handshake } from "lucide-react";
 
 export default function DashboardPage() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["dashboard", "members", "common"]);
   const { slug } = useParams<{ slug: string }>();
   const { user, profile, isLoading } = useSession();
   const navigate = useNavigate();
@@ -61,42 +61,42 @@ export default function DashboardPage() {
 
   const organizationCards = [
     {
-      title: t("members.membersTitle"),
+      title: t("members:membersTitle"),
       icon: Users,
-      description: t("members.membersDesc"),
+      description: t("members:membersDesc"),
       link: `/tenant/${tenant?.slug}/members`,
     },
     {
-      title: t("dashboard.groupsTitle"),
+      title: t("groupsTitle"),
       icon: Group,
-      description: t("dashboard.groupsDesc"),
+      description: t("groupsDesc"),
       link: `/tenant/${tenant?.slug}/groups`,
     },
   ];
 
   const utilityCards = [
     {
-      title: t("dashboard.eventsTitle"),
+      title: t("eventsTitle"),
       icon: Calendar,
-      description: t("dashboard.eventsDesc"),
+      description: t("eventsDesc"),
       link: `/tenant/${tenant?.slug}/events`,
     },
     {
-      title: t("dashboard.resourcesTitle"),
+      title: t("resourcesTitle"),
       icon: FileText,
-      description: t("dashboard.resourcesDesc"),
+      description: t("resourcesDesc"),
       link: `/tenant/${tenant?.slug}/resources`,
     },
     {
-      title: t("dashboard.serviceManagementTitle"),
+      title: t("serviceManagementTitle"),
       icon: Handshake,
-      description: t("dashboard.serviceManagementDesc"),
+      description: t("serviceManagementDesc"),
       link: `/tenant/${tenant?.slug}/services`,
     },
     {
-      title: t("dashboard.serviceScheduleTitle"),
+      title: t("serviceEventTitle"),
       icon: Calendar,
-      description: t("dashboard.serviceScheduleDesc"),
+      description: t("serviceEventDesc"),
       link: `/tenant/${tenant?.slug}/service_events`,
     },
   ];
@@ -105,7 +105,7 @@ export default function DashboardPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">{t("dashboard.loadingText")}</span>
+        <span className="ml-2">{t("loadingText")}</span>
       </div>
     );
   }
@@ -116,10 +116,10 @@ export default function DashboardPage() {
         <NavBar />
         <main className="flex-1 container mx-auto px-4 py-8 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-3xl font-bold mb-4">{t("dashboard.churchNotFound")}</h1>
-            <p className="mb-6">{t("dashboard.churchNotFoundDesc", { slug })}</p>
+            <h1 className="text-3xl font-bold mb-4">{t("churchNotFound")}</h1>
+            <p className="mb-6">{t("churchNotFoundDesc", { slug })}</p>
             <button onClick={() => navigate("/")} className="text-primary hover:underline">
-              {t("dashboard.returnHome")}
+              {t("returnHome")}
             </button>
           </div>
         </main>
@@ -132,17 +132,15 @@ export default function DashboardPage() {
       <NavBar />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold">
-            {t("dashboard.tenantDashboard", { name: tenant?.name })}
-          </h1>
+          <h1 className="text-3xl font-bold">{t("welcome", { tenantName: tenant?.name })}</h1>
           <p className="text-muted-foreground">
-            {t("dashboard.welcomeUser", { name: profile?.full_name || t("dashboard.defaultUser") })}
+            {t("welcomeUser", { name: profile?.full_name || t("defaultUser") })}
           </p>
         </div>
 
         <div className="space-y-8">
           <section>
-            <h2 className="text-2xl font-semibold mb-4">{t("dashboard.organizationManagement")}</h2>
+            <h2 className="text-2xl font-semibold mb-4">{t("organizationManagement")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {organizationCards.map((card) => (
                 <Card
@@ -163,7 +161,7 @@ export default function DashboardPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">{t("dashboard.tools")}</h2>
+            <h2 className="text-2xl font-semibold mb-4">{t("tools")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {utilityCards.map((card) => (
                 <Card

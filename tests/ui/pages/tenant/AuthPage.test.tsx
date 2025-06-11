@@ -76,7 +76,7 @@ describe("AuthPage (Tenant)", () => {
         render(<AuthPage />);
       });
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
     });
 
     it("should show tenant loading state while fetching tenant", async () => {
@@ -91,7 +91,7 @@ describe("AuthPage (Tenant)", () => {
         render(<AuthPage />);
       });
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
       // Check for spinner icon (Loader2 component)
       expect(
         document.querySelector('[data-testid="loader"]') || document.querySelector(".animate-spin"),
@@ -120,8 +120,8 @@ describe("AuthPage (Tenant)", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("common.tenantNotFound")).toBeInTheDocument();
-        expect(screen.getByText("common.tenantNotFoundDesc")).toBeInTheDocument();
+        expect(screen.getByText("common:tenantNotFound")).toBeInTheDocument();
+        expect(screen.getByText("common:tenantNotFoundDesc")).toBeInTheDocument();
       });
     });
 
@@ -136,7 +136,7 @@ describe("AuthPage (Tenant)", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("common.unknownError")).toBeInTheDocument();
+        expect(screen.getByText("common:unknownError")).toBeInTheDocument();
       });
 
       expect(consoleSpy).toHaveBeenCalledWith("Error fetching tenant:", expect.any(Error));
@@ -234,7 +234,7 @@ describe("AuthPage (Tenant)", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
+        expect(screen.getByText("auth:welcomeToChurch")).toBeInTheDocument();
       });
 
       expect(mockNavigate).not.toHaveBeenCalled();
@@ -253,7 +253,7 @@ describe("AuthPage (Tenant)", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
+        expect(screen.getByText("auth:welcomeToChurch")).toBeInTheDocument();
       });
 
       expect(consoleSpy).toHaveBeenCalledWith(
@@ -292,7 +292,7 @@ describe("AuthPage (Tenant)", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
+        expect(screen.getByText("auth:welcomeToChurch")).toBeInTheDocument();
         expect(screen.getByTestId("tenant-auth-flow")).toBeInTheDocument();
       });
     });
@@ -330,8 +330,8 @@ describe("AuthPage (Tenant)", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("common.tenantNotFound")).toBeInTheDocument();
-        expect(screen.getByText("common.returnHome")).toBeInTheDocument();
+        expect(screen.getByText("common:tenantNotFound")).toBeInTheDocument();
+        expect(screen.getByText("common:returnHome")).toBeInTheDocument();
       });
     });
 
@@ -347,10 +347,10 @@ describe("AuthPage (Tenant)", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("common.returnHome")).toBeInTheDocument();
+        expect(screen.getByText("common:returnHome")).toBeInTheDocument();
       });
 
-      const homeLink = screen.getByText("common.returnHome");
+      const homeLink = screen.getByText("common:returnHome");
       await user.click(homeLink);
 
       expect(mockNavigate).toHaveBeenCalledWith("/");
@@ -375,7 +375,7 @@ describe("AuthPage (Tenant)", () => {
         rerender = result.rerender;
       });
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
 
       // Resolve the promise to simulate data loading
       await act(async () => {
@@ -384,7 +384,7 @@ describe("AuthPage (Tenant)", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
+        expect(screen.getByText("auth:welcomeToChurch")).toBeInTheDocument();
       });
     });
 
@@ -398,7 +398,7 @@ describe("AuthPage (Tenant)", () => {
         rerender = result.rerender;
       });
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
 
       // Change to user with access
       (memberService.checkUserTenantAccess as jest.Mock).mockResolvedValue(true);
@@ -442,7 +442,7 @@ describe("AuthPage (Tenant)", () => {
       });
 
       // Should show auth form since user doesn't have access
-      expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
+      expect(screen.getByText("auth:welcomeToChurch")).toBeInTheDocument();
     });
   });
 });

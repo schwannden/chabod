@@ -101,8 +101,8 @@ export default function GroupMembersPage() {
       } catch (error) {
         console.error("Error fetching data:", error);
         toast({
-          title: t("common.error"),
-          description: t("groups.failedToLoadMembers"),
+          title: t("common:error"),
+          description: t("groups:failedToLoadMembers"),
           variant: "destructive",
         });
       } finally {
@@ -122,8 +122,8 @@ export default function GroupMembersPage() {
     try {
       await addUserToGroup(groupId, selectedUserId);
       toast({
-        title: t("common.success"),
-        description: t("groups.memberAdded"),
+        title: t("common:success"),
+        description: t("groups:memberAdded"),
       });
 
       const updatedMembers = await getGroupMembers(groupId);
@@ -137,8 +137,8 @@ export default function GroupMembersPage() {
     } catch (error) {
       console.error("Failed to add member:", error);
       toast({
-        title: t("common.error"),
-        description: t("groups.failedToAddMember"),
+        title: t("common:error"),
+        description: t("groups:failedToAddMember"),
         variant: "destructive",
       });
     } finally {
@@ -151,8 +151,8 @@ export default function GroupMembersPage() {
     try {
       await removeUserFromGroup(memberId);
       toast({
-        title: t("common.success"),
-        description: t("groups.memberRemoved"),
+        title: t("common:success"),
+        description: t("groups:memberRemoved"),
       });
 
       const updatedMembers = await getGroupMembers(groupId!);
@@ -169,8 +169,8 @@ export default function GroupMembersPage() {
     } catch (error) {
       console.error("Failed to remove member:", error);
       toast({
-        title: t("common.error"),
-        description: t("groups.failedToRemoveMember"),
+        title: t("common:error"),
+        description: t("groups:failedToRemoveMember"),
         variant: "destructive",
       });
     } finally {
@@ -180,7 +180,7 @@ export default function GroupMembersPage() {
 
   if (isSessionLoading || isLoading || isRoleLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">{t("common.loading")}</div>
+      <div className="flex items-center justify-center min-h-screen">{t("common:loading")}</div>
     );
   }
 
@@ -195,23 +195,23 @@ export default function GroupMembersPage() {
               tenantSlug={tenant.slug}
               items={[
                 {
-                  label: t("groups.groups"),
+                  label: t("groups:groups"),
                   path: `/tenant/${tenant.slug}/groups`,
                 },
                 {
-                  label: t("groups.members"),
+                  label: t("groups:members"),
                 },
               ]}
             />
 
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-3xl font-bold">{t("groups.groupMembers", { groupName })}</h1>
-                <p className="text-muted-foreground">{t("groups.manageMembersDescription")}</p>
+                <h1 className="text-3xl font-bold">{t("groups:groupMembers", { groupName })}</h1>
+                <p className="text-muted-foreground">{t("groups:manageMembersDescription")}</p>
               </div>
               <div className="flex space-x-2">
                 <Button variant="outline" onClick={() => navigate(`/tenant/${slug}/groups`)}>
-                  {t("groups.backToGroups")}
+                  {t("groups:backToGroups")}
                 </Button>
 
                 {isTenantOwner && (
@@ -219,7 +219,7 @@ export default function GroupMembersPage() {
                     onClick={() => setIsAddMemberOpen(true)}
                     disabled={availableMembers.length === 0}
                   >
-                    {t("groups.addMember")}
+                    {t("groups:addMember")}
                   </Button>
                 )}
               </div>
@@ -229,19 +229,19 @@ export default function GroupMembersPage() {
 
         {members.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            {t("groups.noMembersInGroup")}{" "}
-            {isTenantOwner && availableMembers.length > 0 && t("groups.addMembersToGetStarted")}
-            {isTenantOwner && availableMembers.length === 0 && t("groups.allMembersAlreadyInGroup")}
+            {t("groups:noMembersInGroup")}{" "}
+            {isTenantOwner && availableMembers.length > 0 && t("groups:addMembersToGetStarted")}
+            {isTenantOwner && availableMembers.length === 0 && t("groups:allMembersAlreadyInGroup")}
           </div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t("groups.name")}</TableHead>
-                <TableHead>{t("groups.email")}</TableHead>
-                <TableHead>{t("groups.addedOn")}</TableHead>
+                <TableHead>{t("groups:name")}</TableHead>
+                <TableHead>{t("groups:email")}</TableHead>
+                <TableHead>{t("groups:addedOn")}</TableHead>
                 {isTenantOwner && (
-                  <TableHead className="text-right">{t("groups.actions")}</TableHead>
+                  <TableHead className="text-right">{t("groups:actions")}</TableHead>
                 )}
               </TableRow>
             </TableHeader>
@@ -249,9 +249,9 @@ export default function GroupMembersPage() {
               {members.map((member) => (
                 <TableRow key={member.id}>
                   <TableCell className="font-medium">
-                    {member.profile?.full_name || t("groups.unknown")}
+                    {member.profile?.full_name || t("groups:unknown")}
                   </TableCell>
-                  <TableCell>{member.profile?.email || t("groups.noEmail")}</TableCell>
+                  <TableCell>{member.profile?.email || t("groups:noEmail")}</TableCell>
                   <TableCell>{new Date(member.created_at).toLocaleDateString()}</TableCell>
                   {isTenantOwner && (
                     <TableCell className="text-right">
@@ -262,7 +262,7 @@ export default function GroupMembersPage() {
                         disabled={isSubmitting}
                       >
                         <UserMinus className="h-4 w-4 mr-1" />
-                        {t("groups.remove")}
+                        {t("groups:remove")}
                       </Button>
                     </TableCell>
                   )}
@@ -275,17 +275,17 @@ export default function GroupMembersPage() {
         <Dialog open={isAddMemberOpen} onOpenChange={setIsAddMemberOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{t("groups.addMemberToGroup")}</DialogTitle>
+              <DialogTitle>{t("groups:addMemberToGroup")}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               {availableMembers.length === 0 ? (
-                <p>{t("groups.allMembersAlreadyInGroup")}</p>
+                <p>{t("groups:allMembersAlreadyInGroup")}</p>
               ) : (
                 <div className="space-y-2">
-                  <Label htmlFor="member-select">{t("groups.selectMember")}</Label>
+                  <Label htmlFor="member-select">{t("groups:selectMember")}</Label>
                   <Select value={selectedUserId} onValueChange={setSelectedUserId}>
                     <SelectTrigger id="member-select">
-                      <SelectValue placeholder={t("groups.selectMemberPlaceholder")} />
+                      <SelectValue placeholder={t("groups:selectMemberPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
                       {availableMembers.map((profile) => (
@@ -300,13 +300,13 @@ export default function GroupMembersPage() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsAddMemberOpen(false)}>
-                {t("common.cancel")}
+                {t("common:cancel")}
               </Button>
               <Button
                 onClick={handleAddMember}
                 disabled={isSubmitting || !selectedUserId || availableMembers.length === 0}
               >
-                {isSubmitting ? t("groups.adding") : t("groups.addToGroup")}
+                {isSubmitting ? t("groups:adding") : t("groups:addToGroup")}
               </Button>
             </DialogFooter>
           </DialogContent>

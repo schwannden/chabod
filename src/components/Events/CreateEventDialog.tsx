@@ -80,14 +80,14 @@ export function CreateEventDialog({
       <DialogTrigger asChild>
         {trigger || (
           <Button data-dialog-trigger={dialogId}>
-            {initialValues ? t("events.copyEvent") : t("events.createEvent")}
+            {initialValues ? t("events:copyEvent") : t("events:createEvent")}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader className="sticky top-0 z-10 bg-background pb-4">
           <DialogTitle>
-            {initialValues ? t("events.copyEventTitle") : t("events.createNewEvent")}
+            {initialValues ? t("events:copyEventTitle") : t("events:createNewEvent")}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
@@ -95,14 +95,14 @@ export function CreateEventDialog({
             <EventDetailsFields form={form} groups={allGroups} />
             <div className="sticky bottom-0 pt-2 bg-background flex justify-end gap-2">
               <Button variant="outline" type="button" onClick={() => setOpen(false)}>
-                {t("common.cancel")}
+                {t("common:cancel")}
               </Button>
               <Button type="submit" disabled={isLoading}>
                 {isLoading
-                  ? t("events.creating")
+                  ? t("events:creating")
                   : initialValues
-                    ? t("events.createCopy")
-                    : t("events.createEvent")}
+                    ? t("events:createCopy")
+                    : t("events:createEvent")}
               </Button>
             </div>
           </form>

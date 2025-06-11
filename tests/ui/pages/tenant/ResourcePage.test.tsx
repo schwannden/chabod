@@ -375,8 +375,8 @@ describe("ResourcePage", () => {
       render(<ResourcePage />);
 
       await waitFor(() => {
-        expect(screen.getByTestId("layout-title")).toHaveTextContent("dashboard.resourcesTitle");
-        expect(screen.getByTestId("breadcrumb-0")).toHaveTextContent("dashboard.resourcesTitle");
+        expect(screen.getByTestId("layout-title")).toHaveTextContent("dashboard:resourcesTitle");
+        expect(screen.getByTestId("breadcrumb-0")).toHaveTextContent("dashboard:resourcesTitle");
       });
     });
 
@@ -437,7 +437,7 @@ describe("ResourcePage", () => {
       await waitFor(
         () => {
           const actionElement = screen.getByTestId("layout-action");
-          expect(actionElement).toHaveTextContent("resources.addResource");
+          expect(actionElement).toHaveTextContent("resources:addResource");
         },
         { timeout: 3000 },
       );

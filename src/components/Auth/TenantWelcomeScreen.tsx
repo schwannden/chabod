@@ -26,10 +26,10 @@ export function TenantWelcomeScreen({
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">
           {inviteToken
-            ? t("auth.invitedToJoin", { tenantName })
-            : t("auth.welcomeToChurch", { tenantName })}
+            ? t("auth:invitedToJoin", { tenantName })
+            : t("auth:welcomeToChurch", { tenantName })}
         </CardTitle>
-        {inviteToken && <p className="text-sm text-muted-foreground">{t("auth.invitedDesc")}</p>}
+        {inviteToken && <p className="text-sm text-muted-foreground">{t("auth:invitedDesc")}</p>}
       </CardHeader>
       <CardContent className="space-y-4">
         <Button
@@ -39,8 +39,8 @@ export function TenantWelcomeScreen({
         >
           <UserPlus className="h-5 w-5 mr-3" />
           <div>
-            <div className="font-medium">{t("auth.newToChabod")}</div>
-            <div className="text-sm text-muted-foreground">{t("auth.newToChabodDesc")}</div>
+            <div className="font-medium">{t("auth:newToChabod")}</div>
+            <div className="text-sm text-muted-foreground">{t("auth:newToChabodDesc")}</div>
           </div>
         </Button>
 
@@ -51,8 +51,8 @@ export function TenantWelcomeScreen({
         >
           <LogIn className="h-5 w-5 mr-3" />
           <div>
-            <div className="font-medium">{t("auth.haveAccount")}</div>
-            <div className="text-sm text-muted-foreground">{t("auth.haveAccountDesc")}</div>
+            <div className="font-medium">{t("auth:haveAccount")}</div>
+            <div className="text-sm text-muted-foreground">{t("auth:haveAccountDesc")}</div>
           </div>
         </Button>
 
@@ -63,8 +63,8 @@ export function TenantWelcomeScreen({
         >
           <Users className="h-5 w-5 mr-3" />
           <div>
-            <div className="font-medium">{t("auth.alreadyMember")}</div>
-            <div className="text-sm text-muted-foreground">{t("auth.alreadyMemberDesc")}</div>
+            <div className="font-medium">{t("auth:alreadyMember")}</div>
+            <div className="text-sm text-muted-foreground">{t("auth:alreadyMemberDesc")}</div>
           </div>
         </Button>
       </CardContent>

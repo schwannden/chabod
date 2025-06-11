@@ -87,8 +87,8 @@ export function ServiceEventCreateDialog({
       await createServiceEventWithOwners(eventData, owners);
 
       toast({
-        title: t("common.success"),
-        description: t("serviceEvents.eventCreated"),
+        title: t("common:success"),
+        description: t("serviceEvents:eventCreated"),
       });
 
       onEventCreated();
@@ -96,8 +96,8 @@ export function ServiceEventCreateDialog({
     } catch (error) {
       console.error("Error creating service event:", error);
       toast({
-        title: t("common.error"),
-        description: t("serviceEvents.createEventError"),
+        title: t("common:error"),
+        description: t("serviceEvents:createEventError"),
         variant: "destructive",
       });
     } finally {
@@ -116,12 +116,12 @@ export function ServiceEventCreateDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       {shouldShowTrigger && (
         <DialogTrigger asChild>
-          {trigger || <Button>{t("serviceEvents.createServiceEvent")}</Button>}
+          {trigger || <Button>{t("serviceEvents:createServiceEvent")}</Button>}
         </DialogTrigger>
       )}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{t("serviceEvents.createServiceEventTitle")}</DialogTitle>
+          <DialogTitle>{t("serviceEvents:createServiceEventTitle")}</DialogTitle>
         </DialogHeader>
 
         <ServiceEventForm
@@ -138,7 +138,7 @@ export function ServiceEventCreateDialog({
           setSelectedOwners={setSelectedOwners}
         >
           <div className="space-y-4 mb-4">
-            <div className="text-sm font-medium mb-1">{t("serviceEvents.memberAssignment")}</div>
+            <div className="text-sm font-medium mb-1">{t("serviceEvents:memberAssignment")}</div>
             {selectedServiceId && (
               <ServiceEventOwnerSelect
                 serviceId={selectedServiceId}
@@ -151,10 +151,10 @@ export function ServiceEventCreateDialog({
 
           <DialogFooter className="mt-6">
             <Button type="button" variant="outline" onClick={handleCancel}>
-              {t("common.cancel")}
+              {t("common:cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? t("common.submitting") : t("common.create")}
+              {isSubmitting ? t("common:submitting") : t("common:create")}
             </Button>
           </DialogFooter>
         </ServiceEventForm>

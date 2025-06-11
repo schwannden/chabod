@@ -53,8 +53,8 @@ export function MemberTableActions({
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDelete}
-        title={t("members.removeMember")}
-        description={t("members.removeMemberConfirm", { memberName })}
+        title={t("members:removeMember")}
+        description={t("members:removeMemberConfirm", { memberName })}
         isLoading={isLoading}
       />
     </div>

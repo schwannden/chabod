@@ -44,11 +44,11 @@ export default function AuthPage() {
           setTenant(tenantData);
           setError(null);
         } else {
-          setError(t("common.tenantNotFoundDesc", { slug }));
+          setError(t("common:tenantNotFoundDesc", { slug }));
         }
       } catch (error) {
         console.error("Error fetching tenant:", error);
-        setError(t("common.unknownError"));
+        setError(t("common:unknownError"));
       } finally {
         setIsTenantLoading(false);
       }
@@ -103,7 +103,7 @@ export default function AuthPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">{t("common.loading")}</div>
+      <div className="flex items-center justify-center min-h-screen">{t("common:loading")}</div>
     );
   }
 
@@ -111,7 +111,7 @@ export default function AuthPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">{t("common.loading")}</span>
+        <span className="ml-2">{t("common:loading")}</span>
       </div>
     );
   }
@@ -122,10 +122,10 @@ export default function AuthPage() {
         <NavBar />
         <main className="flex-1 container mx-auto px-4 py-8 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-3xl font-bold mb-4">{t("common.tenantNotFound")}</h1>
+            <h1 className="text-3xl font-bold mb-4">{t("common:tenantNotFound")}</h1>
             <p className="mb-6">{error}</p>
             <button onClick={() => navigate("/")} className="text-primary hover:underline">
-              {t("common.returnHome")}
+              {t("common:returnHome")}
             </button>
           </div>
         </main>
@@ -141,7 +141,7 @@ export default function AuthPage() {
           {tenant && (
             <>
               <h1 className="text-3xl font-bold text-center mb-8">
-                {t("auth.welcomeToChurch", { tenantName: tenant.name })}
+                {t("auth:welcomeToChurch", { tenantName: tenant.name })}
               </h1>
               <TenantAuthFlow
                 tenantSlug={tenant.slug}

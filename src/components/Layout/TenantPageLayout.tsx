@@ -34,7 +34,7 @@ export function TenantPageLayout({
         <main className="flex-1 container mx-auto px-4 py-8">
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="ml-2">{t("common.loading")}</span>
+            <span className="ml-2">{t("common:loading")}</span>
           </div>
         </main>
       </div>

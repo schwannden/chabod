@@ -8,23 +8,23 @@ import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 
 export function NavBar() {
+  const { t } = useTranslation(["nav", "auth"]);
   const { user } = useSession();
   const location = useLocation();
   const { toast } = useToast();
-  const { t } = useTranslation();
 
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
       toast({
-        title: t("auth.loggedOut"),
-        description: t("auth.loggedOutSuccess"),
+        title: t("auth:loggedOut"),
+        description: t("auth:loggedOutSuccess"),
       });
     } catch (error) {
       console.error("Sign out error:", error);
       toast({
-        title: t("auth.logoutError"),
-        description: t("auth.logoutError"),
+        title: t("auth:logoutError"),
+        description: t("auth:logoutError"),
         variant: "destructive",
       });
     }
@@ -97,15 +97,15 @@ export function NavBar() {
                 <Button asChild variant="ghost" size="sm">
                   <Link to="/dashboard">
                     <User className="h-4 w-4 mr-2" />
-                    {t("nav.dashboard")}
+                    {t("dashboard")}
                   </Link>
                 </Button>
                 <Button asChild variant="ghost" size="sm">
-                  <Link to={getProfileDestination()}>{t("nav.profile")}</Link>
+                  <Link to={getProfileDestination()}>{t("profile")}</Link>
                 </Button>
                 <Button variant="ghost" size="sm" onClick={handleSignOut}>
                   <LogOut className="h-4 w-4 mr-2" />
-                  {t("nav.logout")}
+                  {t("logout")}
                 </Button>
               </div>
             ) : (
@@ -116,11 +116,11 @@ export function NavBar() {
                     <Link
                       to={`/auth${location.pathname !== "/" && !location.pathname.startsWith("/auth") ? `?redirect=${encodeURIComponent(location.pathname)}` : ""}`}
                     >
-                      {t("nav.login")}
+                      {t("login")}
                     </Link>
                   </Button>
                   <Button asChild size="sm">
-                    <Link to="/auth?tab=signup">{t("nav.signup")}</Link>
+                    <Link to="/auth?tab=signup">{t("signup")}</Link>
                   </Button>
                 </div>
               )
