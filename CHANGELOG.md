@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.5.0](https://github.com/schwannden/chabod/compare/v0.4.1...v0.5.0) (2025-06-11)
+
+
+### Features
+
+* block existing user registration ([044175e](https://github.com/schwannden/chabod/commit/044175ed61f0e4c0ef6d7ddee9e2f68f63905613))
+* Implement tenant auth flow separation ([8bc7f0b](https://github.com/schwannden/chabod/commit/8bc7f0b50990d4a60d97003a4dbe198194bf6e18))
+* improve duplicate tenant register flow ([97122fd](https://github.com/schwannden/chabod/commit/97122fdd5a4a2c6c7ddd270700fc04a65eff9942))
+* improve navbar behavior on auth page ([528e9a2](https://github.com/schwannden/chabod/commit/528e9a2e0ceb22922351103a80be61c7ab83f52a))
+
+
+### Bug Fixes
+
+* add bread crumb for profile ([#76](https://github.com/schwannden/chabod/issues/76)) ([5d24ff9](https://github.com/schwannden/chabod/commit/5d24ff9d8091a9d210358bcbe13970e0fbe23480))
+* landing page i18n ([#77](https://github.com/schwannden/chabod/issues/77)) ([cddbf25](https://github.com/schwannden/chabod/commit/cddbf2501e020e500752131da25b1f01e4abed57))
+* service creation issue ([#75](https://github.com/schwannden/chabod/issues/75)) ([7cd4a60](https://github.com/schwannden/chabod/commit/7cd4a60f7234bdd53e8b099b32c00be340b2401b))
+
+
+### Refactors
+
+* mockUseSession ([#73](https://github.com/schwannden/chabod/issues/73)) ([a32fa19](https://github.com/schwannden/chabod/commit/a32fa192848371a13ca5d4ce3b933c143416a52f))
+* reduce test size ([ac19b8f](https://github.com/schwannden/chabod/commit/ac19b8ff07b77f236942fdcbb97d3c96227feb95))
+* split translation files ([#74](https://github.com/schwannden/chabod/issues/74)) ([d9171fb](https://github.com/schwannden/chabod/commit/d9171fb35cf20026231a32ecc6abbb76aae5f20d))
+
+
+### Documentation
+
+* updated readme with en and zh-TW ([3764040](https://github.com/schwannden/chabod/commit/37640401c7bf4123f298ae309629706f9e769590))
+
 ## [0.4.1](https://github.com/schwannden/chabod/compare/v0.4.0...v0.4.1) (2025-06-10)
 
 
