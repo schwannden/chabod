@@ -39,6 +39,8 @@ export function SignUpForm({
   const [fullName, setFullName] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showSignInOption, setShowSignInOption] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,6 +49,9 @@ export function SignUpForm({
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setShowSignInOption(false);
+
     if (!termsAccepted) {
       toast({
         title: t("auth.pleaseAgreeToFaith"),
@@ -71,36 +76,7 @@ export function SignUpForm({
     setLoading(true);
 
     try {
-      // First, try to sign in
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      // If user exists, proceed with tenant association
-      if (!signInError && signInData.user) {
-        if (tenantSlug) {
-          try {
-            await associateUserWithTenant(signInData.user.id, tenantSlug, inviteToken);
-            toast({
-              title: t("auth.accountLinkedToChurch"),
-              description: t("auth.accountSuccessfullyJoined", { tenantSlug }),
-            });
-          } catch (associateError) {
-            // Sign out user if tenant association fails
-            await supabase.auth.signOut();
-            const errorMessage = associateError?.message || t("auth.unknownError");
-            throw new Error(t("auth.cannotJoinChurch", { errorMessage }));
-          }
-        }
-
-        if (onSuccess) {
-          onSuccess();
-        }
-        return;
-      }
-
-      // User doesn't exist, sign up the user
+      // Sign up the user
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -112,14 +88,22 @@ export function SignUpForm({
       });
 
       if (error) {
-        // Translate common Supabase error codes to Chinese
+        // Check if it's a "user already registered" error
+        if (
+          error.message.includes("User already registered") ||
+          error.message.includes("already been registered")
+        ) {
+          setError(t("auth.emailAlreadyRegistered"));
+          setShowSignInOption(true);
+          return;
+        }
+
+        // Translate other common Supabase error codes
         let errorMessage = t("auth.unknownError");
         if (error.message?.includes("invalid email")) {
           errorMessage = t("auth.emailFormatIncorrect");
         } else if (error.message?.includes("password")) {
           errorMessage = t("auth.passwordMinLength");
-        } else if (error.message?.includes("User already registered")) {
-          errorMessage = t("auth.emailAlreadyRegistered");
         } else if (error.message) {
           errorMessage = error.message;
         }
@@ -180,6 +164,25 @@ export function SignUpForm({
           </div>
           <AuthEmailInput value={email} onChange={setEmail} disabled={loading} />
           <AuthPasswordInput value={password} onChange={setPassword} required disabled={loading} />
+
+          {error && (
+            <div className="space-y-2">
+              <div className="text-sm text-destructive">{error}</div>
+              {showSignInOption && (
+                <div className="text-sm text-muted-foreground">
+                  {t("auth.alreadyHaveAccount")}{" "}
+                  <button
+                    type="button"
+                    onClick={onSignInClick}
+                    className="text-primary hover:underline"
+                  >
+                    {t("auth.signInToJoin")}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           <TermsOfService accepted={termsAccepted} onChange={setTermsAccepted} />
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? t("auth.creatingAccount") : t("auth.createAccount")}
