@@ -185,6 +185,7 @@
     "enterEmailAddress": "Enter your email address",
     "continue": "Continue",
     "checking": "Checking...",
+    "emailCheckFailed": "Failed to check email. Please try again.",
     "createYourAccount": "Create your account",
     "joinChurchDesc": "Join {{tenantName}} by creating your Chabod account.",
     "invitedSpecialPermissions": "You'll get special permissions as invited.",

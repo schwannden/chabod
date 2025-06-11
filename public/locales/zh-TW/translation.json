@@ -185,6 +185,7 @@
     "enterEmailAddress": "輸入您的電子郵件地址",
     "continue": "繼續",
     "checking": "檢查中...",
+    "emailCheckFailed": "檢查電子郵件失敗，請重試。",
     "createYourAccount": "建立您的帳號",
     "joinChurchDesc": "透過建立 Chabod 帳號加入 {{tenantName}}。",
     "invitedSpecialPermissions": "您將作為受邀者獲得特殊權限。",

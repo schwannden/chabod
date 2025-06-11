@@ -1,5 +1,4 @@
-
-import { useTenantAuthFlow } from "@/hooks/useTenantAuthFlow";
+import { useTenantAuthFlow, AuthFlowStep } from "@/hooks/useTenantAuthFlow";
 import { TenantWelcomeScreen } from "./TenantWelcomeScreen";
 import { EmailDetectionForm } from "./EmailDetectionForm";
 import { JoinTenantSignUpForm } from "./JoinTenantSignUpForm";
@@ -11,6 +10,9 @@ interface TenantAuthFlowProps {
   tenantName: string;
   inviteToken?: string;
   onSuccess: () => void;
+  initialStep?: AuthFlowStep;
+  prefilledEmail?: string;
+  onFlowChange?: (step: AuthFlowStep, email?: string) => void;
 }
 
 export function TenantAuthFlow({
@@ -18,25 +20,32 @@ export function TenantAuthFlow({
   tenantName,
   inviteToken,
   onSuccess,
+  initialStep = "welcome",
+  prefilledEmail,
+  onFlowChange,
 }: TenantAuthFlowProps) {
-  const {
-    currentStep,
-    detectedEmail,
-    isLoading,
-    error,
-    setStep,
-    checkEmailExists,
-    reset,
-  } = useTenantAuthFlow();
+  const { currentStep, detectedEmail, isLoading, error, setStep, checkEmailExists, reset } =
+    useTenantAuthFlow(initialStep, prefilledEmail);
+
+  const handleStepChange = (step: AuthFlowStep, email?: string) => {
+    setStep(step);
+    if (onFlowChange) {
+      onFlowChange(step, email);
+    }
+  };
+
+  const handleReset = () => {
+    reset();
+    if (onFlowChange) {
+      onFlowChange("welcome");
+    }
+  };
 
   const handleEmailCheck = async (email: string) => {
     const emailExists = await checkEmailExists(email);
-    
-    if (emailExists) {
-      setStep("join-signin");
-    } else {
-      setStep("signup");
-    }
+
+    const nextStep = emailExists ? "join-signin" : "signup";
+    handleStepChange(nextStep, email);
   };
 
   switch (currentStep) {
@@ -45,9 +54,9 @@ export function TenantAuthFlow({
         <TenantWelcomeScreen
           tenantName={tenantName}
           inviteToken={inviteToken}
-          onNewUser={() => setStep("signup")}
-          onExistingUser={() => setStep("email-detection")}
-          onMemberSignIn={() => setStep("signin")}
+          onNewUser={() => handleStepChange("signup")}
+          onExistingUser={() => handleStepChange("email-detection")}
+          onMemberSignIn={() => handleStepChange("signin")}
         />
       );
 
@@ -55,7 +64,7 @@ export function TenantAuthFlow({
       return (
         <EmailDetectionForm
           tenantName={tenantName}
-          onBack={reset}
+          onBack={handleReset}
           onEmailChecked={handleEmailCheck}
           isLoading={isLoading}
           error={error}
@@ -68,9 +77,10 @@ export function TenantAuthFlow({
           tenantName={tenantName}
           tenantSlug={tenantSlug}
           inviteToken={inviteToken}
-          onBack={reset}
+          onBack={handleReset}
           onSuccess={onSuccess}
-          prefilledEmail={detectedEmail || undefined}
+          prefilledEmail={detectedEmail || prefilledEmail || undefined}
+          onSwitchToSignIn={(email: string) => handleStepChange("join-signin", email)}
         />
       );
 
@@ -80,19 +90,15 @@ export function TenantAuthFlow({
           tenantName={tenantName}
           tenantSlug={tenantSlug}
           inviteToken={inviteToken}
-          onBack={reset}
+          onBack={handleReset}
           onSuccess={onSuccess}
-          prefilledEmail={detectedEmail || undefined}
+          prefilledEmail={detectedEmail || prefilledEmail || undefined}
         />
       );
 
     case "signin":
       return (
-        <MemberSignInForm
-          tenantName={tenantName}
-          onBack={reset}
-          onSuccess={onSuccess}
-        />
+        <MemberSignInForm tenantName={tenantName} onBack={handleReset} onSuccess={onSuccess} />
       );
 
     default:

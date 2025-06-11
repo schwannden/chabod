@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams, useLocation } from "react-router-dom";
 import { TenantAuthFlow } from "@/components/Auth/TenantAuthFlow";
 import { NavBar } from "@/components/Layout/NavBar";
 import { useSession } from "@/hooks/useSession";
@@ -9,16 +8,23 @@ import { Tenant } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { checkUserTenantAccess } from "@/lib/member-service";
 import { useTranslation } from "react-i18next";
+import { AuthFlowStep } from "@/hooks/useTenantAuthFlow";
 
 export default function AuthPage() {
   const { slug } = useParams<{ slug: string }>();
   const { user, isLoading } = useSession();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [isTenantLoading, setIsTenantLoading] = useState(true);
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
+
+  // Get the flow step from URL query parameter
+  const flowStep = searchParams.get("flow") as AuthFlowStep | null;
+  const prefilledEmail = searchParams.get("email");
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -75,6 +81,26 @@ export default function AuthPage() {
     navigate(`/tenant/${slug}`);
   };
 
+  const handleFlowChange = (step: AuthFlowStep, email?: string) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+
+    if (step === "welcome") {
+      newSearchParams.delete("flow");
+      newSearchParams.delete("email");
+    } else {
+      newSearchParams.set("flow", step);
+      if (email) {
+        newSearchParams.set("email", email);
+      } else if (!email && newSearchParams.has("email")) {
+        newSearchParams.delete("email");
+      }
+    }
+
+    // Keep existing parameters like token
+    const newUrl = `${location.pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ""}`;
+    navigate(newUrl, { replace: true });
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">{t("common.loading")}</div>
@@ -114,12 +140,17 @@ export default function AuthPage() {
         <div className="max-w-md mx-auto mt-8">
           {tenant && (
             <>
-              <h1 className="text-3xl font-bold text-center mb-8">{t("auth.welcomeToChurch", { tenantName: tenant.name })}</h1>
+              <h1 className="text-3xl font-bold text-center mb-8">
+                {t("auth.welcomeToChurch", { tenantName: tenant.name })}
+              </h1>
               <TenantAuthFlow
                 tenantSlug={tenant.slug}
                 tenantName={tenant.name}
                 inviteToken={inviteToken || undefined}
                 onSuccess={handleAuthSuccess}
+                initialStep={flowStep || "welcome"}
+                prefilledEmail={prefilledEmail || undefined}
+                onFlowChange={handleFlowChange}
               />
             </>
           )}

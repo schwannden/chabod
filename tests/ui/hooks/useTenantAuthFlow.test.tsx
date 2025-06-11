@@ -220,7 +220,7 @@ describe("useTenantAuthFlow", () => {
       });
 
       expect(emailExists).toBe(false);
-      expect(result.current.error).toBe("Failed to check email. Please try again.");
+      expect(result.current.error).toBe("EMAIL_CHECK_FAILED");
       expect(result.current.isLoading).toBe(false);
     });
 

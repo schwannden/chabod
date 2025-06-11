@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,7 @@ import { useTranslation } from "react-i18next";
 interface EmailDetectionFormProps {
   tenantName: string;
   onBack: () => void;
-  onEmailChecked: (email: string, exists: boolean) => void;
+  onEmailChecked: (email: string) => void;
   isLoading: boolean;
   error: string | null;
 }
@@ -28,8 +27,20 @@ export function EmailDetectionForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
-    
-    onEmailChecked(email, false); // The parent will handle the actual checking
+
+    onEmailChecked(email);
+  };
+
+  // Translate error messages
+  const getErrorMessage = (errorCode: string | null) => {
+    if (!errorCode) return null;
+
+    switch (errorCode) {
+      case "EMAIL_CHECK_FAILED":
+        return t("auth.emailCheckFailed");
+      default:
+        return errorCode; // Return original error if not recognized
+    }
   };
 
   return (
@@ -41,9 +52,7 @@ export function EmailDetectionForm({
           </Button>
           <CardTitle className="text-xl">{t("auth.whatsYourEmail")}</CardTitle>
         </div>
-        <p className="text-sm text-muted-foreground">
-          {t("auth.emailCheckDesc", { tenantName })}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("auth.emailCheckDesc", { tenantName })}</p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -59,10 +68,8 @@ export function EmailDetectionForm({
               disabled={isLoading}
             />
           </div>
-          
-          {error && (
-            <div className="text-sm text-destructive">{error}</div>
-          )}
+
+          {error && <div className="text-sm text-destructive">{getErrorMessage(error)}</div>}
 
           <Button type="submit" className="w-full" disabled={isLoading || !email.trim()}>
             {isLoading ? t("auth.checking") : t("auth.continue")}

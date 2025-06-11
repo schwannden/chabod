@@ -16,6 +16,7 @@ interface JoinTenantSignUpFormProps {
   onBack: () => void;
   onSuccess: () => void;
   prefilledEmail?: string;
+  onSwitchToSignIn?: (email: string) => void;
 }
 
 export function JoinTenantSignUpForm({
@@ -25,6 +26,7 @@ export function JoinTenantSignUpForm({
   onBack,
   onSuccess,
   prefilledEmail,
+  onSwitchToSignIn,
 }: JoinTenantSignUpFormProps) {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -35,6 +37,7 @@ export function JoinTenantSignUpForm({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showSignInOption, setShowSignInOption] = useState(false);
   const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,6 +49,7 @@ export function JoinTenantSignUpForm({
 
     setIsLoading(true);
     setError(null);
+    setShowSignInOption(false);
 
     try {
       const { data, error: signUpError } = await supabase.auth.signUp({
@@ -62,7 +66,16 @@ export function JoinTenantSignUpForm({
       });
 
       if (signUpError) {
-        setError(signUpError.message);
+        // Check if it's a "user already registered" error
+        if (
+          signUpError.message.includes("User already registered") ||
+          signUpError.message.includes("already been registered")
+        ) {
+          setError(t("auth.emailAlreadyRegistered"));
+          setShowSignInOption(true);
+        } else {
+          setError(signUpError.message);
+        }
         return;
       }
 
@@ -74,7 +87,7 @@ export function JoinTenantSignUpForm({
           setError(
             associationError instanceof Error
               ? associationError.message
-              : t("auth.cannotJoinChurch", { errorMessage: "Unknown error" }),
+              : t("auth.cannotJoinChurch", { errorMessage: t("auth.unknownError") }),
           );
         }
       }
@@ -82,6 +95,12 @@ export function JoinTenantSignUpForm({
       setError(t("auth.unknownError"));
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSwitchToSignIn = () => {
+    if (onSwitchToSignIn) {
+      onSwitchToSignIn(formData.email);
     }
   };
 
@@ -148,7 +167,23 @@ export function JoinTenantSignUpForm({
             />
           </div>
 
-          {error && <div className="text-sm text-destructive">{error}</div>}
+          {error && (
+            <div className="space-y-2">
+              <div className="text-sm text-destructive">{error}</div>
+              {showSignInOption && onSwitchToSignIn && (
+                <div className="text-sm text-muted-foreground">
+                  {t("auth.alreadyHaveAccount")}{" "}
+                  <button
+                    type="button"
+                    onClick={handleSwitchToSignIn}
+                    className="text-primary hover:underline"
+                  >
+                    {t("auth.signInToJoin")}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           <TermsOfService accepted={termsAccepted} onChange={setTermsAccepted} />
 

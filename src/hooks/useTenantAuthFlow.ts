@@ -10,10 +10,10 @@ export interface TenantAuthFlowState {
   error: string | null;
 }
 
-export function useTenantAuthFlow() {
+export function useTenantAuthFlow(initialStep: AuthFlowStep = "welcome", initialEmail?: string) {
   const [state, setState] = useState<TenantAuthFlowState>({
-    currentStep: "welcome",
-    detectedEmail: null,
+    currentStep: initialStep,
+    detectedEmail: initialEmail || null,
     isLoading: false,
     error: null,
   });
@@ -55,7 +55,7 @@ export function useTenantAuthFlow() {
       // Other errors typically mean email doesn't exist
       return false;
     } catch {
-      setError("Failed to check email. Please try again.");
+      setError("EMAIL_CHECK_FAILED");
       return false;
     }
   };
