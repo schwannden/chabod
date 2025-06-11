@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/schwannden/chabod/compare/v0.5.0...v0.5.1) (2025-06-11)
+
+
+### Bug Fixes
+
+* broken announcement ([dcfc42e](https://github.com/schwannden/chabod/commit/dcfc42e1e95a3423c7e4c81dab4d718c8df65a44))
+
 ## [0.5.0](https://github.com/schwannden/chabod/compare/v0.4.1...v0.5.0) (2025-06-11)
 
 
