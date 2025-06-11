@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
-const ANNOUNCEMENT_PREFIX = "announcements";
 const STORAGE_PREFIX = "chabod-announcement-dismissed";
 const EXPIRATION_DAYS = 60;
 
@@ -41,19 +40,18 @@ export function useAnnouncement() {
     if (!ready) return [];
 
     try {
-      // Get current language resources
-      const store = i18n.getResourceBundle(i18n.language, "translation");
+      // Get current language resources from the announcements namespace
+      const store = i18n.getResourceBundle(i18n.language, "announcements");
 
-      if (!store || !store[ANNOUNCEMENT_PREFIX]) {
+      if (!store) {
         return [];
       }
 
       const announcements: Announcement[] = [];
-      const announcementKeys = store[ANNOUNCEMENT_PREFIX];
 
-      // Scan for announcement objects
-      Object.keys(announcementKeys).forEach((key) => {
-        const announcement = announcementKeys[key];
+      // Scan for announcement objects directly in the store
+      Object.keys(store).forEach((key) => {
+        const announcement = store[key];
 
         // Check if this is a valid announcement object with required fields
         if (typeof announcement === "object" && announcement.title && announcement.message) {

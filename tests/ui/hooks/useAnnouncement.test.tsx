@@ -35,17 +35,20 @@ describe("useAnnouncement", () => {
     ready: true,
     i18n: {
       language: "en",
-      getResourceBundle: () => ({
-        announcements: {
-          testAnnouncement: {
-            title: "Test Title",
-            message: "Test Message",
-            icon: "warning",
-            dontShowAgain: "Don't show again",
-            understood: "Got it",
-          },
-        },
-      }),
+      getResourceBundle: (lang: string, namespace: string) => {
+        if (namespace === "announcements") {
+          return {
+            testAnnouncement: {
+              title: "Test Title",
+              message: "Test Message",
+              icon: "warning",
+              dontShowAgain: "Don't show again",
+              understood: "Got it",
+            },
+          };
+        }
+        return null;
+      },
     },
   };
 
@@ -210,7 +213,7 @@ describe("useAnnouncement", () => {
       ...defaultMockTranslation,
       i18n: {
         language: "en",
-        getResourceBundle: () => {
+        getResourceBundle: (lang: string, namespace: string) => {
           throw new Error("Resource bundle error");
         },
       },
@@ -230,18 +233,21 @@ describe("useAnnouncement", () => {
       ...defaultMockTranslation,
       i18n: {
         language: "en",
-        getResourceBundle: () => ({
-          announcements: {
-            invalidAnnouncement: {
-              icon: "warning",
-              // Missing title and message - should be ignored
-            },
-            validAnnouncement: {
-              title: "Valid Title",
-              message: "Valid Message",
-            },
-          },
-        }),
+        getResourceBundle: (lang: string, namespace: string) => {
+          if (namespace === "announcements") {
+            return {
+              invalidAnnouncement: {
+                icon: "warning",
+                // Missing title and message - should be ignored
+              },
+              validAnnouncement: {
+                title: "Valid Title",
+                message: "Valid Message",
+              },
+            };
+          }
+          return null;
+        },
       },
     });
 
@@ -268,7 +274,12 @@ describe("useAnnouncement", () => {
       ...defaultMockTranslation,
       i18n: {
         language: "en",
-        getResourceBundle: () => ({}),
+        getResourceBundle: (lang: string, namespace: string) => {
+          if (namespace === "announcements") {
+            return {};
+          }
+          return null;
+        },
       },
     });
 
