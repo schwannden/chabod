@@ -65,6 +65,20 @@ export function NavBar() {
     return "/profile";
   };
 
+  // Check if we're on an auth page (main auth or tenant auth)
+  const isOnAuthPage = () => {
+    const currentPath = location.pathname;
+    // Main auth page
+    if (currentPath === "/auth") {
+      return true;
+    }
+    // Tenant auth pages: /tenant/{slug}/auth
+    if (currentPath.match(/^\/tenant\/[^/]+\/auth$/)) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <nav className="border-b bg-background">
       <div className="container mx-auto px-4">
@@ -95,18 +109,21 @@ export function NavBar() {
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
-                <Button asChild variant="ghost" size="sm">
-                  <Link
-                    to={`/auth${location.pathname !== "/" && !location.pathname.startsWith("/auth") ? `?redirect=${encodeURIComponent(location.pathname)}` : ""}`}
-                  >
-                    {t("nav.login")}
-                  </Link>
-                </Button>
-                <Button asChild size="sm">
-                  <Link to="/auth?tab=signup">{t("nav.signup")}</Link>
-                </Button>
-              </div>
+              // Only show login/register buttons if not on auth pages
+              !isOnAuthPage() && (
+                <div className="flex items-center space-x-2">
+                  <Button asChild variant="ghost" size="sm">
+                    <Link
+                      to={`/auth${location.pathname !== "/" && !location.pathname.startsWith("/auth") ? `?redirect=${encodeURIComponent(location.pathname)}` : ""}`}
+                    >
+                      {t("nav.login")}
+                    </Link>
+                  </Button>
+                  <Button asChild size="sm">
+                    <Link to="/auth?tab=signup">{t("nav.signup")}</Link>
+                  </Button>
+                </div>
+              )
             )}
           </div>
         </div>

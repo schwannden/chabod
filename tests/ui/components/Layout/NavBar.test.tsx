@@ -51,7 +51,7 @@ describe("NavBar", () => {
   });
 
   describe("Rendering", () => {
-    it("should render with unauthenticated user", () => {
+    it("should render with unauthenticated user on non-auth pages", () => {
       mockUseSessionHelpers.unauthenticated();
 
       render(<NavBar />);
@@ -71,6 +71,72 @@ describe("NavBar", () => {
       expect(screen.getByText("nav.dashboard")).toBeInTheDocument();
       expect(screen.getByText("nav.profile")).toBeInTheDocument();
       expect(screen.getByText("nav.logout")).toBeInTheDocument();
+    });
+  });
+
+  describe("Auth Page Detection", () => {
+    beforeEach(() => {
+      mockUseSessionHelpers.unauthenticated();
+    });
+
+    it("should hide login/register buttons on main auth page", () => {
+      mockLocation.pathname = "/auth";
+      render(<NavBar />);
+
+      expect(screen.getByText("Chabod")).toBeInTheDocument();
+      expect(screen.getByTestId("language-switcher")).toBeInTheDocument();
+      expect(screen.queryByText("nav.login")).not.toBeInTheDocument();
+      expect(screen.queryByText("nav.signup")).not.toBeInTheDocument();
+    });
+
+    it("should hide login/register buttons on tenant auth page", () => {
+      mockLocation.pathname = "/tenant/my-church/auth";
+      render(<NavBar />);
+
+      expect(screen.getByText("Chabod")).toBeInTheDocument();
+      expect(screen.getByTestId("language-switcher")).toBeInTheDocument();
+      expect(screen.queryByText("nav.login")).not.toBeInTheDocument();
+      expect(screen.queryByText("nav.signup")).not.toBeInTheDocument();
+    });
+
+    it("should show login/register buttons on non-auth pages", () => {
+      mockLocation.pathname = "/dashboard";
+      render(<NavBar />);
+
+      expect(screen.getByText("nav.login")).toBeInTheDocument();
+      expect(screen.getByText("nav.signup")).toBeInTheDocument();
+    });
+
+    it("should show login/register buttons on tenant non-auth pages", () => {
+      mockLocation.pathname = "/tenant/my-church";
+      render(<NavBar />);
+
+      expect(screen.getByText("nav.login")).toBeInTheDocument();
+      expect(screen.getByText("nav.signup")).toBeInTheDocument();
+    });
+
+    it("should show login/register buttons on tenant members page", () => {
+      mockLocation.pathname = "/tenant/my-church/members";
+      render(<NavBar />);
+
+      expect(screen.getByText("nav.login")).toBeInTheDocument();
+      expect(screen.getByText("nav.signup")).toBeInTheDocument();
+    });
+
+    it("should not match partial auth paths", () => {
+      mockLocation.pathname = "/tenant/my-church/auth/extra";
+      render(<NavBar />);
+
+      expect(screen.getByText("nav.login")).toBeInTheDocument();
+      expect(screen.getByText("nav.signup")).toBeInTheDocument();
+    });
+
+    it("should not match auth in tenant slug", () => {
+      mockLocation.pathname = "/tenant/auth-church";
+      render(<NavBar />);
+
+      expect(screen.getByText("nav.login")).toBeInTheDocument();
+      expect(screen.getByText("nav.signup")).toBeInTheDocument();
     });
   });
 
@@ -150,6 +216,14 @@ describe("NavBar", () => {
       const logoLink = screen.getByText("Chabod").closest("a");
       expect(logoLink).toHaveAttribute("href", "/");
     });
+
+    it("should link to tenant dashboard when on tenant auth page", () => {
+      mockLocation.pathname = "/tenant/my-church/auth";
+      render(<NavBar />);
+
+      const logoLink = screen.getByText("Chabod").closest("a");
+      expect(logoLink).toHaveAttribute("href", "/tenant/my-church");
+    });
   });
 
   describe("User Authentication Actions", () => {
@@ -194,10 +268,12 @@ describe("NavBar", () => {
   });
 
   describe("Navigation Links", () => {
-    it("should render correct login link with redirect when not on root", () => {
-      mockLocation.pathname = "/some-path";
+    beforeEach(() => {
       mockUseSessionHelpers.unauthenticated();
+    });
 
+    it("should render correct login link with redirect when not on root or auth page", () => {
+      mockLocation.pathname = "/some-path";
       render(<NavBar />);
 
       const loginLink = screen.getByText("nav.login").closest("a");
@@ -206,12 +282,24 @@ describe("NavBar", () => {
 
     it("should render correct login link without redirect on root", () => {
       mockLocation.pathname = "/";
-      mockUseSessionHelpers.unauthenticated();
-
       render(<NavBar />);
 
       const loginLink = screen.getByText("nav.login").closest("a");
       expect(loginLink).toHaveAttribute("href", "/auth");
+    });
+
+    it("should not render login link on auth page", () => {
+      mockLocation.pathname = "/auth";
+      render(<NavBar />);
+
+      expect(screen.queryByText("nav.login")).not.toBeInTheDocument();
+    });
+
+    it("should not render login link on tenant auth page", () => {
+      mockLocation.pathname = "/tenant/my-church/auth";
+      render(<NavBar />);
+
+      expect(screen.queryByText("nav.login")).not.toBeInTheDocument();
     });
   });
 });
