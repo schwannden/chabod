@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSession } from "@/hooks/useSession";
 import { NavBar } from "@/components/Layout/NavBar";
+import { TenantBreadcrumb } from "@/components/Layout/TenantBreadcrumb";
 import { getTenantBySlug } from "@/lib/tenant-utils";
 import { ProfileForm } from "@/components/Profile/ProfileForm";
 import { Tenant, Profile } from "@/lib/types";
@@ -99,6 +100,16 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <NavBar />
+      {/* Show breadcrumb only for tenant profile pages */}
+      {slug && tenant && (
+        <div className="container mx-auto px-4 py-4">
+          <TenantBreadcrumb
+            tenantName={tenant.name}
+            tenantSlug={tenant.slug}
+            items={[{ label: "個人資料" }]}
+          />
+        </div>
+      )}
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold">你的個人資料</h1>
