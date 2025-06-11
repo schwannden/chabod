@@ -41,6 +41,23 @@ jest.mock("@/components/Layout/NavBar", () => ({
   NavBar: () => <nav data-testid="navbar">NavBar</nav>,
 }));
 
+// Mock TenantBreadcrumb
+jest.mock("@/components/Layout/TenantBreadcrumb", () => ({
+  TenantBreadcrumb: ({ tenantName, tenantSlug, items }: any) => (
+    <nav data-testid="tenant-breadcrumb">
+      <span data-testid="breadcrumb-tenant-name">{tenantName}</span>
+      <span data-testid="breadcrumb-tenant-slug">{tenantSlug}</span>
+      <div data-testid="breadcrumb-items">
+        {items.map((item: any, index: number) => (
+          <span key={index} data-testid={`breadcrumb-item-${index}`}>
+            {item.label}
+          </span>
+        ))}
+      </div>
+    </nav>
+  ),
+}));
+
 // Mock react-router-dom
 const mockNavigate = jest.fn();
 const mockParams = { slug: undefined };
@@ -95,6 +112,17 @@ describe("ProfilePage", () => {
         expect(screen.getByTestId("profile-form")).toBeInTheDocument();
         expect(screen.getByTestId("profile-name")).toHaveTextContent("John Doe");
       });
+    });
+
+    it("should not show breadcrumb for regular profile page", async () => {
+      mockUseSessionHelpers.withProfile(testProfile);
+
+      await act(async () => {
+        render(<ProfilePage />);
+      });
+
+      // Should not render breadcrumb for non-tenant profile page
+      expect(screen.queryByTestId("tenant-breadcrumb")).not.toBeInTheDocument();
     });
 
     it("should redirect to auth when user is not authenticated", async () => {
@@ -183,6 +211,55 @@ describe("ProfilePage", () => {
       expect(mockGetTenantBySlug).toHaveBeenCalledWith("test-church");
     });
 
+    it("should show breadcrumb for tenant profile page when tenant is loaded", async () => {
+      mockUseSessionHelpers.withProfile(testProfile);
+      mockGetTenantBySlug.mockResolvedValue(mockTenant);
+
+      await act(async () => {
+        render(<ProfilePage />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("tenant-breadcrumb")).toBeInTheDocument();
+        expect(screen.getByTestId("breadcrumb-tenant-name")).toHaveTextContent("Test Church");
+        expect(screen.getByTestId("breadcrumb-tenant-slug")).toHaveTextContent("test-church");
+        expect(screen.getByTestId("breadcrumb-item-0")).toHaveTextContent("個人資料");
+      });
+    });
+
+    it("should not show breadcrumb when tenant is not loaded", async () => {
+      mockUseSessionHelpers.withProfile(testProfile);
+      mockGetTenantBySlug.mockResolvedValue(null);
+
+      await act(async () => {
+        render(<ProfilePage />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText("找不到租戶")).toBeInTheDocument();
+      });
+
+      // Should not render breadcrumb when tenant is not found
+      expect(screen.queryByTestId("tenant-breadcrumb")).not.toBeInTheDocument();
+    });
+
+    it("should not show breadcrumb while tenant is loading", async () => {
+      mockUseSessionHelpers.withProfile(testProfile);
+
+      // Mock a pending promise to simulate loading state
+      mockGetTenantBySlug.mockImplementation(() => new Promise(() => {}));
+
+      await act(async () => {
+        render(<ProfilePage />);
+      });
+
+      // Should show loading state
+      expect(screen.getByText("載入中...")).toBeInTheDocument();
+
+      // Should not render breadcrumb while loading
+      expect(screen.queryByTestId("tenant-breadcrumb")).not.toBeInTheDocument();
+    });
+
     it("should redirect to tenant auth when user is not authenticated", async () => {
       mockUseSessionHelpers.unauthenticated();
 
@@ -223,19 +300,6 @@ describe("ProfilePage", () => {
       await waitFor(() => {
         expect(screen.getByText("找不到租戶")).toBeInTheDocument();
       });
-    });
-
-    it("should show loading state while tenant is loading", async () => {
-      mockUseSessionHelpers.loading();
-
-      // Don't resolve the promise immediately
-      mockGetTenantBySlug.mockImplementation(() => new Promise(() => {}));
-
-      await act(async () => {
-        render(<ProfilePage />);
-      });
-
-      expect(screen.getByText("載入中...")).toBeInTheDocument();
     });
 
     it("should navigate to home when clicking return home button", async () => {
@@ -384,6 +448,170 @@ describe("ProfilePage", () => {
 
       // Should not navigate anywhere when rendering in tenant context
       expect(mockNavigate).not.toHaveBeenCalledWith("/");
+    });
+  });
+
+  describe("Breadcrumb Behavior", () => {
+    describe("Regular Profile Page", () => {
+      beforeEach(() => {
+        mockParams.slug = undefined;
+      });
+
+      it("should never show breadcrumb on regular profile page", async () => {
+        mockUseSessionHelpers.withProfile(testProfile);
+
+        await act(async () => {
+          render(<ProfilePage />);
+        });
+
+        expect(screen.queryByTestId("tenant-breadcrumb")).not.toBeInTheDocument();
+      });
+
+      it("should not show breadcrumb even when user is loading", async () => {
+        mockUseSessionHelpers.loading();
+
+        await act(async () => {
+          render(<ProfilePage />);
+        });
+
+        expect(screen.queryByTestId("tenant-breadcrumb")).not.toBeInTheDocument();
+      });
+    });
+
+    describe("Tenant Profile Page", () => {
+      beforeEach(() => {
+        mockParams.slug = "test-church";
+      });
+
+      it("should show breadcrumb with correct tenant data", async () => {
+        mockUseSessionHelpers.withProfile(testProfile);
+        mockGetTenantBySlug.mockResolvedValue(mockTenant);
+
+        await act(async () => {
+          render(<ProfilePage />);
+        });
+
+        await waitFor(() => {
+          const breadcrumb = screen.getByTestId("tenant-breadcrumb");
+          expect(breadcrumb).toBeInTheDocument();
+
+          expect(screen.getByTestId("breadcrumb-tenant-name")).toHaveTextContent("Test Church");
+          expect(screen.getByTestId("breadcrumb-tenant-slug")).toHaveTextContent("test-church");
+          expect(screen.getByTestId("breadcrumb-item-0")).toHaveTextContent("個人資料");
+        });
+      });
+
+      it("should show breadcrumb with different tenant data", async () => {
+        const differentTenant = {
+          ...mockTenant,
+          name: "Different Church",
+          slug: "different-church",
+        };
+
+        mockParams.slug = "different-church";
+        mockUseSessionHelpers.withProfile(testProfile);
+        mockGetTenantBySlug.mockResolvedValue(differentTenant);
+
+        await act(async () => {
+          render(<ProfilePage />);
+        });
+
+        await waitFor(() => {
+          expect(screen.getByTestId("tenant-breadcrumb")).toBeInTheDocument();
+          expect(screen.getByTestId("breadcrumb-tenant-name")).toHaveTextContent(
+            "Different Church",
+          );
+          expect(screen.getByTestId("breadcrumb-tenant-slug")).toHaveTextContent(
+            "different-church",
+          );
+          expect(screen.getByTestId("breadcrumb-item-0")).toHaveTextContent("個人資料");
+        });
+      });
+
+      it("should not show breadcrumb when slug exists but tenant is null", async () => {
+        mockUseSessionHelpers.withProfile(testProfile);
+        mockGetTenantBySlug.mockResolvedValue(null);
+
+        await act(async () => {
+          render(<ProfilePage />);
+        });
+
+        await waitFor(() => {
+          expect(screen.getByText("找不到租戶")).toBeInTheDocument();
+        });
+
+        expect(screen.queryByTestId("tenant-breadcrumb")).not.toBeInTheDocument();
+      });
+
+      it("should not show breadcrumb when tenant fetch fails", async () => {
+        mockUseSessionHelpers.withProfile(testProfile);
+        mockGetTenantBySlug.mockRejectedValue(new Error("Network error"));
+
+        await act(async () => {
+          render(<ProfilePage />);
+        });
+
+        await waitFor(() => {
+          expect(screen.getByText("找不到租戶")).toBeInTheDocument();
+        });
+
+        expect(screen.queryByTestId("tenant-breadcrumb")).not.toBeInTheDocument();
+      });
+
+      it("should not show breadcrumb while tenant is loading", async () => {
+        mockUseSessionHelpers.withProfile(testProfile);
+
+        // Mock a pending promise to simulate loading
+        mockGetTenantBySlug.mockImplementation(() => new Promise(() => {}));
+
+        await act(async () => {
+          render(<ProfilePage />);
+        });
+
+        expect(screen.getByText("載入中...")).toBeInTheDocument();
+        expect(screen.queryByTestId("tenant-breadcrumb")).not.toBeInTheDocument();
+      });
+
+      it("should not show breadcrumb when user session is loading", async () => {
+        mockUseSessionHelpers.loading();
+
+        await act(async () => {
+          render(<ProfilePage />);
+        });
+
+        expect(screen.getByText("載入中...")).toBeInTheDocument();
+        expect(screen.queryByTestId("tenant-breadcrumb")).not.toBeInTheDocument();
+      });
+
+      it("should show breadcrumb only after both user and tenant are loaded", async () => {
+        mockUseSessionHelpers.withProfile(testProfile);
+
+        // Start with pending tenant
+        let resolveTenant: (value: typeof mockTenant) => void;
+        const tenantPromise = new Promise<typeof mockTenant>((resolve) => {
+          resolveTenant = resolve;
+        });
+        mockGetTenantBySlug.mockReturnValue(tenantPromise);
+
+        await act(async () => {
+          render(<ProfilePage />);
+        });
+
+        // Should show loading, no breadcrumb
+        expect(screen.getByText("載入中...")).toBeInTheDocument();
+        expect(screen.queryByTestId("tenant-breadcrumb")).not.toBeInTheDocument();
+
+        // Resolve tenant
+        await act(async () => {
+          resolveTenant(mockTenant);
+        });
+
+        // Should now show breadcrumb
+        await waitFor(() => {
+          expect(screen.getByTestId("tenant-breadcrumb")).toBeInTheDocument();
+          expect(screen.getByTestId("breadcrumb-tenant-name")).toHaveTextContent("Test Church");
+        });
+      });
     });
   });
 });
