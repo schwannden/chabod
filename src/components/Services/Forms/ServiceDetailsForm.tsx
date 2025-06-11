@@ -51,7 +51,7 @@ export function ServiceDetailsForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("services.name")}</FormLabel>
+              <FormLabel>{t("services:name")}</FormLabel>
               <FormControl>
                 <Input
                   placeholder=""
@@ -70,7 +70,7 @@ export function ServiceDetailsForm({
             name="default_start_time"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("services.defaultStartTime")}</FormLabel>
+                <FormLabel>{t("services:defaultStartTime")}</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -83,7 +83,7 @@ export function ServiceDetailsForm({
             name="default_end_time"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("services.defaultEndTime")}</FormLabel>
+                <FormLabel>{t("services:defaultEndTime")}</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -104,7 +104,7 @@ export function ServiceDetailsForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("services.name")}</FormLabel>
+              <FormLabel>{t("services:name")}</FormLabel>
               <FormControl>
                 <Input
                   placeholder=""
@@ -123,7 +123,7 @@ export function ServiceDetailsForm({
             name="default_start_time"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("services.defaultStartTime")}</FormLabel>
+                <FormLabel>{t("services:defaultStartTime")}</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -136,7 +136,7 @@ export function ServiceDetailsForm({
             name="default_end_time"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("services.defaultEndTime")}</FormLabel>
+                <FormLabel>{t("services:defaultEndTime")}</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -147,10 +147,10 @@ export function ServiceDetailsForm({
         </div>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={onCancel}>
-            {t("common.cancel")}
+            {t("common:cancel")}
           </Button>
           <Button type="submit" disabled={isProcessing}>
-            {isProcessing ? t("common.processing") : submitLabel}
+            {isProcessing ? t("common:processing") : submitLabel}
           </Button>
         </div>
       </form>

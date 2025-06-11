@@ -89,15 +89,15 @@ export function EventList({
       if (error) throw error;
 
       toast({
-        title: t("events.eventDeleted"),
-        description: t("events.eventDeletedSuccess"),
+        title: t("events:eventDeleted"),
+        description: t("events:eventDeletedSuccess"),
       });
       onEventUpdated();
     } catch (error) {
       console.error("Error deleting event:", error);
       toast({
-        title: t("common.error"),
-        description: t("events.eventDeleteError"),
+        title: t("common:error"),
+        description: t("events:eventDeleteError"),
         variant: "destructive",
       });
     }
@@ -115,8 +115,8 @@ export function EventList({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{t("events.noEventsFound")}</CardTitle>
-          <CardDescription>{t("events.noEventsMatchingFilters")}</CardDescription>
+          <CardTitle>{t("events:noEventsFound")}</CardTitle>
+          <CardDescription>{t("events:noEventsMatchingFilters")}</CardDescription>
         </CardHeader>
       </Card>
     );

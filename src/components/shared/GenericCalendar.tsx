@@ -34,7 +34,7 @@ export function GenericCalendar({
 
   // Format year-month based on current language
   const formatYearMonth = (date: Date) => {
-    return t("shared.monthFormat", {
+    return t("shared:monthFormat", {
       year: format(date, "yyyy"),
       month: format(date, "M"),
     });
@@ -155,7 +155,7 @@ export function GenericCalendar({
         </button>
         <div className="font-bold text-lg">
           {formatYearMonth(baseMonth)}
-          {monthsToShow > 1 ? t("shared.monthsTotal", { monthsToShow }) : ""}
+          {monthsToShow > 1 ? t("shared:monthsTotal", { monthsToShow }) : ""}
         </div>
         <button
           onClick={handleNext}

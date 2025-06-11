@@ -58,8 +58,8 @@ describe("NavBar", () => {
 
       expect(screen.getByText("Chabod")).toBeInTheDocument();
       expect(screen.getByTestId("language-switcher")).toBeInTheDocument();
-      expect(screen.getByText("nav.login")).toBeInTheDocument();
-      expect(screen.getByText("nav.signup")).toBeInTheDocument();
+      expect(screen.getByText("login")).toBeInTheDocument();
+      expect(screen.getByText("signup")).toBeInTheDocument();
     });
 
     it("should render with authenticated user", () => {
@@ -68,9 +68,9 @@ describe("NavBar", () => {
       render(<NavBar />);
 
       expect(screen.getByText("Chabod")).toBeInTheDocument();
-      expect(screen.getByText("nav.dashboard")).toBeInTheDocument();
-      expect(screen.getByText("nav.profile")).toBeInTheDocument();
-      expect(screen.getByText("nav.logout")).toBeInTheDocument();
+      expect(screen.getByText("dashboard")).toBeInTheDocument();
+      expect(screen.getByText("profile")).toBeInTheDocument();
+      expect(screen.getByText("logout")).toBeInTheDocument();
     });
   });
 
@@ -85,8 +85,8 @@ describe("NavBar", () => {
 
       expect(screen.getByText("Chabod")).toBeInTheDocument();
       expect(screen.getByTestId("language-switcher")).toBeInTheDocument();
-      expect(screen.queryByText("nav.login")).not.toBeInTheDocument();
-      expect(screen.queryByText("nav.signup")).not.toBeInTheDocument();
+      expect(screen.queryByText("login")).not.toBeInTheDocument();
+      expect(screen.queryByText("signup")).not.toBeInTheDocument();
     });
 
     it("should hide login/register buttons on tenant auth page", () => {
@@ -95,48 +95,48 @@ describe("NavBar", () => {
 
       expect(screen.getByText("Chabod")).toBeInTheDocument();
       expect(screen.getByTestId("language-switcher")).toBeInTheDocument();
-      expect(screen.queryByText("nav.login")).not.toBeInTheDocument();
-      expect(screen.queryByText("nav.signup")).not.toBeInTheDocument();
+      expect(screen.queryByText("login")).not.toBeInTheDocument();
+      expect(screen.queryByText("signup")).not.toBeInTheDocument();
     });
 
     it("should show login/register buttons on non-auth pages", () => {
       mockLocation.pathname = "/dashboard";
       render(<NavBar />);
 
-      expect(screen.getByText("nav.login")).toBeInTheDocument();
-      expect(screen.getByText("nav.signup")).toBeInTheDocument();
+      expect(screen.getByText("login")).toBeInTheDocument();
+      expect(screen.getByText("signup")).toBeInTheDocument();
     });
 
     it("should show login/register buttons on tenant non-auth pages", () => {
       mockLocation.pathname = "/tenant/my-church";
       render(<NavBar />);
 
-      expect(screen.getByText("nav.login")).toBeInTheDocument();
-      expect(screen.getByText("nav.signup")).toBeInTheDocument();
+      expect(screen.getByText("login")).toBeInTheDocument();
+      expect(screen.getByText("signup")).toBeInTheDocument();
     });
 
     it("should show login/register buttons on tenant members page", () => {
       mockLocation.pathname = "/tenant/my-church/members";
       render(<NavBar />);
 
-      expect(screen.getByText("nav.login")).toBeInTheDocument();
-      expect(screen.getByText("nav.signup")).toBeInTheDocument();
+      expect(screen.getByText("login")).toBeInTheDocument();
+      expect(screen.getByText("signup")).toBeInTheDocument();
     });
 
     it("should not match partial auth paths", () => {
       mockLocation.pathname = "/tenant/my-church/auth/extra";
       render(<NavBar />);
 
-      expect(screen.getByText("nav.login")).toBeInTheDocument();
-      expect(screen.getByText("nav.signup")).toBeInTheDocument();
+      expect(screen.getByText("login")).toBeInTheDocument();
+      expect(screen.getByText("signup")).toBeInTheDocument();
     });
 
     it("should not match auth in tenant slug", () => {
       mockLocation.pathname = "/tenant/auth-church";
       render(<NavBar />);
 
-      expect(screen.getByText("nav.login")).toBeInTheDocument();
-      expect(screen.getByText("nav.signup")).toBeInTheDocument();
+      expect(screen.getByText("login")).toBeInTheDocument();
+      expect(screen.getByText("signup")).toBeInTheDocument();
     });
   });
 
@@ -235,7 +235,7 @@ describe("NavBar", () => {
 
       render(<NavBar />);
 
-      const logoutButton = screen.getByText("nav.logout");
+      const logoutButton = screen.getByText("logout");
       await user.click(logoutButton);
 
       await waitFor(() => {
@@ -244,8 +244,8 @@ describe("NavBar", () => {
 
       await waitFor(() => {
         expect(mockToast).toHaveBeenCalledWith({
-          title: "auth.loggedOut",
-          description: "auth.loggedOutSuccess",
+          title: "auth:loggedOut",
+          description: "auth:loggedOutSuccess",
         });
       });
     });
@@ -258,7 +258,7 @@ describe("NavBar", () => {
 
       render(<NavBar />);
 
-      const logoutButton = screen.getByText("nav.logout");
+      const logoutButton = screen.getByText("logout");
       await user.click(logoutButton);
 
       await waitFor(() => {
@@ -276,7 +276,7 @@ describe("NavBar", () => {
       mockLocation.pathname = "/some-path";
       render(<NavBar />);
 
-      const loginLink = screen.getByText("nav.login").closest("a");
+      const loginLink = screen.getByText("login").closest("a");
       expect(loginLink).toHaveAttribute("href", "/auth?redirect=%2Fsome-path");
     });
 
@@ -284,7 +284,7 @@ describe("NavBar", () => {
       mockLocation.pathname = "/";
       render(<NavBar />);
 
-      const loginLink = screen.getByText("nav.login").closest("a");
+      const loginLink = screen.getByText("login").closest("a");
       expect(loginLink).toHaveAttribute("href", "/auth");
     });
 
@@ -292,14 +292,14 @@ describe("NavBar", () => {
       mockLocation.pathname = "/auth";
       render(<NavBar />);
 
-      expect(screen.queryByText("nav.login")).not.toBeInTheDocument();
+      expect(screen.queryByText("login")).not.toBeInTheDocument();
     });
 
     it("should not render login link on tenant auth page", () => {
       mockLocation.pathname = "/tenant/my-church/auth";
       render(<NavBar />);
 
-      expect(screen.queryByText("nav.login")).not.toBeInTheDocument();
+      expect(screen.queryByText("login")).not.toBeInTheDocument();
     });
   });
 });

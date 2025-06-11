@@ -40,7 +40,7 @@ describe("AuthPage (Main)", () => {
       // Test loading state
       mockUseSessionHelpers.loading();
       const { rerender } = render(<AuthPage />);
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
       expect(mockNavigate).not.toHaveBeenCalled();
 
       // Test redirect on authentication
@@ -53,7 +53,7 @@ describe("AuthPage (Main)", () => {
       mockUseSessionHelpers.unauthenticated();
       render(<AuthPage />);
 
-      expect(screen.getByText("auth.welcome")).toBeInTheDocument();
+      expect(screen.getByText("welcome")).toBeInTheDocument();
       expect(screen.getByTestId("auth-tabs")).toBeInTheDocument();
       expect(screen.getByRole("main")).toBeInTheDocument();
     });

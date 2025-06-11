@@ -53,9 +53,9 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
         name="name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{t("events.eventName")}</FormLabel>
+            <FormLabel>{t("events:eventName")}</FormLabel>
             <FormControl>
-              <Input placeholder={t("events.eventNamePlaceholder")} {...field} />
+              <Input placeholder={t("events:eventNamePlaceholder")} {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -67,9 +67,9 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
         name="description"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{t("events.description")}</FormLabel>
+            <FormLabel>{t("events:description")}</FormLabel>
             <FormControl>
-              <Input placeholder={t("events.descriptionPlaceholder")} {...field} />
+              <Input placeholder={t("events:descriptionPlaceholder")} {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -81,7 +81,7 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
         name="date"
         render={({ field }) => (
           <FormItem className="flex flex-col">
-            <FormLabel>{t("events.date")}</FormLabel>
+            <FormLabel>{t("events:date")}</FormLabel>
             <FormControl>
               <Input
                 type="date"
@@ -107,11 +107,11 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
 
           return (
             <FormItem>
-              <FormLabel>{t("events.groups")}</FormLabel>
+              <FormLabel>{t("events:groups")}</FormLabel>
               <FormControl>
                 {groups.length > 0 ? (
                   <div className="border rounded-md p-2">
-                    <p className="text-sm mb-2">{t("events.availableGroups")}</p>
+                    <p className="text-sm mb-2">{t("events:availableGroups")}</p>
                     {groups.map((group) => (
                       <div key={group.id} className="flex items-center gap-2 p-1">
                         <input
@@ -129,11 +129,11 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
                   </div>
                 ) : (
                   <div className="p-3 border rounded-md text-sm text-muted-foreground">
-                    {t("events.noGroupsAvailable")}
+                    {t("events:noGroupsAvailable")}
                   </div>
                 )}
               </FormControl>
-              <FormDescription>{t("events.selectGroupsDescription")}</FormDescription>
+              <FormDescription>{t("events:selectGroupsDescription")}</FormDescription>
               <FormMessage />
             </FormItem>
           );
@@ -148,7 +148,7 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
             <FormControl>
               <Switch checked={field.value} onCheckedChange={field.onChange} />
             </FormControl>
-            <FormLabel>{t("events.fullDayEvent")}</FormLabel>
+            <FormLabel>{t("events:fullDayEvent")}</FormLabel>
             <FormMessage />
           </FormItem>
         )}
@@ -161,7 +161,7 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
             name="start_time"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel>{t("events.startTime")}</FormLabel>
+                <FormLabel>{t("events:startTime")}</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -175,7 +175,7 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
             name="end_time"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel>{t("events.endTime")}</FormLabel>
+                <FormLabel>{t("events:endTime")}</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -191,9 +191,9 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
         name="event_link"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{t("events.eventLink")}</FormLabel>
+            <FormLabel>{t("events:eventLink")}</FormLabel>
             <FormControl>
-              <Input type="url" placeholder={t("events.eventLinkPlaceholder")} {...field} />
+              <Input type="url" placeholder={t("events:eventLinkPlaceholder")} {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -206,8 +206,8 @@ export function EventDetailsFields({ form, groups = [] }: EventDetailsFieldsProp
         render={({ field }) => (
           <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
             <div className="space-y-0.5">
-              <FormLabel>{t("events.privateEvent")}</FormLabel>
-              <FormDescription>{t("events.privateEventDescription")}</FormDescription>
+              <FormLabel>{t("events:privateEvent")}</FormLabel>
+              <FormDescription>{t("events:privateEventDescription")}</FormDescription>
             </div>
             <FormControl>
               <Switch

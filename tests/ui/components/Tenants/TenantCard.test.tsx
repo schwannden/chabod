@@ -63,16 +63,19 @@ describe("TenantCard", () => {
       // Check basic information
       expect(screen.getByText("Test Church")).toBeInTheDocument();
       expect(screen.getByText("Slug: test-church")).toBeInTheDocument();
-      expect(screen.getByText("15 tenant.members")).toBeInTheDocument();
+
+      // Check member count - use regex to match the pattern
+      expect(screen.getByText(/15\s+tenant:members/)).toBeInTheDocument();
 
       // Check subscription plan information
       expect(screen.getByText("Basic")).toBeInTheDocument();
-      expect(screen.getByText("$29tenant.monthlyPrice")).toBeInTheDocument();
+      // Price is also split across elements - check for the pattern
+      expect(screen.getByText(/\$29\s*tenant:monthlyPrice/)).toBeInTheDocument();
 
-      // Check usage limits
-      expect(screen.getByText("tenant.membersLimit: 15 / 50")).toBeInTheDocument();
-      expect(screen.getByText("tenant.groupsLimit: 3 / 10")).toBeInTheDocument();
-      expect(screen.getByText("tenant.eventsLimit: 5 / 20")).toBeInTheDocument();
+      // Check usage limits using regex to handle whitespace
+      expect(screen.getByText(/tenant:membersLimit.*15.*50/)).toBeInTheDocument();
+      expect(screen.getByText(/tenant:groupsLimit.*3.*10/)).toBeInTheDocument();
+      expect(screen.getByText(/tenant:eventsLimit.*5.*20/)).toBeInTheDocument();
 
       // Check login URL
       expect(screen.getByText("https://example.com/tenant/test-church/auth")).toBeInTheDocument();
@@ -88,7 +91,7 @@ describe("TenantCard", () => {
       );
 
       // Check that created date is displayed
-      expect(screen.getByText(/tenant.created:/)).toBeInTheDocument();
+      expect(screen.getByText(/tenant:created/)).toBeInTheDocument();
     });
 
     it("should handle missing price tier information", () => {
@@ -106,7 +109,8 @@ describe("TenantCard", () => {
       );
 
       expect(screen.getByText("Free")).toBeInTheDocument();
-      expect(screen.getByText("$0tenant.monthlyPrice")).toBeInTheDocument();
+      // Check for the price pattern
+      expect(screen.getByText(/\$0\s*tenant:monthlyPrice/)).toBeInTheDocument();
     });
   });
 
@@ -132,11 +136,11 @@ describe("TenantCard", () => {
       expect(screen.getByTestId("trash-icon")).toBeInTheDocument();
 
       // Navigation buttons should always be visible
-      expect(screen.getByText("tenant.goToChurchDashboard")).toBeInTheDocument();
-      expect(screen.getByText("tenant.goToChurchLogin")).toBeInTheDocument();
+      expect(screen.getByText("tenant:goToChurchDashboard")).toBeInTheDocument();
+      expect(screen.getByText("tenant:goToChurchLogin")).toBeInTheDocument();
 
       // Copy button should always be visible
-      expect(screen.getByText("tenant.copy")).toBeInTheDocument();
+      expect(screen.getByText("tenant:copy")).toBeInTheDocument();
     });
 
     it("should not render edit and delete buttons for non-owner members", () => {
@@ -160,11 +164,11 @@ describe("TenantCard", () => {
       expect(screen.queryByTestId("trash-icon")).not.toBeInTheDocument();
 
       // Navigation buttons should still be visible
-      expect(screen.getByText("tenant.goToChurchDashboard")).toBeInTheDocument();
-      expect(screen.getByText("tenant.goToChurchLogin")).toBeInTheDocument();
+      expect(screen.getByText("tenant:goToChurchDashboard")).toBeInTheDocument();
+      expect(screen.getByText("tenant:goToChurchLogin")).toBeInTheDocument();
 
       // Copy button should still be visible
-      expect(screen.getByText("tenant.copy")).toBeInTheDocument();
+      expect(screen.getByText("tenant:copy")).toBeInTheDocument();
     });
 
     it("should not render edit and delete buttons when userRole is null", () => {
@@ -188,8 +192,8 @@ describe("TenantCard", () => {
       expect(screen.queryByTestId("trash-icon")).not.toBeInTheDocument();
 
       // Navigation buttons should still be visible
-      expect(screen.getByText("tenant.goToChurchDashboard")).toBeInTheDocument();
-      expect(screen.getByText("tenant.goToChurchLogin")).toBeInTheDocument();
+      expect(screen.getByText("tenant:goToChurchDashboard")).toBeInTheDocument();
+      expect(screen.getByText("tenant:goToChurchLogin")).toBeInTheDocument();
     });
 
     it("should handle admin role (non-owner) correctly", () => {
@@ -211,8 +215,8 @@ describe("TenantCard", () => {
       expect(screen.queryByTestId("trash-icon")).not.toBeInTheDocument();
 
       // But navigation buttons should still be visible
-      expect(screen.getByText("tenant.goToChurchDashboard")).toBeInTheDocument();
-      expect(screen.getByText("tenant.goToChurchLogin")).toBeInTheDocument();
+      expect(screen.getByText("tenant:goToChurchDashboard")).toBeInTheDocument();
+      expect(screen.getByText("tenant:goToChurchLogin")).toBeInTheDocument();
     });
 
     it("should disable delete button when deleting", async () => {
@@ -251,7 +255,7 @@ describe("TenantCard", () => {
         />,
       );
 
-      const manageButton = screen.getByText("tenant.goToChurchDashboard");
+      const manageButton = screen.getByText("tenant:goToChurchDashboard");
       await user.click(manageButton);
 
       expect(mockNavigate).toHaveBeenCalledWith("/tenant/test-church");
@@ -268,7 +272,7 @@ describe("TenantCard", () => {
         />,
       );
 
-      const loginButton = screen.getByText("tenant.goToChurchLogin");
+      const loginButton = screen.getByText("tenant:goToChurchLogin");
       await user.click(loginButton);
 
       expect(mockNavigate).toHaveBeenCalledWith("/tenant/test-church/auth");
@@ -296,7 +300,7 @@ describe("TenantCard", () => {
         />,
       );
 
-      const copyButton = screen.getByText("tenant.copy");
+      const copyButton = screen.getByText("tenant:copy");
       await user.click(copyButton);
 
       expect(mockWriteText).toHaveBeenCalledWith("https://example.com/tenant/test-church/auth");
@@ -445,9 +449,12 @@ describe("TenantCard", () => {
         />,
       );
 
-      expect(screen.getByText("0 tenant.members")).toBeInTheDocument();
-      expect(screen.getByText("tenant.groupsLimit: 0 / 10")).toBeInTheDocument();
-      expect(screen.getByText("tenant.eventsLimit: 0 / 20")).toBeInTheDocument();
+      // Check member count is 0 - use regex to match the pattern
+      expect(screen.getByText(/0\s+tenant:members/)).toBeInTheDocument();
+
+      // Check usage limits using regex to handle whitespace
+      expect(screen.getByText(/tenant:groupsLimit.*0.*10/)).toBeInTheDocument();
+      expect(screen.getByText(/tenant:eventsLimit.*0.*20/)).toBeInTheDocument();
     });
 
     it("should handle undefined counts gracefully", () => {
@@ -466,9 +473,9 @@ describe("TenantCard", () => {
         />,
       );
 
-      // Should handle undefined gracefully
-      expect(screen.getByText("tenant.groupsLimit: 0 / 10")).toBeInTheDocument();
-      expect(screen.getByText("tenant.eventsLimit: 0 / 20")).toBeInTheDocument();
+      // Should handle undefined gracefully - component shows 0 for undefined
+      expect(screen.getByText(/tenant:groupsLimit.*0.*10/)).toBeInTheDocument();
+      expect(screen.getByText(/tenant:eventsLimit.*0.*20/)).toBeInTheDocument();
     });
 
     it("should handle very long tenant names", () => {

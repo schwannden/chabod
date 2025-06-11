@@ -1,5 +1,6 @@
 import { Group } from "@/lib/types";
 import { GenericFilterBar, FilterConfig } from "@/components/shared/GenericFilterBar";
+import { useTranslation } from "react-i18next";
 
 interface EventFilterBarProps {
   allGroups: Group[];
@@ -20,14 +21,16 @@ export function EventFilterBar({
   endDate,
   setEndDate,
 }: EventFilterBarProps) {
+  const { t } = useTranslation();
+
   // Create a configuration array for our filters
   const filters: FilterConfig<Group>[] = [
     // Group filter
     {
       type: "select",
       id: "group-filter",
-      label: "Group",
-      placeholder: "Select Group",
+      label: t("events:filterGroup"),
+      placeholder: t("events:selectGroup"),
       options: allGroups,
       value: selectedGroup,
       onChange: setSelectedGroup,
@@ -36,7 +39,7 @@ export function EventFilterBar({
     {
       type: "date",
       id: "start-date-filter",
-      label: "From",
+      label: t("events:filterFrom"),
       value: startDate,
       onChange: setStartDate,
     },
@@ -44,7 +47,7 @@ export function EventFilterBar({
     {
       type: "date",
       id: "end-date-filter",
-      label: "To",
+      label: t("events:filterTo"),
       value: endDate,
       onChange: setEndDate,
     },

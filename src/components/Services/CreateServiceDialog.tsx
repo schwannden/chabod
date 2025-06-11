@@ -82,16 +82,16 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
       );
 
       toast({
-        title: t("services.serviceTypeCreated"),
-        description: t("services.serviceTypeCreatedSuccess"),
+        title: t("services:serviceTypeCreated"),
+        description: t("services:serviceTypeCreatedSuccess"),
       });
       handleDialogClose();
       onSuccess?.();
     } catch (error) {
       console.error("Error creating service:", error);
       toast({
-        title: t("common.error"),
-        description: t("services.createServiceTypeError"),
+        title: t("common:error"),
+        description: t("services:createServiceTypeError"),
         variant: "destructive",
       });
     } finally {
@@ -109,12 +109,12 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
       <DialogTrigger asChild>
         <Button>
           <Plus className="size-4 mr-2" />
-          {t("services.addServiceType")}
+          {t("services:addServiceType")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-auto">
         <DialogHeader>
-          <DialogTitle>{t("services.addServiceType")}</DialogTitle>
+          <DialogTitle>{t("services:addServiceType")}</DialogTitle>
         </DialogHeader>
 
         <ServiceForm
@@ -134,7 +134,7 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
           onSubmit={handleSubmit}
           onCancel={handleDialogClose}
           isSubmitting={isSubmitting}
-          submitLabel={t("services.addServiceType")}
+          submitLabel={t("services:addServiceType")}
           isEditing={false}
         />
       </DialogContent>

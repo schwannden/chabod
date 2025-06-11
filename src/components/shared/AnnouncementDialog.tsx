@@ -60,8 +60,8 @@ export function AnnouncementDialog({ isOpen, announcement, onDismiss }: Announce
 
   const icon = getIcon(announcement.icon);
   const dontShowAgainText =
-    announcement.dontShowAgain || t("common.dontShowAgain", "Don't show this again");
-  const understoodText = announcement.understood || t("common.understood", "Understood");
+    announcement.dontShowAgain || t("common:dontShowAgain", "Don't show this again");
+  const understoodText = announcement.understood || t("common:understood", "Understood");
 
   // For accessibility: generate unique ids for aria-labelledby/aria-describedby
   const dialogTitleId = `announcement-dialog-title-${announcement.id}`;

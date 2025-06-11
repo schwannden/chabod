@@ -40,7 +40,7 @@ export function MemberSignInForm({ tenantName, onBack, onSuccess }: MemberSignIn
 
       onSuccess();
     } catch {
-      setError(t("auth.unknownError"));
+      setError(t("auth:unknownError"));
     } finally {
       setIsLoading(false);
     }
@@ -53,16 +53,16 @@ export function MemberSignInForm({ tenantName, onBack, onSuccess }: MemberSignIn
           <Button variant="ghost" size="sm" onClick={onBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <CardTitle className="text-xl">{t("auth.welcomeBack")}</CardTitle>
+          <CardTitle className="text-xl">{t("auth:welcomeBack")}</CardTitle>
         </div>
         <p className="text-sm text-muted-foreground">
-          {t("auth.signInToChurchAccount", { tenantName })}
+          {t("auth:signInToChurchAccount", { tenantName })}
         </p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">{t("auth.email")}</Label>
+            <Label htmlFor="email">{t("auth:email")}</Label>
             <Input
               id="email"
               type="email"
@@ -74,7 +74,7 @@ export function MemberSignInForm({ tenantName, onBack, onSuccess }: MemberSignIn
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">{t("auth.password")}</Label>
+            <Label htmlFor="password">{t("auth:password")}</Label>
             <Input
               id="password"
               type="password"
@@ -88,7 +88,7 @@ export function MemberSignInForm({ tenantName, onBack, onSuccess }: MemberSignIn
           {error && <div className="text-sm text-destructive">{error}</div>}
 
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? t("auth.signingIn") : t("auth.signIn")}
+            {isLoading ? t("auth:signingIn") : t("auth:signIn")}
           </Button>
         </form>
       </CardContent>

@@ -39,8 +39,8 @@ export function MemberInviteDialog({
 
     if (!email.trim()) {
       toast({
-        title: t("members.validationError"),
-        description: t("members.emailRequired"),
+        title: t("members:validationError"),
+        description: t("members:emailRequired"),
         variant: "destructive",
       });
       return;
@@ -50,8 +50,8 @@ export function MemberInviteDialog({
     try {
       await inviteMemberToTenant(tenantSlug, email, role);
       toast({
-        title: t("members.inviteSent"),
-        description: t("members.inviteSentSuccess", { email }),
+        title: t("members:inviteSent"),
+        description: t("members:inviteSentSuccess", { email }),
       });
       setEmail("");
       setRole("member");
@@ -59,8 +59,8 @@ export function MemberInviteDialog({
       onClose();
     } catch (error) {
       toast({
-        title: t("members.inviteError"),
-        description: error?.message || t("members.unknownError"),
+        title: t("members:inviteError"),
+        description: error?.message || t("members:unknownError"),
         variant: "destructive",
       });
     } finally {
@@ -72,13 +72,13 @@ export function MemberInviteDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("members.inviteMember")}</DialogTitle>
-          <DialogDescription>{t("members.inviteMemberDesc")}</DialogDescription>
+          <DialogTitle>{t("members:inviteMember")}</DialogTitle>
+          <DialogDescription>{t("members:inviteMemberDesc")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">{t("members.emailAddress")}</Label>
+            <Label htmlFor="email">{t("members:emailAddress")}</Label>
             <Input
               id="email"
               type="email"
@@ -90,18 +90,18 @@ export function MemberInviteDialog({
           </div>
 
           <div className="space-y-3">
-            <Label>{t("members.role")}</Label>
+            <Label>{t("members:role")}</Label>
             <RadioGroup value={role} onValueChange={setRole}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="member" id="member" />
                 <Label htmlFor="member" className="cursor-pointer">
-                  {t("members.generalMember")}
+                  {t("members:generalMember")}
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="owner" id="owner" />
                 <Label htmlFor="owner" className="cursor-pointer">
-                  {t("members.admin")}
+                  {t("members:admin")}
                 </Label>
               </div>
             </RadioGroup>
@@ -109,10 +109,10 @@ export function MemberInviteDialog({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("common.cancel")}
+              {t("common:cancel")}
             </Button>
             <Button type="submit" disabled={isInviting}>
-              {isInviting ? t("members.sendingInvite") : t("members.sendInvite")}
+              {isInviting ? t("members:sendingInvite") : t("members:sendInvite")}
             </Button>
           </DialogFooter>
         </form>

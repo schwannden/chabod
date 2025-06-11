@@ -54,8 +54,8 @@ export function SignUpForm({
 
     if (!termsAccepted) {
       toast({
-        title: t("auth.pleaseAgreeToFaith"),
-        description: t("auth.mustAgreeToRegister"),
+        title: t("auth:pleaseAgreeToFaith"),
+        description: t("auth:mustAgreeToRegister"),
         variant: "destructive",
       });
       return;
@@ -66,8 +66,8 @@ export function SignUpForm({
 
     if (!trimmedFullName) {
       toast({
-        title: t("auth.nameCannotBeEmpty"),
-        description: t("auth.pleaseEnterYourName"),
+        title: t("auth:nameCannotBeEmpty"),
+        description: t("auth:pleaseEnterYourName"),
         variant: "destructive",
       });
       return;
@@ -93,17 +93,17 @@ export function SignUpForm({
           error.message.includes("User already registered") ||
           error.message.includes("already been registered")
         ) {
-          setError(t("auth.emailAlreadyRegistered"));
+          setError(t("auth:emailAlreadyRegistered"));
           setShowSignInOption(true);
           return;
         }
 
         // Translate other common Supabase error codes
-        let errorMessage = t("auth.unknownError");
+        let errorMessage = t("auth:unknownError");
         if (error.message?.includes("invalid email")) {
-          errorMessage = t("auth.emailFormatIncorrect");
+          errorMessage = t("auth:emailFormatIncorrect");
         } else if (error.message?.includes("password")) {
-          errorMessage = t("auth.passwordMinLength");
+          errorMessage = t("auth:passwordMinLength");
         } else if (error.message) {
           errorMessage = error.message;
         }
@@ -117,15 +117,15 @@ export function SignUpForm({
         } catch (associateError) {
           // Sign out user if tenant association fails
           await supabase.auth.signOut();
-          throw new Error(t("auth.cannotJoinChurch", { errorMessage: associateError }));
+          throw new Error(t("auth:cannotJoinChurch", { errorMessage: associateError }));
         }
       }
 
       toast({
-        title: t("auth.accountCreatedSuccess"),
+        title: t("auth:accountCreatedSuccess"),
         description: tenantSlug
-          ? t("auth.accountCreatedAndJoined", { tenantSlug })
-          : t("auth.checkEmailForConfirmation"),
+          ? t("auth:accountCreatedAndJoined", { tenantSlug })
+          : t("auth:checkEmailForConfirmation"),
       });
 
       if (onSuccess) {
@@ -133,8 +133,8 @@ export function SignUpForm({
       }
     } catch (error) {
       toast({
-        title: t("auth.createAccountFailed"),
-        description: error?.message || t("auth.unknownError"),
+        title: t("auth:createAccountFailed"),
+        description: error?.message || t("auth:unknownError"),
         variant: "destructive",
       });
     } finally {
@@ -145,18 +145,18 @@ export function SignUpForm({
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>{t("auth.signUpTitle")}</CardTitle>
+        <CardTitle>{t("auth:signUpTitle")}</CardTitle>
         <CardDescription>
-          {tenantName ? t("auth.signUpToJoin", { tenantName }) : t("auth.signUpToChabod")}
+          {tenantName ? t("auth:signUpToJoin", { tenantName }) : t("auth:signUpToChabod")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSignUp} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="full-name">{t("auth.fullName")}</Label>
+            <Label htmlFor="full-name">{t("auth:fullName")}</Label>
             <Input
               id="full-name"
-              placeholder={t("auth.enterYourName")}
+              placeholder={t("auth:enterYourName")}
               value={fullName}
               onChange={handleFullNameChange}
               required
@@ -170,13 +170,13 @@ export function SignUpForm({
               <div className="text-sm text-destructive">{error}</div>
               {showSignInOption && (
                 <div className="text-sm text-muted-foreground">
-                  {t("auth.alreadyHaveAccount")}{" "}
+                  {t("auth:alreadyHaveAccount")}{" "}
                   <button
                     type="button"
                     onClick={onSignInClick}
                     className="text-primary hover:underline"
                   >
-                    {t("auth.signInToJoin")}
+                    {t("auth:signInToJoin")}
                   </button>
                 </div>
               )}
@@ -185,13 +185,13 @@ export function SignUpForm({
 
           <TermsOfService accepted={termsAccepted} onChange={setTermsAccepted} />
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? t("auth.creatingAccount") : t("auth.createAccount")}
+            {loading ? t("auth:creatingAccount") : t("auth:createAccount")}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="flex justify-center">
         <Button variant="link" onClick={onSignInClick}>
-          {t("auth.alreadyHaveAccount")}
+          {t("auth:alreadyHaveAccount")}
         </Button>
       </CardFooter>
     </Card>

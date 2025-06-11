@@ -13,8 +13,10 @@ import { useServiceEvents } from "@/hooks/useServiceEvents";
 import { ServiceEventList } from "@/components/ServiceEvents/ServiceEventList";
 import { GenericEventPage } from "@/components/shared/GenericEventPage";
 import { getTenantGroups } from "@/lib/group-service";
+import { useTranslation } from "react-i18next";
 
 export default function ServiceEventPage() {
+  const { t } = useTranslation(["dashboard"]);
   const { slug } = useParams<{ slug: string }>();
   const { user } = useSession();
   const { role } = useTenantRole(slug, user?.id);
@@ -146,7 +148,8 @@ export default function ServiceEventPage() {
   return slug ? (
     <GenericEventPage
       slug={slug}
-      title="服事表"
+      title={t("dashboard:serviceEventTitle")}
+      description={t("dashboard:serviceEventDesc")}
       calendar={
         <ServiceEventCalendar
           serviceEvents={serviceEvents}

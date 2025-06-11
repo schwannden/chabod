@@ -9,6 +9,7 @@ interface GenericEventPageProps {
   // Page metadata
   slug: string;
   title: string;
+  description: string;
 
   // Main components
   calendar: ReactNode;
@@ -26,6 +27,7 @@ interface GenericEventPageProps {
 export function GenericEventPage({
   slug,
   title,
+  description,
   calendar,
   filterBar,
   listView,
@@ -65,6 +67,7 @@ export function GenericEventPage({
   return (
     <TenantPageLayout
       title={title}
+      description={description}
       tenantName={tenant?.name || ""}
       tenantSlug={slug || ""}
       isLoading={isLoading}

@@ -282,7 +282,7 @@ describe("MembersPage", () => {
         render(<MembersPage />);
       });
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
     });
 
     it("should show loading state while data is loading", async () => {
@@ -300,7 +300,7 @@ describe("MembersPage", () => {
         render(<MembersPage />);
       });
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
     });
 
     it("should render the page layout with correct props", async () => {
@@ -310,11 +310,11 @@ describe("MembersPage", () => {
 
       await waitFor(() => {
         expect(screen.getByTestId("tenant-page-layout")).toBeInTheDocument();
-        expect(screen.getByTestId("layout-title")).toHaveTextContent("members.membersTitle");
-        expect(screen.getByTestId("layout-description")).toHaveTextContent("members.membersDesc");
+        expect(screen.getByTestId("layout-title")).toHaveTextContent("members:membersTitle");
+        expect(screen.getByTestId("layout-description")).toHaveTextContent("members:membersDesc");
         expect(screen.getByTestId("layout-tenant-name")).toHaveTextContent(mockTenant.name);
         expect(screen.getByTestId("layout-tenant-slug")).toHaveTextContent(mockTenant.slug);
-        expect(screen.getByTestId("breadcrumb-0")).toHaveTextContent("nav.members");
+        expect(screen.getByTestId("breadcrumb-0")).toHaveTextContent("nav:members");
       });
     });
 
@@ -348,7 +348,7 @@ describe("MembersPage", () => {
 
       await waitFor(() => {
         const actionContainer = screen.getByTestId("layout-action");
-        expect(actionContainer).toHaveTextContent("members.inviteMember");
+        expect(actionContainer).toHaveTextContent("members:inviteMember");
       });
     });
 
@@ -384,9 +384,9 @@ describe("MembersPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("common.tenantNotFound")).toBeInTheDocument();
-        expect(screen.getByText("common.tenantNotFoundDesc")).toBeInTheDocument();
-        expect(screen.getByText("common.returnHome")).toBeInTheDocument();
+        expect(screen.getByText("common:tenantNotFound")).toBeInTheDocument();
+        expect(screen.getByText("common:tenantNotFoundDesc")).toBeInTheDocument();
+        expect(screen.getByText("common:returnHome")).toBeInTheDocument();
       });
     });
   });
@@ -479,7 +479,7 @@ describe("MembersPage", () => {
         expect(screen.getByTestId("layout-action")).toBeInTheDocument();
       });
 
-      const inviteButton = screen.getByText("members.inviteMember");
+      const inviteButton = screen.getByText("members:inviteMember");
       await act(async () => {
         await user.click(inviteButton);
       });
@@ -501,7 +501,7 @@ describe("MembersPage", () => {
       });
 
       // Open dialog first
-      const inviteButton = screen.getByText("members.inviteMember");
+      const inviteButton = screen.getByText("members:inviteMember");
       await act(async () => {
         await user.click(inviteButton);
       });
@@ -712,10 +712,10 @@ describe("MembersPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("common.returnHome")).toBeInTheDocument();
+        expect(screen.getByText("common:returnHome")).toBeInTheDocument();
       });
 
-      const returnButton = screen.getByText("common.returnHome");
+      const returnButton = screen.getByText("common:returnHome");
       await act(async () => {
         await user.click(returnButton);
       });

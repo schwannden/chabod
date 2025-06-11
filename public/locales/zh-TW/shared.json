@@ -1,0 +1,16 @@
+{
+  "traditionalChinese": "繁體中文",
+  "monthFormat": "{{year}}年{{month}}月",
+  "monthsTotal": " 共{{monthsToShow}}個月",
+  "confirmDelete": "確認刪除",
+  "confirmDeleteDesc": "您確定要刪除此項目嗎？此操作無法撤銷。",
+  "deleteButton": "刪除",
+  "cancelButton": "取消",
+  "highRiskDelete": "高風險刪除",
+  "warningCannotUndo": "警告：此操作無法撤銷！",
+  "deleteWarningDesc": "刪除後，所有相關資料將永久消失且無法恢復。",
+  "enterConfirmationText": "請輸入",
+  "toConfirmDelete": "以確認刪除：",
+  "enterConfirmationPlaceholder": "請輸入確認文字",
+  "permanentDelete": "永久刪除"
+}

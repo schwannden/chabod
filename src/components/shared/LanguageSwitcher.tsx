@@ -12,7 +12,7 @@ export function LanguageSwitcher() {
   const { i18n, t } = useTranslation();
 
   const languages = [
-    { code: "zh-TW", name: t("shared.traditionalChinese"), flag: "🇹🇼" },
+    { code: "zh-TW", name: t("shared:traditionalChinese"), flag: "🇹🇼" },
     { code: "en", name: "English", flag: "🇺🇸" },
   ];
 

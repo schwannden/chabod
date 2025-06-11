@@ -13,6 +13,7 @@ import { Calendar, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { EventActions } from "./EventActions";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface EventCardProps {
   event: EventWithGroups;
@@ -31,6 +32,7 @@ export function EventCard({
   onCopyEvent,
   allGroups,
 }: EventCardProps) {
+  const { t } = useTranslation();
   const formattedDate = format(new Date(event.date), "MMMM d, yyyy");
   const hasTime = event.start_time || event.end_time;
 
@@ -38,9 +40,9 @@ export function EventCard({
   if (event.start_time && event.end_time) {
     timeDisplay = `${event.start_time} - ${event.end_time}`;
   } else if (event.start_time) {
-    timeDisplay = `Starts at ${event.start_time}`;
+    timeDisplay = `${t("events:startsAt")} ${event.start_time}`;
   } else if (event.end_time) {
-    timeDisplay = `Ends at ${event.end_time}`;
+    timeDisplay = `${t("events:endsAt")} ${event.end_time}`;
   }
 
   return (
@@ -83,7 +85,7 @@ export function EventCard({
               rel="noopener noreferrer"
               className="text-sm text-primary underline hover:no-underline"
             >
-              Event Link
+              {t("events:eventLinkText")}
             </a>
           )}
 
@@ -99,7 +101,7 @@ export function EventCard({
 
           {event.visibility === "private" && (
             <Badge variant="secondary" className="ml-auto">
-              Private
+              {t("events:private")}
             </Badge>
           )}
         </CardFooter>

@@ -55,31 +55,31 @@ describe("TenantWelcomeScreen", () => {
     it("should render welcome message without invite token", () => {
       render(<TenantWelcomeScreen {...defaultProps} />);
 
-      expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
-      expect(screen.queryByText("auth.invitedDesc")).not.toBeInTheDocument();
+      expect(screen.getByText("auth:welcomeToChurch")).toBeInTheDocument();
+      expect(screen.queryByText("auth:invitedDesc")).not.toBeInTheDocument();
     });
 
     it("should render invited message with invite token", () => {
       render(<TenantWelcomeScreen {...defaultProps} inviteToken="invite-123" />);
 
-      expect(screen.getByText("auth.invitedToJoin")).toBeInTheDocument();
-      expect(screen.getByText("auth.invitedDesc")).toBeInTheDocument();
+      expect(screen.getByText("auth:invitedToJoin")).toBeInTheDocument();
+      expect(screen.getByText("auth:invitedDesc")).toBeInTheDocument();
     });
 
     it("should render all three action buttons", () => {
       render(<TenantWelcomeScreen {...defaultProps} />);
 
-      expect(screen.getByText("auth.newToChabod")).toBeInTheDocument();
-      expect(screen.getByText("auth.haveAccount")).toBeInTheDocument();
-      expect(screen.getByText("auth.alreadyMember")).toBeInTheDocument();
+      expect(screen.getByText("auth:newToChabod")).toBeInTheDocument();
+      expect(screen.getByText("auth:haveAccount")).toBeInTheDocument();
+      expect(screen.getByText("auth:alreadyMember")).toBeInTheDocument();
     });
 
     it("should render descriptive text for each button", () => {
       render(<TenantWelcomeScreen {...defaultProps} />);
 
-      expect(screen.getByText("auth.newToChabodDesc")).toBeInTheDocument();
-      expect(screen.getByText("auth.haveAccountDesc")).toBeInTheDocument();
-      expect(screen.getByText("auth.alreadyMemberDesc")).toBeInTheDocument();
+      expect(screen.getByText("auth:newToChabodDesc")).toBeInTheDocument();
+      expect(screen.getByText("auth:haveAccountDesc")).toBeInTheDocument();
+      expect(screen.getByText("auth:alreadyMemberDesc")).toBeInTheDocument();
     });
   });
 
@@ -126,7 +126,7 @@ describe("TenantWelcomeScreen", () => {
       render(<TenantWelcomeScreen {...defaultProps} tenantName="My Awesome Church" />);
 
       // The translation system should interpolate the tenant name
-      expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
+      expect(screen.getByText("auth:welcomeToChurch")).toBeInTheDocument();
     });
 
     it("should display tenant name in invited message", () => {
@@ -138,7 +138,7 @@ describe("TenantWelcomeScreen", () => {
         />,
       );
 
-      expect(screen.getByText("auth.invitedToJoin")).toBeInTheDocument();
+      expect(screen.getByText("auth:invitedToJoin")).toBeInTheDocument();
     });
   });
 
@@ -202,7 +202,7 @@ describe("TenantWelcomeScreen", () => {
     it("should handle empty tenant name", () => {
       render(<TenantWelcomeScreen {...defaultProps} tenantName="" />);
 
-      expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
+      expect(screen.getByText("auth:welcomeToChurch")).toBeInTheDocument();
     });
 
     it("should handle very long tenant name", () => {
@@ -210,15 +210,15 @@ describe("TenantWelcomeScreen", () => {
         "This is a very long church name that might cause layout issues if not handled properly";
       render(<TenantWelcomeScreen {...defaultProps} tenantName={longName} />);
 
-      expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
+      expect(screen.getByText("auth:welcomeToChurch")).toBeInTheDocument();
     });
 
     it("should handle empty invite token string", () => {
       render(<TenantWelcomeScreen {...defaultProps} inviteToken="" />);
 
       // Empty string should be treated as no invite token
-      expect(screen.getByText("auth.welcomeToChurch")).toBeInTheDocument();
-      expect(screen.queryByText("auth.invitedDesc")).not.toBeInTheDocument();
+      expect(screen.getByText("auth:welcomeToChurch")).toBeInTheDocument();
+      expect(screen.queryByText("auth:invitedDesc")).not.toBeInTheDocument();
     });
   });
 

@@ -31,9 +31,9 @@ export function MemberFilterBar({
 
   return (
     <FilterLayout>
-      <FilterGroup label={t("members.name")}>
+      <FilterGroup label={t("members:name")}>
         <Input
-          placeholder={t("members.searchName")}
+          placeholder={t("members:searchName")}
           value={searchName}
           onChange={(e) => setSearchName(e.target.value)}
           className="max-w-sm"
@@ -42,22 +42,22 @@ export function MemberFilterBar({
 
       <FilterGroup label="Email">
         <Input
-          placeholder={t("members.searchEmail")}
+          placeholder={t("members:searchEmail")}
           value={searchEmail}
           onChange={(e) => setSearchEmail(e.target.value)}
           className="max-w-sm"
         />
       </FilterGroup>
 
-      <FilterGroup label={t("members.role")}>
+      <FilterGroup label={t("members:role")}>
         <Select value={roleFilter} onValueChange={setRoleFilter}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder={t("members.selectRole")} />
+            <SelectValue placeholder={t("members:selectRole")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">{t("members.allRoles")}</SelectItem>
-            <SelectItem value="owner">{t("members.admin")}</SelectItem>
-            <SelectItem value="member">{t("members.member")}</SelectItem>
+            <SelectItem value="all">{t("members:allRoles")}</SelectItem>
+            <SelectItem value="owner">{t("members:admin")}</SelectItem>
+            <SelectItem value="member">{t("members:member")}</SelectItem>
           </SelectContent>
         </Select>
       </FilterGroup>

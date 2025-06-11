@@ -83,7 +83,7 @@ jest.mock("@/components/Services/ServiceCard", () => ({
       <div data-testid="service-time">
         {service.default_start_time && service.default_end_time
           ? `${service.default_start_time} - ${service.default_end_time}`
-          : "services.notSetDefaultTime"}
+          : "services:notSetDefaultTime"}
       </div>
       <button onClick={() => onEdit(service)} data-testid="edit-service">
         Edit Service
@@ -231,10 +231,10 @@ describe("ServicePage", () => {
       await waitFor(() => {
         expect(screen.getByTestId("tenant-page-layout")).toBeInTheDocument();
         expect(screen.getByTestId("layout-title")).toHaveTextContent(
-          "dashboard.serviceManagementTitle",
+          "dashboard:serviceManagementTitle",
         );
         expect(screen.getByTestId("layout-description")).toHaveTextContent(
-          "dashboard.serviceManagementDesc",
+          "dashboard:serviceManagementDesc",
         );
         expect(screen.getByTestId("layout-tenant-name")).toHaveTextContent("Test Church");
         expect(screen.getByTestId("layout-tenant-slug")).toHaveTextContent("test-church");
@@ -254,7 +254,7 @@ describe("ServicePage", () => {
 
       await waitFor(() => {
         expect(screen.getByTestId("breadcrumb-0")).toHaveTextContent(
-          "dashboard.serviceManagementTitle",
+          "dashboard:serviceManagementTitle",
         );
       });
     });
@@ -316,7 +316,7 @@ describe("ServicePage", () => {
         "Wednesday Prayer",
       );
       expect(service2Card.querySelector('[data-testid="service-time"]')).toHaveTextContent(
-        "services.notSetDefaultTime",
+        "services:notSetDefaultTime",
       );
     });
 
@@ -326,7 +326,7 @@ describe("ServicePage", () => {
       render(<ServicePage />);
 
       await waitFor(() => {
-        expect(screen.getByText("services.noServiceTypesYet")).toBeInTheDocument();
+        expect(screen.getByText("services:noServiceTypesYet")).toBeInTheDocument();
         expect(screen.queryByTestId("service-card-service-1")).not.toBeInTheDocument();
       });
     });
@@ -336,7 +336,7 @@ describe("ServicePage", () => {
 
       render(<ServicePage />);
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
     });
   });
 
@@ -473,7 +473,7 @@ describe("ServicePage", () => {
 
       await waitFor(() => {
         // Should show no services message when services fail to load
-        expect(screen.getByText("services.noServiceTypesYet")).toBeInTheDocument();
+        expect(screen.getByText("services:noServiceTypesYet")).toBeInTheDocument();
       });
     });
 
@@ -567,7 +567,7 @@ describe("ServicePage", () => {
 
       render(<ServicePage />);
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
     });
 
     it("should not show loading when all data is loaded", async () => {
@@ -575,7 +575,7 @@ describe("ServicePage", () => {
 
       await waitFor(() => {
         expect(screen.getByTestId("layout-loading")).toHaveTextContent("not-loading");
-        expect(screen.queryByText("common.loading")).not.toBeInTheDocument();
+        expect(screen.queryByText("common:loading")).not.toBeInTheDocument();
       });
     });
   });

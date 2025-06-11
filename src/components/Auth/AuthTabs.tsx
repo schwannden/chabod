@@ -37,8 +37,8 @@ export function AuthTabs({
       className="w-full max-w-md mx-auto"
     >
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="signin">{t("auth.signIn")}</TabsTrigger>
-        <TabsTrigger value="signup">{t("auth.signUp")}</TabsTrigger>
+        <TabsTrigger value="signin">{t("auth:signIn")}</TabsTrigger>
+        <TabsTrigger value="signup">{t("auth:signUp")}</TabsTrigger>
       </TabsList>
       <TabsContent value="signin">
         <SignInForm

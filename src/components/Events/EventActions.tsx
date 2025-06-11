@@ -79,14 +79,14 @@ export function EventActions({
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="h-8 w-8">
             <MoreVertical className="h-4 w-4" />
-            <span className="sr-only">{t("common.openMenu")}</span>
+            <span className="sr-only">{t("common:openMenu")}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <EditEventDialog event={event} onEventUpdated={onEventUpdated} allGroups={allGroups}>
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
               <Pencil className="mr-2 h-4 w-4" />
-              {t("events.editEvent")}
+              {t("events:editEvent")}
             </DropdownMenuItem>
           </EditEventDialog>
 
@@ -99,7 +99,7 @@ export function EventActions({
               }}
             >
               <Copy className="mr-2 h-4 w-4" />
-              {t("events.copyEvent")}
+              {t("events:copyEvent")}
             </DropdownMenuItem>
           )}
 
@@ -111,7 +111,7 @@ export function EventActions({
             className="text-destructive"
           >
             <Trash2 className="mr-2 h-4 w-4" />
-            {t("events.deleteEvent")}
+            {t("events:deleteEvent")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -120,8 +120,8 @@ export function EventActions({
         isOpen={isDeleteDialogOpen}
         onOpenChange={handleDialogOpenChange}
         onConfirm={handleDelete}
-        title={t("events.deleteEvent")}
-        description={t("events.deleteEventConfirm", { eventName: event.name })}
+        title={t("events:deleteEvent")}
+        description={t("events:deleteEventConfirm", { eventName: event.name })}
         isLoading={isDeleting}
       />
     </div>

@@ -2,52 +2,93 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
+// Define all namespaces
+const namespaces = [
+  "common",
+  "announcements",
+  "shared",
+  "nav",
+  "landing",
+  "auth",
+  "tenant",
+  "profile",
+  "members",
+  "groups",
+  "resources",
+  "services",
+  "serviceEvents",
+  "events",
+  "dashboard",
+];
+
 // Fallback translations to prevent crashes
 const fallbackTranslations = {
-  en: {
-    translation: {
-      common: {
+  en: namespaces.reduce(
+    (acc, ns) => {
+      acc[ns] = {
         loading: "Loading...",
         error: "Error",
         save: "Save",
         cancel: "Cancel",
-      },
+      };
+      return acc;
     },
-  },
-  "zh-TW": {
-    translation: {
-      common: {
+    {} as Record<string, Record<string, string>>,
+  ),
+  "zh-TW": namespaces.reduce(
+    (acc, ns) => {
+      acc[ns] = {
         loading: "載入中...",
         error: "錯誤",
         save: "儲存",
         cancel: "取消",
-      },
+      };
+      return acc;
     },
-  },
+    {} as Record<string, Record<string, string>>,
+  ),
 };
 
-// Load translations first
+// Load translations from multiple files
 const loadTranslations = async () => {
   try {
-    const [enResponse, zhTWResponse] = await Promise.allSettled([
-      fetch("/locales/en/translation.json"),
-      fetch("/locales/zh-TW/translation.json"),
-    ]);
-
-    const enTranslation =
-      enResponse.status === "fulfilled"
-        ? await enResponse.value.json()
-        : fallbackTranslations.en.translation;
-
-    const zhTWTranslation =
-      zhTWResponse.status === "fulfilled"
-        ? await zhTWResponse.value.json()
-        : fallbackTranslations["zh-TW"].translation;
-
-    return {
-      en: { translation: enTranslation },
-      "zh-TW": { translation: zhTWTranslation },
+    const resources: Record<string, Record<string, Record<string, string>>> = {
+      en: {},
+      "zh-TW": {},
     };
+
+    // Load all namespace files for both languages
+    const loadPromises = [];
+
+    for (const ns of namespaces) {
+      loadPromises.push(
+        fetch(`/locales/en/${ns}.json`)
+          .then((res) => res.json())
+          .then((data) => {
+            resources.en[ns] = data;
+          })
+          .catch((error) => {
+            console.warn(`Failed to load English ${ns} translations:`, error);
+            resources.en[ns] = fallbackTranslations.en[ns];
+          }),
+      );
+
+      loadPromises.push(
+        fetch(`/locales/zh-TW/${ns}.json`)
+          .then((res) => res.json())
+          .then((data) => {
+            resources["zh-TW"][ns] = data;
+          })
+          .catch((error) => {
+            console.warn(`Failed to load Chinese ${ns} translations:`, error);
+            resources["zh-TW"][ns] = fallbackTranslations["zh-TW"][ns];
+          }),
+      );
+    }
+
+    await Promise.allSettled(loadPromises);
+
+    return resources;
   } catch (error) {
     console.error("Failed to load translations, using fallbacks:", error);
     return fallbackTranslations;
@@ -140,12 +181,9 @@ const initializeI18n = async () => {
         // Disable loading fallback messages
         saveMissing: false,
 
-        // Disable pre-loading of resources
-        preload: [],
-
-        // Load namespaces
-        ns: ["translation"],
-        defaultNS: "translation",
+        // Load all namespaces
+        ns: namespaces,
+        defaultNS: "common",
 
         // Return key if translation is missing rather than error
         returnEmptyString: false,
@@ -167,6 +205,7 @@ const initializeI18n = async () => {
     }
 
     console.log("i18n initialized successfully with language:", i18n.language);
+    console.log("Loaded namespaces:", namespaces);
     return i18n;
   } catch (error) {
     console.error("Error during i18n initialization:", error);
@@ -177,6 +216,8 @@ const initializeI18n = async () => {
         fallbackLng: "zh-TW",
         resources: fallbackTranslations,
         interpolation: { escapeValue: false },
+        ns: ["common"],
+        defaultNS: "common",
       });
     }
     return i18n;

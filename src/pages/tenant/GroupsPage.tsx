@@ -68,19 +68,19 @@ export default function GroupsPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">{t("common.loading")}</span>
+        <span className="ml-2">{t("common:loading")}</span>
       </div>
     );
   }
 
   return (
     <TenantPageLayout
-      title={t("groups.manageGroups")}
-      description={t("groups.manageGroupsDescription", { tenantName: tenant?.name || "" })}
+      title={t("groups:manageGroups")}
+      description={t("groups:manageGroupsDescription", { tenantName: tenant?.name || "" })}
       tenantName={tenant?.name || ""}
       tenantSlug={slug || ""}
       isLoading={isLoading || isRoleLoading}
-      breadcrumbItems={[{ label: t("groups.groups") }]}
+      breadcrumbItems={[{ label: t("groups:groups") }]}
     >
       {tenant && (
         <GroupTable

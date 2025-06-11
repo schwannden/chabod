@@ -1,0 +1,9 @@
+{
+  "dashboard": "Dashboard",
+  "profile": "Profile",
+  "settings": "Settings",
+  "logout": "Logout",
+  "login": "Login",
+  "signup": "Sign Up",
+  "members": "Members"
+}

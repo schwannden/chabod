@@ -57,10 +57,11 @@ jest.mock("@/integrations/supabase/client", () => ({
 
 // Mock components
 jest.mock("@/components/shared/GenericEventPage", () => ({
-  GenericEventPage: ({ actionButton, title, slug }: any) => (
+  GenericEventPage: ({ actionButton, title, slug, description }: any) => (
     <div data-testid="generic-event-page">
       <div data-testid="page-title">{title}</div>
       <div data-testid="page-slug">{slug}</div>
+      <div data-testid="page-description">{description}</div>
       <div data-testid="action-button-section">{actionButton}</div>
     </div>
   ),
@@ -102,7 +103,7 @@ describe("ServiceEventPage", () => {
     render(<ServiceEventPage />);
 
     expect(screen.getByTestId("generic-event-page")).toBeInTheDocument();
-    expect(screen.getByTestId("page-title")).toHaveTextContent("服事表");
+    expect(screen.getByTestId("page-title")).toHaveTextContent("dashboard:serviceEventTitle");
     expect(screen.getByTestId("page-slug")).toHaveTextContent("test-church");
   });
 

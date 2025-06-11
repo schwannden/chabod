@@ -1,0 +1,18 @@
+{
+  "title": "Your Profile",
+  "description": "Update your personal information",
+  "fullName": "Full Name",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "email": "Email Address",
+  "emailNote": "Email cannot be changed.",
+  "avatarUrl": "Avatar URL",
+  "yourName": "Your Name",
+  "firstName_": "First Name",
+  "lastName_": "Last Name",
+  "saveChanges": "Save Changes",
+  "profileUpdated": "Profile Updated",
+  "profileUpdatedSuccess": "Your profile has been updated successfully.",
+  "profileUpdateError": "Error updating profile",
+  "profileUpdateErrorDesc": "An unknown error occurred"
+}

@@ -190,7 +190,7 @@ describe("GroupsPage", () => {
 
       render(<GroupsPage />);
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
     });
 
     it("should navigate to not-found when tenant doesn't exist", async () => {
@@ -239,9 +239,9 @@ describe("GroupsPage", () => {
         expect(screen.getByTestId("group-table")).toBeInTheDocument();
       });
 
-      expect(screen.getByTestId("layout-title")).toHaveTextContent("groups.manageGroups");
+      expect(screen.getByTestId("layout-title")).toHaveTextContent("groups:manageGroups");
       expect(screen.getByTestId("layout-description")).toHaveTextContent(
-        "groups.manageGroupsDescription",
+        "groups:manageGroupsDescription",
       );
       expect(screen.getByTestId("layout-tenant-name")).toHaveTextContent("Test Church");
       expect(screen.getByTestId("layout-tenant-slug")).toHaveTextContent("test-church");
@@ -279,7 +279,7 @@ describe("GroupsPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByTestId("breadcrumb-0")).toHaveTextContent("groups.groups");
+        expect(screen.getByTestId("breadcrumb-0")).toHaveTextContent("groups:groups");
       });
     });
   });
@@ -370,7 +370,7 @@ describe("GroupsPage", () => {
         render(<GroupsPage />);
       });
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
     });
 
     it("should show data loading state", async () => {
@@ -383,7 +383,7 @@ describe("GroupsPage", () => {
 
       render(<GroupsPage />);
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
     });
   });
 
@@ -443,7 +443,7 @@ describe("GroupsPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("common.loading")).toBeInTheDocument();
+        expect(screen.getByText("common:loading")).toBeInTheDocument();
       });
     });
 
@@ -470,7 +470,7 @@ describe("GroupsPage", () => {
 
       render(<GroupsPage />);
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
 
       // Resolve the promise to simulate data loading
       await act(async () => {

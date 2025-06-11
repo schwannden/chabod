@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { ServiceEventRow } from "./ServiceEventRow";
 import { Table, TableHeader, TableBody, TableRow, TableHead } from "@/components/ui/table";
 import { deleteServiceEvent } from "@/lib/services/service-event-crud";
+import { useTranslation } from "react-i18next";
 
 interface ServiceEventListProps {
   serviceEvents: ServiceEventWithService[];
@@ -29,6 +30,7 @@ export function ServiceEventList({
   const { toast } = useToast();
   const { role } = useTenantRole(tenantSlug, user?.id);
   const [editableEvents, setEditableEvents] = useState<Record<string, boolean>>({});
+  const { t } = useTranslation("services");
 
   const sortedEvents = [...serviceEvents].sort((a, b) => {
     const dateComparison = new Date(a.date).getTime() - new Date(b.date).getTime();
@@ -90,8 +92,8 @@ export function ServiceEventList({
       await deleteServiceEvent(eventId);
 
       toast({
-        title: "事件刪除成功",
-        description: "服事排班已刪除",
+        title: t("eventDeletedSuccess"),
+        description: t("serviceScheduleDeleted"),
       });
 
       // Call the onEventUpdated callback to refresh the parent components
@@ -99,8 +101,8 @@ export function ServiceEventList({
     } catch (error) {
       console.error("Error deleting service event:", error);
       toast({
-        title: "錯誤",
-        description: "刪除服事排班時出錯",
+        title: t("error"),
+        description: t("deleteServiceScheduleError"),
         variant: "destructive",
       });
     }
@@ -118,8 +120,8 @@ export function ServiceEventList({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>未找到服事排班</CardTitle>
-          <CardDescription>沒有符合您篩選條件的服事排班</CardDescription>
+          <CardTitle>{t("noServiceSchedulesFound")}</CardTitle>
+          <CardDescription>{t("noSchedulesMatchFilter")}</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -128,19 +130,19 @@ export function ServiceEventList({
   return (
     <Card className="mt-6">
       <CardHeader>
-        <CardTitle>服事表</CardTitle>
+        <CardTitle>{t("serviceSchedule")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>日期</TableHead>
-                <TableHead>時間</TableHead>
-                <TableHead>服事</TableHead>
-                <TableHead>副標題</TableHead>
-                <TableHead>服事人員</TableHead>
-                <TableHead className="w-[100px]">操作</TableHead>
+                <TableHead>{t("date")}</TableHead>
+                <TableHead>{t("time")}</TableHead>
+                <TableHead>{t("serviceType")}</TableHead>
+                <TableHead>{t("subtitle")}</TableHead>
+                <TableHead>{t("servicePersonnel")}</TableHead>
+                <TableHead className="w-[100px]">{t("actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

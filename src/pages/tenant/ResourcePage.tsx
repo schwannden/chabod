@@ -89,9 +89,9 @@ export default function ResourcePage() {
 
       setResourceGroupMap(groupMap);
     } catch (error) {
-      const errorMessage = error?.message || t("common.unknownError");
+      const errorMessage = error?.message || t("common:unknownError");
       toast({
-        title: t("common.error"),
+        title: t("common:error"),
         description: errorMessage,
         variant: "destructive",
       });
@@ -140,15 +140,15 @@ export default function ResourcePage() {
 
   return (
     <TenantPageLayout
-      title={t("dashboard.resourcesTitle")}
+      title={t("dashboard:resourcesTitle")}
       tenantName={tenantName}
       tenantSlug={slug || ""}
       isLoading={isLoading}
-      breadcrumbItems={[{ label: t("dashboard.resourcesTitle") }]}
+      breadcrumbItems={[{ label: t("dashboard:resourcesTitle") }]}
       action={
         role === "owner" && (
           <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" /> {t("resources.addResource")}
+            <Plus className="mr-2 h-4 w-4" /> {t("resources:addResource")}
           </Button>
         )
       }

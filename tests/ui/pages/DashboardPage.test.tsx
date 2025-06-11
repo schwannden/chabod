@@ -67,7 +67,7 @@ describe("DashboardPage", () => {
 
       render(<DashboardPage />);
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
     });
 
     it("should redirect to auth when user is not logged in", () => {
@@ -87,12 +87,12 @@ describe("DashboardPage", () => {
 
       // Wait for tenants to load
       await waitFor(() => {
-        expect(screen.getByText("dashboard.churchesYouManage")).toBeInTheDocument();
+        expect(screen.getByText("churchesYouManage")).toBeInTheDocument();
       });
 
       // Wait for the loading state to complete
       await waitFor(() => {
-        expect(screen.queryByText("dashboard.loadingChurchesList")).not.toBeInTheDocument();
+        expect(screen.queryByText("loadingChurchesList")).not.toBeInTheDocument();
       });
 
       // Check that tenants are displayed
@@ -111,8 +111,8 @@ describe("DashboardPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("dashboard.noChurchesYet")).toBeInTheDocument();
-        expect(screen.getByText("dashboard.addFirstChurch")).toBeInTheDocument();
+        expect(screen.getByText("noChurchesYet")).toBeInTheDocument();
+        expect(screen.getByText("addFirstChurch")).toBeInTheDocument();
       });
     });
 
@@ -124,7 +124,7 @@ describe("DashboardPage", () => {
 
       render(<DashboardPage />);
 
-      expect(screen.getByText("dashboard.loadingChurchesList")).toBeInTheDocument();
+      expect(screen.getByText("loadingChurchesList")).toBeInTheDocument();
     });
 
     it("should handle tenant fetching errors gracefully", async () => {
@@ -136,7 +136,7 @@ describe("DashboardPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("dashboard.noChurchesYet")).toBeInTheDocument();
+        expect(screen.getByText("noChurchesYet")).toBeInTheDocument();
       });
 
       expect(consoleSpy).toHaveBeenCalledWith("Error fetching tenants:", expect.any(Error));
@@ -153,10 +153,10 @@ describe("DashboardPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("dashboard.churchesYouManage")).toBeInTheDocument();
+        expect(screen.getByText("churchesYouManage")).toBeInTheDocument();
       });
 
-      const addButton = screen.getByRole("button", { name: /dashboard.addChurch/i });
+      const addButton = screen.getByRole("button", { name: /addChurch/i });
       await user.click(addButton);
 
       // The dialog should be open (this depends on TenantCreateDialog implementation)
@@ -172,11 +172,11 @@ describe("DashboardPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("dashboard.noChurchesYet")).toBeInTheDocument();
+        expect(screen.getByText("noChurchesYet")).toBeInTheDocument();
       });
 
       // Should have two add buttons - one in header, one in empty state
-      const addButtons = screen.getAllByText("dashboard.addChurch");
+      const addButtons = screen.getAllByText("addChurch");
       expect(addButtons).toHaveLength(2);
     });
   });
@@ -219,7 +219,7 @@ describe("DashboardPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("dashboard.churchesYouManage")).toBeInTheDocument();
+        expect(screen.getByText("churchesYouManage")).toBeInTheDocument();
       });
 
       // The NavBar should be rendered (this depends on NavBar implementation)
@@ -234,7 +234,7 @@ describe("DashboardPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("dashboard.churchesYouManage")).toBeInTheDocument();
+        expect(screen.getByText("churchesYouManage")).toBeInTheDocument();
       });
 
       // Check for main content area
@@ -244,9 +244,9 @@ describe("DashboardPage", () => {
 
       // Check for header with title and button
       const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toHaveTextContent("dashboard.churchesYouManage");
+      expect(heading).toHaveTextContent("churchesYouManage");
 
-      const addButton = screen.getByRole("button", { name: /dashboard.addChurch/i });
+      const addButton = screen.getByRole("button", { name: /addChurch/i });
       expect(addButton).toBeInTheDocument();
     });
   });
@@ -263,7 +263,7 @@ describe("DashboardPage", () => {
       render(<DashboardPage />);
 
       // Initial render should show tenant loading
-      expect(screen.getByText("dashboard.loadingChurchesList")).toBeInTheDocument();
+      expect(screen.getByText("loadingChurchesList")).toBeInTheDocument();
 
       // Resolve the promise to complete loading
       await act(async () => {
@@ -273,7 +273,7 @@ describe("DashboardPage", () => {
 
       // Loading message should disappear after data loads
       await waitFor(() => {
-        expect(screen.queryByText("dashboard.loadingChurchesList")).not.toBeInTheDocument();
+        expect(screen.queryByText("loadingChurchesList")).not.toBeInTheDocument();
       });
     });
 
@@ -553,8 +553,8 @@ describe("DashboardPage", () => {
       expect(screen.queryByTestId("trash-icon")).not.toBeInTheDocument();
 
       // But navigation buttons should still be present
-      expect(screen.getByText("tenant.goToChurchDashboard")).toBeInTheDocument();
-      expect(screen.getByText("tenant.goToChurchLogin")).toBeInTheDocument();
+      expect(screen.getByText("tenant:goToChurchDashboard")).toBeInTheDocument();
+      expect(screen.getByText("tenant:goToChurchLogin")).toBeInTheDocument();
     });
   });
 
@@ -566,7 +566,7 @@ describe("DashboardPage", () => {
 
       render(<DashboardPage />);
 
-      expect(screen.getByText("dashboard.loadingChurchesList")).toBeInTheDocument();
+      expect(screen.getByText("loadingChurchesList")).toBeInTheDocument();
     });
 
     it("should handle empty tenant list", async () => {
@@ -575,12 +575,12 @@ describe("DashboardPage", () => {
       render(<DashboardPage />);
 
       await waitFor(() => {
-        expect(screen.getByText("dashboard.noChurchesYet")).toBeInTheDocument();
-        expect(screen.getByText("dashboard.addFirstChurch")).toBeInTheDocument();
+        expect(screen.getByText("noChurchesYet")).toBeInTheDocument();
+        expect(screen.getByText("addFirstChurch")).toBeInTheDocument();
       });
 
       // Should still show the "Add Church" button
-      const addButtons = screen.getAllByText("dashboard.addChurch");
+      const addButtons = screen.getAllByText("addChurch");
       expect(addButtons).toHaveLength(2); // One in header, one in empty state
     });
   });
@@ -594,11 +594,11 @@ describe("DashboardPage", () => {
       render(<DashboardPage />);
 
       await waitFor(() => {
-        expect(screen.getByText("dashboard.noChurchesYet")).toBeInTheDocument();
+        expect(screen.getByText("noChurchesYet")).toBeInTheDocument();
       });
 
       // Click the add church button in the header
-      const addButton = screen.getAllByText("dashboard.addChurch")[0];
+      const addButton = screen.getAllByText("addChurch")[0];
       await user.click(addButton);
 
       // The create dialog should open

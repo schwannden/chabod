@@ -37,6 +37,7 @@ jest.mock("@/components/shared/GenericEventPage", () => ({
   GenericEventPage: ({
     slug,
     title,
+    description,
     calendar,
     filterBar,
     listView,
@@ -45,6 +46,7 @@ jest.mock("@/components/shared/GenericEventPage", () => ({
   }: {
     slug: string;
     title: string;
+    description: string;
     calendar: React.ReactNode;
     filterBar: React.ReactNode;
     listView: React.ReactNode;
@@ -62,6 +64,7 @@ jest.mock("@/components/shared/GenericEventPage", () => ({
       <div data-testid="generic-event-page">
         <div data-testid="page-slug">{slug}</div>
         <div data-testid="page-title">{title}</div>
+        <div data-testid="page-description">{description}</div>
         <div data-testid="calendar-section">{calendar}</div>
         <div data-testid="filter-bar-section">{filterBar}</div>
         <div data-testid="list-view-section">{listView}</div>
@@ -319,7 +322,7 @@ describe("EventPage", () => {
       });
 
       expect(screen.getByTestId("page-slug")).toHaveTextContent("test-church");
-      expect(screen.getByTestId("page-title")).toHaveTextContent("活動");
+      expect(screen.getByTestId("page-title")).toHaveTextContent("dashboard:eventsTitle");
     });
 
     it("should return null when no slug is provided", () => {

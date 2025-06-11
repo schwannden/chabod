@@ -1,0 +1,9 @@
+{
+  "alphaVersion": {
+    "title": "Alpha 版本通知",
+    "message": "Chabod 目前為 Alpha 版本，資料庫可能隨時會被重置。我們建議貢獻者使用本地開發環境。",
+    "icon": "warning",
+    "dontShowAgain": "不要再次顯示",
+    "understood": "我了解"
+  }
+}

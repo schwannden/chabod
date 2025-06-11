@@ -305,7 +305,7 @@ describe("GroupMembersPage", () => {
       useTenantRole.mockReturnValue({ role: "member", isLoading: false });
       render(<GroupMembersPage />);
       await waitFor(() => {
-        expect(screen.queryByText("groups.addMember")).not.toBeInTheDocument();
+        expect(screen.queryByText("groups:addMember")).not.toBeInTheDocument();
         expect(screen.queryByTestId("user-minus")).not.toBeInTheDocument();
       });
     });
@@ -314,7 +314,7 @@ describe("GroupMembersPage", () => {
       useTenantRole.mockReturnValue({ role: "owner", isLoading: false });
       render(<GroupMembersPage />);
       await waitFor(() => {
-        expect(screen.getByText("groups.addMember")).toBeInTheDocument();
+        expect(screen.getByText("groups:addMember")).toBeInTheDocument();
         expect(screen.getAllByTestId("user-minus").length).toBeGreaterThan(0);
       });
     });
@@ -335,7 +335,7 @@ describe("GroupMembersPage", () => {
         render(<GroupMembersPage />);
       });
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
     });
 
     it("should navigate to not-found when tenant doesn't exist", async () => {
@@ -406,7 +406,7 @@ describe("GroupMembersPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("groups.groupMembers")).toBeInTheDocument();
+        expect(screen.getByText("groups:groupMembers")).toBeInTheDocument();
         expect(screen.getByText("John Doe")).toBeInTheDocument();
         expect(screen.getByText("jane@example.com")).toBeInTheDocument();
       });
@@ -419,8 +419,8 @@ describe("GroupMembersPage", () => {
 
       await waitFor(() => {
         expect(screen.getByTestId("breadcrumb-tenant-name")).toHaveTextContent("Test Church");
-        expect(screen.getByTestId("breadcrumb-item-0")).toHaveTextContent("groups.groups");
-        expect(screen.getByTestId("breadcrumb-item-1")).toHaveTextContent("groups.members");
+        expect(screen.getByTestId("breadcrumb-item-0")).toHaveTextContent("groups:groups");
+        expect(screen.getByTestId("breadcrumb-item-1")).toHaveTextContent("groups:members");
       });
     });
 
@@ -430,7 +430,7 @@ describe("GroupMembersPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("groups.backToGroups")).toBeInTheDocument();
+        expect(screen.getByText("groups:backToGroups")).toBeInTheDocument();
       });
     });
 
@@ -442,7 +442,7 @@ describe("GroupMembersPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("groups.noMembersInGroup")).toBeInTheDocument();
+        expect(screen.getByText("groups:noMembersInGroup")).toBeInTheDocument();
       });
     });
 
@@ -460,7 +460,7 @@ describe("GroupMembersPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("groups.unknown")).toBeInTheDocument();
+        expect(screen.getByText("groups:unknown")).toBeInTheDocument();
       });
     });
   });
@@ -479,13 +479,13 @@ describe("GroupMembersPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("groups.addMember")).toBeInTheDocument();
+        expect(screen.getByText("groups:addMember")).toBeInTheDocument();
       });
 
-      const addButton = screen.getByText("groups.addMember");
+      const addButton = screen.getByText("groups:addMember");
       await user.click(addButton);
 
-      expect(screen.getByText("groups.addMemberToGroup")).toBeInTheDocument();
+      expect(screen.getByText("groups:addMemberToGroup")).toBeInTheDocument();
     });
 
     it("should add member successfully", async () => {
@@ -497,10 +497,10 @@ describe("GroupMembersPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("groups.addMember")).toBeInTheDocument();
+        expect(screen.getByText("groups:addMember")).toBeInTheDocument();
       });
 
-      const addButton = screen.getByText("groups.addMember");
+      const addButton = screen.getByText("groups:addMember");
       await user.click(addButton);
 
       // Select a member (our mock automatically selects user-3)
@@ -508,7 +508,7 @@ describe("GroupMembersPage", () => {
       await user.click(select);
 
       // Submit
-      const submitButton = screen.getByText("groups.addToGroup");
+      const submitButton = screen.getByText("groups:addToGroup");
       await user.click(submitButton);
 
       await waitFor(() => {
@@ -526,10 +526,10 @@ describe("GroupMembersPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("groups.addMember")).toBeInTheDocument();
+        expect(screen.getByText("groups:addMember")).toBeInTheDocument();
       });
 
-      const addButton = screen.getByText("groups.addMember");
+      const addButton = screen.getByText("groups:addMember");
       await user.click(addButton);
 
       // Select a member (our mock automatically selects user-3)
@@ -537,7 +537,7 @@ describe("GroupMembersPage", () => {
       await user.click(select);
 
       // Submit
-      const submitButton = screen.getByText("groups.addToGroup");
+      const submitButton = screen.getByText("groups:addToGroup");
       await user.click(submitButton);
 
       await waitFor(() => {
@@ -556,10 +556,10 @@ describe("GroupMembersPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getAllByText("groups.remove")).toHaveLength(2);
+        expect(screen.getAllByText("groups:remove")).toHaveLength(2);
       });
 
-      const removeButtons = screen.getAllByText("groups.remove");
+      const removeButtons = screen.getAllByText("groups:remove");
       await user.click(removeButtons[0]); // Click the first remove button
 
       await waitFor(() => {
@@ -577,10 +577,10 @@ describe("GroupMembersPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getAllByText("groups.remove")).toHaveLength(2);
+        expect(screen.getAllByText("groups:remove")).toHaveLength(2);
       });
 
-      const removeButtons = screen.getAllByText("groups.remove");
+      const removeButtons = screen.getAllByText("groups:remove");
       await user.click(removeButtons[0]); // Click the first remove button
 
       await waitFor(() => {
@@ -598,7 +598,7 @@ describe("GroupMembersPage", () => {
       });
 
       await waitFor(() => {
-        const addButton = screen.getByText("groups.addMember");
+        const addButton = screen.getByText("groups:addMember");
         expect(addButton).toBeDisabled();
       });
     });
@@ -617,10 +617,10 @@ describe("GroupMembersPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("groups.backToGroups")).toBeInTheDocument();
+        expect(screen.getByText("groups:backToGroups")).toBeInTheDocument();
       });
 
-      const backButton = screen.getByText("groups.backToGroups");
+      const backButton = screen.getByText("groups:backToGroups");
       await user.click(backButton);
 
       expect(mockNavigate).toHaveBeenCalledWith("/tenant/test-church/groups");
@@ -635,7 +635,7 @@ describe("GroupMembersPage", () => {
         render(<GroupMembersPage />);
       });
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
     });
 
     it("should show data loading state", async () => {
@@ -650,7 +650,7 @@ describe("GroupMembersPage", () => {
         render(<GroupMembersPage />);
       });
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
     });
   });
 
@@ -708,7 +708,7 @@ describe("GroupMembersPage", () => {
         rerender = result.rerender;
       });
 
-      expect(screen.getByText("common.loading")).toBeInTheDocument();
+      expect(screen.getByText("common:loading")).toBeInTheDocument();
 
       // Resolve the promise to simulate data loading
       await act(async () => {
@@ -735,8 +735,8 @@ describe("GroupMembersPage", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("groups.unknown")).toBeInTheDocument();
-        expect(screen.getByText("groups.noEmail")).toBeInTheDocument();
+        expect(screen.getByText("groups:unknown")).toBeInTheDocument();
+        expect(screen.getByText("groups:noEmail")).toBeInTheDocument();
       });
     });
   });
