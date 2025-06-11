@@ -29,7 +29,7 @@ export function ServiceDetailsForm({
   isProcessing = false,
   submitLabel,
 }: ServiceDetailsFormProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation("services");
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Trim the name on blur, but allow typing with spaces
@@ -51,7 +51,7 @@ export function ServiceDetailsForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("services:name")}</FormLabel>
+              <FormLabel>{t("name")}</FormLabel>
               <FormControl>
                 <Input
                   placeholder=""
@@ -70,7 +70,7 @@ export function ServiceDetailsForm({
             name="default_start_time"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("services:defaultStartTime")}</FormLabel>
+                <FormLabel>{t("defaultStartTime")}</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -83,7 +83,7 @@ export function ServiceDetailsForm({
             name="default_end_time"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("services:defaultEndTime")}</FormLabel>
+                <FormLabel>{t("defaultEndTime")}</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -104,7 +104,7 @@ export function ServiceDetailsForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("services:name")}</FormLabel>
+              <FormLabel>{t("name")}</FormLabel>
               <FormControl>
                 <Input
                   placeholder=""
@@ -123,7 +123,7 @@ export function ServiceDetailsForm({
             name="default_start_time"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("services:defaultStartTime")}</FormLabel>
+                <FormLabel>{t("defaultStartTime")}</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -136,7 +136,7 @@ export function ServiceDetailsForm({
             name="default_end_time"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("services:defaultEndTime")}</FormLabel>
+                <FormLabel>{t("defaultEndTime")}</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>

@@ -10,6 +10,7 @@ import { Group, TenantMemberWithProfile } from "@/lib/types";
 import { NoteFormValues } from "./ServiceNotesForm";
 import { RoleFormValues } from "./ServiceRolesForm";
 import { ServiceFormValues } from "../hooks/useServiceForm";
+import { Form } from "@/components/ui/form";
 
 export interface ServiceFormProps {
   form: UseFormReturn<ServiceFormValues, unknown, undefined>;
@@ -57,7 +58,7 @@ export function ServiceForm({
   const tenantId = form.getValues().tenant_id;
 
   return (
-    <>
+    <Form {...form}>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-5 mb-4">
           <TabsTrigger value="details">基本資料</TabsTrigger>
@@ -125,6 +126,6 @@ export function ServiceForm({
           {isSubmitting ? "處理中..." : submitLabel}
         </Button>
       </div>
-    </>
+    </Form>
   );
 }

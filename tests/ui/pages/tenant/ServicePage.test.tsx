@@ -103,6 +103,7 @@ jest.mock("@/components/Services/CreateServiceDialog", () => ({
       <button onClick={onSuccess} data-testid="trigger-success">
         Trigger Success
       </button>
+      <div data-testid="form-context-test">Form context available</div>
     </div>
   ),
 }));
@@ -430,6 +431,18 @@ describe("ServicePage", () => {
       // Verify getServices was called again (refetch)
       await waitFor(() => {
         expect(serviceCore.getServices).toHaveBeenCalledTimes(2);
+      });
+    });
+
+    it("should render create service dialog with form context available", async () => {
+      useTenantRole.mockReturnValue({ role: "owner", isLoading: false });
+
+      render(<ServicePage />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId("create-service-dialog")).toBeInTheDocument();
+        expect(screen.getByTestId("form-context-test")).toBeInTheDocument();
+        expect(screen.getByTestId("form-context-test")).toHaveTextContent("Form context available");
       });
     });
   });

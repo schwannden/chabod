@@ -21,7 +21,7 @@ interface CreateServiceDialogProps {
 }
 
 export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialogProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation("services");
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
 
@@ -82,8 +82,8 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
       );
 
       toast({
-        title: t("services:serviceTypeCreated"),
-        description: t("services:serviceTypeCreatedSuccess"),
+        title: t("serviceTypeCreated"),
+        description: t("serviceTypeCreatedSuccess"),
       });
       handleDialogClose();
       onSuccess?.();
@@ -91,7 +91,7 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
       console.error("Error creating service:", error);
       toast({
         title: t("common:error"),
-        description: t("services:createServiceTypeError"),
+        description: t("createServiceTypeError"),
         variant: "destructive",
       });
     } finally {
@@ -109,12 +109,12 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
       <DialogTrigger asChild>
         <Button>
           <Plus className="size-4 mr-2" />
-          {t("services:addServiceType")}
+          {t("addServiceType")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-auto">
         <DialogHeader>
-          <DialogTitle>{t("services:addServiceType")}</DialogTitle>
+          <DialogTitle>{t("addServiceType")}</DialogTitle>
         </DialogHeader>
 
         <ServiceForm
@@ -134,7 +134,7 @@ export function CreateServiceDialog({ tenantId, onSuccess }: CreateServiceDialog
           onSubmit={handleSubmit}
           onCancel={handleDialogClose}
           isSubmitting={isSubmitting}
-          submitLabel={t("services:addServiceType")}
+          submitLabel={t("addServiceType")}
           isEditing={false}
         />
       </DialogContent>

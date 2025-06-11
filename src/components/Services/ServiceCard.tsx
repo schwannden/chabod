@@ -28,7 +28,7 @@ interface ServiceCardProps {
 }
 
 export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation("services");
   const { toast } = useToast();
   const [activeSheet, setActiveSheet] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -40,15 +40,15 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
       setIsDeleting(true);
       await deleteService(service.id);
       toast({
-        title: t("services:serviceTypeDeleted"),
-        description: t("services:serviceDeletedSuccess"),
+        title: t("serviceTypeDeleted"),
+        description: t("serviceDeletedSuccess"),
       });
       onDeleted();
     } catch (error) {
       console.error("Error deleting service:", error);
       toast({
         title: t("common:error"),
-        description: t("services:deleteServiceTypeError"),
+        description: t("deleteServiceTypeError"),
         variant: "destructive",
       });
     } finally {
@@ -70,7 +70,7 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
           <CardDescription>
             {service.default_start_time && service.default_end_time
               ? `${service.default_start_time} - ${service.default_end_time}`
-              : t("services:notSetDefaultTime")}
+              : t("notSetDefaultTime")}
           </CardDescription>
         </div>
         <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
@@ -82,7 +82,7 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => onEdit(service)}>
               <Pencil className="mr-2 h-4 w-4" />
-              {t("services:editBasicInfo")}
+              {t("editBasicInfo")}
             </DropdownMenuItem>
             <DropdownMenuItem className="text-destructive" onClick={handleDeleteClick}>
               <Trash className="mr-2 h-4 w-4" />
@@ -100,13 +100,13 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
             <SheetTrigger asChild>
               <Button variant="outline" className="w-full">
                 <UserPlus className="mr-2 h-4 w-4" />
-                {t("services:serviceAdmins")}
+                {t("serviceAdmins")}
               </Button>
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
                 <SheetTitle>
-                  {service.name} - {t("services:serviceAdmins")}
+                  {service.name} - {t("serviceAdmins")}
                 </SheetTitle>
               </SheetHeader>
               <div className="py-4">
@@ -122,13 +122,13 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
             <SheetTrigger asChild>
               <Button variant="outline" className="w-full">
                 <Users className="mr-2 h-4 w-4" />
-                {t("services:serviceGroups")}
+                {t("serviceGroups")}
               </Button>
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
                 <SheetTitle>
-                  {service.name} - {t("services:serviceGroups")}
+                  {service.name} - {t("serviceGroups")}
                 </SheetTitle>
               </SheetHeader>
               <div className="py-4">
@@ -144,13 +144,13 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
             <SheetTrigger asChild>
               <Button variant="outline" className="w-full">
                 <FilePlus className="mr-2 h-4 w-4" />
-                {t("services:serviceNotes")}
+                {t("serviceNotes")}
               </Button>
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
                 <SheetTitle>
-                  {service.name} - {t("services:serviceNotes")}
+                  {service.name} - {t("serviceNotes")}
                 </SheetTitle>
               </SheetHeader>
               <div className="py-4">
@@ -166,13 +166,13 @@ export function ServiceCard({ service, onEdit, onDeleted }: ServiceCardProps) {
             <SheetTrigger asChild>
               <Button variant="outline" className="w-full">
                 <ShieldPlus className="mr-2 h-4 w-4" />
-                {t("services:serviceRoles")}
+                {t("serviceRoles")}
               </Button>
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
                 <SheetTitle>
-                  {service.name} - {t("services:serviceRoles")}
+                  {service.name} - {t("serviceRoles")}
                 </SheetTitle>
               </SheetHeader>
               <div className="py-4">

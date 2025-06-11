@@ -17,13 +17,15 @@ import { Edit2, Trash2, X, Check, Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { addServiceRole, deleteServiceRoles } from "@/lib/services";
+import { useTranslation } from "react-i18next";
 
-const roleFormSchema = z.object({
-  name: z.string().min(1, "角色名稱為必填"),
-  description: z.string().optional(),
-});
+const createRoleFormSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(1, t("roleNameRequired")),
+    description: z.string().optional(),
+  });
 
-export type RoleFormValues = z.infer<typeof roleFormSchema>;
+export type RoleFormValues = z.infer<ReturnType<typeof createRoleFormSchema>>;
 
 interface ServiceRolesFormProps {
   roles: RoleFormValues[];
@@ -40,7 +42,10 @@ export function ServiceRolesForm({
   tenantId,
   isEditing,
 }: ServiceRolesFormProps) {
+  const { t } = useTranslation("services");
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+  const roleFormSchema = createRoleFormSchema(t);
 
   const roleForm = useForm<RoleFormValues>({
     resolver: zodResolver(roleFormSchema),
@@ -77,7 +82,7 @@ export function ServiceRolesForm({
         roleForm.reset();
       } catch (error) {
         console.error("Error adding service role:", error);
-        toast.error("新增角色時發生錯誤");
+        toast.error(t("errorAddingRole"));
       }
     } else {
       roleForm.trigger();
@@ -128,7 +133,7 @@ export function ServiceRolesForm({
         setEditingIndex(null);
       } catch (error) {
         console.error("Error updating service role:", error);
-        toast.error("更新角色時發生錯誤");
+        toast.error(t("errorUpdatingRole"));
       }
     } else {
       editForm.trigger();
@@ -170,13 +175,13 @@ export function ServiceRolesForm({
       }
     } catch (error) {
       console.error("Error deleting service role:", error);
-      toast.error("刪除角色時發生錯誤");
+      toast.error(t("errorDeletingRole"));
     }
   };
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium">新增服事角色</h3>
+      <h3 className="text-lg font-medium">{t("addServiceRoles")}</h3>
       <Form {...roleForm}>
         <form className="space-y-4">
           <FormField
@@ -184,9 +189,9 @@ export function ServiceRolesForm({
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>角色名稱</FormLabel>
+                <FormLabel>{t("roleName")}</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="角色名稱" />
+                  <Input {...field} placeholder={t("roleName")} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -194,14 +199,14 @@ export function ServiceRolesForm({
           />
           <Button type="button" onClick={handleAddRole}>
             <Plus className="mr-2 h-4 w-4" />
-            新增角色
+            {t("addRole")}
           </Button>
         </form>
       </Form>
 
       {roles.length > 0 && (
         <div className="mt-4">
-          <h4 className="text-sm font-medium mb-2">已新增角色</h4>
+          <h4 className="text-sm font-medium mb-2">{t("addedRoles")}</h4>
           <ScrollArea className="h-40 border rounded-md p-2">
             <div className="space-y-2">
               {roles.map((role, index) => (
@@ -215,7 +220,7 @@ export function ServiceRolesForm({
                           render={({ field }) => (
                             <FormItem>
                               <FormControl>
-                                <Input {...field} placeholder="角色名稱" />
+                                <Input {...field} placeholder={t("roleName")} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -227,7 +232,7 @@ export function ServiceRolesForm({
                           render={({ field }) => (
                             <FormItem>
                               <FormControl>
-                                <Textarea {...field} placeholder="角色描述" rows={2} />
+                                <Textarea {...field} placeholder={t("roleDescription")} rows={2} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -241,11 +246,11 @@ export function ServiceRolesForm({
                             onClick={handleCancelEdit}
                           >
                             <X className="h-4 w-4" />
-                            <span className="sr-only">取消</span>
+                            <span className="sr-only">{t("cancel")}</span>
                           </Button>
                           <Button type="button" size="sm" onClick={() => handleSaveEdit(index)}>
                             <Check className="h-4 w-4" />
-                            <span className="sr-only">儲存</span>
+                            <span className="sr-only">{t("save")}</span>
                           </Button>
                         </div>
                       </form>
@@ -264,7 +269,7 @@ export function ServiceRolesForm({
                           onClick={() => handleEditRole(index)}
                         >
                           <Edit2 className="h-4 w-4" />
-                          <span className="sr-only">編輯角色</span>
+                          <span className="sr-only">{t("editRole")}</span>
                         </Button>
                         <Button
                           variant="ghost"
@@ -273,7 +278,7 @@ export function ServiceRolesForm({
                           onClick={() => handleDeleteRole(index)}
                         >
                           <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">刪除角色</span>
+                          <span className="sr-only">{t("deleteRole")}</span>
                         </Button>
                       </div>
                     </div>
