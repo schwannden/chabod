@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { DollarSign } from "lucide-react";
 import { PriceTier } from "@/lib/types";
 import { getPriceTiers } from "@/lib/tenant-service";
+import { useTranslation } from "react-i18next";
 
 interface PricingCardProps {
   title: string;
@@ -27,6 +28,8 @@ function PricingCard({
   highlighted = false,
   buttonLink,
 }: PricingCardProps) {
+  const { t } = useTranslation();
+
   return (
     <Card
       className={`border-0 ${highlighted ? "shadow-xl ring-2 ring-primary" : "shadow-md"} relative`}
@@ -34,7 +37,7 @@ function PricingCard({
       {highlighted && (
         <div className="absolute -top-4 left-0 right-0 text-center">
           <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded-full">
-            推薦方案
+            {t("landing:pricingPlans.recommended")}
           </span>
         </div>
       )}
@@ -44,7 +47,9 @@ function PricingCard({
           <span className="text-3xl font-bold">
             {typeof price === "number" ? `NT$${price}` : price}
           </span>
-          {typeof price === "number" && <span className="ml-1">/ 月</span>}
+          {typeof price === "number" && (
+            <span className="ml-1">{t("landing:pricingPlans.monthlyPrice")}</span>
+          )}
         </div>
         <CardDescription className="mt-2">{description}</CardDescription>
       </CardHeader>
@@ -74,6 +79,7 @@ function PricingCard({
 export function PricingPlans() {
   const [priceTiers, setPriceTiers] = useState<PriceTier[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const loadPriceTiers = async () => {
@@ -91,27 +97,39 @@ export function PricingPlans() {
   }, []);
 
   if (isLoading) {
-    return <div className="py-20 text-center">載入價格方案中...</div>;
+    return <div className="py-20 text-center">{t("landing:pricingPlans.loadingMessage")}</div>;
   }
 
   // Helper function to get tier features
   const getTierFeatures = (tier: PriceTier) => {
     const features = [
-      `會友人數上限: ${tier.user_limit} 人`,
-      `小組數量上限: ${tier.group_limit} 個`,
-      `活動數量上限: ${tier.event_limit} 個`,
+      t("landing:pricingPlans.userLimit", { count: tier.user_limit }),
+      t("landing:pricingPlans.groupLimit", { count: tier.group_limit }),
+      t("landing:pricingPlans.eventLimit", { count: tier.event_limit }),
     ];
 
     if (tier.name === "Free") {
-      features.push("所有基本管理", "社群支援");
+      features.push(
+        t("landing:pricingPlans.features.basicManagement"),
+        t("landing:pricingPlans.features.communitySupport"),
+      );
     } else if (tier.name === "Starter") {
-      features.push("所有免費方案功能");
+      features.push(t("landing:pricingPlans.features.allFreeFeatures"));
     } else if (tier.name === "Standard") {
-      features.push("所有Starter功能", "優先支援");
+      features.push(
+        t("landing:pricingPlans.features.allStarterFeatures"),
+        t("landing:pricingPlans.features.prioritySupport"),
+      );
     } else if (tier.name === "Advanced") {
-      features.push("所有Standard功能", "優先支援");
+      features.push(
+        t("landing:pricingPlans.features.allStandardFeatures"),
+        t("landing:pricingPlans.features.prioritySupport"),
+      );
     } else if (tier.name === "Pro") {
-      features.push("所有Advanced功能", "專屬支援經理");
+      features.push(
+        t("landing:pricingPlans.features.allAdvancedFeatures"),
+        t("landing:pricingPlans.features.dedicatedSupport"),
+      );
     }
 
     return features;
@@ -121,13 +139,13 @@ export function PricingPlans() {
   const getTierButtonProps = (tier: PriceTier) => {
     if (tier.name === "Free") {
       return {
-        text: "立即開始",
+        text: t("landing:pricingPlans.getStarted"),
         variant: "outline" as const,
         link: "/auth?tab=signup",
       };
     } else {
       return {
-        text: "聯絡我們",
+        text: t("landing:pricingPlans.contactUs"),
         variant: "default" as const,
         link: "mailto:support@fruitful-tools.com",
       };
@@ -141,16 +159,17 @@ export function PricingPlans() {
           <div className="inline-block p-3 bg-primary/10 rounded-full mb-4">
             <DollarSign className="h-6 w-6 text-primary" />
           </div>
-          <h2 className="text-3xl font-bold mb-4">價格方案</h2>
+          <h2 className="text-3xl font-bold mb-4">{t("landing:pricingPlans.title")}</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            彈性的價格方案，滿足不同規模教會的需求
+            {t("landing:pricingPlans.subtitle")}
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {priceTiers.map((tier, index) => {
             const buttonProps = getTierButtonProps(tier);
-            const price = tier.name === "Free" ? "免費" : tier.price_monthly;
+            const price =
+              tier.name === "Free" ? t("landing:pricingPlans.free") : tier.price_monthly;
             const isHighlighted = tier.name === "Standard";
 
             return (

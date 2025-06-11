@@ -49,5 +49,41 @@
     "title": "開始使用 Chabod 進行教會管理",
     "subtitle": "凱撒的歸凱撒，上帝的歸上帝，可以數位化的交給Chabod",
     "signUp": "立即註冊"
+  },
+  "namingExplanation": "我們的事工名為「Chabod（כָּבוֹד）」，源自希伯來文，意指「榮耀」。這個名字回應了《撒母耳記上》中的約櫃流浪記——當神的約櫃被非利士人擄去時，以色列人驚呼「以迦博」（Ichabod），意思是「榮耀離開了以色列」。這是對神同在失落的極大哀嘆，但在耶穌基督裡，我們深信：神的榮耀從未離開(Chabod)，祂住在我們中間，正如昔日祂擊倒大袞一般，今天祂仍在這個數位化、AI快速擴張的世界中掌權。Chabod 是我們的宣告：無論世界如何改變，神的榮耀從未離席，依然運行、依然同在，並在每一個看似不可能的地方發出祂榮耀的光芒。",
+  "footer": {
+    "description": "專為現代教會設計的全方位管理平台，傳承數位資產的，簡化行政工作。",
+    "links": "連結",
+    "features": "功能",
+    "pricing": "價格",
+    "contribute": "參與貢獻",
+    "terms": "合約條款",
+    "contact": "聯絡我們",
+    "contactDescription": "有任何問題或建議？",
+    "contactEmail": "請寄信至",
+    "copyright": "© 2025 Chabod Limited. 保留所有權利。"
+  },
+  "pricingPlans": {
+    "title": "價格方案",
+    "subtitle": "彈性的價格方案，滿足不同規模教會的需求",
+    "loadingMessage": "載入價格方案中...",
+    "recommended": "推薦方案",
+    "monthlyPrice": "/ 月",
+    "userLimit": "會友人數上限: {count} 人",
+    "groupLimit": "小組數量上限: {count} 個",
+    "eventLimit": "活動數量上限: {count} 個",
+    "features": {
+      "basicManagement": "所有基本管理",
+      "communitySupport": "社群支援",
+      "allFreeFeatures": "所有免費方案功能",
+      "allStarterFeatures": "所有Starter功能",
+      "prioritySupport": "優先支援",
+      "allStandardFeatures": "所有Standard功能",
+      "allAdvancedFeatures": "所有Advanced功能",
+      "dedicatedSupport": "專屬支援經理"
+    },
+    "getStarted": "立即開始",
+    "contactUs": "聯絡我們",
+    "free": "免費"
   }
 }

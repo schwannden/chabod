@@ -49,5 +49,41 @@
     "title": "Start Using Chabod for Church Management",
     "subtitle": "Render unto Caesar what is Caesar's, and unto God what is God's. What can be digitized, leave it to Chabod",
     "signUp": "Sign Up Now"
+  },
+  "namingExplanation": "Our ministry is named 'Chabod (כָּבוֹד)', from Hebrew, meaning 'Glory'. This name responds to the wandering of the Ark in 1 Samuel — when the Ark of God was captured by the Philistines, the Israelites cried out 'Ichabod', meaning 'The Glory has departed from Israel'. This was a great lament for the loss of God's presence, but in Jesus Christ, we firmly believe: God's glory has never departed (Chabod), He dwells among us, just as He once struck down Dagon, today He still reigns in this digital, AI-rapidly expanding world. Chabod is our declaration: no matter how the world changes, God's glory has never left, still working, still present, and shining His glorious light in every seemingly impossible place.",
+  "footer": {
+    "description": "A comprehensive management platform designed for modern churches, inheriting digital assets and simplifying administrative work.",
+    "links": "Links",
+    "features": "Features",
+    "pricing": "Pricing",
+    "contribute": "Contribute",
+    "terms": "Terms of Service",
+    "contact": "Contact Us",
+    "contactDescription": "Have any questions or suggestions?",
+    "contactEmail": "Please email us at",
+    "copyright": "© 2025 Chabod Limited. All rights reserved."
+  },
+  "pricingPlans": {
+    "title": "Pricing Plans",
+    "subtitle": "Flexible pricing plans to meet the needs of churches of different sizes",
+    "loadingMessage": "Loading pricing plans...",
+    "recommended": "Recommended",
+    "monthlyPrice": "/ month",
+    "userLimit": "Member limit: {count} people",
+    "groupLimit": "Group limit: {count} groups",
+    "eventLimit": "Event limit: {count} events",
+    "features": {
+      "basicManagement": "All basic management features",
+      "communitySupport": "Community support",
+      "allFreeFeatures": "All free plan features",
+      "allStarterFeatures": "All Starter features",
+      "prioritySupport": "Priority support",
+      "allStandardFeatures": "All Standard features",
+      "allAdvancedFeatures": "All Advanced features",
+      "dedicatedSupport": "Dedicated support manager"
+    },
+    "getStarted": "Get Started",
+    "contactUs": "Contact Us",
+    "free": "Free"
   }
 }
