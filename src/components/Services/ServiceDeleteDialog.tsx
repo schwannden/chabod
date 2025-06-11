@@ -28,7 +28,7 @@ export function ServiceDeleteDialog({
   onConfirm,
   isLoading = false,
 }: ServiceDeleteDialogProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation("services");
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
@@ -36,11 +36,11 @@ export function ServiceDeleteDialog({
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
             <Trash2 className="h-5 w-5 text-destructive" />
-            {t("services:confirmDeleteServiceType")}
+            {t("confirmDeleteServiceType")}
           </AlertDialogTitle>
           <AlertDialogDescription
             dangerouslySetInnerHTML={{
-              __html: t("services:deleteServiceTypeConfirm", { serviceName: service.name }),
+              __html: t("deleteServiceTypeConfirm", { serviceName: service.name }),
             }}
           />
         </AlertDialogHeader>
@@ -50,13 +50,13 @@ export function ServiceDeleteDialog({
             <div className="flex items-start">
               <AlertTriangle className="mr-2 h-4 w-4 mt-0.5" />
               <div>
-                <div className="font-medium">{t("services:deleteServiceTypeWarning")}</div>
+                <div className="font-medium">{t("deleteServiceTypeWarning")}</div>
                 <ul className="list-disc pl-5 mt-1">
-                  <li>{t("services:relatedSchedules")}</li>
-                  <li>{t("services:relatedNotes")}</li>
-                  <li>{t("services:relatedRoles")}</li>
-                  <li>{t("services:relatedGroups")}</li>
-                  <li>{t("services:relatedAdmins")}</li>
+                  <li>{t("relatedSchedules")}</li>
+                  <li>{t("relatedNotes")}</li>
+                  <li>{t("relatedRoles")}</li>
+                  <li>{t("relatedGroups")}</li>
+                  <li>{t("relatedAdmins")}</li>
                 </ul>
               </div>
             </div>
@@ -73,7 +73,7 @@ export function ServiceDeleteDialog({
             disabled={isLoading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isLoading ? t("common:processing") : t("services:confirmDelete")}
+            {isLoading ? t("common:processing") : t("confirmDelete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

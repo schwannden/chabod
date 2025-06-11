@@ -16,25 +16,27 @@ import { Edit2, Trash2, X, Check, Plus, Link } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { addServiceNote, deleteServiceNotes } from "@/lib/services";
+import { useTranslation } from "react-i18next";
 
 // Updated schema to validate URLs
-const noteFormSchema = z.object({
-  text: z.string().min(1, "標題為必填"),
-  link: z
-    .string()
-    .refine(
-      (val) =>
-        !val ||
-        /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/.test(
-          val,
-        ),
-      { message: "請輸入有效的URL" },
-    )
-    .optional()
-    .or(z.literal("")),
-});
+const createNoteFormSchema = (t: (key: string) => string) =>
+  z.object({
+    text: z.string().min(1, t("titleRequired")),
+    link: z
+      .string()
+      .refine(
+        (val) =>
+          !val ||
+          /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/.test(
+            val,
+          ),
+        { message: t("pleaseEnterValidUrl") },
+      )
+      .optional()
+      .or(z.literal("")),
+  });
 
-export type NoteFormValues = z.infer<typeof noteFormSchema>;
+export type NoteFormValues = z.infer<ReturnType<typeof createNoteFormSchema>>;
 
 interface ServiceNotesFormProps {
   notes: NoteFormValues[];
@@ -51,7 +53,10 @@ export function ServiceNotesForm({
   tenantId,
   isEditing,
 }: ServiceNotesFormProps) {
+  const { t } = useTranslation("services");
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+  const noteFormSchema = createNoteFormSchema(t);
 
   const noteForm = useForm<NoteFormValues>({
     resolver: zodResolver(noteFormSchema),
@@ -88,7 +93,7 @@ export function ServiceNotesForm({
         noteForm.reset();
       } catch (error) {
         console.error("Error adding service note:", error);
-        toast.error("新增備註時發生錯誤");
+        toast.error(t("errorAddingNote"));
       }
     } else {
       noteForm.trigger();
@@ -139,7 +144,7 @@ export function ServiceNotesForm({
         setEditingIndex(null);
       } catch (error) {
         console.error("Error updating service note:", error);
-        toast.error("更新備註時發生錯誤");
+        toast.error(t("errorUpdatingNote"));
       }
     } else {
       editForm.trigger();
@@ -181,13 +186,13 @@ export function ServiceNotesForm({
       }
     } catch (error) {
       console.error("Error deleting service note:", error);
-      toast.error("刪除備註時發生錯誤");
+      toast.error(t("errorDeletingNote"));
     }
   };
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium">新增服事備註</h3>
+      <h3 className="text-lg font-medium">{t("addServiceNotes")}</h3>
       <Form {...noteForm}>
         <form className="space-y-4">
           <FormField
@@ -195,9 +200,9 @@ export function ServiceNotesForm({
             name="text"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>內容</FormLabel>
+                <FormLabel>{t("content")}</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="備註內容" />
+                  <Input {...field} placeholder={t("noteContent")} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -210,7 +215,7 @@ export function ServiceNotesForm({
               <FormItem>
                 <FormLabel className="flex items-center gap-1">
                   <Link className="h-4 w-4" />
-                  連結 URL
+                  {t("linkUrl")}
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
@@ -224,14 +229,14 @@ export function ServiceNotesForm({
           />
           <Button type="button" onClick={handleAddNote}>
             <Plus className="mr-2 h-4 w-4" />
-            新增備註
+            {t("addNote")}
           </Button>
         </form>
       </Form>
 
       {notes.length > 0 && (
         <div className="mt-4">
-          <h4 className="text-sm font-medium mb-2">已新增備註</h4>
+          <h4 className="text-sm font-medium mb-2">{t("addedNotes")}</h4>
           <ScrollArea className="h-40 border rounded-md p-2">
             <div className="space-y-2">
               {notes.map((note, index) => (
@@ -245,7 +250,7 @@ export function ServiceNotesForm({
                           render={({ field }) => (
                             <FormItem>
                               <FormControl>
-                                <Input {...field} placeholder="備註內容" />
+                                <Input {...field} placeholder={t("noteContent")} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -256,7 +261,6 @@ export function ServiceNotesForm({
                           name="link"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-xs">連結 URL</FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <Input
@@ -279,11 +283,11 @@ export function ServiceNotesForm({
                             onClick={handleCancelEdit}
                           >
                             <X className="h-4 w-4" />
-                            <span className="sr-only">取消</span>
+                            <span className="sr-only">{t("cancel")}</span>
                           </Button>
                           <Button type="button" size="sm" onClick={() => handleSaveEdit(index)}>
                             <Check className="h-4 w-4" />
-                            <span className="sr-only">儲存</span>
+                            <span className="sr-only">{t("save")}</span>
                           </Button>
                         </div>
                       </form>
@@ -297,9 +301,8 @@ export function ServiceNotesForm({
                             href={note.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs text-blue-500 hover:underline flex items-center mt-1"
+                            className="text-sm text-blue-600 hover:underline"
                           >
-                            <Link className="h-3 w-3 mr-1" />
                             {note.link}
                           </a>
                         )}
@@ -312,7 +315,7 @@ export function ServiceNotesForm({
                           onClick={() => handleEditNote(index)}
                         >
                           <Edit2 className="h-4 w-4" />
-                          <span className="sr-only">編輯備註</span>
+                          <span className="sr-only">{t("common:edit")}</span>
                         </Button>
                         <Button
                           variant="ghost"
@@ -321,7 +324,7 @@ export function ServiceNotesForm({
                           onClick={() => handleDeleteNote(index)}
                         >
                           <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">刪除備註</span>
+                          <span className="sr-only">{t("common:delete")}</span>
                         </Button>
                       </div>
                     </div>

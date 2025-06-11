@@ -8,8 +8,11 @@ import {
 } from "@/components/ui/accordion";
 import { Calendar, FileText, PlusCircle, Link } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 export function ServiceNoteView({ serviceId }: { serviceId: string }) {
+  const { t } = useTranslation("services");
+
   const {
     data: notes = [],
     isLoading,
@@ -19,17 +22,17 @@ export function ServiceNoteView({ serviceId }: { serviceId: string }) {
     queryFn: () => getServiceNotes(serviceId),
   });
 
-  if (isLoading) return <div className="text-center py-4">載入中...</div>;
-  if (error) return <div className="text-red-500">載入失敗</div>;
+  if (isLoading) return <div className="text-center py-4">{t("loading")}</div>;
+  if (error) return <div className="text-red-500">{t("loadingFailed")}</div>;
 
   return (
     <div className="space-y-4">
       {notes.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-8 text-center">
-          <p className="text-muted-foreground mb-4">尚未添加服事備註</p>
+          <p className="text-muted-foreground mb-4">{t("noServiceNotesAdded")}</p>
           <Button variant="outline" size="sm" disabled className="opacity-50">
             <PlusCircle className="mr-2 h-4 w-4" />
-            添加備註
+            {t("addNotes")}
           </Button>
         </div>
       ) : (
@@ -50,7 +53,9 @@ export function ServiceNoteView({ serviceId }: { serviceId: string }) {
               <AccordionContent className="px-4 pt-2 pb-4">
                 <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
                   <Calendar className="h-3.5 w-3.5" />
-                  <span>更新於: {new Date(note.updated_at).toLocaleString()}</span>
+                  <span>
+                    {t("updatedAt")}: {new Date(note.updated_at).toLocaleString()}
+                  </span>
                 </div>
                 <p className="whitespace-pre-wrap mb-2 mt-4 text-sm">{note.text}</p>
                 {note.link && (

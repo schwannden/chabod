@@ -8,8 +8,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useTranslation } from "react-i18next";
 
 export function ServiceRoleView({ serviceId }: { serviceId: string }) {
+  const { t } = useTranslation("services");
+
   const {
     data: roles = [],
     isLoading,
@@ -19,17 +22,17 @@ export function ServiceRoleView({ serviceId }: { serviceId: string }) {
     queryFn: () => getServiceRoles(serviceId),
   });
 
-  if (isLoading) return <div className="text-center py-4">載入中...</div>;
-  if (error) return <div className="text-red-500">載入失敗</div>;
+  if (isLoading) return <div className="text-center py-4">{t("loading")}</div>;
+  if (error) return <div className="text-red-500">{t("loadingFailed")}</div>;
 
   return (
     <div className="space-y-4">
       {roles.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-8 text-center">
-          <p className="text-muted-foreground mb-4">尚未添加服事角色</p>
+          <p className="text-muted-foreground mb-4">{t("noServiceRolesAdded")}</p>
           <Button variant="outline" size="sm" disabled className="opacity-50">
             <PlusCircle className="mr-2 h-4 w-4" />
-            添加角色
+            {t("addRoles")}
           </Button>
         </div>
       ) : (
@@ -46,7 +49,9 @@ export function ServiceRoleView({ serviceId }: { serviceId: string }) {
               </AccordionTrigger>
               <AccordionContent className="px-4 pt-2 pb-4">
                 <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
-                  <span>創建於: {new Date(role.created_at).toLocaleString()}</span>
+                  <span>
+                    {t("createdAt")}: {new Date(role.created_at).toLocaleString()}
+                  </span>
                 </div>
                 {/* Only show description if it exists */}
                 {role.description && (

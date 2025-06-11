@@ -3,6 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Group } from "@/lib/types";
 import { toast } from "sonner";
 import { addServiceGroup, removeServiceGroup } from "@/lib/services";
+import { useTranslation } from "react-i18next";
 
 interface ServiceGroupsFormProps {
   groups: Group[];
@@ -19,6 +20,8 @@ export function ServiceGroupsForm({
   serviceId,
   isEditing,
 }: ServiceGroupsFormProps) {
+  const { t } = useTranslation("services");
+
   const handleGroupChange = async (groupId: string, checked: boolean) => {
     try {
       if (isEditing && serviceId) {
@@ -38,13 +41,13 @@ export function ServiceGroupsForm({
       }
     } catch (error) {
       console.error("Error updating service groups:", error);
-      toast.error("更新小組時發生錯誤");
+      toast.error(t("errorUpdatingGroups"));
     }
   };
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium">選擇服事小組</h3>
+      <h3 className="text-lg font-medium">{t("selectServiceGroups")}</h3>
       <ScrollArea className="h-72 border rounded-md p-2">
         <div className="space-y-2">
           {groups.length > 0 ? (
@@ -63,7 +66,7 @@ export function ServiceGroupsForm({
               </div>
             ))
           ) : (
-            <p className="text-muted-foreground">尚未有小組</p>
+            <p className="text-muted-foreground">{t("noGroupsYet")}</p>
           )}
         </div>
       </ScrollArea>
