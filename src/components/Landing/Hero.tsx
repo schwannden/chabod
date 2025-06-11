@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Info } from "lucide-react";
@@ -14,7 +13,7 @@ export function Hero() {
     <section className="py-20 px-4 text-center bg-gradient-to-b from-primary/10 to-background">
       <div className="container mx-auto max-w-4xl">
         <h1 className="text-4xl md:text-5xl font-bold mb-6 inline-flex items-center justify-center gap-2">
-          {t('landing.hero.title')}
+          {t("landing:hero.title")}
           <TooltipProvider>
             <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
               <TooltipTrigger asChild onClick={() => setIsTooltipOpen(!isTooltipOpen)}>
@@ -27,14 +26,14 @@ export function Hero() {
           </TooltipProvider>
         </h1>
         <p className="text-xl md:text-2xl mb-8 text-muted-foreground">
-          {t('landing.hero.subtitle')}
+          {t("landing:hero.subtitle")}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button asChild size="lg" className="text-base">
-            <Link to="/auth">{t('landing.hero.getStarted')}</Link>
+            <Link to="/auth">{t("landing:hero.getStarted")}</Link>
           </Button>
           <Button asChild variant="outline" size="lg" className="text-base">
-            <a href="#features">{t('landing.hero.learnMore')}</a>
+            <a href="#features">{t("landing:hero.learnMore")}</a>
           </Button>
         </div>
       </div>
