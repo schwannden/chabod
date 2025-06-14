@@ -35,7 +35,7 @@ describe("useAnnouncement", () => {
     ready: true,
     i18n: {
       language: "en",
-      getResourceBundle: (lang: string, namespace: string) => {
+      getResourceBundle: (_lang: string, namespace: string) => {
         if (namespace === "announcements") {
           return {
             testAnnouncement: {
@@ -213,7 +213,7 @@ describe("useAnnouncement", () => {
       ...defaultMockTranslation,
       i18n: {
         language: "en",
-        getResourceBundle: (lang: string, namespace: string) => {
+        getResourceBundle: (_lang: string, _namespace: string) => {
           throw new Error("Resource bundle error");
         },
       },
@@ -233,7 +233,7 @@ describe("useAnnouncement", () => {
       ...defaultMockTranslation,
       i18n: {
         language: "en",
-        getResourceBundle: (lang: string, namespace: string) => {
+        getResourceBundle: (_lang: string, namespace: string) => {
           if (namespace === "announcements") {
             return {
               invalidAnnouncement: {
@@ -274,7 +274,7 @@ describe("useAnnouncement", () => {
       ...defaultMockTranslation,
       i18n: {
         language: "en",
-        getResourceBundle: (lang: string, namespace: string) => {
+        getResourceBundle: (_lang: string, namespace: string) => {
           if (namespace === "announcements") {
             return {};
           }
