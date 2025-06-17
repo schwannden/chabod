@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.5.2](https://github.com/schwannden/chabod/compare/v0.5.1...v0.5.2) (2025-06-17)
+
+
+### Build Related
+
+* **deps-dev:** bump @types/node from 22.7.9 to 24.0.3 ([#82](https://github.com/schwannden/chabod/issues/82)) ([5dc6d33](https://github.com/schwannden/chabod/commit/5dc6d33f5e4bd4edd27decee08aa70b6c1a99cae))
+* **deps-dev:** bump @vitejs/plugin-react-swc from 3.10.0 to 3.10.2 ([#81](https://github.com/schwannden/chabod/issues/81)) ([9f3824a](https://github.com/schwannden/chabod/commit/9f3824abe92ac649cdb3a9a1514b5209ccc100c6))
+* **deps-dev:** bump postcss from 8.5.4 to 8.5.6 ([#85](https://github.com/schwannden/chabod/issues/85)) ([df419c4](https://github.com/schwannden/chabod/commit/df419c441454053170b6d37dd70c1b6d9aa2a71b))
+* **deps:** bump @radix-ui/react-alert-dialog from 1.1.2 to 1.1.14 ([#87](https://github.com/schwannden/chabod/issues/87)) ([f64e911](https://github.com/schwannden/chabod/commit/f64e911d5136206db7a64402299a0b33632f6849))
+* **deps:** bump @radix-ui/react-avatar from 1.1.1 to 1.1.10 ([#84](https://github.com/schwannden/chabod/issues/84)) ([5862c44](https://github.com/schwannden/chabod/commit/5862c44b792e79dff6a472b6ef026b086fc2c098))
+* **deps:** bump @radix-ui/react-scroll-area from 1.2.0 to 1.2.9 ([#88](https://github.com/schwannden/chabod/issues/88)) ([3175b1e](https://github.com/schwannden/chabod/commit/3175b1efb5211e59df4da8b7914b93c86d99a817))
+* **deps:** bump @radix-ui/react-toast from 1.2.2 to 1.2.14 ([#80](https://github.com/schwannden/chabod/issues/80)) ([437034b](https://github.com/schwannden/chabod/commit/437034b93710def573547abb95258c8f147cdc1c))
+* **deps:** bump cmdk from 1.0.0 to 1.1.1 ([#86](https://github.com/schwannden/chabod/issues/86)) ([171765c](https://github.com/schwannden/chabod/commit/171765cda61f1d484dbc307debd4d8f51577ee88))
+* **deps:** bump recharts from 2.13.0 to 2.15.3 ([#89](https://github.com/schwannden/chabod/issues/89)) ([db0938d](https://github.com/schwannden/chabod/commit/db0938de02b0c0b13f24389851fdd47316a6a411))
+* **deps:** bump zod from 3.24.4 to 3.25.67 ([#83](https://github.com/schwannden/chabod/issues/83)) ([27b88f3](https://github.com/schwannden/chabod/commit/27b88f3b359888aba766931280bdc6bca1601b09))
+
+
+### Tests
+
+* add landing page coverage ([b0c7ed1](https://github.com/schwannden/chabod/commit/b0c7ed1f680ce045713a70b46edf8df41fdf036c))
+
 ## [0.5.1](https://github.com/schwannden/chabod/compare/v0.5.0...v0.5.1) (2025-06-11)
 
 
