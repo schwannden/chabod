@@ -8,10 +8,12 @@
 
 **Project URL**: https://chabod.fruitful-tools.com
 
+**Join Discussion**: https://discord.gg/hnQrfUvFk3
+
 Demo Account：
 
-* admin@fruitful-tools.com
-* strongAndFruitfulPassword
+- admin@fruitful-tools.com
+- strongAndFruitfulPassword
 
 ## About Chabod
 

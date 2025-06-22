@@ -8,10 +8,12 @@
 
 **專案網址**: https://chabod.fruitful-tools.com
 
+**加入討論**: https://discord.gg/hnQrfUvFk3
+
 Demo 帳號：
 
-* admin@fruitful-tools.com
-* strongAndFruitfulPassword
+- admin@fruitful-tools.com
+- strongAndFruitfulPassword
 
 ## 關於 Chabod
 

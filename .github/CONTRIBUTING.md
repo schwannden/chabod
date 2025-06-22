@@ -4,6 +4,8 @@ Thank you for your interest in contributing to Chabod! This document provides gu
 
 For a comprehensive overview of the project, tech stack, and features, please see our [main README](../README.md).
 
+**Join Discussion**: https://discord.gg/hnQrfUvFk3
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) (we recommend using Volta for version management)
