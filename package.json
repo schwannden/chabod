@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "format": "prettier --write src --config ./.prettierrc",
+    "ncu": "npx npm-check-updates -t minor -i",
     "preview": "vite preview",
     "prepare": "husky",
     "test": "jest",
