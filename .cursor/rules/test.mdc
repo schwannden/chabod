@@ -1,0 +1,60 @@
+---
+description: Testing strategy and quick iteration workflow
+globs: "tests/**/*.{ts,tsx}"
+alwaysApply: true
+---
+# Testing Rules
+
+## Quick Test Iteration Commands
+
+### Run Specific Test Files
+```bash
+# UI component test (fast iteration)
+npm run test:ui -- ComponentName.test.tsx
+npm run test:ui:watch -- ComponentName.test.tsx
+
+# RLS test (specific file)
+./tests/rls/run-rls-tests.sh groups.rls.test.ts
+./tests/rls/run-rls-tests.sh --watch groups.rls.test.ts
+
+# Run test by pattern
+npm run test:ui -- --testNamePattern="should render"
+```
+
+## When to Use Which Test Command
+
+### Use `npm run test:ui` (Frontend Only) When:
+- **Only** modifying React components, hooks, or UI logic
+- **Only** changing frontend functionality (forms, navigation, styling)
+- **No** database operations or service layer changes
+- **Fast feedback** needed for UI development
+
+### Use `npm run test` (Full Test Suite) When:
+- **Any** backend/database changes (new tables, RLS policies, service functions)
+- **Any** Supabase schema or migration changes
+- **Cross-cutting** changes affecting both frontend and backend
+- **Before** committing or creating PR
+- **Any** changes to `src/lib/services/` or `src/integrations/supabase/`
+
+### Use RLS-specific commands When:
+- **Only** testing database security policies
+- **Only** modifying RLS policies or tenant isolation logic
+- **Debugging** specific permission issues
+
+## Test Design (Succinct)
+
+### RLS Tests
+- Use `createRLSTest()` and `createStandardRLSTestSuite()`
+- Always test: owner access, member restrictions, tenant isolation
+- Always cleanup with `try/finally` blocks
+
+### UI Tests  
+- Use `mockUseSessionHelpers.authenticated()` for auth state
+- Test user behavior, not implementation details
+- Use semantic queries: `getByRole`, `getByLabelText`
+- Test error states and loading states
+
+### Required Coverage
+- **New database table** → RLS test required
+- **New component** → UI test required
+- **Mirror structure**: `src/components/Feature/` → `tests/ui/components/Feature/`

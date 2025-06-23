@@ -1,123 +1,30 @@
 ---
-description: 
-globs: 
-alwaysApply: false
+description: i18n translation standards
+globs: "**/*.tsx"
+alwaysApply: true
 ---
-# Internationalization (i18n) Rules
+# i18n Rules
 
-## Translation Setup
-- Use React i18next for all internationalization
-- Translation files in `public/locales/` organized by namespace
-- Supported languages: English (`en`) and Chinese (`zh-TW`)
-- Import: `import { useTranslation } from "react-i18next"`
+## Critical Rule
+**Replace ALL hardcoded text with translation keys**
+
+## Usage Patterns
+```tsx
+// Single namespace (preferred)
+const { t } = useTranslation('members');
+t('membersTitle')
+```
+
+```tsx
+// Multiple namespaces
+const { t } = useTranslation(['members', 'common']);
+t('common:loading')
+```
 
 ## Available Namespaces
-- `common` - Shared UI elements (loading, error, CRUD operations)
-- `shared` - Shared components across features
-- `nav` - Navigation elements
-- `auth` - Authentication and authorization
-- `dashboard` - Dashboard and main pages
-- `tenant` - Tenant/church management
-- `profile` - User profile management
-- `members` - Member management
-- `groups` - Group management
-- `resources` - Resource management
-- `services` - Service management
-- `serviceEvents` - Service event specific translations
-- `events` - Event management
-- `announcements` - System announcements
+`common`, `auth`, `dashboard`, `members`, `groups`, `resources`, `services`, `serviceEvents`, `events`, `announcements`, `tenant`, `profile`, `nav`, `shared`
 
-## Hook Usage
-
-### Single Namespace (Recommended)
-```tsx
-const { t } = useTranslation('members');
-t('membersTitle') // "Members"
-t('inviteMember') // "Invite Member"
-```
-
-### Multiple Namespaces
-```tsx
-const { t } = useTranslation(['members', 'common']);
-t('membersTitle')        // from members namespace
-t('common:loading')      // explicit namespace with colon
-```
-
-### Default (Common)
-```tsx
-const { t } = useTranslation(); // Uses 'common' namespace
-```
-
-## Translation Key Conventions
-- Use camelCase for keys: `firstName`, `emailAddress`, `defaultStartTime`
-- Keys are scoped to namespace, no prefixes needed
-- Use descriptive, meaningful names
-- Support parameter interpolation: `t('key', { parameter: value })`
-
-## Common Patterns
-
-### Form Fields
-```tsx
-const { t } = useTranslation('profile');
-<FormLabel>{t('fullName')}</FormLabel>
-<Input placeholder={t('enterFullName')} {...field} />
-```
-
-### Conditional Text
-```tsx
-const { t } = useTranslation(['profile', 'common']);
-<Button disabled={isSubmitting}>
-  {isSubmitting ? t('common:saving') : t('saveChanges')}
-</Button>
-```
-
-### Error Handling
-```tsx
-const { t } = useTranslation(['members', 'common']);
-toast({
-  title: t('memberUpdateError'),
-  description: error?.message || t('common:unknownError'),
-  variant: "destructive",
-});
-```
-
-## Best Practices
-- Replace ALL hardcoded text with translation keys
-- Use specific namespaces for feature content
-- Use `common` for generic UI actions and states
-- Test translations in both languages
-- Keep namespace files focused on their specific feature
-- Add translations to ALL language files simultaneously
-- Use colon syntax (`namespace:key`) when using multiple namespaces
-
-## File Structure
-```
-public/locales/
-├── en/
-│   ├── common.json
-│   ├── services.json
-│   ├── members.json
-│   └── [other-namespaces].json
-└── zh-TW/
-    ├── common.json
-    ├── services.json
-    ├── members.json
-    └── [other-namespaces].json
-```
-
-## Translation Keys in Files
-Each namespace file contains keys without namespace prefixes:
-```json
-// common.json
-{
-  "loading": "Loading...",
-  "save": "Save",
-  "cancel": "Cancel"
-}
-
-// members.json  
-{
-  "membersTitle": "Members",
-  "inviteMember": "Invite Member"
-}
-```
+## Key Conventions
+- Use camelCase: `firstName`, `emailAddress`
+- Use `common` for generic UI (save, cancel, loading)
+- Files: `public/locales/[lang]/[namespace].json`
