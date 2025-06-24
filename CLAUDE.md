@@ -26,6 +26,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run test:ui` - Run UI component tests only
 - `npm run test:ui:watch` - Run UI tests in watch mode
 
+#### Quick Test Iteration Commands
+
+```bash
+# UI component test (fast iteration)
+npm run test:ui -- ComponentName.test.tsx
+npm run test:ui:watch -- ComponentName.test.tsx
+
+# RLS test (specific file)
+./tests/rls/run-rls-tests.sh groups.rls.test.ts
+./tests/rls/run-rls-tests.sh --watch groups.rls.test.ts
+
+# Run test by pattern
+npm run test:ui -- --testNamePattern="should render"
+```
+
+#### When to Use Which Test Command
+
+**Use `npm run test:ui` (Frontend Only) When:**
+
+- **Only** modifying React components, hooks, or UI logic
+- **Only** changing frontend functionality (forms, navigation, styling)
+- **No** database operations or service layer changes
+- **Fast feedback** needed for UI development
+
+**Use `npm run test` (Full Test Suite) When:**
+
+- **Any** backend/database changes (new tables, RLS policies, service functions)
+- **Any** Supabase schema or migration changes
+- **Cross-cutting** changes affecting both frontend and backend
+- **Before** committing or creating PR
+- **Any** changes to `src/lib/services/` or `src/integrations/supabase/`
+
 ### Special Testing
 
 - `./tests/rls/run-rls-tests.sh` - Run RLS tests with Supabase setup
@@ -103,11 +135,33 @@ src/
 
 #### Form Handling
 
-- **Always** use React Hook Form + Zod for forms
+- **Always** use React Hook Form + Zod + zodResolver for forms
 - Use `zodResolver` from `@hookform/resolvers/zod`
 - Define Zod schemas with meaningful error messages
 - Use shadcn Form components for consistent UI
 - Handle loading states and form submission errors
+
+**Standard Structure:**
+
+```tsx
+const formSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+});
+
+const form = useForm<z.infer<typeof formSchema>>({
+  resolver: zodResolver(formSchema),
+  defaultValues: { name: "" },
+});
+
+const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  try {
+    // API call
+    // Success message
+  } catch (error) {
+    // Error handling
+  }
+};
+```
 
 #### Internationalization
 
@@ -125,6 +179,9 @@ src/
 - **Never** modify `components/ui/` directly (shadcn components)
 - Use composition patterns with shadcn components
 - Follow PascalCase for component files and functions
+- **Never** perform Supabase queries in components
+- **Always** use service functions from `src/lib/services/`
+- Use React Query for data fetching and caching
 
 #### UX Conventions
 
@@ -142,6 +199,9 @@ src/
 - Test database security policies and tenant isolation
 - Use real Supabase instance with containerized services
 - Critical for multi-tenant data security
+- Use `createRLSTest()` and `createStandardRLSTestSuite()`
+- Always test: owner access, member restrictions, tenant isolation
+- Always cleanup with `try/finally` blocks
 
 #### UI Component Tests
 
@@ -149,6 +209,16 @@ src/
 - Test component behavior and user interactions
 - Mock external dependencies for isolation
 - Use React Testing Library patterns
+- Use `mockUseSessionHelpers.authenticated()` for auth state
+- Test user behavior, not implementation details
+- Use semantic queries: `getByRole`, `getByLabelText`
+- Test error states and loading states
+
+#### Required Coverage
+
+- **New database table** → RLS test required
+- **New component** → UI test required
+- **Mirror structure**: `src/components/Feature/` → `tests/ui/components/Feature/`
 
 ### Development Notes
 
