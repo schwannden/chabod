@@ -10,8 +10,8 @@ For a comprehensive overview of the project, tech stack, and features, please se
 
 - [Node.js](https://nodejs.org/) (we recommend using Volta for version management)
   - [Volta](https://volta.sh/) - for consistent Node.js and npm versions
-- [Supabaswe Cli](https://supabase.com/docs/guides/local-development/cli/getting-started) - to start supabase and setup all databases locally.
-- (Optional) [Cursor](https://cursor.sh/) - recommended IDE as our project has specific Cursor configurations, we have specific Cursor configurations in the `.cursor/rules` file that help maintain consistent development practices.
+- [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started) - to start supabase and setup all databases locally.
+- (Optional) [Cursor](https://cursor.sh/) - recommended IDE as our project has specific Cursor configurations, we have specific Cursor configurations in the `.cursor/rules/` directory that help maintain consistent development practices.
 
 ## Setting Up Volta
 
@@ -119,7 +119,7 @@ This project uses:
 
 The configuration for these tools is defined in:
 
-- `.eslintrc.js`
+- `eslint.config.js`
 - `.prettierrc`
 
 Following these guidelines helps keep the codebase clean and maintainable.
