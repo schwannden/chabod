@@ -69,9 +69,9 @@
     "loadingMessage": "載入價格方案中...",
     "recommended": "推薦方案",
     "monthlyPrice": "/ 月",
-    "userLimit": "會友人數上限: {count} 人",
-    "groupLimit": "小組數量上限: {count} 個",
-    "eventLimit": "活動數量上限: {count} 個",
+    "userLimit": "會友人數上限: {{count}} 人",
+    "groupLimit": "小組數量上限: {{count}} 個",
+    "eventLimit": "活動數量上限: {{count}} 個",
     "features": {
       "basicManagement": "所有基本管理",
       "communitySupport": "社群支援",

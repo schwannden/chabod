@@ -28,7 +28,7 @@ function PricingCard({
   highlighted = false,
   buttonLink,
 }: PricingCardProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation("landing");
 
   return (
     <Card
@@ -37,7 +37,7 @@ function PricingCard({
       {highlighted && (
         <div className="absolute -top-4 left-0 right-0 text-center">
           <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded-full">
-            {t("landing:pricingPlans.recommended")}
+            {t("pricingPlans.recommended")}
           </span>
         </div>
       )}
@@ -48,7 +48,7 @@ function PricingCard({
             {typeof price === "number" ? `NT$${price}` : price}
           </span>
           {typeof price === "number" && (
-            <span className="ml-1">{t("landing:pricingPlans.monthlyPrice")}</span>
+            <span className="ml-1">{t("pricingPlans.monthlyPrice")}</span>
           )}
         </div>
         <CardDescription className="mt-2">{description}</CardDescription>
@@ -79,7 +79,7 @@ function PricingCard({
 export function PricingPlans() {
   const [priceTiers, setPriceTiers] = useState<PriceTier[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { t } = useTranslation();
+  const { t } = useTranslation("landing");
 
   useEffect(() => {
     const loadPriceTiers = async () => {
@@ -97,38 +97,36 @@ export function PricingPlans() {
   }, []);
 
   if (isLoading) {
-    return <div className="py-20 text-center">{t("landing:pricingPlans.loadingMessage")}</div>;
+    return <div className="py-20 text-center">{t("pricingPlans.loadingMessage")}</div>;
   }
 
   // Helper function to get tier features
   const getTierFeatures = (tier: PriceTier) => {
     const features = [
-      t("landing:pricingPlans.userLimit", { count: tier.user_limit }),
-      t("landing:pricingPlans.groupLimit", { count: tier.group_limit }),
-      t("landing:pricingPlans.eventLimit", { count: tier.event_limit }),
+      t("pricingPlans.userLimit", { count: tier.user_limit }),
+      t("pricingPlans.groupLimit", { count: tier.group_limit }),
+      t("pricingPlans.eventLimit", { count: tier.event_limit }),
     ];
 
     if (tier.name === "Free") {
       features.push(
-        t("landing:pricingPlans.features.basicManagement"),
-        t("landing:pricingPlans.features.communitySupport"),
+        t("pricingPlans.features.basicManagement"),
+        t("pricingPlans.features.communitySupport"),
       );
     } else if (tier.name === "Starter") {
-      features.push(t("landing:pricingPlans.features.allFreeFeatures"));
-    } else if (tier.name === "Standard") {
       features.push(
-        t("landing:pricingPlans.features.allStarterFeatures"),
-        t("landing:pricingPlans.features.prioritySupport"),
+        t("pricingPlans.features.allFreeFeatures"),
+        t("pricingPlans.features.prioritySupport"),
       );
     } else if (tier.name === "Advanced") {
       features.push(
-        t("landing:pricingPlans.features.allStandardFeatures"),
-        t("landing:pricingPlans.features.prioritySupport"),
+        t("pricingPlans.features.allStarterFeatures"),
+        t("pricingPlans.features.prioritySupport"),
       );
     } else if (tier.name === "Pro") {
       features.push(
-        t("landing:pricingPlans.features.allAdvancedFeatures"),
-        t("landing:pricingPlans.features.dedicatedSupport"),
+        t("pricingPlans.features.allAdvancedFeatures"),
+        t("pricingPlans.features.dedicatedSupport"),
       );
     }
 
@@ -139,13 +137,13 @@ export function PricingPlans() {
   const getTierButtonProps = (tier: PriceTier) => {
     if (tier.name === "Free") {
       return {
-        text: t("landing:pricingPlans.getStarted"),
+        text: t("pricingPlans.getStarted"),
         variant: "outline" as const,
         link: "/auth?tab=signup",
       };
     } else {
       return {
-        text: t("landing:pricingPlans.contactUs"),
+        text: t("pricingPlans.contactUs"),
         variant: "default" as const,
         link: "mailto:support@fruitful-tools.com",
       };
@@ -159,18 +157,17 @@ export function PricingPlans() {
           <div className="inline-block p-3 bg-primary/10 rounded-full mb-4">
             <DollarSign className="h-6 w-6 text-primary" />
           </div>
-          <h2 className="text-3xl font-bold mb-4">{t("landing:pricingPlans.title")}</h2>
+          <h2 className="text-3xl font-bold mb-4">{t("pricingPlans.title")}</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            {t("landing:pricingPlans.subtitle")}
+            {t("pricingPlans.subtitle")}
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {priceTiers.map((tier, index) => {
             const buttonProps = getTierButtonProps(tier);
-            const price =
-              tier.name === "Free" ? t("landing:pricingPlans.free") : tier.price_monthly;
-            const isHighlighted = tier.name === "Standard";
+            const price = tier.name === "Free" ? t("pricingPlans.free") : tier.price_monthly;
+            const isHighlighted = tier.name === "Starter";
 
             return (
               <PricingCard

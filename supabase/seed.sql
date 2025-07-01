@@ -1,10 +1,10 @@
 INSERT INTO "public"."price_tiers"
   ("id", "name", "price_monthly", "price_yearly", "description", "user_limit", "group_limit", "event_limit", "is_active")
 VALUES
-  ('0d8a9b6d-094d-48ef-9664-fe4d35ce3389', 'Free', '0.00', '0.00', '適合您開始嘗試所有的功能', '20', '5', '10', 'true'),
-  ('dae40b57-0e84-475d-88db-a33063f70957', 'Starter', '300.00', '3000.00', '適合小型教會', '100', '10', '1000', 'true'),
-  ('6352529f-90f4-4622-aeb3-cf542931cd88', 'Advanced', '600.00', '6000.00', '適合中小型教會', '800', '40', '5000', 'true'),
-  ('b1f987b3-f3b4-4c71-ae4d-68d990c1c79f', 'Pro', '1000.00', '10000.00', '適合大型教會', '10000', '200', '30000', 'true');
+  ('0d8a9b6d-094d-48ef-9664-fe4d35ce3389', 'Free', 0.00, 0.00, '適合您開始嘗試所有的功能', 20, 5, 10, true),
+  ('dae40b57-0e84-475d-88db-a33063f70957', 'Starter', 300.00, 3000.00, '適合小型教會', 100, 10, 1000, true),
+  ('6352529f-90f4-4622-aeb3-cf542931cd88', 'Advanced', 600.00, 6000.00, '適合中小型教會', 800, 40, 5000, true),
+  ('b1f987b3-f3b4-4c71-ae4d-68d990c1c79f', 'Pro', 1000.00, 10000.00, '適合大型教會', 10000, 200, 30000, true);
 
 SELECT public.create_user('0b56e2b5-e3cf-43d0-9aca-f8a538fb512b', 'admin@fruitful-tools.com', 'strongAndFruitfulPassword');
 SELECT public.create_user('d2e0a602-1214-4399-96ad-7d4f3dca75e5', 'love@fruitful-tools.com', 'strongAndFruitfulPassword');
