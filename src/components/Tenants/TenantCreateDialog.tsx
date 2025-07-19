@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -31,15 +30,15 @@ export function TenantCreateDialog({ isOpen, onClose, onTenantCreated }: TenantC
       // Fixing this line - removing the extra argument
       await createTenant(formData.name, formData.slug);
       toast({
-        title: t('tenant.created'),
-        description: t('tenant.createdSuccess', { name: formData.name }),
+        title: t("tenant.created"),
+        description: t("tenant.createdSuccess", { name: formData.name }),
       });
       onTenantCreated();
       onClose();
     } catch (error) {
       const errorMessage = error?.message || "未知錯誤";
       toast({
-        title: t('tenant.errorCreating'),
+        title: t("tenant.errorCreating"),
         description: errorMessage,
         variant: "destructive",
       });
@@ -52,16 +51,16 @@ export function TenantCreateDialog({ isOpen, onClose, onTenantCreated }: TenantC
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('tenant.createNew')}</DialogTitle>
-          <DialogDescription>{t('tenant.createDescription')}</DialogDescription>
+          <DialogTitle>{t("tenant.createNew")}</DialogTitle>
+          <DialogDescription>{t("tenant.createDescription")}</DialogDescription>
         </DialogHeader>
 
         <TenantForm
           initialValues={{ name: "", slug: "" }}
           onSubmit={handleSubmit}
           isProcessing={isCreating}
-          processingText={t('tenant.creating')}
-          submitText={t('tenant.createChurch')}
+          processingText={t("tenant.creating")}
+          submitText={t("tenant.createChurch")}
           onCancel={onClose}
           autoGenerateSlug={true}
         />
