@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.5.3](https://github.com/schwannden/chabod/compare/v0.5.2...v0.5.3) (2025-07-19)
+
+
+### Bug Fixes
+
+* downgrade vite to 5, fix messed up dependencies ([#109](https://github.com/schwannden/chabod/issues/109)) ([5fb0e04](https://github.com/schwannden/chabod/commit/5fb0e044180df0f1d3ce3301f7b3bcf0800ea810))
+* wrong price plan string ([#110](https://github.com/schwannden/chabod/issues/110)) ([32d76c1](https://github.com/schwannden/chabod/commit/32d76c17bf6784617280a566ace808e399de5444))
+
+
+### Build Related
+
+* **deps-dev:** bump @eslint/js from 9.29.0 to 9.31.0 ([#125](https://github.com/schwannden/chabod/issues/125)) ([262a231](https://github.com/schwannden/chabod/commit/262a231ff9c1a41278ebbdc65d5dccc6ef146a09))
+* **deps-dev:** bump @tailwindcss/postcss from 4.1.10 to 4.1.11 ([#112](https://github.com/schwannden/chabod/issues/112)) ([28004ab](https://github.com/schwannden/chabod/commit/28004abbd6ab8bd8c839af27143e04097a6dfc08))
+* **deps-dev:** bump eslint-plugin-prettier from 5.5.0 to 5.5.1 ([#117](https://github.com/schwannden/chabod/issues/117)) ([f3f4dee](https://github.com/schwannden/chabod/commit/f3f4dee2ab6487666670b8c630cd43d0a63a64d7))
+* **deps-dev:** bump jest and @types/jest ([#116](https://github.com/schwannden/chabod/issues/116)) ([c156d59](https://github.com/schwannden/chabod/commit/c156d597162bcec7a4b37a0e92e4390776087229))
+* **deps-dev:** bump prettier from 3.6.0 to 3.6.2 ([#111](https://github.com/schwannden/chabod/issues/111)) ([ca2a4dd](https://github.com/schwannden/chabod/commit/ca2a4dd74ddbaf2d1f74f1642084cefae37284ff))
+* **deps-dev:** bump tailwindcss from 4.1.10 to 4.1.11 ([#118](https://github.com/schwannden/chabod/issues/118)) ([826e7a4](https://github.com/schwannden/chabod/commit/826e7a4ecd830e967dd08eb8e4eb07280db56ca8))
+* **deps-dev:** bump typescript-eslint from 8.35.0 to 8.37.0 ([#123](https://github.com/schwannden/chabod/issues/123)) ([2a5304e](https://github.com/schwannden/chabod/commit/2a5304e1023bd6798c36b3b8df94ae784685a98d))
+* **deps:** bump @tanstack/react-query from 5.81.2 to 5.83.0 ([#126](https://github.com/schwannden/chabod/issues/126)) ([6c1ba81](https://github.com/schwannden/chabod/commit/6c1ba81308cc4f7814ccdb60340622aed2152c45))
+* **deps:** bump i18next-browser-languagedetector from 7.2.2 to 8.2.0 ([#115](https://github.com/schwannden/chabod/issues/115)) ([ce7bef0](https://github.com/schwannden/chabod/commit/ce7bef0169c3dd32779176e3bda132f5824ec0a6))
+* **deps:** bump recharts from 2.15.4 to 3.1.0 ([#124](https://github.com/schwannden/chabod/issues/124)) ([f857fc6](https://github.com/schwannden/chabod/commit/f857fc6783d72e5b45365b3c905a5df7e7f79fd2))
+* **deps:** bump tailwind-merge from 3.3.0 to 3.3.1 ([#100](https://github.com/schwannden/chabod/issues/100)) ([6963932](https://github.com/schwannden/chabod/commit/6963932bdb50bd8d6fca7f9ed1553c67f10a98b8))
+
+
+### Chores
+
+* add .vscode settings ([#91](https://github.com/schwannden/chabod/issues/91)) ([b73bb45](https://github.com/schwannden/chabod/commit/b73bb45ca674377fca82c133c63c792101e1f176))
+* update package minor version ([#95](https://github.com/schwannden/chabod/issues/95)) ([10e9a8c](https://github.com/schwannden/chabod/commit/10e9a8c9db442cf4731d3e9c9d65fdee38bacdbd))
+* Updated CLAUDE.md to align with the .cursor/rules specifications. The key additions include: ([#96](https://github.com/schwannden/chabod/issues/96)) ([3c35f4b](https://github.com/schwannden/chabod/commit/3c35f4b44e2e723d7aaa6ed8aa4ad19c8e8f4950))
+
+
+### Documentation
+
+* adding claude code and compact cursor rules ([#94](https://github.com/schwannden/chabod/issues/94)) ([08124ba](https://github.com/schwannden/chabod/commit/08124bace00a314633e81bc83c93104ebedd3d6b))
+* adding discussion link ([49c71b0](https://github.com/schwannden/chabod/commit/49c71b052ae63647634932e8a7a2e1cbbfdf3ba9))
+* fix some contributing doc ([#97](https://github.com/schwannden/chabod/issues/97)) ([04985fe](https://github.com/schwannden/chabod/commit/04985fe2a23efd802745f4a8a8c0c8d7c7a7a929))
+
 ## [0.5.2](https://github.com/schwannden/chabod/compare/v0.5.1...v0.5.2) (2025-06-17)
 
 
