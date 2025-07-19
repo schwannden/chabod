@@ -75,14 +75,14 @@ Page tests rely on global mocks defined in `tests/ui-setup.ts`:
 
 ```bash
 # Run all page tests
-npm run test:ui -- --testPathPattern="pages"
+npm run test:ui -- --testPathPatterns="pages"
 
 # Run specific page tests
-npm run test:ui -- --testPathPattern="AuthPage"
-npm run test:ui -- --testPathPattern="DashboardPage"
+npm run test:ui -- --testPathPatterns="AuthPage"
+npm run test:ui -- --testPathPatterns="DashboardPage"
 
 # Run with verbose output
-npm run test:ui -- --testPathPattern="pages" --verbose
+npm run test:ui -- --testPathPatterns="pages" --verbose
 ```
 
 ## Coverage Goals

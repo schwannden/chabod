@@ -147,13 +147,13 @@ fi
 
 # Run the tests based on parameters
 if [ "$1" = "--coverage" ]; then
-    npm run test:coverage -- --testPathPattern=rls $TEST_PARAMS
+    npm run test:coverage -- --testPathPatterns=rls $TEST_PARAMS
 elif [ "$1" = "--watch" ]; then
     if [ "$IS_CI" = true ]; then
         echo -e "${YELLOW}⚠️  Watch mode is not supported in CI${NC}"
         npm run test:rls -- $TEST_PARAMS
     else
-        npm run test:watch -- --testPathPattern=rls
+        npm run test:watch -- --testPathPatterns=rls
     fi
 elif [ -n "$1" ]; then
     # Run specific test file
