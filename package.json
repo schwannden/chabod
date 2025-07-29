@@ -75,7 +75,7 @@
     "react": "^19.1.0",
     "react-day-picker": "^9.7.0",
     "react-dom": "^19.1.0",
-    "react-hook-form": "^7.58.1",
+    "react-hook-form": "^7.61.1",
     "react-i18next": "^15.5.3",
     "react-resizable-panels": "^2.1.9",
     "react-router-dom": "^7.6.2",
