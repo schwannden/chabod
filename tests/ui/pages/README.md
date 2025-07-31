@@ -1,10 +1,13 @@
-# Page Component Tests
+# Page Testing Guide
 
-This directory contains tests for page-level components that represent full application screens.
+Tests complete page workflows, navigation, and component integration.
 
-## Overview
+## Key Focus Areas
 
-Page tests focus on complete user workflows, navigation behavior, and integration between multiple components. These tests ensure that entire pages work correctly from a user's perspective.
+- Complete user workflows and navigation behavior
+- Integration between multiple components
+- Authentication flows and routing
+- URL parameter handling and async state management
 
 ## Testing Patterns
 

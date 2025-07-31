@@ -1,10 +1,8 @@
-# Context Tests
+# Context Testing Guide
 
-This directory contains tests for React context providers in `src/contexts/`.
+Tests React context providers from `src/contexts/`.
 
-## Testing Context Providers
-
-Test context providers by rendering them with test components:
+## Testing Pattern
 
 ```tsx
 import { render, screen } from "@testing-library/react";

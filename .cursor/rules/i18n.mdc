@@ -22,9 +22,9 @@ t('common:loading')
 ```
 
 ## Available Namespaces
-`common`, `auth`, `dashboard`, `members`, `groups`, `resources`, `services`, `serviceEvents`, `events`, `announcements`, `tenant`, `profile`, `nav`, `shared`
+`common`, `auth`, `dashboard`, `members`, `groups`, `resources`, `services`, `serviceEvents`, `events`, `announcements`, `tenant`, `profile`, `nav`, `shared`, `landing`
 
 ## Key Conventions
 - Use camelCase: `firstName`, `emailAddress`
 - Use `common` for generic UI (save, cancel, loading)
-- Files: `public/locales/[lang]/[namespace].json`
+- Files: `public/locales/[lang]/[namespace].json` (languages: `en`, `zh-TW`)

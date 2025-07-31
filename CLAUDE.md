@@ -91,7 +91,10 @@ src/
 │   ├── Auth/            # Authentication components
 │   ├── Events/          # Event management
 │   ├── Groups/          # Group management
+│   ├── Layout/          # Layout and navigation components
+│   ├── Landing/         # Landing page components
 │   ├── Members/         # Member management
+│   ├── Profile/         # Profile management
 │   ├── Resources/       # Resource management
 │   ├── Services/        # Service management
 │   ├── ServiceEvents/   # Service event scheduling
@@ -167,10 +170,10 @@ const onSubmit = async (values: z.infer<typeof formSchema>) => {
 
 - **Replace ALL hardcoded text** with translation keys
 - Use `useTranslation` hook with specific namespaces
-- Available namespaces: `common`, `auth`, `dashboard`, `members`, `groups`, `resources`, `services`, `serviceEvents`, `events`, `announcements`, `tenant`, `profile`, `nav`, `shared`
+- Available namespaces: `common`, `auth`, `dashboard`, `members`, `groups`, `resources`, `services`, `serviceEvents`, `events`, `announcements`, `tenant`, `profile`, `nav`, `shared`, `landing`
 - Use `common` namespace for generic UI actions (save, cancel, loading)
 - Syntax: `t('key')` for single namespace, `t('namespace:key')` for multiple
-- Translation files in `public/locales/[lang]/[namespace].json`
+- Translation files in `public/locales/[lang]/[namespace].json` (languages: `en`, `zh-TW`)
 
 #### UI & Styling
 

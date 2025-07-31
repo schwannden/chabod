@@ -17,7 +17,10 @@ npm run test:ui:watch -- ComponentName.test.tsx
 ./tests/rls/run-rls-tests.sh groups.rls.test.ts
 ./tests/rls/run-rls-tests.sh --watch groups.rls.test.ts
 
-# Run test by pattern
+# Run all tests
+npm test
+
+# Run by pattern
 npm run test:ui -- --testNamePattern="should render"
 ```
 

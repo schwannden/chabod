@@ -1,6 +1,6 @@
-# Library Tests
+# Library Testing Guide
 
-This directory contains tests for utility functions and services in `src/lib/`.
+Tests utility functions and services from `src/lib/`.
 
 ## Testing Utilities and Services
 

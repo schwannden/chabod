@@ -30,11 +30,11 @@ tests/rls/
 ├── setup.ts                    # Global test configuration
 ├── run-rls-tests.sh           # Automated test runner
 ├── tenants.rls.test.ts        # Tenant security tests
+├── tenant-members.rls.test.ts # Tenant member security tests
 ├── groups.rls.test.ts         # Group security tests
 ├── resources.rls.test.ts      # Resource security tests
 ├── events.rls.test.ts         # Event security tests
-├── services.rls.test.ts       # Service security tests
-└── tenant-members.rls.test.ts # Tenant member security tests
+└── services.rls.test.ts       # Service security tests
 ```
 
 ## Writing RLS Tests

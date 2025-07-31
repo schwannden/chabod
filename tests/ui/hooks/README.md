@@ -1,10 +1,10 @@
-# Hook Tests
+# Hook Testing Guide
 
-This directory contains tests for custom React hooks in `src/hooks/`.
+Tests custom React hooks from `src/hooks/`.
 
 ## Testing Custom Hooks
 
-Use `@testing-library/react-hooks` patterns for testing hooks:
+Use React Testing Library's `renderHook` for testing hooks:
 
 ```tsx
 import { renderHook, act } from "@testing-library/react";

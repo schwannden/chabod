@@ -1,0 +1,49 @@
+# Chabod - Multi-Tenant Church Management System
+
+> Open-source, multi-tenant church management SaaS platform built with React 19, Supabase, and TypeScript. Features member management, event scheduling, resource sharing, and role-based permissions with complete tenant isolation.
+
+## Project Documentation
+
+- [README.md](README.md) - Main project overview, features, and getting started guide (Chinese)
+- [README.en.md](README.en.md) - English version of project overview and documentation
+- [CHANGELOG.md](CHANGELOG.md) - Version history and release notes
+- [CLAUDE.md](CLAUDE.md) - Comprehensive development guide for Claude Code with commands, architecture, and patterns
+
+## Development Guidelines
+
+- [.cursor/rules/forms.mdc](.cursor/rules/forms.mdc) - Form handling standards using React Hook Form + Zod + zodResolver
+- [.cursor/rules/i18n.mdc](.cursor/rules/i18n.mdc) - Internationalization guidelines with available namespaces and translation patterns
+- [.cursor/rules/structure.mdc](.cursor/rules/structure.mdc) - Project organization and file structure standards
+- [.cursor/rules/supabase.mdc](.cursor/rules/supabase.mdc) - Supabase integration patterns, database operations, and error handling
+- [.cursor/rules/test.mdc](.cursor/rules/test.mdc) - Testing strategy and quick iteration workflow commands
+- [.cursor/rules/ui.mdc](.cursor/rules/ui.mdc) - UI component and styling standards using Tailwind CSS and shadcn/ui
+
+## Testing Documentation
+
+- [tests/README.md](tests/README.md) - Complete testing overview with RLS and UI test strategies
+- [tests/rls/README.md](tests/rls/README.md) - Row Level Security testing guide for database security policies
+- [tests/ui/README.md](tests/ui/README.md) - UI component testing with Jest and React Testing Library
+- [tests/ui/components/README.md](tests/ui/components/README.md) - Component testing guide organized by feature domains
+- [tests/ui/contexts/README.md](tests/ui/contexts/README.md) - React context provider testing patterns
+- [tests/ui/hooks/README.md](tests/ui/hooks/README.md) - Custom React hook testing with renderHook patterns
+- [tests/ui/lib/README.md](tests/ui/lib/README.md) - Utility functions and service testing guidelines
+- [tests/ui/pages/README.md](tests/ui/pages/README.md) - Page-level integration testing for complete user workflows
+
+## Community & Legal
+
+- [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) - Contribution guidelines and development workflow
+- [.github/CODE_OF_CONDUCT.md](.github/CODE_OF_CONDUCT.md) - Community standards and behavior expectations
+- [.github/ISSUE_TEMPLATE/bug_report.md](.github/ISSUE_TEMPLATE/bug_report.md) - Bug report template for issue submission
+- [.github/ISSUE_TEMPLATE/feature_request.md](.github/ISSUE_TEMPLATE/feature_request.md) - Feature request template for enhancement proposals
+- [LICENSE.md](LICENSE.md) - Project license terms and conditions
+- [SECURITY.md](SECURITY.md) - Security policy and vulnerability reporting guidelines
+
+## Tech Stack Summary
+
+**Frontend:** React 19, TypeScript, Vite, Tailwind CSS, shadcn/ui, React Hook Form, Zod, React Query, React i18next
+
+**Backend:** Supabase (PostgreSQL + Auth + Storage), Row Level Security policies, real-time subscriptions
+
+**Testing:** Jest, React Testing Library, comprehensive RLS policy testing, UI component testing
+
+**Development:** ESLint, Prettier, Husky Git hooks, Volta Node.js version management

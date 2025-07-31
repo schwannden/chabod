@@ -8,7 +8,9 @@ alwaysApply: true
 ## Directory Organization
 - `src/components/` - Feature-organized UI components
   - `ui/` - shadcn components (don't modify)
-  - Feature dirs: `Events/`, `Services/`, etc.
+  - Feature dirs: `Auth/`, `Events/`, `Groups/`, `Members/`, `Resources/`, `Services/`, `ServiceEvents/`, `Tenants/`, `Profile/`
+  - `Layout/` - Layout and navigation components
+  - `Landing/` - Landing page components
   - `shared/` - Cross-feature reusable components
 - `src/lib/services/` - All database operations
 - `src/lib/types.ts` - Type definitions

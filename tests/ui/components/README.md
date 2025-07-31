@@ -1,10 +1,8 @@
-# Component Tests
+# Component Testing Guide
 
-This directory contains tests for UI components organized by feature/domain.
+UI component tests mirror `src/components/` structure for easy navigation.
 
 ## Directory Structure
-
-Each subdirectory corresponds to a feature area in `src/components/`:
 
 - `Auth/` - Authentication components (login, signup, password reset)
 - `Events/` - Event management components
@@ -15,7 +13,6 @@ Each subdirectory corresponds to a feature area in `src/components/`:
 - `Profile/` - User profile components
 - `Resources/` - Resource management components
 - `Services/` - Service management components
-- `ServiceEvents/` - Service event specific components
 - `Tenants/` - Tenant/church management components
 - `shared/` - Reusable components used across features
 
