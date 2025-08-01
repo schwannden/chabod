@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.5.4](https://github.com/schwannden/chabod/compare/v0.5.3...v0.5.4) (2025-08-01)
+
+
+### Build Related
+
+* **deps-dev:** bump @eslint/js from 9.31.0 to 9.32.0 ([#129](https://github.com/schwannden/chabod/issues/129)) ([ff9c97d](https://github.com/schwannden/chabod/commit/ff9c97dd14e4de26e7b5f70315320fa7938e0941))
+* **deps-dev:** bump eslint-config-prettier from 10.1.5 to 10.1.8 ([#137](https://github.com/schwannden/chabod/issues/137)) ([8577b12](https://github.com/schwannden/chabod/commit/8577b12140f1735f337000ac74e66a76e4920d0e))
+* **deps-dev:** bump eslint-plugin-prettier from 5.5.1 to 5.5.3 ([#134](https://github.com/schwannden/chabod/issues/134)) ([5b464d0](https://github.com/schwannden/chabod/commit/5b464d005e28b4b5af160be89c80d416f56229b0))
+* **deps:** bump i18next from 23.16.8 to 25.3.2 ([#135](https://github.com/schwannden/chabod/issues/135)) ([39f87de](https://github.com/schwannden/chabod/commit/39f87defe8f683d6fa996871a2dbe4f1c1086e68))
+* **deps:** bump lucide-react from 0.522.0 to 0.532.0 ([#133](https://github.com/schwannden/chabod/issues/133)) ([70cd4fc](https://github.com/schwannden/chabod/commit/70cd4fc0766bd4c3ed2d4a9869a7c92ad8d9e3d3))
+* **deps:** bump react-hook-form from 7.58.1 to 7.61.1 ([#132](https://github.com/schwannden/chabod/issues/132)) ([f61bbe8](https://github.com/schwannden/chabod/commit/f61bbe86d326c628fedb880df90d52b45f7c80b2))
+* **deps:** bump react-router-dom from 7.6.2 to 7.7.1 ([#136](https://github.com/schwannden/chabod/issues/136)) ([608fe31](https://github.com/schwannden/chabod/commit/608fe31cb0e6dd4e9cb6a5b267c8acaaef586a07))
+* **deps:** bump sonner from 2.0.5 to 2.0.6 ([#138](https://github.com/schwannden/chabod/issues/138)) ([76bf0ce](https://github.com/schwannden/chabod/commit/76bf0ce9131e0aa1a74bab6cf08885227a7e0029))
+* **deps:** bump zod from 3.25.67 to 4.0.11 ([#139](https://github.com/schwannden/chabod/issues/139)) ([2dc5940](https://github.com/schwannden/chabod/commit/2dc59406e6b2da5b9d0c641adbf9dfb778e436eb))
+
+
+### Documentation
+
+* adding context engineering prompt ([9ed102b](https://github.com/schwannden/chabod/commit/9ed102bca20e8b83010595e8a99762227c402385))
+
 ## [0.5.3](https://github.com/schwannden/chabod/compare/v0.5.2...v0.5.3) (2025-07-19)
 
 
