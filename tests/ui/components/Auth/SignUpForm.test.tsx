@@ -19,6 +19,25 @@ jest.mock("@/lib/tenant-utils", () => ({
   associateUserWithTenant: jest.fn(),
 }));
 
+// Mock OAuth components
+jest.mock("@/components/Auth/GoogleOAuthButton", () => ({
+  GoogleOAuthButton: ({
+    onSuccess,
+    onError,
+  }: {
+    onSuccess?: () => void;
+    onError?: (error: string) => void;
+  }) => (
+    <button data-testid="google-oauth-button" onClick={() => onSuccess?.()}>
+      Continue with Google
+    </button>
+  ),
+}));
+
+jest.mock("@/components/Auth/OAuthDivider", () => ({
+  OAuthDivider: () => <div data-testid="oauth-divider">or continue with</div>,
+}));
+
 // Import the mocked modules
 import { supabase } from "@/integrations/supabase/client";
 import { associateUserWithTenant } from "@/lib/tenant-utils";

@@ -7,6 +7,9 @@ import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { associateUserWithTenant } from "@/lib/membership-service";
+import { GoogleOAuthButton } from "./GoogleOAuthButton";
+import { OAuthDivider } from "./OAuthDivider";
+import { useToast } from "@/hooks/use-toast";
 
 interface JoinTenantSignInFormProps {
   tenantName: string;
@@ -32,6 +35,7 @@ export function JoinTenantSignInForm({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,37 +87,54 @@ export function JoinTenantSignInForm({
         </p>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">{t("auth:email")}</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-              required
-              disabled={isLoading || !!prefilledEmail}
-            />
-          </div>
+        <div className="space-y-4">
+          <GoogleOAuthButton
+            onSuccess={onSuccess}
+            onError={(error) => {
+              setError(error);
+              toast({
+                title: t("auth:loginFailed"),
+                description: error,
+                variant: "destructive",
+              });
+            }}
+            inviteToken={inviteToken}
+          />
 
-          <div className="space-y-2">
-            <Label htmlFor="password">{t("auth:password")}</Label>
-            <Input
-              id="password"
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
-              required
-              disabled={isLoading}
-            />
-          </div>
+          <OAuthDivider />
 
-          {error && <div className="text-sm text-destructive">{error}</div>}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">{t("auth:email")}</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+                required
+                disabled={isLoading || !!prefilledEmail}
+              />
+            </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? t("auth:signingIn") : t("auth:joinChurch", { tenantName })}
-          </Button>
-        </form>
+            <div className="space-y-2">
+              <Label htmlFor="password">{t("auth:password")}</Label>
+              <Input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
+                required
+                disabled={isLoading}
+              />
+            </div>
+
+            {error && <div className="text-sm text-destructive">{error}</div>}
+
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? t("auth:signingIn") : t("auth:joinChurch", { tenantName })}
+            </Button>
+          </form>
+        </div>
       </CardContent>
     </Card>
   );

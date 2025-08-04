@@ -14,6 +14,8 @@ import { associateUserWithTenant } from "@/lib/membership-service";
 import { checkUserTenantAccess } from "@/lib/member-service";
 import { AuthEmailInput } from "./AuthEmailInput";
 import { AuthPasswordInput } from "./AuthPasswordInput";
+import { GoogleOAuthButton } from "./GoogleOAuthButton";
+import { OAuthDivider } from "./OAuthDivider";
 import { useTranslation } from "react-i18next";
 
 interface SignInFormProps {
@@ -195,18 +197,34 @@ export function SignInForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSignIn} className="space-y-4">
-          <AuthEmailInput value={email} onChange={setEmail} disabled={loading} />
-          <AuthPasswordInput
-            value={password}
-            onChange={setPassword}
-            disabled={loading}
-            onForgotPassword={() => setResetPasswordMode(true)}
+        <div className="space-y-4">
+          <GoogleOAuthButton
+            onSuccess={onSuccess}
+            onError={(error) =>
+              toast({
+                title: t("auth:loginFailed"),
+                description: error,
+                variant: "destructive",
+              })
+            }
+            inviteToken={inviteToken}
           />
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? t("common:loading") : t("auth:signIn")}
-          </Button>
-        </form>
+
+          <OAuthDivider />
+
+          <form onSubmit={handleSignIn} className="space-y-4">
+            <AuthEmailInput value={email} onChange={setEmail} disabled={loading} />
+            <AuthPasswordInput
+              value={password}
+              onChange={setPassword}
+              disabled={loading}
+              onForgotPassword={() => setResetPasswordMode(true)}
+            />
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? t("common:loading") : t("auth:signIn")}
+            </Button>
+          </form>
+        </div>
       </CardContent>
       <CardFooter className="flex justify-center">
         <Button variant="link" onClick={onSignUpClick}>

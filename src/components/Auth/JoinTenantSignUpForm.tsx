@@ -8,6 +8,9 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { associateUserWithTenant } from "@/lib/membership-service";
 import { TermsOfService } from "./TermsOfService";
+import { GoogleOAuthButton } from "./GoogleOAuthButton";
+import { OAuthDivider } from "./OAuthDivider";
+import { useToast } from "@/hooks/use-toast";
 
 interface JoinTenantSignUpFormProps {
   tenantName: string;
@@ -39,6 +42,7 @@ export function JoinTenantSignUpForm({
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showSignInOption, setShowSignInOption] = useState(false);
   const { t } = useTranslation();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,78 +123,95 @@ export function JoinTenantSignUpForm({
         </p>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-4">
+          <GoogleOAuthButton
+            onSuccess={onSuccess}
+            onError={(error) => {
+              setError(error);
+              toast({
+                title: t("auth:createAccountFailed"),
+                description: error,
+                variant: "destructive",
+              });
+            }}
+            inviteToken={inviteToken}
+          />
+
+          <OAuthDivider />
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">{t("auth:firstName")}</Label>
+                <Input
+                  id="firstName"
+                  value={formData.firstName}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, firstName: e.target.value }))}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">{t("auth:lastName")}</Label>
+                <Input
+                  id="lastName"
+                  value={formData.lastName}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, lastName: e.target.value }))}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <Label htmlFor="firstName">{t("auth:firstName")}</Label>
+              <Label htmlFor="email">{t("auth:email")}</Label>
               <Input
-                id="firstName"
-                value={formData.firstName}
-                onChange={(e) => setFormData((prev) => ({ ...prev, firstName: e.target.value }))}
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+                required
+                disabled={isLoading || !!prefilledEmail}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">{t("auth:password")}</Label>
+              <Input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
                 required
                 disabled={isLoading}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">{t("auth:lastName")}</Label>
-              <Input
-                id="lastName"
-                value={formData.lastName}
-                onChange={(e) => setFormData((prev) => ({ ...prev, lastName: e.target.value }))}
-                required
-                disabled={isLoading}
-              />
-            </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">{t("auth:email")}</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-              required
-              disabled={isLoading || !!prefilledEmail}
-            />
-          </div>
+            {error && (
+              <div className="space-y-2">
+                <div className="text-sm text-destructive">{error}</div>
+                {showSignInOption && onSwitchToSignIn && (
+                  <div className="text-sm text-muted-foreground">
+                    {t("auth:alreadyHaveAccount")}{" "}
+                    <button
+                      type="button"
+                      onClick={handleSwitchToSignIn}
+                      className="text-primary hover:underline"
+                    >
+                      {t("auth:signInToJoin")}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
-          <div className="space-y-2">
-            <Label htmlFor="password">{t("auth:password")}</Label>
-            <Input
-              id="password"
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
-              required
-              disabled={isLoading}
-            />
-          </div>
+            <TermsOfService accepted={termsAccepted} onChange={setTermsAccepted} />
 
-          {error && (
-            <div className="space-y-2">
-              <div className="text-sm text-destructive">{error}</div>
-              {showSignInOption && onSwitchToSignIn && (
-                <div className="text-sm text-muted-foreground">
-                  {t("auth:alreadyHaveAccount")}{" "}
-                  <button
-                    type="button"
-                    onClick={handleSwitchToSignIn}
-                    className="text-primary hover:underline"
-                  >
-                    {t("auth:signInToJoin")}
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          <TermsOfService accepted={termsAccepted} onChange={setTermsAccepted} />
-
-          <Button type="submit" className="w-full" disabled={isLoading || !termsAccepted}>
-            {isLoading ? t("auth:creatingAccount") : t("auth:joinChurch", { tenantName })}
-          </Button>
-        </form>
+            <Button type="submit" className="w-full" disabled={isLoading || !termsAccepted}>
+              {isLoading ? t("auth:creatingAccount") : t("auth:joinChurch", { tenantName })}
+            </Button>
+          </form>
+        </div>
       </CardContent>
     </Card>
   );
