@@ -31,57 +31,47 @@ export async function checkTenantMembership(userId: string, tenantSlug: string):
 }
 
 /**
- * Associates a user with a tenant, optionally using an invite token
+ * Associates a user with a tenant directly (no invitation tokens)
  */
 export async function associateUserWithTenant(
   userId: string,
-  tenantSlug: string,
-  inviteToken?: string,
-): Promise<boolean> {
+  tenantId: string,
+  role: string = "member",
+): Promise<void> {
   try {
-    const tenant = await getTenantBySlug(tenantSlug);
-    if (!tenant) {
-      throw new Error(`Tenant "${tenantSlug}" not found`);
-    }
-
-    const isMember = await checkTenantMembership(userId, tenantSlug);
-    if (isMember) {
-      return true;
-    }
-
-    let role = "member";
-
-    if (inviteToken) {
-      const { data: invitation, error: inviteError } = await supabase
-        .from("invitations")
-        .select("*")
-        .eq("tenant_id", tenant.id)
-        .eq("token", inviteToken)
-        .maybeSingle();
-
-      if (inviteError || !invitation) {
-        throw new Error("Invalid or expired invitation token");
-      }
-
-      role = invitation.role;
-
-      await supabase.from("invitations").delete().eq("id", invitation.id);
-    }
-
-    const { error } = await supabase.from("tenant_members").insert({
-      tenant_id: tenant.id,
-      user_id: userId,
-      role,
-    });
+    // CRITICAL: RLS policy requires BOTH is_tenant_owner() AND check_tenant_user_limit()
+    const { data: _data, error } = await supabase
+      .from("tenant_members")
+      .insert({
+        tenant_id: tenantId,
+        user_id: userId,
+        role,
+      })
+      .select()
+      .single();
 
     if (error) {
-      throw new Error(`Failed to add user to tenant: ${error.message}`);
+      if (error.code === "PGRST116") {
+        throw new Error("Tenant not found or access denied");
+      }
+      throw new Error(error.message);
     }
 
-    return true;
+    // Profile creation happens automatically via database triggers
+    // But verify profile exists for reliability (pattern from test-data-factory.ts)
+    const { error: profileError } = await supabase.from("profiles").upsert(
+      {
+        id: userId,
+        // Profile fields will be populated from auth.users automatically
+      },
+      { onConflict: "id" },
+    );
+
+    if (profileError) {
+      console.warn(`Profile verification warning: ${profileError.message}`);
+      // Don't throw - profile creation is automatic, this is just verification
+    }
   } catch (error) {
-    const errorMessage = error?.message || "未知錯誤";
-    console.error("Error associating user with tenant:", error);
-    throw new Error(`Failed to add user to tenant: ${errorMessage}`);
+    throw new Error(`Error associating user with tenant: ${error.message}`);
   }
 }

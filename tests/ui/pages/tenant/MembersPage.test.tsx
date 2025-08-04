@@ -7,7 +7,7 @@ import * as tenantService from "@/lib/tenant-service";
 import * as memberService from "@/lib/member-service";
 import type { TenantPageLayoutProps } from "@/components/Layout/TenantPageLayout";
 import type { MemberTableProps } from "@/components/Members/MemberTable";
-import type { MemberInviteDialogProps } from "@/components/Members/MemberInviteDialog";
+import type { MemberAddDialogProps } from "@/components/Members/MemberAddDialog";
 import type { MemberFilterBarProps } from "@/components/Members/MemberFilterBar";
 
 // Mock navigation
@@ -79,22 +79,17 @@ jest.mock("@/components/Members/MemberTable", () => ({
   ),
 }));
 
-// Mock MemberInviteDialog component
-jest.mock("@/components/Members/MemberInviteDialog", () => ({
-  MemberInviteDialog: ({
-    tenantSlug,
-    isOpen,
-    onClose,
-    onInviteSuccess,
-  }: MemberInviteDialogProps) => (
-    <div data-testid="member-invite-dialog">
+// Mock MemberAddDialog component
+jest.mock("@/components/Members/MemberAddDialog", () => ({
+  MemberAddDialog: ({ tenantSlug, isOpen, onClose, onAddSuccess }: MemberAddDialogProps) => (
+    <div data-testid="member-add-dialog">
       <div data-testid="dialog-tenant-slug">{tenantSlug}</div>
       <div data-testid="dialog-open">{isOpen ? "open" : "closed"}</div>
       <button onClick={onClose} data-testid="mock-dialog-close">
         Close Dialog
       </button>
-      <button onClick={onInviteSuccess} data-testid="mock-invite-success">
-        Trigger Invite Success
+      <button onClick={onAddSuccess} data-testid="mock-add-success">
+        Trigger Add Success
       </button>
     </div>
   ),
@@ -341,18 +336,18 @@ describe("MembersPage", () => {
       });
     });
 
-    it("should show invite button for owners", async () => {
+    it("should show add member button for owners", async () => {
       await act(async () => {
         render(<MembersPage />);
       });
 
       await waitFor(() => {
         const actionContainer = screen.getByTestId("layout-action");
-        expect(actionContainer).toHaveTextContent("members:inviteMember");
+        expect(actionContainer).toHaveTextContent("members:addMember");
       });
     });
 
-    it("should not show invite button for non-owners", async () => {
+    it("should not show add member button for non-owners", async () => {
       useTenantRole.mockReturnValue({ role: "member", isLoading: false });
 
       const nonOwnerMembers = [
@@ -468,7 +463,7 @@ describe("MembersPage", () => {
       mockUseSessionHelpers.authenticatedNoProfile();
     });
 
-    it("should open invite dialog when invite button is clicked", async () => {
+    it("should open add member dialog when add member button is clicked", async () => {
       const user = userEvent.setup();
 
       await act(async () => {
@@ -479,9 +474,9 @@ describe("MembersPage", () => {
         expect(screen.getByTestId("layout-action")).toBeInTheDocument();
       });
 
-      const inviteButton = screen.getByText("members:inviteMember");
+      const addMemberButton = screen.getByText("members:addMember");
       await act(async () => {
-        await user.click(inviteButton);
+        await user.click(addMemberButton);
       });
 
       await waitFor(() => {
@@ -489,7 +484,7 @@ describe("MembersPage", () => {
       });
     });
 
-    it("should close invite dialog when close is triggered", async () => {
+    it("should close add member dialog when close is triggered", async () => {
       const user = userEvent.setup();
 
       await act(async () => {
@@ -501,9 +496,9 @@ describe("MembersPage", () => {
       });
 
       // Open dialog first
-      const inviteButton = screen.getByText("members:inviteMember");
+      const addMemberButton = screen.getByText("members:addMember");
       await act(async () => {
-        await user.click(inviteButton);
+        await user.click(addMemberButton);
       });
 
       await waitFor(() => {
@@ -521,7 +516,7 @@ describe("MembersPage", () => {
       });
     });
 
-    it("should refresh member list when invite is successful", async () => {
+    it("should refresh member list when member addition is successful", async () => {
       const user = userEvent.setup();
 
       await act(async () => {
@@ -538,10 +533,10 @@ describe("MembersPage", () => {
       // Record initial call count before action
       const initialCallCount = (memberService.getTenantMembers as jest.Mock).mock.calls.length;
 
-      const inviteSuccessButton = screen.getByTestId("mock-invite-success");
+      const addSuccessButton = screen.getByTestId("mock-add-success");
 
       await act(async () => {
-        await user.click(inviteSuccessButton);
+        await user.click(addSuccessButton);
       });
 
       // Wait for the refresh to happen
@@ -747,9 +742,9 @@ describe("MembersPage", () => {
       });
 
       await waitFor(() => {
-        const inviteButton = screen.getByRole("button", { name: /members.inviteMember/i });
-        expect(inviteButton).toBeInTheDocument();
-        expect(inviteButton).not.toHaveAttribute("tabindex", "-1");
+        const addMemberButton = screen.getByRole("button", { name: /members.addMember/i });
+        expect(addMemberButton).toBeInTheDocument();
+        expect(addMemberButton).not.toHaveAttribute("tabindex", "-1");
       });
     });
   });
