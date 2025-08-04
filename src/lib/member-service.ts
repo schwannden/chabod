@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { TenantMember, TenantMemberWithProfile } from "./types";
 import { getTenantBySlug } from "./tenant-service";
-import { v4 as uuidv4 } from "uuid";
+import { associateUserWithTenant } from "./membership-service";
 
 /**
  * Fetches all members of a tenant with their profile information
@@ -63,44 +63,58 @@ export async function deleteTenantMember(memberId: string): Promise<void> {
 }
 
 /**
- * Invites a user to join a tenant by tenant slug
+ * Adds a member directly to a tenant (existing user or create new user)
  */
-export async function inviteMemberToTenant(
+export async function addMemberToTenant(
   tenantSlug: string,
   email: string,
   role: string = "member",
+  password?: string, // Optional for existing users
 ): Promise<void> {
-  // First get the tenant by slug
-  const tenant = await getTenantBySlug(tenantSlug);
+  try {
+    // PATTERN: Follow existing getTenantBySlug pattern
+    const tenant = await getTenantBySlug(tenantSlug);
 
-  if (!tenant) {
-    throw new Error(`Tenant "${tenantSlug}" not found`);
-  }
+    if (!tenant) {
+      throw new Error(`Tenant "${tenantSlug}" not found`);
+    }
 
-  // Then use the existing function with tenantId
-  await inviteUserToTenant(tenant.id, email, role);
-}
+    // Check if user already exists
+    const { data: existingUser, error: userError } =
+      await supabase.auth.admin.getUserByEmail(email);
 
-/**
- * Invites a user to join a tenant
- */
-export async function inviteUserToTenant(
-  tenantId: string,
-  email: string,
-  role: string = "member",
-): Promise<void> {
-  const token = uuidv4();
+    if (userError && userError.code !== "PGRST116") {
+      throw new Error(`Error checking existing user: ${userError.message}`);
+    }
 
-  const { error } = await supabase.from("invitations").insert({
-    tenant_id: tenantId,
-    email,
-    role,
-    token,
-  });
+    let userId: string;
 
-  if (error) {
-    console.error("Error creating invitation:", error);
-    throw new Error(error.message);
+    if (!existingUser && password) {
+      // Create new user using database function pattern
+      const newUserId = crypto.randomUUID();
+
+      const { error: createError } = await supabase.rpc("create_user", {
+        user_id: newUserId,
+        email: email,
+        password: password,
+      });
+
+      if (createError) {
+        throw new Error(`Error creating user: ${createError.message}`);
+      }
+
+      userId = newUserId;
+    } else if (existingUser) {
+      userId = existingUser.id;
+    } else {
+      throw new Error("Password required for new user creation");
+    }
+
+    // REUSE: Existing associateUserWithTenant function (cleaned up version)
+    await associateUserWithTenant(userId, tenant.id, role);
+  } catch (error) {
+    // PATTERN: Specific error message prefix
+    throw new Error(`Error adding tenant member: ${error.message}`);
   }
 }
 

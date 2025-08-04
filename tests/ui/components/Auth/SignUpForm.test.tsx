@@ -23,7 +23,7 @@ jest.mock("@/lib/tenant-utils", () => ({
 jest.mock("@/components/Auth/GoogleOAuthButton", () => ({
   GoogleOAuthButton: ({
     onSuccess,
-    onError,
+    onError: _onError,
   }: {
     onSuccess?: () => void;
     onError?: (error: string) => void;

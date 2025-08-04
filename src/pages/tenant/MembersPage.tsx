@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { getTenantBySlug } from "@/lib/tenant-service";
 import { getTenantMembers } from "@/lib/member-service";
 import { MemberTable } from "@/components/Members/MemberTable";
-import { MemberInviteDialog } from "@/components/Members/MemberInviteDialog";
+import { MemberAddDialog } from "@/components/Members/MemberAddDialog";
 import { MemberFilterBar } from "@/components/Members/MemberFilterBar";
 import { Tenant, TenantMemberWithProfile } from "@/lib/types";
 import { UserPlus } from "lucide-react";
@@ -22,7 +22,7 @@ export default function MembersPage() {
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [members, setMembers] = useState<TenantMemberWithProfile[]>([]);
   const [isDataLoading, setIsDataLoading] = useState(true);
-  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [nameFilter, setNameFilter] = useState("");
   const [emailFilter, setEmailFilter] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
@@ -119,8 +119,8 @@ export default function MembersPage() {
       breadcrumbItems={[{ label: t("nav:members") }]}
       action={
         isOwner && (
-          <Button onClick={() => setIsInviteDialogOpen(true)}>
-            <UserPlus className="mr-2 h-4 w-4" /> {t("members:inviteMember")}
+          <Button onClick={() => setIsAddDialogOpen(true)}>
+            <UserPlus className="mr-2 h-4 w-4" /> {t("members:addMember")}
           </Button>
         )
       }
@@ -143,11 +143,11 @@ export default function MembersPage() {
       />
 
       {tenant && (
-        <MemberInviteDialog
+        <MemberAddDialog
           tenantSlug={slug || ""}
-          isOpen={isInviteDialogOpen}
-          onClose={() => setIsInviteDialogOpen(false)}
-          onInviteSuccess={handleMemberUpdated}
+          isOpen={isAddDialogOpen}
+          onClose={() => setIsAddDialogOpen(false)}
+          onAddSuccess={handleMemberUpdated}
         />
       )}
     </TenantPageLayout>
