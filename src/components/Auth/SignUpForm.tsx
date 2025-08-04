@@ -16,6 +16,8 @@ import { associateUserWithTenant } from "@/lib/tenant-utils";
 import { AuthEmailInput } from "./AuthEmailInput";
 import { AuthPasswordInput } from "./AuthPasswordInput";
 import { TermsOfService } from "./TermsOfService";
+import { GoogleOAuthButton } from "./GoogleOAuthButton";
+import { OAuthDivider } from "./OAuthDivider";
 import { useTranslation } from "react-i18next";
 
 interface SignUpFormProps {
@@ -151,43 +153,65 @@ export function SignUpForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSignUp} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="full-name">{t("auth:fullName")}</Label>
-            <Input
-              id="full-name"
-              placeholder={t("auth:enterYourName")}
-              value={fullName}
-              onChange={handleFullNameChange}
-              required
-            />
-          </div>
-          <AuthEmailInput value={email} onChange={setEmail} disabled={loading} />
-          <AuthPasswordInput value={password} onChange={setPassword} required disabled={loading} />
+        <div className="space-y-4">
+          <GoogleOAuthButton
+            onSuccess={onSuccess}
+            onError={(error) => {
+              setError(error);
+              toast({
+                title: t("auth:createAccountFailed"),
+                description: error,
+                variant: "destructive",
+              });
+            }}
+            inviteToken={inviteToken}
+          />
 
-          {error && (
+          <OAuthDivider />
+
+          <form onSubmit={handleSignUp} className="space-y-4">
             <div className="space-y-2">
-              <div className="text-sm text-destructive">{error}</div>
-              {showSignInOption && (
-                <div className="text-sm text-muted-foreground">
-                  {t("auth:alreadyHaveAccount")}{" "}
-                  <button
-                    type="button"
-                    onClick={onSignInClick}
-                    className="text-primary hover:underline"
-                  >
-                    {t("auth:signInToJoin")}
-                  </button>
-                </div>
-              )}
+              <Label htmlFor="full-name">{t("auth:fullName")}</Label>
+              <Input
+                id="full-name"
+                placeholder={t("auth:enterYourName")}
+                value={fullName}
+                onChange={handleFullNameChange}
+                required
+              />
             </div>
-          )}
+            <AuthEmailInput value={email} onChange={setEmail} disabled={loading} />
+            <AuthPasswordInput
+              value={password}
+              onChange={setPassword}
+              required
+              disabled={loading}
+            />
 
-          <TermsOfService accepted={termsAccepted} onChange={setTermsAccepted} />
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? t("auth:creatingAccount") : t("auth:createAccount")}
-          </Button>
-        </form>
+            {error && (
+              <div className="space-y-2">
+                <div className="text-sm text-destructive">{error}</div>
+                {showSignInOption && (
+                  <div className="text-sm text-muted-foreground">
+                    {t("auth:alreadyHaveAccount")}{" "}
+                    <button
+                      type="button"
+                      onClick={onSignInClick}
+                      className="text-primary hover:underline"
+                    >
+                      {t("auth:signInToJoin")}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <TermsOfService accepted={termsAccepted} onChange={setTermsAccepted} />
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? t("auth:creatingAccount") : t("auth:createAccount")}
+            </Button>
+          </form>
+        </div>
       </CardContent>
       <CardFooter className="flex justify-center">
         <Button variant="link" onClick={onSignInClick}>
