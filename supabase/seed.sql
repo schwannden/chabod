@@ -32,6 +32,23 @@ VALUES
   ('c2e64a3f-2004-4f9c-8f41-0a61fbc6540b', 'd2e0a602-1214-4399-96ad-7d4f3dca75e5', 'owner'),
   ('c2e64a3f-2004-4f9c-8f41-0a61fbc6540b', '0b56e2b5-e3cf-43d0-9aca-f8a538fb512b', 'member');
 
+-- Update tenant metadata (auto-created by trigger) with sample data
+UPDATE "public"."tenant_meta" SET 
+  "tax_id" = '12345678',
+  "contact_email" = 'admin@fruitful-church.org',
+  "address" = '台北市大安區信義路四段123號',
+  "website" = 'https://www.fruitful-church.org',
+  "phone_number" = '02-2708-1234',
+  "verified" = true,
+  "verified_time" = now()
+WHERE "tenant_id" = '87332c35-a227-42f9-93cf-bf652f146dde';
+
+UPDATE "public"."tenant_meta" SET 
+  "contact_email" = 'contact@free-church.org',
+  "address" = '台北市中正區羅斯福路一段456號',
+  "phone_number" = '02-2351-5678'
+WHERE "tenant_id" = 'c2e64a3f-2004-4f9c-8f41-0a61fbc6540b';
+
 INSERT INTO "public"."groups"
   ("id", "tenant_id", "name", "description")
 VALUES

@@ -4,6 +4,7 @@ import { Session } from "@supabase/supabase-js";
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type Tenant = Database["public"]["Tables"]["tenants"]["Row"];
+export type TenantMeta = Database["public"]["Tables"]["tenant_meta"]["Row"];
 export type TenantMember = Database["public"]["Tables"]["tenant_members"]["Row"];
 export type Invitation = Database["public"]["Tables"]["invitations"]["Row"];
 export type Group = Database["public"]["Tables"]["groups"]["Row"];
@@ -46,6 +47,10 @@ export type PriceTier = Database["public"]["Tables"]["price_tiers"]["Row"];
 
 export type TenantWithPriceTier = Tenant & {
   price_tier: PriceTier;
+};
+
+export type TenantWithMeta = Tenant & {
+  tenant_meta?: TenantMeta;
 };
 
 export type Resource = Database["public"]["Tables"]["resources"]["Row"];
