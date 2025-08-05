@@ -1,12 +1,28 @@
-import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { DialogFooter } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 export interface TenantFormData {
   name: string;
   slug: string;
+  // Metadata fields
+  tax_id?: string;
+  contact_email: string;
+  address: string;
+  website?: string;
+  phone_number?: string;
 }
 
 interface TenantFormProps {
@@ -19,11 +35,6 @@ interface TenantFormProps {
   autoGenerateSlug?: boolean;
 }
 
-interface FormErrors {
-  name?: string;
-  slug?: string;
-}
-
 export function TenantForm({
   initialValues,
   onSubmit,
@@ -33,103 +44,172 @@ export function TenantForm({
   onCancel,
   autoGenerateSlug = false,
 }: TenantFormProps) {
-  const [name, setName] = useState(initialValues.name);
-  const [slug, setSlug] = useState(initialValues.slug);
-  const [errors, setErrors] = useState<FormErrors>({});
+  const { t } = useTranslation("tenant");
 
-  useEffect(() => {
-    setName(initialValues.name);
-    setSlug(initialValues.slug);
-    setErrors({});
-  }, [initialValues]);
+  const formSchema = z.object({
+    name: z.string().min(1, t("nameRequired")),
+    slug: z
+      .string()
+      .min(1, t("slugRequired"))
+      .regex(/^[a-z0-9-]+$/, t("slugPattern")),
+    tax_id: z.string().optional(),
+    contact_email: z.string().email(t("invalidEmail")).min(1, t("contactEmailRequired")),
+    address: z.string().min(1, t("addressRequired")),
+    website: z.string().url(t("invalidWebsite")).optional().or(z.literal("")),
+    phone_number: z.string().optional(),
+  });
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setName(value);
-    setErrors((prev) => ({ ...prev, name: undefined }));
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: initialValues.name || "",
+      slug: initialValues.slug || "",
+      tax_id: initialValues.tax_id || "",
+      contact_email: initialValues.contact_email || "",
+      address: initialValues.address || "",
+      website: initialValues.website || "",
+      phone_number: initialValues.phone_number || "",
+    },
+  });
 
-    // Auto-generate slug from name if enabled
-    if (autoGenerateSlug) {
-      const slugValue = value
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, "-")
-        .replace(/[^a-z0-9-]/g, "");
-      setSlug(slugValue);
-      setErrors((prev) => ({ ...prev, slug: undefined }));
+  const watchName = form.watch("name");
+
+  // Auto-generate slug from name if enabled
+  if (autoGenerateSlug) {
+    const slugValue = watchName
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+
+    if (slugValue !== form.getValues("slug")) {
+      form.setValue("slug", slugValue);
     }
-  };
+  }
 
-  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toLowerCase();
-    // Only allow lowercase letters, numbers and hyphens
-    const sanitizedValue = value.replace(/[^a-z0-9-]/g, "");
-    setSlug(sanitizedValue);
-    setErrors((prev) => ({ ...prev, slug: undefined }));
-  };
-
-  const validateInputs = () => {
-    const newErrors: FormErrors = {};
-    let isValid = true;
-
-    // Validate name (trim and check if empty)
-    const trimmedName = name.trim();
-    if (!trimmedName) {
-      newErrors.name = "教會名稱不能為空";
-      isValid = false;
-    }
-
-    // Validate slug (check pattern and empty)
-    const trimmedSlug = slug.trim();
-    if (!trimmedSlug) {
-      newErrors.slug = "Slug 不能為空";
-      isValid = false;
-    } else if (!/^[a-z0-9-]+$/.test(trimmedSlug)) {
-      newErrors.slug = "Slug 只能包含小寫字母、數字和連字號";
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return { isValid, trimmedName, trimmedSlug };
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const { isValid, trimmedName, trimmedSlug } = validateInputs();
-
-    if (!isValid) return;
-
-    onSubmit({
-      name: trimmedName,
-      slug: trimmedSlug,
-    });
+  const handleFormSubmit = (values: z.infer<typeof formSchema>) => {
+    onSubmit(values);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name">教會名稱</Label>
-        <Input id="name" value={name} onChange={handleNameChange} placeholder="教會名稱" required />
-        {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
-      </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
+        {/* Basic tenant information */}
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("name")}</FormLabel>
+              <FormControl>
+                <Input placeholder={t("name")} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <div className="space-y-2">
-        <Label htmlFor="slug">Slug</Label>
-        <Input id="slug" value={slug} onChange={handleSlugChange} placeholder="教會代號" required />
-        {errors.slug && <p className="text-sm text-destructive">{errors.slug}</p>}
-        <p className="text-xs text-muted-foreground">
-          這將會被用於 URL: /tenant/{slug || "example"}
-        </p>
-      </div>
+        <FormField
+          control={form.control}
+          name="slug"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("slug")}</FormLabel>
+              <FormControl>
+                <Input placeholder={t("slug")} {...field} />
+              </FormControl>
+              <FormMessage />
+              <p className="text-xs text-muted-foreground">
+                {t("name")}: /tenant/{field.value || "example"}
+              </p>
+            </FormItem>
+          )}
+        />
 
-      <DialogFooter>
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isProcessing}>
-          {isProcessing ? processingText : submitText}
-        </Button>
-      </DialogFooter>
-    </form>
+        {/* Metadata fields */}
+        <div className="space-y-4 pt-4 border-t">
+          <h4 className="font-medium text-sm">{t("churchInfo")}</h4>
+
+          <FormField
+            control={form.control}
+            name="contact_email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("contactEmail")}</FormLabel>
+                <FormControl>
+                  <Input type="email" placeholder={t("contactEmailPlaceholder")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("address")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("addressPlaceholder")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="tax_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("taxId")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("taxIdPlaceholder")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="website"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("website")}</FormLabel>
+                <FormControl>
+                  <Input type="url" placeholder={t("websitePlaceholder")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="phone_number"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("phoneNumber")}</FormLabel>
+                <FormControl>
+                  <Input type="tel" placeholder={t("phoneNumberPlaceholder")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isProcessing}>
+            {isProcessing ? processingText : submitText}
+          </Button>
+        </DialogFooter>
+      </form>
+    </Form>
   );
 }

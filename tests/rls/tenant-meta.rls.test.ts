@@ -119,7 +119,7 @@ describe("Tenant Meta RLS Policies", () => {
       try {
         const { member, tenant } = rlsTest.getContext();
 
-        const { data, error } = await member.client
+        const { data, error: _error } = await member.client
           .from("tenant_meta")
           .update({ website: "https://hacker.com" })
           .eq("tenant_id", tenant.id)
@@ -136,7 +136,7 @@ describe("Tenant Meta RLS Policies", () => {
       try {
         const { outsider, tenant } = rlsTest.getContext();
 
-        const { data, error } = await outsider.client
+        const { data, error: _error } = await outsider.client
           .from("tenant_meta")
           .update({ website: "https://malicious.com" })
           .eq("tenant_id", tenant.id)
@@ -153,7 +153,7 @@ describe("Tenant Meta RLS Policies", () => {
   describe("Tenant Meta Automatic Creation", () => {
     it("should automatically create tenant meta when tenant is created", async () => {
       try {
-        const { owner } = rlsTest.getContext();
+        const { owner: _owner } = rlsTest.getContext();
 
         // Verify that tenant meta was automatically created for the test tenant
         // The createRLSTest() creates a tenant, which should trigger the metadata creation

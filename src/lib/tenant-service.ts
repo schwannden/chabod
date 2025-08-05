@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Tenant, TenantWithUsage, PriceTier } from "./types";
+import { Tenant, TenantWithUsage, PriceTier, TenantMeta } from "./types";
 
 /**
  * Fetches all price tiers
@@ -36,7 +36,8 @@ export async function getTenants(): Promise<TenantWithUsage[]> {
       `
       *,
       price_tier:price_tiers(*),
-      tenant_members!inner(user_id, role)
+      tenant_members!inner(user_id, role),
+      tenant_meta(*)
     `,
     )
     .eq("tenant_members.user_id", user.id);
@@ -187,5 +188,46 @@ export async function getTenantBySlug(slug: string): Promise<Tenant | null> {
   } catch (error) {
     console.error("Error in getTenantBySlug:", error);
     return null;
+  }
+}
+
+/**
+ * Updates a tenant with metadata
+ */
+export async function updateTenantWithMetadata(
+  tenantId: string,
+  tenantData: { name: string; slug: string },
+  metadataData: Partial<Omit<TenantMeta, "id" | "tenant_id" | "created_at" | "updated_at">>,
+): Promise<void> {
+  // Update tenant basic info
+  await updateTenant(tenantId, tenantData.name, tenantData.slug);
+
+  // Update tenant metadata
+  const { error } = await supabase
+    .from("tenant_meta")
+    .update(metadataData)
+    .eq("tenant_id", tenantId);
+
+  if (error) {
+    console.error("Error updating tenant metadata:", error);
+    throw new Error(error.message);
+  }
+}
+
+/**
+ * Creates tenant metadata for new tenant
+ */
+export async function createTenantMetadata(
+  tenantId: string,
+  metadataData: Partial<Omit<TenantMeta, "id" | "tenant_id" | "created_at" | "updated_at">>,
+): Promise<void> {
+  const { error } = await supabase
+    .from("tenant_meta")
+    .update(metadataData)
+    .eq("tenant_id", tenantId);
+
+  if (error) {
+    console.error("Error creating tenant metadata:", error);
+    throw new Error(error.message);
   }
 }

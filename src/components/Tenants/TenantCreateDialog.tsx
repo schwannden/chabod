@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { TenantForm, TenantFormData } from "./TenantForm";
-import { createTenant } from "@/lib/tenant-utils";
+import { createTenant, createTenantMetadata } from "@/lib/tenant-utils";
 import { useTranslation } from "react-i18next";
 
 interface TenantCreateDialogProps {
@@ -21,24 +21,38 @@ interface TenantCreateDialogProps {
 export function TenantCreateDialog({ isOpen, onClose, onTenantCreated }: TenantCreateDialogProps) {
   const [isCreating, setIsCreating] = useState(false);
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t } = useTranslation("tenant");
 
   const handleSubmit = async (formData: TenantFormData) => {
     setIsCreating(true);
 
     try {
-      // Fixing this line - removing the extra argument
-      await createTenant(formData.name, formData.slug);
+      // Create the tenant first
+      const newTenant = await createTenant(formData.name, formData.slug);
+
+      if (newTenant) {
+        // Create/update the metadata
+        const metadataData = {
+          tax_id: formData.tax_id || null,
+          contact_email: formData.contact_email,
+          address: formData.address,
+          website: formData.website || null,
+          phone_number: formData.phone_number || null,
+        };
+
+        await createTenantMetadata(newTenant.id, metadataData);
+      }
+
       toast({
-        title: t("tenant.created"),
-        description: t("tenant.createdSuccess", { name: formData.name }),
+        title: t("created"),
+        description: t("createdSuccess", { name: formData.name }),
       });
       onTenantCreated();
       onClose();
     } catch (error) {
-      const errorMessage = error?.message || "未知錯誤";
+      const errorMessage = error?.message || "Unknown error";
       toast({
-        title: t("tenant.errorCreating"),
+        title: t("errorCreating"),
         description: errorMessage,
         variant: "destructive",
       });
@@ -49,18 +63,26 @@ export function TenantCreateDialog({ isOpen, onClose, onTenantCreated }: TenantC
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t("tenant.createNew")}</DialogTitle>
-          <DialogDescription>{t("tenant.createDescription")}</DialogDescription>
+          <DialogTitle>{t("createNew")}</DialogTitle>
+          <DialogDescription>{t("createDescription")}</DialogDescription>
         </DialogHeader>
 
         <TenantForm
-          initialValues={{ name: "", slug: "" }}
+          initialValues={{
+            name: "",
+            slug: "",
+            tax_id: "",
+            contact_email: "",
+            address: "",
+            website: "",
+            phone_number: "",
+          }}
           onSubmit={handleSubmit}
           isProcessing={isCreating}
-          processingText={t("tenant.creating")}
-          submitText={t("tenant.createChurch")}
+          processingText={t("creating")}
+          submitText={t("createChurch")}
           onCancel={onClose}
           autoGenerateSlug={true}
         />
