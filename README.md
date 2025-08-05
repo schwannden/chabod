@@ -8,7 +8,23 @@
 
 **專案網址**: https://chabod.fruitful-tools.com
 
+<!-- Project Status -->
+
+![Version](https://img.shields.io/github/package-json/v/schwannden/chabod?style=for-the-badge&logo=github)
+![License](https://img.shields.io/badge/License-Elastic_2.0-blue?style=for-the-badge)
+![Website](https://img.shields.io/website?down_color=red&down_message=offline&style=for-the-badge&up_color=green&up_message=online&url=https%3A%2F%2Fchabod.fruitful-tools.com)
+
+<!-- Community -->
+
 [![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289da?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/hnQrfUvFk3)
+
+<!-- Tech Stack -->
+
+![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
 
 ## 關於 Chabod
 
