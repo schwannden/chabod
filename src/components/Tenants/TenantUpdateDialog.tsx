@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -8,11 +9,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { TenantForm, TenantFormData } from "./TenantForm";
-import { Tenant } from "@/lib/types";
-import { updateTenant } from "@/lib/tenant-utils";
+import { TenantWithMeta } from "@/lib/types";
+import { updateTenantWithMetadata } from "@/lib/tenant-utils";
 
 interface TenantUpdateDialogProps {
-  tenant: Tenant;
+  tenant: TenantWithMeta;
   isOpen: boolean;
   onClose: () => void;
   onTenantUpdated: () => void;
@@ -24,9 +25,15 @@ export function TenantUpdateDialog({
   onClose,
   onTenantUpdated,
 }: TenantUpdateDialogProps) {
+  const { t } = useTranslation("tenant");
   const [initialValues, setInitialValues] = useState<TenantFormData>({
     name: tenant.name,
     slug: tenant.slug,
+    tax_id: tenant.tenant_meta?.tax_id || "",
+    contact_email: tenant.tenant_meta?.contact_email || "",
+    address: tenant.tenant_meta?.address || "",
+    website: tenant.tenant_meta?.website || "",
+    phone_number: tenant.tenant_meta?.phone_number || "",
   });
   const [isUpdating, setIsUpdating] = useState(false);
   const { toast } = useToast();
@@ -36,6 +43,11 @@ export function TenantUpdateDialog({
       setInitialValues({
         name: tenant.name,
         slug: tenant.slug,
+        tax_id: tenant.tenant_meta?.tax_id || "",
+        contact_email: tenant.tenant_meta?.contact_email || "",
+        address: tenant.tenant_meta?.address || "",
+        website: tenant.tenant_meta?.website || "",
+        phone_number: tenant.tenant_meta?.phone_number || "",
       });
     }
   }, [tenant, isOpen]);
@@ -44,15 +56,26 @@ export function TenantUpdateDialog({
     setIsUpdating(true);
 
     try {
-      await updateTenant(tenant.id, formData.name, formData.slug);
+      // Separate tenant basic info from metadata
+      const tenantData = { name: formData.name, slug: formData.slug };
+      const metadataData = {
+        tax_id: formData.tax_id || null,
+        contact_email: formData.contact_email,
+        address: formData.address,
+        website: formData.website || null,
+        phone_number: formData.phone_number || null,
+      };
+
+      await updateTenantWithMetadata(tenant.id, tenantData, metadataData);
+
       toast({
-        title: "更新成功",
-        description: `${formData.name} 已更新。`,
+        title: t("updated"),
+        description: t("updatedSuccess", { name: formData.name }),
       });
       onTenantUpdated();
       onClose();
     } catch (error) {
-      const errorMessage = error?.message || "未知錯誤";
+      const errorMessage = error?.message || "Unknown error";
       toast({
         title: "Error updating tenant",
         description: errorMessage,
@@ -65,7 +88,7 @@ export function TenantUpdateDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Update Tenant</DialogTitle>
           <DialogDescription>Update the details of your tenant organization.</DialogDescription>
@@ -75,8 +98,8 @@ export function TenantUpdateDialog({
           initialValues={initialValues}
           onSubmit={handleSubmit}
           isProcessing={isUpdating}
-          processingText="更新中..."
-          submitText="更新教會資訊"
+          processingText={t("creating")}
+          submitText={t("updated")}
           onCancel={onClose}
         />
       </DialogContent>

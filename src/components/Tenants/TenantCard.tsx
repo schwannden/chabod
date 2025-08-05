@@ -9,17 +9,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2, Users, Copy, Info } from "lucide-react";
-import { TenantWithUsage } from "@/lib/types";
+import { TenantWithUsageAndMeta } from "@/lib/types";
 import { useNavigate } from "react-router-dom";
 import { deleteTenant } from "@/lib/tenant-utils";
 import { TenantUpdateDialog } from "./TenantUpdateDialog";
 import { PricePlansDialog } from "./PricePlansDialog";
+import { ChurchInfoDialog } from "./ChurchInfoDialog";
 import { HighRiskDeleteDialog } from "@/components/shared/HighRiskDeleteDialog";
 import { useTranslation } from "react-i18next";
 
 interface TenantCardProps {
-  tenant: TenantWithUsage;
+  tenant: TenantWithUsageAndMeta;
   onTenantUpdated: () => void;
   onTenantDeleted: () => void;
 }
@@ -30,6 +32,7 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAllPlansDialogOpen, setIsAllPlansDialogOpen] = useState(false);
+  const [isChurchInfoDialogOpen, setIsChurchInfoDialogOpen] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -76,11 +79,18 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
       <Card>
         <CardHeader>
           <CardTitle className="flex justify-between items-center">
-            {tenant.name}
+            <span className="flex items-center gap-2">
+              {tenant.name}
+              {tenant.tenant_meta?.verified && (
+                <Badge variant="secondary" className="bg-green-100 text-green-800">
+                  {t("tenant:verified")}
+                </Badge>
+              )}
+            </span>
             {tenant.userRole === "owner" && (
               <div className="flex space-x-2">
                 <Button size="icon" variant="outline" onClick={() => setIsUpdateDialogOpen(true)}>
-                  <Pencil className="h-4 w-4" />
+                  <Pencil className="h-4 w-4" data-testid="pencil-icon" />
                 </Button>
                 <Button
                   size="icon"
@@ -88,7 +98,7 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
                   onClick={() => setIsDeleteDialogOpen(true)}
                   disabled={isDeleting}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" data-testid="trash-icon" />
                 </Button>
               </div>
             )}
@@ -153,6 +163,20 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
               </Button>
             </div>
           </div>
+
+          <div className="mt-4 pt-2 border-t">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium">{t("tenant:churchInfo")}</p>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-primary"
+                onClick={() => setIsChurchInfoDialogOpen(true)}
+              >
+                <Info className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={handleManageTenant}>
@@ -173,6 +197,12 @@ export function TenantCard({ tenant, onTenantUpdated, onTenantDeleted }: TenantC
         tenant={tenant}
         isOpen={isAllPlansDialogOpen}
         onOpenChange={setIsAllPlansDialogOpen}
+      />
+
+      <ChurchInfoDialog
+        tenant={tenant}
+        isOpen={isChurchInfoDialogOpen}
+        onOpenChange={setIsChurchInfoDialogOpen}
       />
 
       <HighRiskDeleteDialog

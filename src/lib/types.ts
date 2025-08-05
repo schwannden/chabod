@@ -53,6 +53,10 @@ export type TenantWithMeta = Tenant & {
   tenant_meta?: TenantMeta;
 };
 
+export type TenantWithUsageAndMeta = TenantWithUsage & {
+  tenant_meta?: TenantMeta;
+};
+
 export type Resource = Database["public"]["Tables"]["resources"]["Row"];
 export type ResourceGroup = Database["public"]["Tables"]["resources_groups"]["Row"];
 

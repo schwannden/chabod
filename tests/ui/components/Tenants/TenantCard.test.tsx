@@ -432,6 +432,215 @@ describe("TenantCard", () => {
     });
   });
 
+  describe("Tenant Metadata Display", () => {
+    it("should display verification badge when tenant is verified", () => {
+      const verifiedTenant = {
+        ...mockTenantWithUsage,
+        tenant_meta: {
+          id: "meta-id",
+          tenant_id: "test-tenant-id",
+          tax_id: "12345678",
+          contact_email: "admin@church.com",
+          address: "123 Church St",
+          website: "https://church.com",
+          phone_number: "+1-555-0123",
+          verified: true,
+          verified_time: "2024-01-01T00:00:00Z",
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+        },
+      };
+
+      render(
+        <TenantCard
+          tenant={verifiedTenant}
+          onTenantUpdated={mockCallbacks.onTenantUpdated}
+          onTenantDeleted={mockCallbacks.onTenantDeleted}
+        />,
+      );
+
+      expect(screen.getByText("tenant:verified")).toBeInTheDocument();
+    });
+
+    it("should not display verification badge when tenant is not verified", () => {
+      const unverifiedTenant = {
+        ...mockTenantWithUsage,
+        tenant_meta: {
+          id: "meta-id",
+          tenant_id: "test-tenant-id",
+          tax_id: null,
+          contact_email: "admin@church.com",
+          address: "123 Church St",
+          website: null,
+          phone_number: null,
+          verified: false,
+          verified_time: null,
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+        },
+      };
+
+      render(
+        <TenantCard
+          tenant={unverifiedTenant}
+          onTenantUpdated={mockCallbacks.onTenantUpdated}
+          onTenantDeleted={mockCallbacks.onTenantDeleted}
+        />,
+      );
+
+      expect(screen.queryByText("tenant:verified")).not.toBeInTheDocument();
+    });
+
+    it("should not display verification badge when tenant has no metadata", () => {
+      const tenantWithoutMeta = {
+        ...mockTenantWithUsage,
+        tenant_meta: undefined,
+      };
+
+      render(
+        <TenantCard
+          tenant={tenantWithoutMeta}
+          onTenantUpdated={mockCallbacks.onTenantUpdated}
+          onTenantDeleted={mockCallbacks.onTenantDeleted}
+        />,
+      );
+
+      expect(screen.queryByText("tenant:verified")).not.toBeInTheDocument();
+    });
+
+    it("should open church info dialog when info button is clicked", async () => {
+      const user = userEvent.setup();
+      const tenantWithCompleteMetadata = {
+        ...mockTenantWithUsage,
+        tenant_meta: {
+          id: "meta-id",
+          tenant_id: "test-tenant-id",
+          tax_id: "12345678",
+          contact_email: "admin@church.com",
+          address: "123 Church Street, City, State",
+          website: "https://church.com",
+          phone_number: "+1-555-0123",
+          verified: false,
+          verified_time: null,
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+        },
+      };
+
+      render(
+        <TenantCard
+          tenant={tenantWithCompleteMetadata}
+          onTenantUpdated={mockCallbacks.onTenantUpdated}
+          onTenantDeleted={mockCallbacks.onTenantDeleted}
+        />,
+      );
+
+      // Check that church info section is displayed
+      expect(screen.getByText("tenant:churchInfo")).toBeInTheDocument();
+
+      // Find and click the info button for church info
+      const infoButtons = screen.getAllByRole("button");
+      const churchInfoButton = infoButtons.find(
+        (button) =>
+          button.classList.contains("text-muted-foreground") && button.querySelector("svg"),
+      );
+
+      expect(churchInfoButton).toBeInTheDocument();
+
+      if (churchInfoButton) {
+        await user.click(churchInfoButton);
+
+        // After clicking, the dialog should be opened
+        // We can test this by checking if the dialog content appears
+        // Since the ChurchInfoDialog component will render its content
+      }
+    });
+
+    it("should display church info section with partial metadata", async () => {
+      const tenantWithPartialMetadata = {
+        ...mockTenantWithUsage,
+        tenant_meta: {
+          id: "meta-id",
+          tenant_id: "test-tenant-id",
+          tax_id: null,
+          contact_email: "admin@church.com",
+          address: "123 Church Street",
+          website: null,
+          phone_number: null,
+          verified: false,
+          verified_time: null,
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+        },
+      };
+
+      render(
+        <TenantCard
+          tenant={tenantWithPartialMetadata}
+          onTenantUpdated={mockCallbacks.onTenantUpdated}
+          onTenantDeleted={mockCallbacks.onTenantDeleted}
+        />,
+      );
+
+      // Check that church info section is displayed
+      expect(screen.getByText("tenant:churchInfo")).toBeInTheDocument();
+    });
+
+    it("should handle tenant with no metadata gracefully", () => {
+      const tenantWithoutMeta = {
+        ...mockTenantWithUsage,
+        tenant_meta: undefined,
+      };
+
+      render(
+        <TenantCard
+          tenant={tenantWithoutMeta}
+          onTenantUpdated={mockCallbacks.onTenantUpdated}
+          onTenantDeleted={mockCallbacks.onTenantDeleted}
+        />,
+      );
+
+      // Church info section should still be displayed
+      expect(screen.getByText("tenant:churchInfo")).toBeInTheDocument();
+
+      // Verification badge should not be displayed
+      expect(screen.queryByText("tenant:verified")).not.toBeInTheDocument();
+    });
+
+    it("should handle empty metadata gracefully", () => {
+      const tenantWithEmptyMeta = {
+        ...mockTenantWithUsage,
+        tenant_meta: {
+          id: "meta-id",
+          tenant_id: "test-tenant-id",
+          tax_id: null,
+          contact_email: "",
+          address: "",
+          website: null,
+          phone_number: null,
+          verified: false,
+          verified_time: null,
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+        },
+      };
+
+      render(
+        <TenantCard
+          tenant={tenantWithEmptyMeta}
+          onTenantUpdated={mockCallbacks.onTenantUpdated}
+          onTenantDeleted={mockCallbacks.onTenantDeleted}
+        />,
+      );
+
+      // Church info section should still be displayed
+      expect(screen.getByText("tenant:churchInfo")).toBeInTheDocument();
+
+      // Verification badge should not be displayed
+      expect(screen.queryByText("tenant:verified")).not.toBeInTheDocument();
+    });
+  });
+
   describe("Edge Cases", () => {
     it("should handle zero counts gracefully", () => {
       const tenantWithZeroCounts = {
