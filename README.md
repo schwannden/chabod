@@ -8,7 +8,7 @@
 
 **專案網址**: https://chabod.fruitful-tools.com
 
-**加入討論**: [![Discord](https://img.shields.io/discord/1234567890?logo=discord&logoColor=white&label=Discord&color=5865F2)](https://discord.gg/hnQrfUvFk3)
+[![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289da?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/hnQrfUvFk3)
 
 ## 關於 Chabod
 
