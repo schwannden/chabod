@@ -6,6 +6,26 @@ For a comprehensive overview of the project, tech stack, and features, please se
 
 **Join Discussion**: https://discord.gg/hnQrfUvFk3
 
+## Demo Account (Local Development)
+
+For local development and testing, you can use the following demo account after setting up seed data:
+
+### Setup Steps:
+
+1. Rename the seed template: `mv supabase/seed.sql.template supabase/seed.sql`
+2. Uncomment the seed configuration in `supabase/config.toml`:
+   ```toml
+   sql_paths = ["./seed.sql"]
+   ```
+3. Reset your database: `supabase db reset`
+
+### Demo Credentials:
+
+- **Email:** admin@fruitful-tools.com
+- **Password:** strongAndFruitfulPassword
+
+Note: This account is only available when using the seed.sql file in your local development environment.
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) (we recommend using Volta for version management)
@@ -85,7 +105,6 @@ see [Official Docs](https://supabase.com/docs/reference/cli/supabase-db) for mor
    ```
 
    **Testing Guidelines:**
-
    - All RLS (Row Level Security) policies must be tested
    - Run `npm run test:rls` to run only RLS-specific tests
    - For detailed testing documentation, patterns, and best practices, see our [Test Documentation](../tests/README.md)
@@ -97,7 +116,6 @@ see [Official Docs](https://supabase.com/docs/reference/cli/supabase-db) for mor
    ```
 
    Examples:
-
    - `feat: add new prayer entry feature`
    - `fix: resolve bug in edit prayer form`
    - Refer to [release please config](https://github.com/schwannden/chabod/blob/main/release-please-config.json#L12) for more types.

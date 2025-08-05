@@ -1,8 +1,8 @@
 {
-  "alphaVersion": {
-    "title": "Alpha Version Notice",
-    "message": "Chabod is currently in alpha version, database could be reset at any moment. We recommend contributors to use local development environment.",
-    "icon": "warning",
+  "betaVersion": {
+    "title": "Beta Version Notice",
+    "message": "Chabod is now in beta version, some features may be susceptible to breaking changes. We need your input to improve this service. Join us at Discord.",
+    "icon": "info",
     "dontShowAgain": "Don't show this again",
     "understood": "Understood"
   }
