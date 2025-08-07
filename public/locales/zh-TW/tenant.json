@@ -2,7 +2,7 @@
   "createNew": "建立新教會",
   "createDescription": "建立一個新的教會，您將成為其所有者並管理它。",
   "name": "教會名稱",
-  "slug": "網址名稱",
+  "slug": "slug",
   "creating": "建立中...",
   "createChurch": "建立教會",
   "created": "教會已建立",

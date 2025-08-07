@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,19 +74,30 @@ export function TenantForm({
   });
 
   const watchName = form.watch("name");
+  const watchSlug = form.watch("slug");
+  const userHasEditedSlug = useRef(false);
 
-  // Auto-generate slug from name if enabled
-  if (autoGenerateSlug) {
-    const slugValue = watchName
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "");
-
-    if (slugValue !== form.getValues("slug")) {
-      form.setValue("slug", slugValue);
+  // Track if user has manually edited the slug
+  useEffect(() => {
+    if (watchSlug && watchSlug !== initialValues.slug) {
+      userHasEditedSlug.current = true;
     }
-  }
+  }, [watchSlug, initialValues.slug]);
+
+  // Auto-generate slug from name if enabled and user hasn't manually edited slug
+  useEffect(() => {
+    if (autoGenerateSlug && !userHasEditedSlug.current && watchName) {
+      const slugValue = watchName
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
+
+      if (slugValue !== form.getValues("slug")) {
+        form.setValue("slug", slugValue, { shouldValidate: false });
+      }
+    }
+  }, [watchName, autoGenerateSlug, form]);
 
   const handleFormSubmit = (values: z.infer<typeof formSchema>) => {
     onSubmit(values);
@@ -116,11 +128,18 @@ export function TenantForm({
             <FormItem>
               <FormLabel>{t("slug")}</FormLabel>
               <FormControl>
-                <Input placeholder={t("slug")} {...field} />
+                <Input
+                  placeholder={t("slug")}
+                  {...field}
+                  onChange={(e) => {
+                    userHasEditedSlug.current = true;
+                    field.onChange(e);
+                  }}
+                />
               </FormControl>
               <FormMessage />
               <p className="text-xs text-muted-foreground">
-                {t("name")}: /tenant/{field.value || "example"}
+                URL: /tenant/{field.value || "example"}
               </p>
             </FormItem>
           )}
