@@ -111,7 +111,7 @@
     "husky": "^9.1.7",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^30.0.5",
-    "jest-environment-jsdom": "^29.7.0",
+    "jest-environment-jsdom": "^30.0.5",
     "jest-environment-node": "^29.7.0",
     "lint-staged": "^16.1.4",
     "lovable-tagger": "^1.1.9",
