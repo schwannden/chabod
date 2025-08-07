@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/schwannden/chabod/compare/v1.0.1...v1.0.2) (2025-08-07)
+
+
+### Bug Fixes
+
+* auth redirect url ([24879ac](https://github.com/schwannden/chabod/commit/24879ac70c084c6273f3f9dbc49a6c9b4f2f12c0))
+
 ## [1.0.1](https://github.com/schwannden/chabod/compare/v1.0.0...v1.0.1) (2025-08-07)
 
 
