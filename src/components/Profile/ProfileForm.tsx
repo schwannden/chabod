@@ -8,8 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/components/ui/use-toast";
 import { useTranslation } from "react-i18next";
 import { Profile } from "@/lib/types";
-import { PasswordChangeForm } from "./PasswordChangeForm";
-import { PasswordSetupForm } from "./PasswordSetupForm";
 
 interface ProfileFormProps {
   profile: Profile;
@@ -66,83 +64,65 @@ export function ProfileForm({ profile, onProfileUpdated }: ProfileFormProps) {
     }
   };
 
-  // Determine if user is Google OAuth user or email/password user
-  const isGoogleUser = user?.identities?.some((identity) => identity.provider === "google");
-
   return (
-    <>
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>{t("profile:title")}</CardTitle>
-          <CardDescription>{t("profile:description")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+    <Card className="max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle>{t("profile:title")}</CardTitle>
+        <CardDescription>{t("profile:description")}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="full-name">{t("profile:fullName")}</Label>
+            <Input
+              id="full-name"
+              type="text"
+              value={formData.full_name}
+              onChange={(e) => setFormData((prev) => ({ ...prev, full_name: e.target.value }))}
+              placeholder={t("profile:yourName")}
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="full-name">{t("profile:fullName")}</Label>
+              <Label htmlFor="first-name">{t("profile:firstName")}</Label>
               <Input
-                id="full-name"
+                id="first-name"
                 type="text"
-                value={formData.full_name}
-                onChange={(e) => setFormData((prev) => ({ ...prev, full_name: e.target.value }))}
-                placeholder={t("profile:yourName")}
+                value={formData.first_name}
+                onChange={(e) => setFormData((prev) => ({ ...prev, first_name: e.target.value }))}
+                placeholder={t("profile:firstName_")}
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="first-name">{t("profile:firstName")}</Label>
-                <Input
-                  id="first-name"
-                  type="text"
-                  value={formData.first_name}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, first_name: e.target.value }))}
-                  placeholder={t("profile:firstName_")}
-                />
-              </div>
-              <div>
-                <Label htmlFor="last-name">{t("profile:lastName")}</Label>
-                <Input
-                  id="last-name"
-                  type="text"
-                  value={formData.last_name}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, last_name: e.target.value }))}
-                  placeholder={t("profile:lastName_")}
-                />
-              </div>
-            </div>
             <div>
-              <Label htmlFor="email">{t("profile:email")}</Label>
-              <Input id="email" type="email" value={user?.email || ""} disabled />
-              <p className="text-xs text-muted-foreground">{t("profile:emailNote")}</p>
-            </div>
-            <div>
-              <Label htmlFor="avatar-url">{t("profile:avatarUrl")}</Label>
+              <Label htmlFor="last-name">{t("profile:lastName")}</Label>
               <Input
-                id="avatar-url"
-                type="url"
-                value={formData.avatar_url}
-                onChange={(e) => setFormData((prev) => ({ ...prev, avatar_url: e.target.value }))}
+                id="last-name"
+                type="text"
+                value={formData.last_name}
+                onChange={(e) => setFormData((prev) => ({ ...prev, last_name: e.target.value }))}
+                placeholder={t("profile:lastName_")}
               />
             </div>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? t("common:saving") : t("profile:saveChanges")}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-
-      {/* Security Section */}
-      <Card className="max-w-2xl mx-auto mt-6">
-        <CardHeader>
-          <CardTitle>{t("profile:security")}</CardTitle>
-          <CardDescription>
-            {isGoogleUser
-              ? t("profile:passwordSetupDescription")
-              : t("profile:passwordChangeDescription")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>{isGoogleUser ? <PasswordSetupForm /> : <PasswordChangeForm />}</CardContent>
-      </Card>
-    </>
+          </div>
+          <div>
+            <Label htmlFor="email">{t("profile:email")}</Label>
+            <Input id="email" type="email" value={user?.email || ""} disabled />
+            <p className="text-xs text-muted-foreground">{t("profile:emailNote")}</p>
+          </div>
+          <div>
+            <Label htmlFor="avatar-url">{t("profile:avatarUrl")}</Label>
+            <Input
+              id="avatar-url"
+              type="url"
+              value={formData.avatar_url}
+              onChange={(e) => setFormData((prev) => ({ ...prev, avatar_url: e.target.value }))}
+            />
+          </div>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? t("common:saving") : t("profile:saveChanges")}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

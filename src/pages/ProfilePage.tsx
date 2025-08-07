@@ -5,6 +5,7 @@ import { NavBar } from "@/components/Layout/NavBar";
 import { TenantBreadcrumb } from "@/components/Layout/TenantBreadcrumb";
 import { getTenantBySlug } from "@/lib/tenant-utils";
 import { ProfileForm } from "@/components/Profile/ProfileForm";
+import { SecuritySection } from "@/components/Profile/SecuritySection";
 import { Tenant, Profile } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -117,6 +118,11 @@ export default function ProfilePage() {
         </div>
 
         <ProfileForm profile={currentProfile} onProfileUpdated={handleProfileUpdated} />
+
+        {/* Security section with password management and account deletion */}
+        <div className="mt-8">
+          <SecuritySection />
+        </div>
       </main>
     </div>
   );

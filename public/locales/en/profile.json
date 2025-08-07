@@ -39,5 +39,49 @@
   "passwordSetupError": "Password Setup Error",
   "passwordSetupErrorDesc": "An error occurred while setting up your password.",
   "passwordSetupExplanation": "Since you signed in with Google, you can optionally set up a password to enable email/password login as well.",
-  "userNotFound": "User not found"
+  "userNotFound": "User not found",
+  "security": {
+    "title": "Security",
+    "description": "Manage your account security settings including password and account deletion.",
+    "password": {
+      "title": "Password Management",
+      "setupDescription": "Set up a password for your account to enable email/password login in addition to Google Sign-in.",
+      "changeDescription": "Change your account password for security purposes."
+    },
+    "account": {
+      "title": "Account Deletion",
+      "description": "Permanently delete your account and all associated data. This action cannot be undone."
+    }
+  },
+  "deleteAccount": {
+    "title": "Delete Account",
+    "description": "Permanently delete your account and all associated data. This action cannot be undone.",
+    "button": "Delete My Account",
+    "warningTitle": "This action cannot be undone. This will:",
+    "warningItem1": "Permanently delete your profile and account",
+    "warningItem2": "Remove you from all organizations and groups",
+    "warningItem3": "Delete all your personal data",
+    "warningItem4": "Cancel any active subscriptions",
+    "gdprNote": "In compliance with GDPR regulations, all your personal data will be permanently removed from our systems within 30 days.",
+    "cannotDelete": "Cannot Delete Account",
+    "blockerSoleTenantOwner": "You are the sole owner of '{{tenantName}}'. Please transfer ownership or delete the organization first.",
+    "blockerUnknown": "Unknown restriction: {{type}}",
+    "blockerResolution": "Please resolve the above restrictions before attempting to delete your account.",
+    "confirmTitle": "Delete Account",
+    "confirmDescription": "Are you absolutely sure you want to delete your account? Type your email address below to confirm.",
+    "confirmPlaceholder": "Type your email address",
+    "confirmButton": "Delete Account Permanently",
+    "checkEligibilityError": "Failed to check eligibility",
+    "checkEligibilityErrorDesc": "Could not verify if your account can be deleted. Please try again.",
+    "initiationError": "Failed to initiate deletion",
+    "initiationErrorDesc": "Could not start the account deletion process. Please try again.",
+    "confirmationEmailSent": "Confirmation Required",
+    "confirmationEmailSentDesc": "Please check your email for deletion confirmation instructions.",
+    "confirmationError": "Deletion Failed",
+    "confirmationErrorDesc": "Could not delete your account. Please try again.",
+    "tokenExpiredError": "Confirmation link has expired. Please start the deletion process again.",
+    "soleOwnerError": "Cannot delete account while you are the sole owner of one or more organizations.",
+    "success": "Account Deleted",
+    "successDesc": "Your account has been permanently deleted. You will be redirected to the homepage."
+  }
 }

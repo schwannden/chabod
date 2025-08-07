@@ -15,7 +15,19 @@
   "profileUpdatedSuccess": "你的個人資料已成功更新。",
   "profileUpdateError": "更新個人資料時出錯",
   "profileUpdateErrorDesc": "發生未知錯誤",
-  "security": "安全設定",
+  "security": {
+    "title": "安全設定",
+    "description": "管理你的帳戶安全設定，包括密碼和帳戶刪除。",
+    "password": {
+      "title": "密碼管理",
+      "setupDescription": "為你的帳號設定密碼，以啟用電子郵件/密碼登入功能，作為 Google 登入的補充。",
+      "changeDescription": "為了安全考量，變更你的帳號密碼。"
+    },
+    "account": {
+      "title": "帳戶刪除",
+      "description": "永久刪除你的帳戶和所有相關資料。此動作無法復原。"
+    }
+  },
   "passwordSetupDescription": "為你的帳號設定密碼，以啟用電子郵件/密碼登入功能，作為 Google 登入的補充。",
   "passwordChangeDescription": "為了安全考量，變更你的帳號密碼。",
   "currentPassword": "目前密碼",
@@ -39,5 +51,36 @@
   "passwordSetupError": "密碼設定錯誤",
   "passwordSetupErrorDesc": "設定密碼時發生錯誤。",
   "passwordSetupExplanation": "由於你使用 Google 登入，你可以選擇性地設定密碼來啟用電子郵件/密碼登入功能。",
-  "userNotFound": "找不到使用者"
+  "userNotFound": "找不到使用者",
+  "deleteAccount": {
+    "title": "刪除帳戶",
+    "description": "永久刪除你的帳戶和所有相關資料。此動作無法復原。",
+    "button": "刪除我的帳戶",
+    "warningTitle": "此動作無法復原。這將會：",
+    "warningItem1": "永久刪除你的個人資料和帳戶",
+    "warningItem2": "將你從所有組織和群組中移除",
+    "warningItem3": "刪除你的所有個人資料",
+    "warningItem4": "取消任何有效的訂閱",
+    "gdprNote": "根據 GDPR 法規，你的所有個人資料將在 30 天內從我們的系統中永久移除。",
+    "cannotDelete": "無法刪除帳戶",
+    "blockerSoleTenantOwner": "你是「{{tenantName}}」的唯一擁有者。請先轉移擁有權或刪除組織。",
+    "blockerUnknown": "未知限制：{{type}}",
+    "blockerResolution": "請先解決上述限制，再嘗試刪除你的帳戶。",
+    "confirmTitle": "刪除帳戶",
+    "confirmDescription": "你確定要刪除你的帳戶嗎？請在下方輸入你的電子郵件地址以確認。",
+    "confirmPlaceholder": "輸入你的電子郵件地址",
+    "confirmButton": "永久刪除帳戶",
+    "checkEligibilityError": "檢查資格失敗",
+    "checkEligibilityErrorDesc": "無法驗證是否可以刪除你的帳戶。請重試。",
+    "initiationError": "啟動刪除失敗",
+    "initiationErrorDesc": "無法開始帳戶刪除流程。請重試。",
+    "confirmationEmailSent": "需要確認",
+    "confirmationEmailSentDesc": "請檢查你的電子郵件以獲取刪除確認說明。",
+    "confirmationError": "刪除失敗",
+    "confirmationErrorDesc": "無法刪除你的帳戶。請重試。",
+    "tokenExpiredError": "確認連結已過期。請重新開始刪除流程。",
+    "soleOwnerError": "當你是一個或多個組織的唯一擁有者時，無法刪除帳戶。",
+    "success": "帳戶已刪除",
+    "successDesc": "你的帳戶已永久刪除。你將被重新導向到首頁。"
+  }
 }
