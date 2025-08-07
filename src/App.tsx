@@ -8,6 +8,7 @@ import { SessionProvider } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import DashboardPage from "./pages/DashboardPage";
 import AuthPage from "./pages/AuthPage";
+import AuthCallbackPage from "./pages/AuthCallbackPage";
 import LandingPage from "./pages/LandingPage";
 import TenantDashboard from "./pages/tenant/DashboardPage";
 import TenantAuth from "./pages/tenant/AuthPage";
@@ -48,6 +49,7 @@ function AppRoutes() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route path="/profile" element={<ProfilePage />} />
 
         {/* Tenant routes */}
