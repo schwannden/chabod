@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/schwannden/chabod/compare/v1.0.0...v1.0.1) (2025-08-07)
+
+
+### Bug Fixes
+
+* google auth callback page ([231bf13](https://github.com/schwannden/chabod/commit/231bf13ca3dec2330788b27cfd0407c467a373c4))
+
 ## [1.0.0](https://github.com/schwannden/chabod/compare/v0.5.4...v1.0.0) (2025-08-07)
 
 
