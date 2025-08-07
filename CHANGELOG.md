@@ -1,5 +1,44 @@
 # Changelog
 
+## [1.0.0](https://github.com/schwannden/chabod/compare/v0.5.4...v1.0.0) (2025-08-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* we have added tenant meta table to store tenant related metadata
+
+### Features
+
+* adding google auth provider ([#144](https://github.com/schwannden/chabod/issues/144)) ([7eafb2c](https://github.com/schwannden/chabod/commit/7eafb2c47ee31090fb9f33c9b218324569732d65))
+* be: adding tenant meta ([#146](https://github.com/schwannden/chabod/issues/146)) ([9fa29de](https://github.com/schwannden/chabod/commit/9fa29ded805838dcbd3486bcaa6c71029f19a410))
+* ui: adding tenant meta management ([#147](https://github.com/schwannden/chabod/issues/147)) ([3eba597](https://github.com/schwannden/chabod/commit/3eba597183f7dbc9d17ec2952ea57ffddaf65be4))
+* update member management ([#145](https://github.com/schwannden/chabod/issues/145)) ([68d03a1](https://github.com/schwannden/chabod/commit/68d03a198b0d50a126653cfcdac8073d935f3465))
+
+
+### Build Related
+
+* **deps-dev:** bump @testing-library/dom from 10.4.0 to 10.4.1 ([#154](https://github.com/schwannden/chabod/issues/154)) ([7f6e9c5](https://github.com/schwannden/chabod/commit/7f6e9c5821adf66e4e4ecb20f4399fbd12c65730))
+* **deps-dev:** bump @types/node from 24.0.3 to 24.2.0 ([#155](https://github.com/schwannden/chabod/issues/155)) ([8f7a627](https://github.com/schwannden/chabod/commit/8f7a62700918a42e9a46a030cbc0dd97a2b41024))
+* **deps-dev:** bump eslint from 9.29.0 to 9.32.0 ([#149](https://github.com/schwannden/chabod/issues/149)) ([8ed7fde](https://github.com/schwannden/chabod/commit/8ed7fdef560a398d75352a95d252d46ec87c7e19))
+* **deps-dev:** bump globals from 15.15.0 to 16.3.0 ([#156](https://github.com/schwannden/chabod/issues/156)) ([035cdad](https://github.com/schwannden/chabod/commit/035cdad5c2efd2c74f3f0bf9b038e939e8d30f1f))
+* **deps-dev:** bump lovable-tagger from 1.1.8 to 1.1.9 ([#151](https://github.com/schwannden/chabod/issues/151)) ([ed87536](https://github.com/schwannden/chabod/commit/ed8753643b8d2158cf10dfbefe0afdb04843d05e))
+* **deps-dev:** bump msw from 2.10.2 to 2.10.4 ([#157](https://github.com/schwannden/chabod/issues/157)) ([bdf4d62](https://github.com/schwannden/chabod/commit/bdf4d622be6ef8fd72b7024216cd4ea8e0cc5165))
+* **deps:** bump @hookform/resolvers from 3.10.0 to 5.2.1 ([#150](https://github.com/schwannden/chabod/issues/150)) ([5620a24](https://github.com/schwannden/chabod/commit/5620a24670d2be7e10152129d0fb13a104988fbf))
+* **deps:** bump react-hook-form from 7.61.1 to 7.62.0 ([#152](https://github.com/schwannden/chabod/issues/152)) ([8b2dd8f](https://github.com/schwannden/chabod/commit/8b2dd8fcf4b41e2b4ba9633de6609d1739ce57d9))
+* **deps:** bump sonner from 2.0.6 to 2.0.7 ([#153](https://github.com/schwannden/chabod/issues/153)) ([92a426b](https://github.com/schwannden/chabod/commit/92a426bf42f589d1fe7adb4edd6b4a69b9943bf8))
+
+
+### Chores
+
+* disable seed on production ([#148](https://github.com/schwannden/chabod/issues/148)) ([a3f5f60](https://github.com/schwannden/chabod/commit/a3f5f60fff7a2e3037a5b275120dbe8b16ae9932))
+* ncu update ([5fd8f0f](https://github.com/schwannden/chabod/commit/5fd8f0fc13bf03b58f14f82c5f5c0b3c3d35b572))
+
+
+### Documentation
+
+* ading cool badges ([fff1b9b](https://github.com/schwannden/chabod/commit/fff1b9b30955fe5463a37ed44abae0dbaad0a6c5))
+* fix discord links ([05a634f](https://github.com/schwannden/chabod/commit/05a634f4af0a4d8a46f820e9828d0d79524aed88))
+
 ## [0.5.4](https://github.com/schwannden/chabod/compare/v0.5.3...v0.5.4) (2025-08-01)
 
 
