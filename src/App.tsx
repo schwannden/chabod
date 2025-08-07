@@ -38,7 +38,13 @@ function AppRoutes() {
     const redirectPath = sessionStorage.getItem("redirectPath");
     if (redirectPath) {
       sessionStorage.removeItem("redirectPath");
-      navigate(redirectPath, { replace: true });
+      // If we have a hash in the current URL (OAuth tokens), preserve it
+      const currentHash = window.location.hash;
+      if (currentHash && !redirectPath.includes("#")) {
+        navigate(redirectPath + currentHash, { replace: true });
+      } else {
+        navigate(redirectPath, { replace: true });
+      }
     }
   }, [navigate]);
 

@@ -18,8 +18,11 @@
     <script>
       // Store the current path and redirect to index.html
       // React Router will handle the routing client-side
-      sessionStorage.setItem('redirectPath', location.pathname + location.search + location.hash);
-      location.replace('/');
+      // IMPORTANT: Preserve hash for OAuth callbacks
+      const redirectPath = location.pathname + location.search + location.hash;
+      sessionStorage.setItem('redirectPath', redirectPath);
+      // Use replace with hash to preserve OAuth tokens
+      location.replace('/' + location.hash);
     </script>
   </head>
   <body>
