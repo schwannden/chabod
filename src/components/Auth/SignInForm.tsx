@@ -207,7 +207,6 @@ export function SignInForm({
                 variant: "destructive",
               })
             }
-            inviteToken={inviteToken}
           />
 
           <OAuthDivider />

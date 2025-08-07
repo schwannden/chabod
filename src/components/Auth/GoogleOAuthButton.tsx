@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Chrome, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
 
 interface GoogleOAuthButtonProps {
   onSuccess?: () => void;
@@ -11,12 +12,9 @@ interface GoogleOAuthButtonProps {
   inviteToken?: string;
 }
 
-export function GoogleOAuthButton({
-  onSuccess: _onSuccess,
-  onError,
-  inviteToken,
-}: GoogleOAuthButtonProps) {
+export function GoogleOAuthButton({ onSuccess: _onSuccess, onError }: GoogleOAuthButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { slug } = useParams<{ slug: string }>();
   const { t } = useTranslation("auth");
   const { toast } = useToast();
 
@@ -24,10 +22,8 @@ export function GoogleOAuthButton({
     setIsLoading(true);
     try {
       // Include invite token in redirect URL for tenant flows
-      const redirectTo = inviteToken
-        ? `${window.location.origin}/auth/callback?inviteToken=${inviteToken}`
-        : `${window.location.origin}/auth/callback`;
-
+      const authPath = slug ? `/tenant/${slug}/auth` : "/auth";
+      const redirectTo = window.location.origin + authPath;
       const { data: _data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {

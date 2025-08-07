@@ -164,7 +164,6 @@ export function SignUpForm({
                 variant: "destructive",
               });
             }}
-            inviteToken={inviteToken}
           />
 
           <OAuthDivider />

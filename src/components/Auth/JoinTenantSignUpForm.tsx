@@ -134,7 +134,6 @@ export function JoinTenantSignUpForm({
                 variant: "destructive",
               });
             }}
-            inviteToken={inviteToken}
           />
 
           <OAuthDivider />
