@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import { checkUserTenantAccess } from "@/lib/member-service";
 import { useTranslation } from "react-i18next";
 import { AuthFlowStep } from "@/hooks/useTenantAuthFlow";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AuthPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -21,6 +22,7 @@ export default function AuthPage() {
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
+  const { toast } = useToast();
 
   // Get the flow step from URL query parameter
   const flowStep = searchParams.get("flow") as AuthFlowStep | null;
@@ -66,7 +68,13 @@ export default function AuthPage() {
           if (hasAccess) {
             navigate(`/tenant/${slug}`);
           } else if (!inviteToken) {
-            console.log("User is not a member of this tenant and has no invite token");
+            // ADD: User-facing error message instead of console.log
+            setError(t("auth:noPermissionToEnterChurch"));
+            toast({
+              title: t("auth:loginFailed"),
+              description: t("auth:noPermissionToEnterChurch"),
+              variant: "destructive",
+            });
           }
         } catch (error) {
           console.error("Error checking tenant membership:", error);
@@ -75,7 +83,7 @@ export default function AuthPage() {
     };
 
     checkUserMembership();
-  }, [user, isLoading, navigate, tenant, slug, inviteToken]);
+  }, [user, isLoading, navigate, tenant, slug, inviteToken, t, toast]);
 
   const handleAuthSuccess = () => {
     navigate(`/tenant/${slug}`);
@@ -138,6 +146,11 @@ export default function AuthPage() {
       <NavBar />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto mt-8">
+          {error && tenant && (
+            <div className="mb-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <p className="text-destructive text-sm">{error}</p>
+            </div>
+          )}
           {tenant && (
             <>
               <h1 className="text-3xl font-bold text-center mb-8">

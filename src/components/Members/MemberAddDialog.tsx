@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/form";
 import { addMemberToTenant } from "@/lib/member-service";
 import { supabase } from "@/integrations/supabase/client";
+import { getTenantBySlug } from "@/lib/tenant-service";
 import { useTranslation } from "react-i18next";
 
 export interface MemberAddDialogProps {
@@ -111,11 +112,32 @@ export function MemberAddDialog({
 
       setIsCheckingUser(true);
       try {
-        const { data: existingUser } = await supabase.auth.admin.getUserByEmail(watchEmail);
-        const userExists = !!existingUser;
-        setIsNewUser(!userExists);
-        form.setValue("isNewUser", !userExists);
-      } catch {
+        // Get tenant first to pass tenant.id to the secure function
+        const tenant = await getTenantBySlug(tenantSlug);
+        if (!tenant) {
+          setIsNewUser(true);
+          form.setValue("isNewUser", true);
+          return;
+        }
+
+        // Use secure database function instead of admin API
+        const { data: existingUserId, error } = await supabase.rpc("get_user_id_by_email", {
+          p_email: watchEmail,
+          p_tenant_id: tenant.id,
+        });
+
+        if (error) {
+          // If access denied or other error, assume new user for safety
+          console.error("Error checking user:", error);
+          setIsNewUser(true);
+          form.setValue("isNewUser", true);
+        } else {
+          const userExists = !!existingUserId;
+          setIsNewUser(!userExists);
+          form.setValue("isNewUser", !userExists);
+        }
+      } catch (error) {
+        console.error("Error in checkUserExists:", error);
         setIsNewUser(true);
         form.setValue("isNewUser", true);
       } finally {
@@ -125,7 +147,7 @@ export function MemberAddDialog({
 
     const timeoutId = setTimeout(checkUserExists, 500); // Debounce
     return () => clearTimeout(timeoutId);
-  }, [watchEmail, form]);
+  }, [watchEmail, form, tenantSlug]);
 
   const onSubmit = async (values: MemberAddFormValues) => {
     setIsAdding(true);

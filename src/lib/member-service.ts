@@ -79,17 +79,23 @@ export async function addMemberToTenant(
       throw new Error(`Tenant "${tenantSlug}" not found`);
     }
 
-    // Check if user already exists
-    const { data: existingUser, error: userError } =
-      await supabase.auth.admin.getUserByEmail(email);
+    // Check if user already exists using secure database function
+    const { data: existingUserId, error: userError } = await supabase.rpc("get_user_id_by_email", {
+      p_email: email,
+      p_tenant_id: tenant.id,
+    });
 
-    if (userError && userError.code !== "PGRST116") {
+    if (userError) {
+      if (userError.code === "P0001") {
+        // Access denied
+        throw new Error("Only tenant owners can add members");
+      }
       throw new Error(`Error checking existing user: ${userError.message}`);
     }
 
     let userId: string;
 
-    if (!existingUser && password) {
+    if (!existingUserId && password) {
       // Create new user using database function pattern
       const newUserId = crypto.randomUUID();
 
@@ -104,8 +110,8 @@ export async function addMemberToTenant(
       }
 
       userId = newUserId;
-    } else if (existingUser) {
-      userId = existingUser.id;
+    } else if (existingUserId) {
+      userId = existingUserId;
     } else {
       throw new Error("Password required for new user creation");
     }

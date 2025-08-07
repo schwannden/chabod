@@ -445,4 +445,72 @@ describe("AuthPage (Tenant)", () => {
       expect(screen.getByText("auth:welcomeToChurch")).toBeInTheDocument();
     });
   });
+
+  describe("OAuth Error Handling", () => {
+    it("should show error message when user lacks tenant access", async () => {
+      (memberService.checkUserTenantAccess as jest.Mock).mockResolvedValue(false);
+
+      mockUseSessionHelpers.authenticated();
+
+      await act(async () => {
+        render(<AuthPage />);
+      });
+
+      // Should show error message instead of silent failure
+      await waitFor(() => {
+        expect(screen.getByText("auth:noPermissionToEnterChurch")).toBeInTheDocument();
+      });
+
+      // Should not navigate away
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    it("should show error message for non-member OAuth users without invite token", async () => {
+      (memberService.checkUserTenantAccess as jest.Mock).mockResolvedValue(false);
+      // No invite token in URL
+      Object.defineProperty(window, "location", {
+        value: {
+          search: "",
+        },
+        writable: true,
+      });
+
+      mockUseSessionHelpers.authenticated();
+
+      await act(async () => {
+        render(<AuthPage />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText("auth:noPermissionToEnterChurch")).toBeInTheDocument();
+      });
+
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    it("should not show error for users with invite token", async () => {
+      (memberService.checkUserTenantAccess as jest.Mock).mockResolvedValue(false);
+      // Invite token present
+      Object.defineProperty(window, "location", {
+        value: {
+          search: "?token=invite-123",
+        },
+        writable: true,
+      });
+
+      mockUseSessionHelpers.authenticated();
+
+      await act(async () => {
+        render(<AuthPage />);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("invite-token")).toHaveTextContent("invite-123");
+      });
+
+      // Should not show error message when invite token exists
+      expect(screen.queryByText("auth:noPermissionToEnterChurch")).not.toBeInTheDocument();
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+  });
 });
