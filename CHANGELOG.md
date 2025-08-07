@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.4](https://github.com/schwannden/chabod/compare/v1.0.3...v1.0.4) (2025-08-07)
+
+
+### Bug Fixes
+
+* tenant member management ([9e929bc](https://github.com/schwannden/chabod/commit/9e929bcd30252a68805331e2b6ffe244453d4a57))
+
 ## [1.0.3](https://github.com/schwannden/chabod/compare/v1.0.2...v1.0.3) (2025-08-07)
 
 
