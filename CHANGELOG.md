@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/schwannden/chabod/compare/v1.0.2...v1.0.3) (2025-08-07)
+
+
+### Bug Fixes
+
+* oauth redirect for github page ([c6d83f9](https://github.com/schwannden/chabod/commit/c6d83f939812471e9e8cfdbf689a653bffce5738))
+
 ## [1.0.2](https://github.com/schwannden/chabod/compare/v1.0.1...v1.0.2) (2025-08-07)
 
 
