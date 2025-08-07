@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.5](https://github.com/schwannden/chabod/compare/v1.0.4...v1.0.5) (2025-08-07)
+
+
+### Bug Fixes
+
+* tenant slug issue ([64f7215](https://github.com/schwannden/chabod/commit/64f7215b68060fa97df0911981167e367eeafe5d))
+
 ## [1.0.4](https://github.com/schwannden/chabod/compare/v1.0.3...v1.0.4) (2025-08-07)
 
 
