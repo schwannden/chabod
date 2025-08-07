@@ -140,6 +140,11 @@ export function SignInForm({
           errorMessage = t("auth:userNotFound");
         } else if (error.message?.includes("invalid email")) {
           errorMessage = t("auth:emailFormatIncorrect");
+        } else if (
+          error.message?.toLowerCase().includes("rate limit") ||
+          error.message?.toLowerCase().includes("too many")
+        ) {
+          errorMessage = t("auth:rateLimitExceeded");
         } else if (error.message) {
           errorMessage = error.message;
         }
@@ -148,7 +153,7 @@ export function SignInForm({
 
       toast({
         title: t("auth:resetPasswordEmailSent"),
-        description: t("auth:checkEmailForReset"),
+        description: t("auth:checkEmailForResetWithDetails"),
       });
 
       setResetPasswordMode(false);
