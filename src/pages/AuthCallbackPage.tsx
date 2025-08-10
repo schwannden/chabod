@@ -4,6 +4,8 @@ import { useSession } from "@/hooks/useSession";
 import { useTranslation } from "react-i18next";
 import { NavBar } from "@/components/Layout/NavBar";
 import { Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { ResetPasswordForm } from "@/components/Auth/ResetPasswordForm";
 
 export default function AuthCallbackPage() {
   const { t } = useTranslation(["auth", "common"]);
@@ -18,6 +20,22 @@ export default function AuthCallbackPage() {
   const [error, setError] = useState<string | null>(
     hasErrorParam ? errorDescription || hasErrorParam : null,
   );
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
+
+  // Listen for password recovery events
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, _session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        console.log("Password recovery event detected");
+        setShowPasswordReset(true);
+        setIsProcessing(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     // If we already have an error from URL parameters, don't process further
@@ -78,12 +96,29 @@ export default function AuthCallbackPage() {
     };
   }, [session, user, sessionLoading, searchParams, navigate, t, hasErrorParam, errorDescription]);
 
+  // Handle password reset success
+  const handlePasswordResetSuccess = () => {
+    navigate("/profile", { replace: true });
+  };
+
   // Update processing state when session changes
   useEffect(() => {
     if (session && isProcessing) {
       setIsProcessing(false);
     }
   }, [session, isProcessing]);
+
+  // Show password reset form when password recovery is detected
+  if (showPasswordReset) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <NavBar />
+        <main className="flex-1 flex items-center justify-center px-4">
+          <ResetPasswordForm onSuccess={handlePasswordResetSuccess} />
+        </main>
+      </div>
+    );
+  }
 
   // Show loading state while processing OAuth callback
   if (isProcessing || sessionLoading) {
