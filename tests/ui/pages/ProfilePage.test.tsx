@@ -58,6 +58,16 @@ jest.mock("@/components/Layout/TenantBreadcrumb", () => ({
   ),
 }));
 
+// Mock AccountDeletionSection
+jest.mock("@/components/Profile/AccountDeletionSection", () => ({
+  AccountDeletionSection: () => (
+    <div data-testid="account-deletion-section">
+      <div data-testid="delete-account-title">Delete Account</div>
+      <button data-testid="delete-account-button">Delete My Account</button>
+    </div>
+  ),
+}));
+
 // Mock react-router-dom
 const mockNavigate = jest.fn();
 const mockParams = { slug: undefined };

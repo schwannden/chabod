@@ -134,7 +134,10 @@ export const createTestUser = async (
       },
     );
 
-    if (profileError) throw new Error(`Profile creation failed: ${profileError.message}`);
+    if (profileError)
+      throw new Error(
+        `Profile creation failed: ${profileError.message || JSON.stringify(profileError)}`,
+      );
 
     // Verify profile was created successfully
     const { data: verifyProfile, error: verifyError } = await serviceRoleClient

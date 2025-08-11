@@ -16,6 +16,11 @@ This directory contains comprehensive tests for Supabase Row Level Security poli
 
 # Run specific test file
 ./tests/rls/run-rls-tests.sh groups.rls.test.ts
+
+# Alternative: Run single RLS test using npm
+npm run test -- --testPathPatterns=account-deletion
+npm run test -- --testPathPatterns=groups.rls
+npm run test -- --testPathPatterns=tenants.rls
 ```
 
 ## Overview
@@ -29,6 +34,7 @@ tests/rls/
 ├── README.md                   # This documentation
 ├── setup.ts                    # Global test configuration
 ├── run-rls-tests.sh           # Automated test runner
+├── account-deletion.rls.test.ts # Account deletion security tests
 ├── tenants.rls.test.ts        # Tenant security tests
 ├── tenant-members.rls.test.ts # Tenant member security tests
 ├── groups.rls.test.ts         # Group security tests

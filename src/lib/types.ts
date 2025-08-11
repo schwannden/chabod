@@ -94,3 +94,20 @@ export type SessionContextType = {
 export type ServiceWithGroups = Service & {
   groups?: string[];
 };
+
+// Account deletion types for GDPR compliance
+export type AccountDeletionToken = Database["public"]["Tables"]["account_deletion_tokens"]["Row"];
+
+export interface AccountDeletionValidation {
+  canDelete: boolean;
+  blockers: Array<{
+    type: string;
+    tenantId: string;
+    tenantName: string;
+  }>;
+}
+
+export interface AccountDeletionRequest {
+  email: string;
+  confirmationToken?: string;
+}
