@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.1.0](https://github.com/schwannden/chabod/compare/v1.0.5...v1.1.0) (2025-08-22)
+
+
+### Features
+
+* allow reset password ([#166](https://github.com/schwannden/chabod/issues/166)) ([643820a](https://github.com/schwannden/chabod/commit/643820ade29af48e04d3ba6758ec2b996483ced1))
+* GDPR allow account deletion ([#165](https://github.com/schwannden/chabod/issues/165)) ([8bc4f57](https://github.com/schwannden/chabod/commit/8bc4f57772f5ac9fb28c92d8df7094b5ddc3fc22))
+
+
+### Build Related
+
+* **deps-dev:** bump dotenv from 16.6.1 to 17.2.1 ([#169](https://github.com/schwannden/chabod/issues/169)) ([5ffa79f](https://github.com/schwannden/chabod/commit/5ffa79ffbecfcf72379eda7f41e16e27791bccd7))
+* **deps-dev:** bump eslint from 9.32.0 to 9.33.0 ([#173](https://github.com/schwannden/chabod/issues/173)) ([2f7fd8a](https://github.com/schwannden/chabod/commit/2f7fd8a0206b161f1702a5e0b1db8ace436e25d7))
+* **deps-dev:** bump supabase from 2.34.0 to 2.34.1 ([#168](https://github.com/schwannden/chabod/issues/168)) ([c22255e](https://github.com/schwannden/chabod/commit/c22255efe92a76ff4829f5db72a354070cc0d8a8))
+* **deps-dev:** bump typescript-eslint from 8.39.0 to 8.39.1 ([#170](https://github.com/schwannden/chabod/issues/170)) ([220e796](https://github.com/schwannden/chabod/commit/220e7963c5ef54ae96e72fd96e6177841fc905c4))
+* **deps:** bump @supabase/supabase-js from 2.53.0 to 2.54.0 ([#172](https://github.com/schwannden/chabod/issues/172)) ([a186eb3](https://github.com/schwannden/chabod/commit/a186eb33190238a6130cda036c9fa8bc0bdbff25))
+* **deps:** bump @tanstack/react-query from 5.84.1 to 5.84.2 ([#174](https://github.com/schwannden/chabod/issues/174)) ([3144116](https://github.com/schwannden/chabod/commit/3144116eabfa02375a02b0420b9e7d4f9f6c5331))
+* **deps:** bump i18next from 25.3.2 to 25.3.4 ([#175](https://github.com/schwannden/chabod/issues/175)) ([6464b89](https://github.com/schwannden/chabod/commit/6464b89dba3d12e42e4eddc0b976445501e1eba9))
+* **deps:** bump lucide-react from 0.536.0 to 0.539.0 ([#167](https://github.com/schwannden/chabod/issues/167)) ([ded9f4d](https://github.com/schwannden/chabod/commit/ded9f4d8977fe615d1955d860520e2bc4f44e41a))
+* **deps:** bump zod from 4.0.15 to 4.0.17 ([#171](https://github.com/schwannden/chabod/issues/171)) ([0580491](https://github.com/schwannden/chabod/commit/05804913b28f4f8886e61486daf890a3dc962a51))
+
 ## [1.0.5](https://github.com/schwannden/chabod/compare/v1.0.4...v1.0.5) (2025-08-07)
 
 
