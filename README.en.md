@@ -135,6 +135,7 @@ Welcome to use, test, suggest features, write code, and together build truly nee
 - 📎 [Demo Website](https://chabod.fruitful-tools.com/)
 - 📂 [GitHub Project](https://github.com/schwannden/chabod)
 - 🧰 [Contribution Guide](https://github.com/schwannden/chabod/blob/main/.github/CONTRIBUTING.md)
+- 📚 [DeepWiki Documentation](https://deepwiki.com/schwannden/chabod)
 
 ---
 

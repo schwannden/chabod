@@ -134,6 +134,7 @@ Chabod 的誕生，從這樣的思考開始：
 - 📎 [Demo 網站](https://chabod.fruitful-tools.com/)
 - 📂 [GitHub 專案](https://github.com/schwannden/chabod)
 - 🧰 [貢獻教學](https://github.com/schwannden/chabod/blob/main/.github/CONTRIBUTING.md)
+- 📚 [DeepWiki 文檔](https://deepwiki.com/schwannden/chabod)
 
 ---
 
