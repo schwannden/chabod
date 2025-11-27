@@ -153,7 +153,7 @@ export const createTestUser = async (
     }
 
     // Create a new client instance and sign in the user to get a proper session
-    const userClient = createClient(TEST_CONFIG.supabaseUrl, TEST_CONFIG.supabaseAnonKey);
+    const userClient = createClient(TEST_CONFIG.supabaseUrl, TEST_CONFIG.supabaseKey);
 
     const { data: signInData, error: signInError } = await userClient.auth.signInWithPassword({
       email,

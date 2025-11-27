@@ -56,7 +56,7 @@ enabled = true
 # Specifies an ordered list of seed files to load during db reset.
 # Supports glob patterns relative to supabase directory: "./seeds/*.sql"
 # For local development: mv seed.sql.template seed.sql
-# sql_paths = ["./seed.sql.template"]  # Uncomment and rename for local dev
+sql_paths = ["./supabase/seed.sql"]  # Uncomment and rename for local dev
 
 [realtime]
 enabled = true

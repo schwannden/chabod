@@ -55,7 +55,7 @@ if [ "$IS_CI" = false ]; then
             cat > .env.test << EOF
 # Test Environment Configuration
 VITE_SUPABASE_URL=http://localhost:54321
-VITE_SUPABASE_ANON_KEY=your_anon_key_here
+VITE_SUPABASE_PUBLISHABLE_KEY=your_anon_key_here
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:54322/postgres
 EOF
@@ -66,7 +66,7 @@ fi
 
 # Verify environment variables are set (important for CI)
 if [ "$IS_CI" = true ]; then
-    if [ -z "$VITE_SUPABASE_URL" ] || [ -z "$VITE_SUPABASE_ANON_KEY" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+    if [ -z "$VITE_SUPABASE_URL" ] || [ -z "$VITE_SUPABASE_PUBLISHABLE_KEY" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
         echo -e "${RED}❌ Required environment variables are not set${NC}"
         echo "Make sure .env.test contains all required variables"
         exit 1
@@ -105,7 +105,7 @@ fi
 if [ "$IS_CI" = false ]; then
     echo ""
     echo -e "${YELLOW}🔑 API Keys:${NC}"
-    ANON_KEY=$($SUPABASE_CMD status | grep "anon key" | awk '{print $3}')
+    ANON_KEY=$($SUPABASE_CMD status | grep "Publishable key" | awk '{print $3}')
     SERVICE_KEY=$($SUPABASE_CMD status | grep "service_role key" | awk '{print $3}')
 
     echo "Anon Key: ${ANON_KEY:0:20}..."

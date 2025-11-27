@@ -160,7 +160,7 @@ Both test types run automatically in GitHub Actions:
 ```bash
 # Required for RLS tests
 VITE_SUPABASE_URL=your-supabase-url
-VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_SUPABASE_PUBLISHABLE_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 # UI tests use mocked values automatically

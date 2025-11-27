@@ -69,8 +69,8 @@ volta install node
    # Extract Supabase URL
    echo "VITE_SUPABASE_URL=http://localhost:54321" > .env.local
 
-   # Extract and add Supabase anon key
-   echo "VITE_SUPABASE_ANON_KEY=$(supabase status | grep "anon key:" | awk '{print $3}')" >> .env.local
+   # Extract and add Supabase Publishable key
+   echo "VITE_SUPABASE_PUBLISHABLE_KEY=$(supabase status | grep "Publishable key:" | awk '{print $3}')" >> .env.local
    ```
 
 2. Install dependencies: `npm install --legacy-peer-deps`
