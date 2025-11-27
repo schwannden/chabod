@@ -3,8 +3,9 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { beforeEach, afterEach, afterAll } from "@jest/globals";
 import { v4 as uuidv4 } from "uuid";
 
-// Load environment variables
+// Load environment variables - try .env.test first, then .env.local as fallback
 config({ path: ".env.test" });
+config({ path: ".env.local" });
 
 // Generate unique test session ID for this worker/process
 export const TEST_SESSION_ID = `test-${Date.now()}-${process.pid}-${uuidv4().slice(0, 8)}`;
@@ -12,7 +13,7 @@ export const TEST_SESSION_ID = `test-${Date.now()}-${process.pid}-${uuidv4().sli
 // Test configuration
 export const TEST_CONFIG = {
   supabaseUrl: process.env.VITE_SUPABASE_URL || "http://localhost:54321",
-  supabaseAnonKey: process.env.VITE_SUPABASE_ANON_KEY || "",
+  supabaseKey: process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "",
   supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
   testDbUrl:
     process.env.TEST_DATABASE_URL || "postgresql://postgres:postgres@localhost:54322/postgres",
@@ -48,11 +49,11 @@ export const serviceRoleClient = createClient(
 );
 
 // Anonymous client
-export const anonClient = createClient(TEST_CONFIG.supabaseUrl, TEST_CONFIG.supabaseAnonKey);
+export const anonClient = createClient(TEST_CONFIG.supabaseUrl, TEST_CONFIG.supabaseKey);
 
 // Helper to create authenticated client for a specific user ID
 export const createUserClient = (userId: string): SupabaseClient => {
-  return createClient(TEST_CONFIG.supabaseUrl, TEST_CONFIG.supabaseAnonKey, {
+  return createClient(TEST_CONFIG.supabaseUrl, TEST_CONFIG.supabaseKey, {
     global: {
       headers: {
         "X-User-Id": userId, // Custom header for test user context
@@ -67,7 +68,7 @@ export const createUserClient = (userId: string): SupabaseClient => {
 
 // Helper to create authenticated client for a specific user
 export const createAuthenticatedClient = (accessToken: string): SupabaseClient => {
-  return createClient(TEST_CONFIG.supabaseUrl, TEST_CONFIG.supabaseAnonKey, {
+  return createClient(TEST_CONFIG.supabaseUrl, TEST_CONFIG.supabaseKey, {
     global: {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -82,9 +83,9 @@ export const createAuthenticatedClient = (accessToken: string): SupabaseClient =
 
 // Utility to check if test environment is properly configured
 export const checkTestEnvironment = () => {
-  if (!TEST_CONFIG.supabaseUrl || !TEST_CONFIG.supabaseAnonKey) {
+  if (!TEST_CONFIG.supabaseUrl || !TEST_CONFIG.supabaseKey) {
     throw new Error(
-      "Test environment not properly configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY",
+      "Test environment not properly configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY",
     );
   }
 

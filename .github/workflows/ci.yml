@@ -33,7 +33,7 @@ jobs:
 
       - name: Run linter
         run: npm run lint
-        
+
       - name: Build project
         run: npm run build
 
@@ -89,7 +89,7 @@ jobs:
           cat > .env.test << EOF
           # Test Environment Configuration for CI
           VITE_SUPABASE_URL=http://localhost:54321
-          VITE_SUPABASE_ANON_KEY=ANON_KEY_PLACEHOLDER
+          VITE_SUPABASE_PUBLISHABLE_KEY=ANON_KEY_PLACEHOLDER
           SUPABASE_SERVICE_ROLE_KEY=SERVICE_KEY_PLACEHOLDER
           TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:54322/postgres
           EOF
@@ -100,19 +100,19 @@ jobs:
           echo "🚀 Starting Supabase services..."
           ${{ env.SUPABASE_CMD }} start
           echo "✅ Supabase started successfully"
-          
+
       - name: Update environment with actual keys
         run: |
           echo "🔑 Extracting API keys..."
-          ANON_KEY=$(${{ env.SUPABASE_CMD }} status | grep "anon key" | awk '{print $3}')
-          SERVICE_KEY=$(${{ env.SUPABASE_CMD }} status | grep "service_role key" | awk '{print $3}')
-          
+          ANON_KEY=$(${{ env.SUPABASE_CMD }} status -o json | grep '"PUBLISHABLE_KEY"' | sed 's/.*: "\(.*\)".*/\1/')
+          SERVICE_KEY=$(${{ env.SUPABASE_CMD }} status -o json | grep '"SERVICE_ROLE_KEY"' | sed 's/.*: "\(.*\)".*/\1/')
+
           echo "Anon key length: ${#ANON_KEY}"
           echo "Service key length: ${#SERVICE_KEY}"
-          
+
           sed -i "s/ANON_KEY_PLACEHOLDER/$ANON_KEY/g" .env.test
           sed -i "s/SERVICE_KEY_PLACEHOLDER/$SERVICE_KEY/g" .env.test
-          
+
           echo "✅ Environment updated with actual keys"
 
       - name: Load test environment
