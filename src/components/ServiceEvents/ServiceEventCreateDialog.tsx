@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { createServiceEventWithOwners } from "@/lib/services/service-event-crud";
 import { ServiceEventForm, ServiceEventFormValues } from "./ServiceEventForm";
-import { ServiceEventOwner, ServiceEventOwnerSelect } from "./ServiceEventOwnerSelect";
+import { ServiceEventRoleAssignmentList, RoleAssignment } from "./ServiceEventRoleAssignmentList";
 import { useTranslation } from "react-i18next";
 
 interface ServiceEventCreateDialogProps {
@@ -44,7 +44,7 @@ export function ServiceEventCreateDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [defaultStartTime, setDefaultStartTime] = useState<string>("");
   const [defaultEndTime, setDefaultEndTime] = useState<string>("");
-  const [selectedOwners, setSelectedOwners] = useState<ServiceEventOwner[]>([]);
+  const [roleAssignments, setRoleAssignments] = useState<RoleAssignment[]>([]);
 
   const { toast } = useToast();
 
@@ -77,12 +77,14 @@ export function ServiceEventCreateDialog({
         subtitle: values.subtitle ? values.subtitle.trim() : null,
       };
 
-      // Convert owners to the required format
-      const owners = selectedOwners.map((owner) => ({
-        user_id: owner.userId,
-        service_role_id: owner.roleId,
-        tenant_id: tenantId,
-      }));
+      // Convert roleAssignments to owners format
+      const owners = roleAssignments.flatMap((assignment) =>
+        assignment.assignedMembers.map((member) => ({
+          user_id: member.userId,
+          service_role_id: assignment.roleId,
+          tenant_id: tenantId,
+        })),
+      );
 
       await createServiceEventWithOwners(eventData, owners);
 
@@ -134,17 +136,17 @@ export function ServiceEventCreateDialog({
           onCancel={handleCancel}
           defaultStartTime={defaultStartTime}
           defaultEndTime={defaultEndTime}
-          selectedOwners={selectedOwners}
-          setSelectedOwners={setSelectedOwners}
+          selectedOwners={[]} // Not used anymore but keep for compatibility
+          setSelectedOwners={() => {}} // Not used anymore but keep for compatibility
         >
           <div className="space-y-4 mb-4">
-            <div className="text-sm font-medium mb-1">{t("serviceEvents:memberAssignment")}</div>
+            <div className="text-sm font-medium mb-1">{t("services:allServiceRoles")}</div>
             {selectedServiceId && (
-              <ServiceEventOwnerSelect
+              <ServiceEventRoleAssignmentList
                 serviceId={selectedServiceId}
                 tenantId={tenantId}
-                selectedOwners={selectedOwners}
-                setSelectedOwners={setSelectedOwners}
+                roleAssignments={roleAssignments}
+                setRoleAssignments={setRoleAssignments}
               />
             )}
           </div>

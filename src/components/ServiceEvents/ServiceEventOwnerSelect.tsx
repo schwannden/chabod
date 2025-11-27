@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Plus, Trash2, UserRound } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -13,6 +14,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { TenantMemberWithProfile } from "@/lib/types";
 import { ServiceRole, UserProfile } from "@/lib/services/types";
+import { useToast } from "@/components/ui/use-toast";
 
 export interface ServiceEventOwner {
   userId: string;
@@ -34,6 +36,8 @@ export function ServiceEventOwnerSelect({
   selectedOwners,
   setSelectedOwners,
 }: ServiceEventOwnerSelectProps) {
+  const { t } = useTranslation("services");
+  const { toast } = useToast();
   const [members, setMembers] = useState<TenantMemberWithProfile[]>([]);
   const [roles, setRoles] = useState<ServiceRole[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>("");
@@ -68,12 +72,6 @@ export function ServiceEventOwnerSelect({
 
         setMembers((membersData as TenantMemberWithProfile[]) || []);
         setRoles((rolesData as ServiceRole[]) || []);
-
-        // Set default selections if available
-        if (rolesData?.length > 0 && membersData?.length > 0) {
-          setSelectedRoleId(rolesData[0].id);
-          setSelectedUserId(membersData[0].user_id);
-        }
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -87,14 +85,28 @@ export function ServiceEventOwnerSelect({
   }, [serviceId, tenantId]);
 
   const handleAddOwner = () => {
-    if (!selectedUserId || !selectedRoleId) return;
+    if (!selectedUserId || !selectedRoleId) {
+      toast({
+        title: t("error"),
+        description: t("selectMemberAndRole"),
+        variant: "destructive",
+      });
+      return;
+    }
 
     // Check if this user+role combination already exists
     const exists = selectedOwners.some(
       (owner) => owner.userId === selectedUserId && owner.roleId === selectedRoleId,
     );
 
-    if (exists) return;
+    if (exists) {
+      toast({
+        title: t("memberAlreadyAssigned"),
+        description: t("memberRoleAlreadyExists"),
+        variant: "destructive",
+      });
+      return;
+    }
 
     const selectedMember = members.find((m) => m.user_id === selectedUserId);
     const selectedRole = roles.find((r) => r.id === selectedRoleId);
@@ -108,6 +120,12 @@ export function ServiceEventOwnerSelect({
       };
 
       setSelectedOwners([...selectedOwners, newOwner]);
+    } else {
+      toast({
+        title: t("error"),
+        description: t("loadingError"),
+        variant: "destructive",
+      });
     }
   };
 
@@ -118,34 +136,30 @@ export function ServiceEventOwnerSelect({
   };
 
   if (isLoading) {
-    return <div className="text-center py-4">正在載入...</div>;
+    return <div className="text-center py-4">{t("loading")}</div>;
   }
 
   if (roles.length === 0) {
-    return (
-      <div className="text-center py-4 text-yellow-600">
-        此服事類型尚未設定任何角色，請先在服事類型頁面設定角色。
-      </div>
-    );
+    return <div className="text-center py-4 text-yellow-600">{t("noRolesConfigured")}</div>;
   }
 
   return (
     <div className="space-y-4">
       <div className="flex items-end gap-2">
         <div className="flex-1">
-          <label className="text-sm font-medium mb-1 block">成員</label>
+          <label className="text-sm font-medium mb-1 block">{t("member")}</label>
           <Select
             value={selectedUserId}
             onValueChange={setSelectedUserId}
             disabled={members.length === 0}
           >
             <SelectTrigger>
-              <SelectValue placeholder="選擇成員" />
+              <SelectValue placeholder={t("selectMember")} />
             </SelectTrigger>
             <SelectContent>
               {members.map((member) => (
                 <SelectItem key={member.user_id} value={member.user_id}>
-                  {member.profile?.full_name || member.profile?.email || "未命名成員"}
+                  {member.profile?.full_name || member.profile?.email || t("unnamedMember")}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -153,14 +167,14 @@ export function ServiceEventOwnerSelect({
         </div>
 
         <div className="flex-1">
-          <label className="text-sm font-medium mb-1 block">角色</label>
+          <label className="text-sm font-medium mb-1 block">{t("role")}</label>
           <Select
             value={selectedRoleId}
             onValueChange={setSelectedRoleId}
             disabled={roles.length === 0}
           >
             <SelectTrigger>
-              <SelectValue placeholder="選擇角色" />
+              <SelectValue placeholder={t("selectRole")} />
             </SelectTrigger>
             <SelectContent>
               {roles.map((role) => (
@@ -173,7 +187,11 @@ export function ServiceEventOwnerSelect({
         </div>
 
         <Button
-          onClick={handleAddOwner}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleAddOwner();
+          }}
           type="button"
           variant="outline"
           size="icon"
@@ -186,7 +204,7 @@ export function ServiceEventOwnerSelect({
       {selectedOwners.length > 0 && (
         <>
           <Separator />
-          <div className="text-sm font-medium">已選擇的成員</div>
+          <div className="text-sm font-medium">{t("selectedMembers")}</div>
           <ScrollArea className="h-[150px] rounded-md border">
             <div className="p-2">
               {selectedOwners.map((owner) => (
@@ -200,7 +218,7 @@ export function ServiceEventOwnerSelect({
                     </div>
                     <div>
                       <div className="font-medium">
-                        {owner.profile?.full_name || owner.profile?.email || "未命名成員"}
+                        {owner.profile?.full_name || owner.profile?.email || t("unnamedMember")}
                       </div>
                       <div className="text-xs text-muted-foreground">{owner.role.name}</div>
                     </div>

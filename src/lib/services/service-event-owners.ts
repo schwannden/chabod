@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { ServiceEventOwner, ServiceEventOwnerWithDetails } from "./types";
+import { RoleAssignment } from "@/components/ServiceEvents/ServiceEventRoleAssignmentList";
 
 /**
  * Add a service event owner to an existing service event
@@ -155,4 +156,27 @@ export async function updateServiceEventOwners(
   if (owners && owners.length > 0) {
     await createServiceEventOwners(serviceEventId, owners);
   }
+}
+
+/**
+ * Replace service event owners using RoleAssignment structure
+ * Converts RoleAssignment[] to the format needed by updateServiceEventOwners
+ * This is a convenience function for use with ServiceEventRoleAssignmentList component
+ */
+export async function replaceServiceEventOwners(
+  eventId: string,
+  tenantId: string,
+  roleAssignments: RoleAssignment[],
+): Promise<void> {
+  // Flatten roleAssignments into owners array
+  const owners = roleAssignments.flatMap((assignment) =>
+    assignment.assignedMembers.map((member) => ({
+      user_id: member.userId,
+      service_role_id: assignment.roleId,
+      tenant_id: tenantId,
+    })),
+  );
+
+  // Use existing updateServiceEventOwners function
+  await updateServiceEventOwners(eventId, owners);
 }

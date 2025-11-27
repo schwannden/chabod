@@ -7,7 +7,7 @@ import { NavBar } from "@/components/Layout/NavBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tenant } from "@/lib/types";
 import { getTenantBySlug } from "@/lib/tenant-utils";
-import { Loader2, Users, Calendar, Group, FileText, Handshake } from "lucide-react";
+import { Loader2, Users, Calendar, Group, FileText, Handshake, Settings } from "lucide-react";
 
 export default function DashboardPage() {
   const { t } = useTranslation(["dashboard", "members", "common"]);
@@ -98,6 +98,12 @@ export default function DashboardPage() {
       icon: Calendar,
       description: t("serviceEventDesc"),
       link: `/tenant/${tenant?.slug}/service_events`,
+    },
+    {
+      title: t("serviceScheduleManagementTitle"),
+      icon: Settings,
+      description: t("serviceScheduleManagementDesc"),
+      link: `/tenant/${tenant?.slug}/service_schedule_management`,
     },
   ];
 
