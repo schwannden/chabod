@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.2.0](https://github.com/schwannden/chabod/compare/v1.1.0...v1.2.0) (2026-01-03)
+
+
+### Features
+
+* add manage service page ([#217](https://github.com/schwannden/chabod/issues/217)) ([3887f61](https://github.com/schwannden/chabod/commit/3887f613a90edbd4f93189547d3a7a1962a76791))
+* localize event calendars ([dfbfaae](https://github.com/schwannden/chabod/commit/dfbfaae83687f2a074233f6efa4164438cef1a5c))
+
+
+### Chores
+
+* update supabase ([#216](https://github.com/schwannden/chabod/issues/216)) ([7b8e65a](https://github.com/schwannden/chabod/commit/7b8e65ae0665b90367ca645ef64e51efe3196e40))
+
+
+### Documentation
+
+* adding deep wiki link ([67d6f93](https://github.com/schwannden/chabod/commit/67d6f931956c5e6647d2f0a651ce8a7a4eda4479))
+
 ## [1.1.0](https://github.com/schwannden/chabod/compare/v1.0.5...v1.1.0) (2025-08-22)
 
 
