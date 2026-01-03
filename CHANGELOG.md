@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.3](https://github.com/schwannden/chabod/compare/v1.2.2...v1.2.3) (2026-01-03)
+
+
+### Bug Fixes
+
+* auto join tenant ([9a45f7e](https://github.com/schwannden/chabod/commit/9a45f7e0cf2a39ae44509fbf93c7187de12d60a4))
+
 ## [1.2.2](https://github.com/schwannden/chabod/compare/v1.2.1...v1.2.2) (2026-01-03)
 
 
