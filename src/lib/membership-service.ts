@@ -32,11 +32,14 @@ export async function checkTenantMembership(userId: string, tenantSlug: string):
 
 /**
  * Associates a user with a tenant directly (no invitation tokens)
+ * @param userId - The user's UUID
+ * @param tenantIdOrSlug - Either the tenant UUID or slug
+ * @param _inviteToken - Unused, kept for backward compatibility
  */
 export async function associateUserWithTenant(
   userId: string,
-  tenantId: string,
-  role: string = "member",
+  tenantIdOrSlug: string,
+  _inviteToken?: string,
 ): Promise<void> {
   try {
     // Verify auth session before attempting to join
@@ -50,6 +53,23 @@ export async function associateUserWithTenant(
 
     if (session.user.id !== userId) {
       throw new Error("Session user ID mismatch");
+    }
+
+    // Determine if we have a UUID or slug
+    // UUIDs are 36 chars with hyphens in specific positions
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      tenantIdOrSlug,
+    );
+
+    let tenantId = tenantIdOrSlug;
+
+    if (!isUuid) {
+      // It's a slug, lookup the tenant
+      const tenant = await getTenantBySlug(tenantIdOrSlug);
+      if (!tenant) {
+        throw new Error(`Tenant not found: ${tenantIdOrSlug}`);
+      }
+      tenantId = tenant.id;
     }
 
     // Use the join_tenant_as_member function to bypass RLS issues

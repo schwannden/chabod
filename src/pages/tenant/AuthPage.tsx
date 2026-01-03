@@ -11,6 +11,7 @@ import { associateUserWithTenant } from "@/lib/membership-service";
 import { useTranslation } from "react-i18next";
 import { AuthFlowStep } from "@/hooks/useTenantAuthFlow";
 import { useToast } from "@/hooks/use-toast";
+import { useInvalidateTenants } from "@/hooks/useTenants";
 
 export default function AuthPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -26,6 +27,7 @@ export default function AuthPage() {
   const [hasAttemptedAssociation, setHasAttemptedAssociation] = useState(false);
   const { t } = useTranslation();
   const { toast } = useToast();
+  const invalidateTenants = useInvalidateTenants();
 
   // Get the flow step from URL query parameter
   const flowStep = searchParams.get("flow") as AuthFlowStep | null;
@@ -81,6 +83,7 @@ export default function AuthPage() {
       try {
         await associateUserWithTenant(user.id, tenant.id);
         setHasAttemptedAssociation(true);
+        invalidateTenants();
 
         toast({
           title: t("auth:joinedChurch"),
@@ -106,13 +109,32 @@ export default function AuthPage() {
     hasAttemptedAssociation,
     t,
     toast,
+    invalidateTenants,
   ]);
 
   useEffect(() => {
     const checkUserMembership = async () => {
       if (!isLoading && user && tenant && slug) {
         try {
-          const hasAccess = await checkUserTenantAccess(user.id, slug);
+          const isJoinFlow = flowStep === "signup" || flowStep === "join-signin";
+
+          // Prevent premature "no permission" during OAuth auto-join
+          if (!inviteToken && isJoinFlow) {
+            if (isAssociating) return;
+            // Wait for the auto-join attempt to complete before deciding access
+            if (!hasAttemptedAssociation) return;
+          }
+
+          // Optional reliability: retry a few times after join attempt to smooth out timing
+          let hasAccess = false;
+          const maxAttempts = !inviteToken && isJoinFlow && hasAttemptedAssociation ? 5 : 1;
+          for (let attempt = 0; attempt < maxAttempts; attempt++) {
+            hasAccess = await checkUserTenantAccess(user.id, slug);
+            if (hasAccess) break;
+            if (attempt < maxAttempts - 1) {
+              await new Promise((resolve) => setTimeout(resolve, 250));
+            }
+          }
 
           if (hasAccess) {
             // Redirect to original page if specified
@@ -121,7 +143,7 @@ export default function AuthPage() {
             } else {
               navigate(`/tenant/${slug}`);
             }
-          } else if (!inviteToken) {
+          } else if (!inviteToken && !(isJoinFlow && !hasAttemptedAssociation)) {
             // ADD: User-facing error message instead of console.log
             setError(t("auth:noPermissionToEnterChurch"));
             toast({
@@ -137,7 +159,20 @@ export default function AuthPage() {
     };
 
     checkUserMembership();
-  }, [user, isLoading, navigate, tenant, slug, inviteToken, redirectTo, t, toast]);
+  }, [
+    user,
+    isLoading,
+    navigate,
+    tenant,
+    slug,
+    inviteToken,
+    redirectTo,
+    t,
+    toast,
+    flowStep,
+    isAssociating,
+    hasAttemptedAssociation,
+  ]);
 
   const handleAuthSuccess = () => {
     // If redirect parameter exists and is a valid tenant path, use it
