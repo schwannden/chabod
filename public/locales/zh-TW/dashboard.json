@@ -31,5 +31,7 @@
   "serviceManagementTitle": "服事管理",
   "serviceManagementDesc": "創建管理服事類型",
   "serviceEventTitle": "服事表",
-  "serviceEventDesc": "各組服事表"
+  "serviceEventDesc": "各組服事表",
+  "serviceScheduleManagementTitle": "服事表管理",
+  "serviceScheduleManagementDesc": "批量編輯服事排班"
 }

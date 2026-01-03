@@ -31,5 +31,7 @@
   "serviceManagementTitle": "Service Management",
   "serviceManagementDesc": "Create and manage service types",
   "serviceEventTitle": "Service Schedule",
-  "serviceEventDesc": "Service schedules for all groups"
+  "serviceEventDesc": "Service schedules for all groups",
+  "serviceScheduleManagementTitle": "Service Schedule Management",
+  "serviceScheduleManagementDesc": "Bulk edit service schedules"
 }

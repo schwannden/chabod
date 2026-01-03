@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ServiceEventWithService } from "@/lib/services/types";
+import { ServiceEventWithService, ServiceRole } from "@/lib/services/types";
 import {
   Dialog,
   DialogContent,
@@ -11,8 +11,14 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { getServiceEventOwners } from "@/lib/services/service-event-owners";
 import { ServiceEventForm, ServiceEventFormValues } from "./ServiceEventForm";
-import { ServiceEventOwnerSelect } from "./ServiceEventOwnerSelect";
+import {
+  ServiceEventRoleAssignmentList,
+  RoleAssignment,
+  AssignedMember,
+} from "./ServiceEventRoleAssignmentList";
 import { useServiceEventForm } from "@/hooks/useServiceEventForm";
+import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
 
 interface ServiceEventEditDialogProps {
   event: ServiceEventWithService;
@@ -29,8 +35,10 @@ export function ServiceEventEditDialog({
   onEventUpdated,
   services,
 }: ServiceEventEditDialogProps) {
+  const { t } = useTranslation("services");
   const { toast } = useToast();
   const [isLoadingOwners, setIsLoadingOwners] = useState(true);
+  const [roleAssignments, setRoleAssignments] = useState<RoleAssignment[]>([]);
 
   const { isSubmitting, setSelectedServiceId, selectedOwners, setSelectedOwners, handleSubmit } =
     useServiceEventForm(
@@ -51,28 +59,48 @@ export function ServiceEventEditDialog({
     subtitle: event.subtitle || "",
   };
 
-  // Load existing owners when dialog opens
+  // Load existing owners and convert to RoleAssignment format
   useEffect(() => {
-    const fetchOwners = async () => {
+    const fetchOwnersAndRoles = async () => {
       if (isOpen) {
         setIsLoadingOwners(true);
         try {
+          // Fetch all roles for this service
+          const { data: rolesData, error: rolesError } = await supabase
+            .from("service_roles")
+            .select("*")
+            .eq("service_id", event.service_id)
+            .order("name");
+
+          if (rolesError) throw rolesError;
+
+          // Fetch existing owners for this event
           const ownersData = await getServiceEventOwners(event.id);
 
-          // Convert to the format expected by the component
-          const formattedOwners = ownersData.map((owner) => ({
-            userId: owner.user_id,
-            roleId: owner.service_role_id,
-            profile: owner.profile,
-            role: owner.role,
-          }));
+          // Create RoleAssignment structure: all roles with their assigned members
+          const assignments: RoleAssignment[] = (rolesData || []).map((role) => {
+            // Find all owners for this role
+            const roleOwners = ownersData.filter((owner) => owner.service_role_id === role.id);
 
-          setSelectedOwners(formattedOwners);
+            // Convert to AssignedMember format
+            const assignedMembers: AssignedMember[] = roleOwners.map((owner) => ({
+              userId: owner.user_id,
+              profile: owner.profile,
+            }));
+
+            return {
+              roleId: role.id,
+              role: role as ServiceRole,
+              assignedMembers,
+            };
+          });
+
+          setRoleAssignments(assignments);
         } catch (error) {
           console.error("Error loading event owners:", error);
           toast({
-            title: "錯誤",
-            description: "無法載入服事人員資料",
+            title: t("error"),
+            description: t("loadingError"),
             variant: "destructive",
           });
         } finally {
@@ -81,8 +109,21 @@ export function ServiceEventEditDialog({
       }
     };
 
-    fetchOwners();
-  }, [isOpen, event.id, toast, setSelectedOwners]);
+    fetchOwnersAndRoles();
+  }, [isOpen, event.id, event.service_id, toast, t]);
+
+  // Sync roleAssignments to selectedOwners format for the hook
+  useEffect(() => {
+    const owners = roleAssignments.flatMap((assignment) =>
+      assignment.assignedMembers.map((member) => ({
+        userId: member.userId,
+        roleId: assignment.roleId,
+        profile: member.profile,
+        role: assignment.role,
+      })),
+    );
+    setSelectedOwners(owners);
+  }, [roleAssignments, setSelectedOwners]);
 
   const onSubmit = (values: ServiceEventFormValues) => {
     // Call handleSubmit directly with the form values
@@ -102,7 +143,7 @@ export function ServiceEventEditDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>編輯服事排班</DialogTitle>
+          <DialogTitle>{t("editSchedule")}</DialogTitle>
         </DialogHeader>
 
         <ServiceEventForm
@@ -119,25 +160,25 @@ export function ServiceEventEditDialog({
           setSelectedOwners={setSelectedOwners}
         >
           <div className="space-y-4 mb-4">
-            <div className="text-sm font-medium mb-1">服事人員分配</div>
+            <div className="text-sm font-medium mb-1">{t("allServiceRoles")}</div>
             {isLoadingOwners ? (
-              <div className="text-sm text-center py-2">正在載入服事人員...</div>
+              <div className="text-sm text-center py-2">{t("loading")}</div>
             ) : (
-              <ServiceEventOwnerSelect
+              <ServiceEventRoleAssignmentList
                 serviceId={event.service_id}
                 tenantId={event.tenant_id}
-                selectedOwners={selectedOwners}
-                setSelectedOwners={setSelectedOwners}
+                roleAssignments={roleAssignments}
+                setRoleAssignments={setRoleAssignments}
               />
             )}
           </div>
 
           <DialogFooter className="mt-6">
             <Button type="button" variant="outline" onClick={onClose}>
-              取消
+              {t("cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "提交中..." : "保存"}
+              {isSubmitting ? t("common:submitting") : t("save")}
             </Button>
           </DialogFooter>
         </ServiceEventForm>

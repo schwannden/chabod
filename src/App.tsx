@@ -21,6 +21,7 @@ import EventPage from "./pages/tenant/EventPage";
 import ResourcePage from "./pages/tenant/ResourcePage";
 import ServicePage from "./pages/tenant/ServicePage";
 import ServiceEventPage from "./pages/tenant/ServiceEventPage";
+import ServiceScheduleManagementPage from "./pages/tenant/ServiceScheduleManagementPage";
 import { useAnnouncement } from "@/hooks/useAnnouncement";
 import { AnnouncementDialog } from "@/components/shared/AnnouncementDialog";
 
@@ -69,6 +70,10 @@ function AppRoutes() {
         <Route path="/tenant/:slug/resources" element={<ResourcePage />} />
         <Route path="/tenant/:slug/services" element={<ServicePage />} />
         <Route path="/tenant/:slug/service_events" element={<ServiceEventPage />} />
+        <Route
+          path="/tenant/:slug/service_schedule_management"
+          element={<ServiceScheduleManagementPage />}
+        />
 
         {/* Catch-all route */}
         <Route path="*" element={<NotFound />} />

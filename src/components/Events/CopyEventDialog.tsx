@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
@@ -25,21 +25,16 @@ export function CopyEventDialog({
   open,
   onOpenChange,
 }: CopyEventDialogProps) {
-  // Extract group IDs from the event
-  const initialGroupIds = useMemo(() => {
-    return event?.groups?.map((group) => group.id) || [];
-  }, [event?.groups]);
-
   const { form, isLoading, onSubmit } = useEventForm(
     tenantId,
     () => {
       onOpenChange(false);
       onEventCreated();
     },
-    initialGroupIds,
+    [], // Empty array - clear groups by default
   );
 
-  // Set form values when the dialog opens
+  // Set form values when the dialog opens - only keep date and time
   useEffect(() => {
     if (open && event && form) {
       // Format date properly
@@ -49,20 +44,20 @@ export function CopyEventDialog({
           : new Date(event.date)
         : new Date();
 
-      // Populate form with values from the provided event
+      // Only populate date and time fields, clear everything else
       form.reset({
-        name: event.name,
-        description: event.description || "",
+        name: "",
+        description: "",
         date: dateValue,
         isFullDay: !event.start_time && !event.end_time,
         start_time: event.start_time || "",
         end_time: event.end_time || "",
-        event_link: event.event_link || "",
-        visibility: event.visibility,
-        groups: initialGroupIds,
+        event_link: "",
+        visibility: "public",
+        groups: [],
       });
     }
-  }, [open, event, form, initialGroupIds]);
+  }, [open, event, form]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
