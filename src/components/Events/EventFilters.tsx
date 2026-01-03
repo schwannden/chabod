@@ -12,6 +12,8 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
+import { getDateLocale } from "@/lib/dateUtils";
 
 interface EventFiltersProps {
   groups: Group[];
@@ -32,18 +34,19 @@ export function EventFilters({
   endDate,
   setEndDate,
 }: EventFiltersProps) {
+  const { t } = useTranslation();
   const safeGroups = Array.isArray(groups) ? groups : [];
 
   return (
     <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
       <div className="flex flex-col space-y-2">
-        <label className="text-sm font-medium">Group</label>
+        <label className="text-sm font-medium">{t("events:filterGroup")}</label>
         <Select value={selectedGroup} onValueChange={setSelectedGroup}>
           <SelectTrigger className="w-full sm:w-[200px]">
-            <SelectValue placeholder="Select Group" />
+            <SelectValue placeholder={t("events:selectGroup")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Groups</SelectItem>
+            <SelectItem value="all">{t("events:allGroups")}</SelectItem>
             {safeGroups.map((group) => (
               <SelectItem key={group.id} value={group.id}>
                 {group.name}
@@ -55,12 +58,14 @@ export function EventFilters({
 
       <div className="flex gap-2">
         <div className="flex flex-col space-y-2">
-          <label className="text-sm font-medium">From</label>
+          <label className="text-sm font-medium">{t("events:filterFrom")}</label>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="w-full sm:w-auto">
                 <Calendar className="mr-2 h-4 w-4" />
-                {startDate ? format(startDate, "PPP") : "Start Date"}
+                {startDate
+                  ? format(startDate, "PPP", { locale: getDateLocale() })
+                  : t("events:startDate")}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -76,12 +81,14 @@ export function EventFilters({
         </div>
 
         <div className="flex flex-col space-y-2">
-          <label className="text-sm font-medium">To</label>
+          <label className="text-sm font-medium">{t("events:filterTo")}</label>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="w-full sm:w-auto">
                 <Calendar className="mr-2 h-4 w-4" />
-                {endDate ? format(endDate, "PPP") : "End Date"}
+                {endDate
+                  ? format(endDate, "PPP", { locale: getDateLocale() })
+                  : t("events:endDate")}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">

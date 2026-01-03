@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Skeleton } from "@/components/ui/skeleton";
 import { useResponsiveMonths } from "@/hooks/useResponsiveMonths";
 import { useTranslation } from "react-i18next";
+import { getDateLocale } from "@/lib/dateUtils";
 
 // Base event interface with minimal required properties
 export interface BaseEvent {
@@ -193,7 +194,9 @@ export function GenericCalendar({
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{selectedDate && format(new Date(selectedDate), "PPP")}</DialogTitle>
+            <DialogTitle>
+              {selectedDate && format(new Date(selectedDate), "PPP", { locale: getDateLocale() })}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-3 mt-4">
             {selectedEvents.map((event) => (

@@ -1,6 +1,7 @@
 import React from "react";
 import { format } from "date-fns";
 import { EventWithGroups, Group } from "@/lib/types";
+import { getDateLocale } from "@/lib/dateUtils";
 import {
   Card,
   CardContent,
@@ -33,7 +34,7 @@ export function EventCard({
   allGroups,
 }: EventCardProps) {
   const { t } = useTranslation();
-  const formattedDate = format(new Date(event.date), "MMMM d, yyyy");
+  const formattedDate = format(new Date(event.date), "PPP", { locale: getDateLocale() });
   const hasTime = event.start_time || event.end_time;
 
   let timeDisplay = "";

@@ -114,7 +114,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "jest-environment-node": "^29.7.0",
     "lint-staged": "^16.1.4",
-    "lovable-tagger": "^1.1.9",
+    "lovable-tagger": "^1.1.13",
     "msw": "^2.10.4",
     "pg": "^8.16.3",
     "prettier": "^3.6.2",

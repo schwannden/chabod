@@ -1,4 +1,6 @@
 import { format, parseISO } from "date-fns";
+import { zhTW, enUS } from "date-fns/locale";
+import i18n from "./i18n";
 
 // Helper to format Date to 'yyyy-MM-dd' for input value
 export const formatDateForInput = (date: Date | undefined): string => {
@@ -21,4 +23,9 @@ export const parseDateFromInput = (value: string): Date | undefined => {
     console.error("Error parsing date from input:", error);
     return undefined;
   }
+};
+
+// Helper to get date-fns locale based on current i18n language
+export const getDateLocale = () => {
+  return i18n.language === "zh-TW" ? zhTW : enUS;
 };
