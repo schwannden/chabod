@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.1](https://github.com/schwannden/chabod/compare/v1.2.0...v1.2.1) (2026-01-03)
+
+
+### Bug Fixes
+
+* login url on tenant domain ([bcdbc89](https://github.com/schwannden/chabod/commit/bcdbc89a6eec186cbdd877e862d1ea6f2e2c9a50))
+
+
+### Build Related
+
+* **deps-dev:** bump vite from 5.4.19 to 7.1.12 ([#214](https://github.com/schwannden/chabod/issues/214)) ([3a53350](https://github.com/schwannden/chabod/commit/3a533506c97a719cedbcff825ff26298cce3537c))
+
 ## [1.2.0](https://github.com/schwannden/chabod/compare/v1.1.0...v1.2.0) (2026-01-03)
 
 
