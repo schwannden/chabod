@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.4](https://github.com/schwannden/chabod/compare/v1.2.3...v1.2.4) (2026-01-03)
+
+
+### Bug Fixes
+
+* auto join redirect issue ([689fb6f](https://github.com/schwannden/chabod/commit/689fb6f76d221fc382e53831d882825d3622d974))
+
 ## [1.2.3](https://github.com/schwannden/chabod/compare/v1.2.2...v1.2.3) (2026-01-03)
 
 
