@@ -48,6 +48,7 @@
   "startsAt": "Starts at",
   "endsAt": "Ends at",
   "eventLinkText": "Event Link",
+  "addToGoogleCalendar": "Add to Google Calendar",
   "private": "Private",
   "fullDay": "Full Day"
 }

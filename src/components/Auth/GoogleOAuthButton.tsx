@@ -21,17 +21,24 @@ export function GoogleOAuthButton({ onSuccess: _onSuccess, onError }: GoogleOAut
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      // Get current redirect parameter if exists
+      // Get current flow and redirect parameters
       const searchParams = new URLSearchParams(window.location.search);
+      const flowParam = searchParams.get("flow");
       const redirectParam = searchParams.get("redirect");
 
       // Build auth redirect URL
       const authPath = slug ? `/tenant/${slug}/auth` : "/auth";
       let redirectTo = window.location.origin + authPath;
 
-      // Append redirect parameter if it exists
+      // Preserve both flow and redirect parameters
+      const queryParams = new URLSearchParams();
+      if (flowParam) queryParams.set("flow", flowParam);
       if (redirectParam && slug && redirectParam.startsWith(`/tenant/${slug}`)) {
-        redirectTo += `?redirect=${encodeURIComponent(redirectParam)}`;
+        queryParams.set("redirect", redirectParam);
+      }
+
+      if (queryParams.toString()) {
+        redirectTo += `?${queryParams.toString()}`;
       }
 
       const { data: _data, error } = await supabase.auth.signInWithOAuth({
