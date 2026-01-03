@@ -18,6 +18,7 @@ interface EventActionsProps {
   onDeleteEvent: (eventId: string) => Promise<void>;
   onCopyEvent?: (event: EventWithGroups) => void;
   allGroups: Group[];
+  className?: string;
 }
 
 export function EventActions({
@@ -26,6 +27,7 @@ export function EventActions({
   onDeleteEvent,
   onCopyEvent,
   allGroups,
+  className,
 }: EventActionsProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const [isDeleting, setIsDeleting] = React.useState(false);
@@ -74,7 +76,7 @@ export function EventActions({
   };
 
   return (
-    <div className="absolute top-4 right-4">
+    <div className={className}>
       <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="h-8 w-8">

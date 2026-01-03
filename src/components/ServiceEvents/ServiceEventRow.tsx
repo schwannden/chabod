@@ -11,6 +11,9 @@ import { ServiceEventCopyDialog } from "./ServiceEventCopyDialog";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useTranslation } from "react-i18next";
+import { AddToGoogleCalendarLink } from "@/components/shared/AddToGoogleCalendarLink";
+import { combineDateAndTimeLocal, parseISODateLocal } from "@/lib/googleCalendar";
 
 interface ServiceEventRowProps {
   event: ServiceEventWithService;
@@ -34,6 +37,7 @@ export function ServiceEventRow({
   const [owners, setOwners] = useState<ServiceEventOwnerWithDetails[]>([]);
   const [isLoadingOwners, setIsLoadingOwners] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation("services");
 
   useEffect(() => {
     const fetchOwners = async () => {
@@ -44,8 +48,8 @@ export function ServiceEventRow({
       } catch (error) {
         console.error("Error fetching service event owners:", error);
         toast({
-          title: "錯誤",
-          description: "無法載入服事人員資料",
+          title: t("error"),
+          description: t("loadServicePersonnelError"),
           variant: "destructive",
         });
       } finally {
@@ -54,7 +58,7 @@ export function ServiceEventRow({
     };
 
     fetchOwners();
-  }, [event.id, toast]);
+  }, [event.id, toast, t]);
 
   const handleDelete = async () => {
     try {
@@ -77,35 +81,59 @@ export function ServiceEventRow({
         <TableCell>
           {event.start_time} - {event.end_time}
         </TableCell>
-        <TableCell>{event.service.name}</TableCell>
-        <TableCell>{event.subtitle || "—"}</TableCell>
+        <TableCell>
+          <div className="flex items-center justify-between gap-2">
+            <span className="min-w-0 truncate">{event.service.name}</span>
+            {(() => {
+              const start =
+                combineDateAndTimeLocal(event.date, event.start_time) ??
+                parseISODateLocal(event.date) ??
+                new Date();
+              const end =
+                combineDateAndTimeLocal(event.date, event.end_time) ??
+                new Date(start.getTime() + 60 * 60 * 1000);
+              const title = `${event.service.name}${event.subtitle ? ` - ${event.subtitle}` : ""}`;
+
+              return (
+                <AddToGoogleCalendarLink
+                  title={title}
+                  start={start}
+                  end={end}
+                  className="shrink-0 px-0"
+                  label={t("addToGoogleCalendar")}
+                />
+              );
+            })()}
+          </div>
+        </TableCell>
+        <TableCell>{event.subtitle || t("emptyValue")}</TableCell>
         <TableCell>
           <div className="flex flex-wrap gap-1">
             {isLoadingOwners ? (
-              <span className="text-xs text-muted-foreground">載入中...</span>
+              <span className="text-xs text-muted-foreground">{t("loading")}</span>
             ) : owners.length === 0 ? (
-              <span className="text-xs text-muted-foreground">未指派</span>
+              <span className="text-xs text-muted-foreground">{t("noAssignees")}</span>
             ) : (
               owners.map((owner) => (
                 <TooltipProvider key={owner.id}>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Badge variant="outline" className="cursor-default">
-                        {owner.profile?.full_name || owner.profile?.email || "未知用戶"}
+                        {owner.profile?.full_name || owner.profile?.email || t("unknownUser")}
                         <span className="ml-1 text-muted-foreground">
-                          ({owner.role?.name || ""})
+                          ({owner.role?.name || t("unknownRole")})
                         </span>
                       </Badge>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>
-                        <strong>角色:</strong> {owner.role?.name || "未知角色"}
+                        <strong>{t("role")}:</strong> {owner.role?.name || t("unknownRole")}
                       </p>
                       <p>
-                        <strong>姓名:</strong> {owner.profile?.full_name || "未提供"}
+                        <strong>{t("name")}:</strong> {owner.profile?.full_name || t("notProvided")}
                       </p>
                       <p>
-                        <strong>電子郵件:</strong> {owner.profile?.email || "未提供"}
+                        <strong>{t("email")}:</strong> {owner.profile?.email || t("notProvided")}
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -115,19 +143,21 @@ export function ServiceEventRow({
           </div>
         </TableCell>
         <TableCell>
-          {isEditable && (
-            <div className="flex space-x-2">
-              <Button variant="ghost" size="icon" onClick={() => setIsEditDialogOpen(true)}>
-                <Edit className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" onClick={() => setIsCopyDialogOpen(true)}>
-                <Copy className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" onClick={() => setIsDeleteDialogOpen(true)}>
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
-            </div>
-          )}
+          <div className="flex items-center space-x-2">
+            {isEditable && (
+              <>
+                <Button variant="ghost" size="icon" onClick={() => setIsEditDialogOpen(true)}>
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => setIsCopyDialogOpen(true)}>
+                  <Copy className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => setIsDeleteDialogOpen(true)}>
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </>
+            )}
+          </div>
         </TableCell>
       </TableRow>
 
@@ -154,8 +184,11 @@ export function ServiceEventRow({
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDelete}
-        title="確認刪除服事排班"
-        description={`您確定要刪除 ${format(new Date(event.date), "yyyy-MM-dd")} 的 ${event.service.name} 服事排班嗎？此操作無法撤銷。`}
+        title={t("confirmDeleteScheduleTitle")}
+        description={t("confirmDeleteScheduleDescription", {
+          date: format(new Date(event.date), "yyyy-MM-dd"),
+          serviceName: event.service.name,
+        })}
         isLoading={isDeleting}
       />
     </>

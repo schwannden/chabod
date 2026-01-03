@@ -9,6 +9,26 @@ import { TextEncoder, TextDecoder } from "util";
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 
+// Polyfill fetch (used by i18n initialization in some imports)
+if (!global.fetch) {
+  global.fetch = jest.fn().mockRejectedValue(new Error("fetch is not available in tests"));
+}
+
+// Polyfill matchMedia (used by responsive hooks)
+if (!window.matchMedia) {
+  window.matchMedia = (query: string) =>
+    ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      addListener: jest.fn(), // deprecated
+      removeListener: jest.fn(), // deprecated
+      dispatchEvent: jest.fn(),
+    }) as unknown as MediaQueryList;
+}
+
 // Configure React 18 test environment
 global.IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -169,6 +189,8 @@ jest.mock("lucide-react", () => ({
   Pencil: () => React.createElement("svg", { "data-testid": "pencil-icon" }),
   Users: () => React.createElement("svg", { "data-testid": "users-icon" }),
   Calendar: () => React.createElement("svg", { "data-testid": "calendar-icon" }),
+  Clock: () => React.createElement("svg", { "data-testid": "clock-icon" }),
+  CalendarPlus: () => React.createElement("svg", { "data-testid": "calendar-plus-icon" }),
   Home: () => React.createElement("svg", { "data-testid": "home-icon" }),
   LogOut: () => React.createElement("svg", { "data-testid": "logout-icon" }),
   Copy: () => React.createElement("svg", { "data-testid": "copy-icon" }),

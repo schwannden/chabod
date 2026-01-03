@@ -48,6 +48,7 @@
   "startsAt": "開始於",
   "endsAt": "結束於",
   "eventLinkText": "活動連結",
+  "addToGoogleCalendar": "加入 Google 日曆",
   "private": "私人",
   "fullDay": "全天"
 }

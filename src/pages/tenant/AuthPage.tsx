@@ -7,6 +7,7 @@ import { getTenantBySlug } from "@/lib/tenant-utils";
 import { Tenant } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { checkUserTenantAccess } from "@/lib/member-service";
+import { associateUserWithTenant } from "@/lib/membership-service";
 import { useTranslation } from "react-i18next";
 import { AuthFlowStep } from "@/hooks/useTenantAuthFlow";
 import { useToast } from "@/hooks/use-toast";
@@ -21,6 +22,8 @@ export default function AuthPage() {
   const [isTenantLoading, setIsTenantLoading] = useState(true);
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isAssociating, setIsAssociating] = useState(false);
+  const [hasAttemptedAssociation, setHasAttemptedAssociation] = useState(false);
   const { t } = useTranslation();
   const { toast } = useToast();
 
@@ -59,6 +62,51 @@ export default function AuthPage() {
 
     fetchTenant();
   }, [slug, t]);
+
+  // Auto-associate OAuth users with tenant when they complete signup/join flow
+  useEffect(() => {
+    const autoAssociateOAuthUser = async () => {
+      // Guard conditions
+      if (!user || !tenant || !flowStep || isLoading || isTenantLoading) return;
+      if (flowStep !== "signup" && flowStep !== "join-signin") return;
+      if (inviteToken) return; // Invite flow handles its own association
+      if (hasAttemptedAssociation) return; // Prevent double-association
+
+      // Check if user already has access
+      const hasAccess = await checkUserTenantAccess(user.id, slug!);
+      if (hasAccess) return; // Already a member
+
+      // Associate user with tenant
+      setIsAssociating(true);
+      try {
+        await associateUserWithTenant(user.id, tenant.id);
+        setHasAttemptedAssociation(true);
+
+        toast({
+          title: t("auth:joinedChurch"),
+          description: t("auth:joinedChurchDesc", { tenantName: tenant.name }),
+        });
+      } catch (error) {
+        console.error("Auto-association error:", error);
+        setError(error instanceof Error ? error.message : t("auth:cannotJoinChurch"));
+      } finally {
+        setIsAssociating(false);
+      }
+    };
+
+    autoAssociateOAuthUser();
+  }, [
+    user,
+    tenant,
+    flowStep,
+    isLoading,
+    isTenantLoading,
+    slug,
+    inviteToken,
+    hasAttemptedAssociation,
+    t,
+    toast,
+  ]);
 
   useEffect(() => {
     const checkUserMembership = async () => {
@@ -121,17 +169,13 @@ export default function AuthPage() {
     navigate(newUrl, { replace: true });
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">{t("common:loading")}</div>
-    );
-  }
-
-  if (isTenantLoading) {
+  if (isLoading || isTenantLoading || isAssociating) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">{t("common:loading")}</span>
+        <span className="ml-2">
+          {isAssociating ? t("auth:joiningChurch") : t("common:loading")}
+        </span>
       </div>
     );
   }
