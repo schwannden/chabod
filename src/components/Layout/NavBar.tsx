@@ -65,6 +65,32 @@ export function NavBar() {
     return "/profile";
   };
 
+  // Dynamic auth destination logic
+  const getAuthDestination = (isSignup: boolean = false) => {
+    const currentPath = location.pathname;
+
+    // If on tenant paths, go to tenant auth
+    const tenantMatch = currentPath.match(/^\/tenant\/([^/]+)/);
+    if (tenantMatch) {
+      const slug = tenantMatch[1];
+      // Build redirect URL to return user to original page
+      const redirectParam =
+        currentPath !== `/tenant/${slug}` && currentPath !== `/tenant/${slug}/auth`
+          ? `?redirect=${encodeURIComponent(currentPath)}`
+          : "";
+      const tabParam = isSignup ? `${redirectParam ? "&" : "?"}tab=signup` : "";
+      return `/tenant/${slug}/auth${redirectParam}${tabParam}`;
+    }
+
+    // For all other paths, go to global auth
+    const redirectParam =
+      currentPath !== "/" && !currentPath.startsWith("/auth") && currentPath !== "/dashboard"
+        ? `?redirect=${encodeURIComponent(currentPath)}`
+        : "";
+    const tabParam = isSignup ? `${redirectParam ? "&" : "?"}tab=signup` : "";
+    return `/auth${redirectParam}${tabParam}`;
+  };
+
   // Check if we're on an auth page (main auth or tenant auth)
   const isOnAuthPage = () => {
     const currentPath = location.pathname;
@@ -113,14 +139,10 @@ export function NavBar() {
               !isOnAuthPage() && (
                 <div className="flex items-center space-x-2">
                   <Button asChild variant="ghost" size="sm">
-                    <Link
-                      to={`/auth${location.pathname !== "/" && !location.pathname.startsWith("/auth") ? `?redirect=${encodeURIComponent(location.pathname)}` : ""}`}
-                    >
-                      {t("login")}
-                    </Link>
+                    <Link to={getAuthDestination(false)}>{t("login")}</Link>
                   </Button>
                   <Button asChild size="sm">
-                    <Link to="/auth?tab=signup">{t("signup")}</Link>
+                    <Link to={getAuthDestination(true)}>{t("signup")}</Link>
                   </Button>
                 </div>
               )

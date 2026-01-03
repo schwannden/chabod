@@ -21,9 +21,19 @@ export function GoogleOAuthButton({ onSuccess: _onSuccess, onError }: GoogleOAut
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      // Include invite token in redirect URL for tenant flows
+      // Get current redirect parameter if exists
+      const searchParams = new URLSearchParams(window.location.search);
+      const redirectParam = searchParams.get("redirect");
+
+      // Build auth redirect URL
       const authPath = slug ? `/tenant/${slug}/auth` : "/auth";
-      const redirectTo = window.location.origin + authPath;
+      let redirectTo = window.location.origin + authPath;
+
+      // Append redirect parameter if it exists
+      if (redirectParam && slug && redirectParam.startsWith(`/tenant/${slug}`)) {
+        redirectTo += `?redirect=${encodeURIComponent(redirectParam)}`;
+      }
+
       const { data: _data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {

@@ -27,6 +27,7 @@ export default function AuthPage() {
   // Get the flow step from URL query parameter
   const flowStep = searchParams.get("flow") as AuthFlowStep | null;
   const prefilledEmail = searchParams.get("email");
+  const redirectTo = searchParams.get("redirect");
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -66,7 +67,12 @@ export default function AuthPage() {
           const hasAccess = await checkUserTenantAccess(user.id, slug);
 
           if (hasAccess) {
-            navigate(`/tenant/${slug}`);
+            // Redirect to original page if specified
+            if (redirectTo && redirectTo.startsWith(`/tenant/${slug}`)) {
+              navigate(redirectTo);
+            } else {
+              navigate(`/tenant/${slug}`);
+            }
           } else if (!inviteToken) {
             // ADD: User-facing error message instead of console.log
             setError(t("auth:noPermissionToEnterChurch"));
@@ -83,10 +89,16 @@ export default function AuthPage() {
     };
 
     checkUserMembership();
-  }, [user, isLoading, navigate, tenant, slug, inviteToken, t, toast]);
+  }, [user, isLoading, navigate, tenant, slug, inviteToken, redirectTo, t, toast]);
 
   const handleAuthSuccess = () => {
-    navigate(`/tenant/${slug}`);
+    // If redirect parameter exists and is a valid tenant path, use it
+    if (redirectTo && redirectTo.startsWith(`/tenant/${slug}`)) {
+      navigate(redirectTo);
+    } else {
+      // Default to tenant dashboard
+      navigate(`/tenant/${slug}`);
+    }
   };
 
   const handleFlowChange = (step: AuthFlowStep, email?: string) => {

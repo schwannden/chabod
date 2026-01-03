@@ -60,10 +60,21 @@ export default function AuthCallbackPage() {
           // Handle tenant invitation flow
           navigate(`/tenant/auth?invite=${inviteToken}`, { replace: true });
         } else {
-          // Redirect to dashboard or original destination
-          const redirectPath = sessionStorage.getItem("redirectPath") || "/dashboard";
-          sessionStorage.removeItem("redirectPath");
-          navigate(redirectPath, { replace: true });
+          // Check for redirect parameter from URL (preserved from OAuth initiator)
+          const redirectParam = searchParams.get("redirect");
+
+          // Use redirect if it's a valid path
+          if (
+            redirectParam &&
+            (redirectParam.startsWith("/tenant/") || redirectParam.startsWith("/"))
+          ) {
+            navigate(redirectParam, { replace: true });
+          } else {
+            // Fallback to sessionStorage or dashboard
+            const redirectPath = sessionStorage.getItem("redirectPath") || "/dashboard";
+            sessionStorage.removeItem("redirectPath");
+            navigate(redirectPath, { replace: true });
+          }
         }
       } catch (error) {
         console.error("OAuth callback error:", error);

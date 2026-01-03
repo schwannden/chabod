@@ -11,16 +11,27 @@ export default function AuthPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialTab = searchParams.get("tab") === "signup" ? "signup" : "signin";
+  const redirectTo = searchParams.get("redirect");
 
   useEffect(() => {
     if (!isLoading && user) {
-      // User is already logged in, redirect to dashboard
-      navigate("/dashboard");
+      // If redirect parameter exists and is NOT a tenant path, use it
+      if (redirectTo && !redirectTo.startsWith("/tenant/")) {
+        navigate(redirectTo);
+      } else {
+        // Default to dashboard
+        navigate("/dashboard");
+      }
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, navigate, redirectTo]);
 
   const handleAuthSuccess = () => {
-    navigate("/dashboard");
+    // If redirect parameter exists and is NOT a tenant path, use it
+    if (redirectTo && !redirectTo.startsWith("/tenant/")) {
+      navigate(redirectTo);
+    } else {
+      navigate("/dashboard");
+    }
   };
 
   if (isLoading) {
